@@ -3,10 +3,10 @@
 # Clancy Rowley
 # Princeton University
 #
-# $Date: $
-# $Revision: $
-# $Author: $
-# $HeadURL: $
+# $Date$
+# $Revision$
+# $Author$
+# $HeadURL$
 
 all: doc ibpm_design.pdf
 

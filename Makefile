@@ -3,10 +3,10 @@
 # Clancy Rowley
 # Princeton University
 #
-# $Date: $
-# $Revision: $
-# $Author: $
-# $HeadURL: $
+# $Date$
+# $Revision$
+# $Author$
+# $HeadURL$
 
 all: lib test ibpm
 
