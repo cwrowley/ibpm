@@ -69,7 +69,7 @@ This document is {\em not} intended to be a ``living'' document that evolves as 
 \section{History and design approach}
 
 \subsection{Previously used code and its limitations}
-Prior to the development of the code described in this document, we have been using an implementation of the Immersed Boundary Projection Method (IBPM) written by Colonius and Taira, written in Fortran 90.  However, because of the complexity and the tight coupling of the Fortran implementation, this code has become difficult to maintain.  For instance, we wished to change the timestepper, from a second-order Adams-Bashforth/Crank-Nicolson scheme (a two-step scheme) to a Runge-Kutta/Crank-Nicolson scheme, both for improved timestep restrictions, and to sidestep certain issues with a multi-step scheme, when used for adjoint simulations, eigenvalue solvers, and the like.  However, the Fortran~90 code is tightly coupled, making extensive use of global or global-like data (publicly accessible module data), and even making such an apparently simple modification would require major surgery (in particular, to the long routine {\tt operators.f90::advance}, as well as {\tt myfft.f90::setup\_fft}).  Such modifications throughout the code would be error prone, and it would be difficult to switch between integrators, should one wish to go back to Adams-Bashforth, or try other timesteppers.  
+Prior to the development of the code described in this document, we have been using an implementation of the Immersed Boundary Projection Method (IBPM) written by Colonius and Taira, using Fortran 90.  However, because of the complexity and the tight coupling of the Fortran implementation, this code has become difficult to maintain.  For instance, we wished to change the timestepper, from a second-order Adams-Bashforth/Crank-Nicolson scheme (a two-step scheme) to a Runge-Kutta/Crank-Nicolson scheme, both for improved timestep restrictions, and to sidestep certain issues with a multi-step scheme, when used for adjoint simulations, eigenvalue solvers, and the like.  However, the Fortran~90 code is tightly coupled, making extensive use of global or global-like data (publicly accessible module data), and even making such an apparently simple modification would require major surgery (in particular, to the long routine {\tt operators.f90::advance}, as well as {\tt myfft.f90::setup\_fft}).  Such modifications throughout the code would be error prone, and it would be difficult to switch between integrators, should one wish to go back to Adams-Bashforth, or try other timesteppers.  
 
 Furthermore, the Fortran code has already become rather unwieldy, with flags for different modes of operation, such as solving the linearized or adjoint equations.  This implementation using flags has proven error-prone as well, since the switching logic is distributed throughout the code, and future modifications require a thorough knowledge of many parts of the code.
 
@@ -85,8 +85,6 @@ In order to overcome the difficulties described above, an object-oriented design
 
 A key point is to separate {\em interface} from {\em implementation}, so that code that provides a service (i.e., provides a particular implementation) is cleanly separated (via the interface) from code that uses this service.  In this way, the implementation of various portions of the code can evolve without affecting the rest of the code, as long as the interface remains consistent.
 
-This document discusses the high-level design, focusing on the interfaces, but with some ideas about possible implementation, where appropriate.
-
 \subsection{What the code does}
 For details of the numerical method this code solves, see~\cite{ColTai-07}.  Here, we give only a brief overview.
 
@@ -95,7 +93,7 @@ The Navier Stokes equations are solved in two dimensions, using a streamfunction
 
 Let $q$ denote the (vector-valued) velocity flux, $\psi$ the streamfunction, and $\gamma$ the circulation about a cell.  The no-slip boundary condition at the surface of an object are imposed by delta-function forces at the boundary locations, and $f$ is a vector of these force values.  The equations to be solved are given as (22) in~\cite{ColTai-07}:
 \begin{align}
-	\frac{d\gamma}{dt} + C^TE^T\tilde f &= -\beta C^TC\gamma + C^T\cal{N}(q) + bc_\gamma
+	\frac{d\gamma}{dt} + C^TE^T\tilde f &= -\beta C^TC\gamma + C^T\mathcal{N}(q) + bc_\gamma
 	\label{eq:navier_stokes}\\
 EC(S\Lambda^{-1}S)\gamma + bc_s &= u_B.
 \label{eq:no_slip}
@@ -109,28 +107,28 @@ $S$ 	& $\gamma\mapsto\hat\gamma$ & discrete sin transform\\
 $-C^TC$	& $\gamma\mapsto\gamma$ & Laplacian, analogous to $\triangle u = \nabla(\nabla\cdot u) - \nabla\times\nabla\times u$\\
 $\Lambda$	& $\hat\gamma\mapsto\hat\gamma$ & eigenvalues of Laplacian\\
 $E$ 	& $q\mapsto u_B$ & restriction of fluxes everywhere to velocities at boundary\\
-$E^T$	& $u_B\mapsto q$ & regularization of velocities at boundary points to fluxes everywhere
+$E^T$	& $f\mapsto q$ & regularization of forces at boundary points to fluxes everywhere
 \end{tabular}
 \end{center}
 where $u_B$ is a vector of velocities at boundary points.  The discrete Laplacian $C^TC$ is diagonalized by the discrete sin transform~$S$, and its eigenvalues are known analytically.  Since $\triangle\psi =\gamma$, we have
 \begin{equation}
-	\psi = S\Lambda^{-1}S + bc.
+	\psi = S\Lambda^{-1}S\gamma + bc.
 \end{equation}
 To retrieve the fluxes $q$ from the streamfunction~$\psi$, we need to add in a (prescribed) potential flow solution~$q_\text{pot}$ as well as a boundary term $bc_q$, so we have
 \begin{equation}
-	q = Cs + q_\text{pot} + bc_q.
+	q = C\psi + q_\text{pot} + bc_q.
 \end{equation}
 
 \paragraph{Time discretization}
-Equation~(\ref{eq:navier_stokes}--\ref{eq:no_slip}) are stepped forward in time using a projection method, as follows.  For instance, discretizing the linear terms of (\ref{eq:navier_stokes}) using Crank-Nicolson (trapezoidal rule), and the nonlinear terms using forward Euler, one obtains
+Equation~(\ref{eq:navier_stokes}--\ref{eq:no_slip}) are stepped forward in time using a projection method, as follows.  For instance, discretizing the linear terms of (\ref{eq:navier_stokes}) using Crank-Nicolson (trapezoidal rule), and the nonlinear terms using explicit Euler, one obtains
 \begin{align}
-	\left(1+\frac{\beta\Delta t}{2}C^TC\right)\gamma^{n+1} + \Delta t C^TE^Tf &= \left(1 - \frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \Delta t C^T \cal{N}(q^n) + bc_\gamma \label{eq:timestepper}\\
+	\left(1+\frac{\beta\Delta t}{2}C^TC\right)\gamma^{n+1} + \Delta t C^TE^Tf &= \left(1 - \frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \Delta t C^T \mathcal{N}(q^n) + bc_\gamma \label{eq:timestepper}\\
 	EC(S\Lambda^{-1}S)\gamma^{n+1} &= u_B - bc_s.
 \end{align}
 These equations are of the form
 \begin{equation}
 	\begin{bmatrix}
-		\cal{A} & \cal{C}\\\cal{B} & 0
+		\mathcal{A} & \mathcal{C}\\\mathcal{B} & 0
 	\end{bmatrix}
 	\begin{bmatrix}
 		\gamma^{n+1}\\ f
@@ -143,10 +141,10 @@ These equations are of the form
 \end{equation}
 where
 \begin{align}
-	\cal{A} &= 1 + \frac{\beta\Delta t}{2}C^TC\\
-	\cal{B} &= \Delta t C^TE^T\\
-	\cal{C} &= ECS\Lambda^{-1}S\\
-	a &= \left(1-\frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \Delta t C^T\cal{N}(q^n) + bc_\gamma\\
+	\mathcal{A} &= 1 + \frac{\beta\Delta t}{2}C^TC\\
+	\mathcal{B} &= \Delta t C^TE^T\\
+	\mathcal{C} &= ECS\Lambda^{-1}S\\
+	a &= \left(1-\frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \Delta t C^T\mathcal{N}(q^n) + bc_\gamma\\
 	b &= u_B - bc_s
 \end{align}
 
@@ -154,13 +152,13 @@ where
 We solve the constrained equation~(\ref{eq:constrained}) using the following algorithm:
 \begin{equation}
 \begin{aligned}
-	\cal{A}\gamma^* = a\\
-	\cal{BA}^{-1}\cal{C}f = \cal{B}\gamma^* - b\\
-	\gamma^{n+1} = \gamma^* - \cal{A}^{-1}\cal{C}f
+	\mathcal{A}\gamma^* = a\\
+	\mathcal{BA}^{-1}\mathcal{C}f = \mathcal{B}\gamma^* - b\\
+	\gamma^{n+1} = \gamma^* - \mathcal{A}^{-1}\mathcal{C}f
 \end{aligned}
 \label{eq:projection_alg}
 \end{equation}
-Since the matrix $\cal{A}$ is easily invertible using a sin transform, one may solve the first equation easily.  The second equation is rather small ($\text{\#forces} \times \text{\#forces}$), and furthermore the matrix on the left-hand-side is symmetric, since $A$ and $C^TC$ have the same eigenvectors.  When the boundary conditions are fixed (stationary bodies), then this matrix is constant in time, and so may be LU decomposed (e.g. using a Cholesky decomposition) once beforehand, and solved rapidly at each timestep.  When the boundary conditions vary in time, then $E$ changes at each step, and a direct solve is not as efficient as an iterative solve, such as a conjugate-gradient method (for symmetric matrices).
+Since the matrix $\mathcal{A}$ is easily invertible using a sin transform, one may solve the first equation easily.  The second equation is rather small ($\text{\#forces} \times \text{\#forces}$), and furthermore the matrix on the left-hand-side is symmetric, since $A$ and $C^TC$ have the same eigenvectors.  When the boundary conditions are fixed (stationary bodies), then this matrix is constant in time, and so may be LU decomposed (e.g. using a Cholesky decomposition) once beforehand, and solved rapidly at each timestep.  When the boundary conditions vary in time, then $E$ changes at each step, and a direct solve is not as efficient as an iterative solve, such as a conjugate-gradient method (for symmetric matrices).
 
 In the design below, we decouple the algorithm for the timestepper~(\ref{eq:timestepper}) from the algorithm (\ref{eq:projection_alg}) for solving equation~(\ref{eq:constrained}).
 
@@ -194,19 +192,25 @@ Note that \class{TimeStepper} is an abstract class, and cannot be instantiated d
 		Bq &= b
 	\end{align}
 	where the operators in this equation are defined in the associated instance of \class{NavierStokesModel}.  Pure virtual function: subclasses must override this.
+	\item Scalar \virtualfn{Ainv\_times}(Scalar g)\\
+		Compute\ldots
+	\item \virtualfn{B\_times}()\\
+		Compute\ldots
+	\item \virtualfn{C\_times}()\\
+		Compute\ldots
 \end{description}
 
-\question{Subclasses should define three {\em routines} that can be provided to a \class{ProjectionSolver} instance (that return $\cal{A}^{-1}$, $\cal{B}$, and $\cal{C}$ acting on a vector).  How can a subclass define such a routine and pass it?  Can one pass methods of an object as parameters to a constructor for \class{ProjectionSolver} instance?  If so, do they need to be public, or can they be protected? (Do the two classes need to be friends?)  Would it make sense to define another class \class{ProjectionRoutines} that contains these three routines as methods?  Or just pass an entire \class{TimeStepper} object to the \class{ProjectionSolver}?}
+\question{Subclasses should define three routines that can be provided to a \class{ProjectionSolver} instance (that return $\mathcal{A}^{-1}$, $\mathcal{B}$, and $\mathcal{C}$ acting on a vector).  How can a subclass define such a routine and pass it?  Can one pass methods of an object as parameters to a constructor for \class{ProjectionSolver} instance?  If so, do they need to be public, or can they be protected? (Do the two classes need to be friends?)  Would it make sense to define another class \class{ProjectionRoutines} that contains these three routines as methods?  Or just pass an entire \class{TimeStepper} object to the \class{ProjectionSolver}?}
 
 \paragraph{Implementation}
-The functionality of the projection step~(\ref{eq:projection_alg}) is contained in the \class{ProjectionSolver}, so the only portion derived classes need to implement when overriding \virtualfn{advance} is a description of the timestepper as in~(\ref{eq:timestepper}), followed by a call to \fn{\_solver.solve}(a,b,$\gamma^{n+1}$,$f^{n+1}$).  Note that when using a \class{CholeskySolver}, one needs to know the matrices $\cal{A,B,C}$ when instantiating the solver, while when using a \class{ConjugateGradientSolver}, these matrices change at each step.
+The functionality of the projection step~(\ref{eq:projection_alg}) is contained in the \class{ProjectionSolver}, so the only portion derived classes need to implement when overriding \virtualfn{advance} is a description of the timestepper as in~(\ref{eq:timestepper}), followed by a call to \fn{\_solver.solve}(a,b,$\gamma^{n+1}$,$f^{n+1}$).  Note that when using a \class{CholeskySolver}, one needs to know the matrices $\mathcal{A,B,C}$ when instantiating the solver, while when using a \class{ConjugateGradientSolver}, these matrices change at each step.
 
 \subsubsection{Euler}
 Timestepper using Crank-Nicolson for linear terms, Explicit Euler for nonlinear.
 
 In particular, \fn{advance}(q,f) returns the solution of
 	\begin{align}
-		\left(1+\frac{\beta\Delta t}{2}C^TC\right)\gamma^{n+1} + \Delta t C^TE^Tf &= \left(1 - \frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \Delta t C^T \cal{N}(q^n) + bc_\gamma \\
+		\left(1+\frac{\beta\Delta t}{2}C^TC\right)\gamma^{n+1} + \Delta t C^TE^Tf &= \left(1 - \frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \Delta t C^T \mathcal{N}(q^n) + bc_\gamma \\
 		EC(S\Lambda^{-1}S)\gamma^{n+1} &= u_B - bc_s.
 	\end{align}
 
@@ -215,7 +219,7 @@ Timestepper using Crank-Nicolson for linear terms, Adams Bashforth for nonlinear
 
 In particular, \fn{advance}(q,f) returns the solution of
 	\begin{align}
-		\left(1+\frac{\beta\Delta t}{2}C^TC\right)\gamma^{n+1} + \Delta t C^TE^Tf &= \left(1 - \frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \frac{1}{2}\Delta t C^T (3\cal{N}(q^n)-\cal{N}(q^{n-1})) + bc_\gamma \\
+		\left(1+\frac{\beta\Delta t}{2}C^TC\right)\gamma^{n+1} + \Delta t C^TE^Tf &= \left(1 - \frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \frac{1}{2}\Delta t C^T (3\mathcal{N}(q^n)-\mathcal{N}(q^{n-1})) + bc_\gamma \\
 		EC(S\Lambda^{-1}S)\gamma^{n+1} &= u_B - bc_s.
 	\end{align}
 Storing the previous value~$N(q^{n-1})$ is the responsibility of \class{AdamsBashforth}, and there is an additional method \fn{set\_old\_q}() that initializes the value of $q$ at an earlier timestep, if desired.  If \fn{advance} is called without first calling \fn{set\_old\_q}, then an explicit Euler method is used for the first step.
@@ -237,7 +241,7 @@ Timestepper using Crank-Nicolson for linear terms, 3rd-order Runge-Kutta for non
 
 \subsection{NavierStokesModel}
 which provides functions 
-$S$, $S^{-1}$, $\Lambda$, $\cal{N}$, $B$, and $C$, for equations of the form.
+$S$, $S^{-1}$, $\Lambda$, $\mathcal{N}$, $B$, and $C$, for equations of the form.
 \subsubsection{NonlinearNavierStokes}
 \subsubsection{LinearNavierStokes}
 \subsubsection{AdjointNavierStokes}
