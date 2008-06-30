@@ -33,7 +33,7 @@ $(IBPMLIB): $(OBJS)
 $(IBPM): ibpm.o $(IBPMLIB)
 	$(CXX) -o $@ $^
 
-.cpp.o:
+.cc.o:
 	$(CXX) -c $(CXXFLAGS) $<
 
 clean:

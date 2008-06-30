@@ -1,4 +1,4 @@
-/*! \file Geometry.cpp
+/*! \file Geometry.cc
 
 This is an example description.
 */

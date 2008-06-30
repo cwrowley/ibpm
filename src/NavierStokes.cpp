@@ -1,4 +1,4 @@
-/*! \file NavierStokes.cpp
+/*! \file NavierStokes.cc
 
 This is an example description.
 */
