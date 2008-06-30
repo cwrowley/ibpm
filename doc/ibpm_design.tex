@@ -213,14 +213,12 @@ A \class{TimeStepper} object creates an appropriate \class{ProjectionSolver} obj
 \end{description}
 \paragraph{Protected}
 \begin{description}
-	\item ProjectionSolver\& \fn{create\_solver}(double alpha)\\
+	\item ProjectionSolver *\fn{create\_solver}(double alpha)\\
 		Return a reference to a \class{ProjectionSolver} of the appropriate type (e.g., conjugate gradient or Cholesky), with the appropriate initializations, e.g. for filename or tolerance.
-		
-		\todo{Look up Factory Method design pattern, or what is a standard way to do this: subclasses need to be able to create different ProjectionSolvers, but should not need to mess with logic of choosing Cholesky vs Conj Gradient, specifying tolerance, filenames, etc.}
-\end{description}
+	\end{description}
 
 \paragraph{Design choices}
-\todo{Discuss Abstract Factory or Factory Method design pattern, or whatever we end up using.}
+The \fn{create\_solver} encapsulates the logic of choosing which solver to use, since this depends only on the \class{Geometry}, and in particular whether the body is stationary or moving.  This way, subclasses don't need to worry about this logic.
 
 \paragraph{Implementation}
 The functionality of the projection step~(\ref{eq:projection_alg}) is contained in the \class{ProjectionSolver}, so the only portion derived classes need to implement when overriding \virtualfn{advance} is a description of the timestepper as in~(\ref{eq:timestepper}), followed by a call to \fn{\_solver.solve}(a,b,$\gamma^{n+1}$,$f^{n+1}$).  Note that a \class{CholeskySolver} should be instantiated when the body is stationary, while a \class{ConjugateGradientSolver} should be used when the body is moving, since the $B$ and $C$ matrices change at each step.
@@ -279,8 +277,7 @@ Note that it is sufficient to store the nonlinear terms~$N(\gamma)$ at the previ
 \subsubsection{RungeKutta2}
 Timestepper using Crank-Nicolson for linear terms, RK2 for nonlinear terms.
 
-Uses the scheme given by Peyret, p.~148\cite{Peyret}, for $\alpha=1$, $\beta=1/2$:
-% TODO: add Peyret book to master.bib
+Uses the scheme given by Peyret, p.~148\cite{Peyret:2002}, for $\alpha=1$, $\beta=1/2$:
 \begin{align}
 	(1 - \frac{h}{2}L)x_1 + hBf_1 &= (1+\frac{h}{2}L)x^n + hN(x^n)\\
 	Cx_1 &= b_{n+1}\\
@@ -292,7 +289,7 @@ Note that the equations for $x_1$ correspond to an Euler-CN step.  Conveniently,
 \subsubsection{RungeKutta3}
 Timestepper using Crank-Nicolson for linear terms, 3rd-order Runge-Kutta for nonlinear.
 
-Uses the scheme given by Peyret, p.~149\cite{Peyret}:
+Uses the scheme given by Peyret, p.~149\cite{Peyret:2002}:
 \begin{align}
 	Q_1 &= hN(x^n)\\
 	(1-\frac{h}{6}L)x_1 + \frac{h}{3}Bf_1 &= (1+\frac{h}{6}L)x^n + \frac{h}{3}Q_1\\
@@ -521,12 +518,21 @@ Data structure and interface for storing a 2d array of scalars, located at cell 
 \subsection{Flux}
 Data structure and interface for storing a 2D array of fluxes, located at cell edges.
 
+\todo{Decide on this interface.}
+
 \subsection{Force}
+Data structure and interface for storing vectors located at boundary points (for instance, forces, velocities of the body, and positions of the boundary points).
+
+\todo{Decide on this interface.  Rename this \class{BoundaryVector}?}
 
 \paragraph{Implementation}
 Store as a 1d array, to facilitate solving linear systems for forces.
 
 \subsection{Probe}
+Store information about what information to write to probe files.
+
+\todo{Flesh this out more.  Have a ProbeList or Logger class to collect different probes and call them when necessary?}
+
 \subsection{Geometry}
 Create, load, and save geometries composed of \class{RigidBody} objects.
 
@@ -674,7 +680,7 @@ Perform translations and rotations in 2D, corresponding to the action of the gro
 		Constructor for a transformation corresponding to rotation by $\theta$, followed by translation by $(x,y)$.
 	\item set\_velocity(double xdot, double ydot, double thetadot) \\
 		Set the tangent vector, for use in \fn{mapVelocity}
-	\item map\_position(double a,double b, double\& a\_new, double\& b\_new)\\
+	\item map\_position(double a, double b, double\& a\_new, double\& b\_new)\\
 		Given the point $(a,b)$, compute the mapped point $(a\_\text{new},b\_\text{new})$.
 	\item map\_velocity(double u, double v, double\& u\_new, double\& v\_new)\\
 		Given the velocity $(u,v)$, compute the mapped velocity $(u_\text{new},v_\text{new})$.  If velocity of the mapping has not been set, assume zero velocity $\dot x = \dot y = 0$.
