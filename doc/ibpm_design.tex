@@ -65,7 +65,11 @@
 \section{Purpose of this document}
 This document describes the design of a code to implement the fast (multiple-grid) Immersed Boundary Projection Method (IBPM) of Colonius and Taira \cite{ColTai-07}.  Here we give a high-level overview of the classes planned, interactions between them, and their public interfaces.  Where appropriate, we describe ideas for possible implementations, but for the most part we leave implementation to the detailed class design.
 
-This document is not intended to be a ``living'' document that evolves as changes are made to the code (although such modifications would of course be appropriate should major changes or additions to the code be undertaken).  The intent is for the ``living'' documentation to be contained within the code itself, to be extracted using Doxygen.
+The design here addresses only the single-grid case, rather than the more complex multiple-grid case.  The philosophy here was that we will probably want to iterate and refine this design, and will learn along the way (for instance, when implementing the boundary conditions and learning more about the dependencies), so it probably does not make sense to design for multiple grids at the outset.
+
+This document is not intended to be a ``living'' document that evolves as changes are made to the code, and thus should not be taken as the definitive documentation.  The intent is for the ``living'' documentation to be contained within the code itself, to be extracted using Doxygen, and for this document to serve both as a blueprint for construction, and as a reference for how and why design decisions were made.  If major changes to the structure are made, however (such as extending to the multiple-grid case), then it would be appropriate to revise this document, or write a new one.
+
+\tableofcontents
 
 \section{History and design approach}
 
@@ -393,8 +397,8 @@ This is an abstract base class, and may not be instantiated directly, but all op
 
 \paragraph{Interface}
 \begin{description}
-	\item \fn{NavierStokesModel}(Grid grid, Geometry geom)\\
-		Constructor.  Set up the appropriate data needed to evaluate $\Lambda$, and the discrete sin transform $S$, $S^{-1}$.
+	\item \fn{NavierStokesModel}(Grid grid, Geometry\& geom)\\
+		Constructor.  Set up the appropriate data needed to evaluate $\Lambda$, and the discrete sin transform $S$, $S^{-1}$.  Does not make a local copy of \class{Geometry}, but instead keeps a reference (or pointer) to the one passed.
 	\item \fn{\~NavierStokesModel}()\\
 	\item const Geometry\& \fn{getGeometry}()\\
 		Return a reference to the associated \class{Geometry}.
@@ -410,12 +414,21 @@ This is an abstract base class, and may not be instantiated directly, but all op
 		Return $Bf$, as in~(\ref{eq:model}).
 	\item Force \fn{C}(Scalar gamma)\\
 		Return $C\gamma$, as in~(\ref{eq:model}).
+	\item Flux \fn{regularize}(Force f) \\
+		Operator $E^T$ in~(\ref{eq:navier_stokes}).
+	\item Force \fn{regularizeT}(Flux q) \\
+		Transpose of regularize, operator $E$ in~(\ref{eq:navier_stokes}).
+	\item void \fn{updateRegularization}() \\
+		Update the operators \fn{regularize}, \fn{regularizeT}.  Must be called whenever the body position changes.
 \end{description}
 \paragraph{Protected}
 \begin{description}
 	\item Scalar \fn{bilinear}(State x1, State x2)\\
 		Return bilinear term, used by subclasses (e.g. $N(q)=\operatorname{bilinear}(q,q)$).
 \end{description}
+
+\paragraph{Design notes}
+Another option is to define \fn{regularize} in the \class{Geometry} class, so that it can be more easily updated when the body moves (then these updates occur only within one class).  However, this does not seem as appropriate, since otherwise \class{Geometry} does not need to know any information about the \class{Grid}, which is needed to compute regularization operators.  Also, all other operators are defined within the \class{NavierStokesModel}, so \fn{regularize} seems to fit better here.
 
 \subsubsection{NonlinearNavierStokes}
 Define the nonlinear term for the full nonlinear Navier-Stokes equations.
@@ -432,7 +445,7 @@ Define the ``nonlinear'' term $N(q)$ for Navier-Stokes equations linearized abou
 \begin{description}
 	\item \fn{LinearNavierStokes}(Grid grid, Geometry geom, State baseflow)\\
 		Constructor for Navier-Stokes equations linearized about a constant equilibrium solution given by baseflow.
-	\item \Scalar \fn{nonlinear}(State x)
+	\item Scalar \fn{nonlinear}(State x)
 \end{description}
 
 \subsubsection{AdjointNavierStokes}
@@ -442,22 +455,230 @@ Define the ``nonlinear'' term $N(q)$ for adjoint Navier-Stokes equations, linear
 \begin{description}
 	\item \fn{AdjointNavierStokes}(Grid grid, Geometry geom, State baseflow)\\
 		Constructor for adjoint equations for Navier-Stokes linearized about a constant equilibrium solution given by baseflow.
-	\item \Scalar \fn{nonlinear}(State x)
+	\item Scalar \fn{nonlinear}(State x)
 \end{description}
 
 \subsection{Grid}
+Define parameters associated with an Eulerian grid.
+
+Use single grid for now.  Will want to extend to multiple grids, but choose to design the interface for a single grid first, so that we can iterate and refine the design before extending to multiple grids.
+
+\paragraph{Interface}
+\begin{description}
+	\item Grid(int nx, int ny, double length)\\
+		Constructor, given numbers of gridpoints in $x$ and $y$-directions, length in the $x$-direction.  A square grid is assumed.
+	\item int \fn{getNx}()\\
+		Return number of points in $x$-direction.
+	\item int \fn{getNy}()\\
+		Return number of points in $y$-direction.
+	\item double \fn{getLength}()\\
+		Return length in $x$-direction.
+	\item double \fn{getDx}()\\
+		Return grid spacing (same in $x$- and $y$-directions).
+		
+\end{description}
+
 
 \subsection{State}
-Include time, scalar, flux, and force.
+Include time, Scalar gamma, Flux q, and Force f.  Possibly also boundary conditions?
+
+\paragraph{Interface}
+\begin{description}
+	\item State(Grid grid, Geometry geom)\\
+		Constructor.  Allocate memory for the associated objects (flux, circulation, and forces).
+	\item \~State()\\
+		Destructor.
+\end{description}
+
+\paragraph{Public data}
+\begin{description}
+	\item int timestep\\
+		Timestep associated with the current value of the state (e.g. incremented by the \class{TimeStepper}).
+	\item double time\\
+		The time associated with the current value of the state (e.g. incremented by the \class{TimeStepper}).
+	\item Scalar gamma\\
+	\item Flux q\\
+	\item Force f
+\end{description}
+
+\paragraph{Implementation}
+No need to store the Grid and Geometry information in the state, since it is already contained in the contained data structures.
 
 \subsection{Scalar}
+Data structure and interface for storing a 2d array of scalars, located at cell centers, on multiple grids.
+
+\paragraph{Interface}
+\begin{description}
+	\item Addition of two Scalars
+	\item Subtraction of two Scalars
+	\item Multiplication of a Scalar by a double
+	\item Access individual elements with $(i,j)$ or $[i][j]$.
+\end{description}
+
+\paragraph{Implementation}
+2d array.  Need to be able to take an FFT of this, so possibly best to allocate memory using an FFTW memory allocator (which ensures optimal alignment of doubles).  Use an array library such as Blitz++, TNT, or Boost?  (Governing principle: no matter what, make sure that the implementation of the arrays is independent from the interface, so the rest of the code does not need to change if the implementation is changed.)
+
 \subsection{Flux}
+Data structure and interface for storing a 2D array of fluxes, located at cell edges.
+
 \subsection{Force}
+
+\paragraph{Implementation}
+Store as a 1d array, to facilitate solving linear systems for forces.
+
 \subsection{Probe}
 \subsection{Geometry}
-Include the name of the geometry, to be saved by the \class{CholeskySolver} when a Cholesky factorization is needed.
+Create, load, and save geometries composed of \class{RigidBody} objects.
+
+This class is responsible for maintaining a list of bodies (each an instance of \class{RigidBody}, and for telling an associated \class{NavierStokesModel} when to update its regularization operators $E$ and $E^T$, for instance as used in~(\ref{eq:navier_stokes}).
+
+Each geometry can be saved to or loaded from a file, and the interface should be designed so that it is easy to write a small utility program for creating and saving geometries (possibly with wrappers for Python or Matlab?).  
+
+\paragraph{Interface}
+\begin{description}
+	\item \fn{Geometry}() \\
+		Constructor
+	\item \fn{\~\null Geometry}() \\
+		Destructor
+	\item void \fn{addBody}(RigidBody body) \\
+		Append the given \class{RigidBody} to the list of bodies in the current geometry, making a copy of it internally.
+	\item void \fn{load}(istream in) \\
+		Load a geometry from the specified input stream.  The format of the input file is as follows:
+\begin{verbatim}
+name My Geometry
+body Flat plate
+	line 0 0 1 0 50  # 50 points on a line
+	center 0.25 0    # center at quarter chord
+end
+body Large Circle
+	circle 2 3 5 100 # 100 points on a circle with radius 5, center (2,3)
+					 # default center is (2,3)
+end
+body Airfoil
+	raw naca0012.in  # Read in the raw data file
+end
+		\end{verbatim}
+	 Whitespace at the beginnings of lines is ignored, and comments are started by \#.
+	\item void \fn{setName}(string name) \\
+		Set the name of the current geometry.
+	\item void \fn{setModel}(NavierStokesModel\& model) \\
+		Set an associated \class{NavierStokesModel}.
+	\item void \fn{moveBodies}(double time) \\
+		Update the position and velocities of the bodies, as specified by the associated \class{Motion}.  Also updates \fn{regularize} and \fn{regularizeT}, via the associated \class{NavierStokesModel}.
+	\item int \fn{getNumPoints}() \\
+		Return the total number of points in all bodies.
+	\item Force \fn{getPoints}() \\
+		Return the list of coordinates for each point on each body.
+	\item Force \fn{getVelocities}() \\
+		Return the list of velocities at each point on each body.		
+\end{description}
+
+\paragraph{Design notes}
+An alternative is to specify the operators \fn{regularize} and \fn{regularizeT} in this class, rather than \class{NavierStokesModel}.  See the remarks in \class{NavierStokesModel} for reasons why this interface was chosen.
+
+\paragraph{Implementation}
+Internally, either \class{Geometry} or each \class{RigidBody} should maintain a list of the points after the motion has been applied.  These will be necessary for defining the regularization operators, but don't need to be publicly accessible.  Not sure where is the best place to keep this information.
+
 \subsubsection{RigidBody}
+Specify coordinates and center of a rigid body, and its motion in time.
+
+\paragraph{Interface}
+\begin{description}
+	\item \fn{RigidBody}() \\
+		Constructor.  Initialize the center to $(0,0)$.
+	\item void \fn{addPoint}(double x, double y) \\
+		Add the specified point to the list of points on the body's boundary.
+	\item void \fn{addCircle}(double xc, double yc, double radius, int numPoints) \\
+		Add a circle with center $(x_c,y_c)$ and the given radius, with the specified number of points.
+	\item void \fn{addLine}(double x1, double y1, double x2, double y2, int numPoints) \\
+		Add a line connecting $(x_1,y_1)$ and $(x_2,y_2)$, with the specified number of points.
+	\item void \fn{load}(istream in) \\
+		Load a list of commands from the specified input stream.  See below for file format.
+	\item void \fn{loadRaw}(istream in) \\
+		Load a list of points, in ASCII format, with one point per line.  Assumes the center is 
+	\item void \fn{saveRaw}(ostream out) \\
+		Save a list of points to a file with the specified name, overwriting if already present.
+	\item int \fn{getNumPoints}() \\
+		Return the number of points on the body's boundary.
+	\item bool \fn{isStationary}() \\
+		Return true if the body is not moving in time.
+	\item void \fn{setMotion}(Motion motion) \\
+		Set the evolution of the of the current body (which may be stationary or not).
+	\item void \fn{setCenter}(double x, double y) \\
+		Set the center of the body, about which rotations are defined.
+	\item void \fn{getCenter}(double\& x, double\& y)\\
+		Get the center of the body, about which rotations are defined.
+	\item void \fn{setName} \\
+		Set the name of the body
+	\item string \fn{getName}() \\
+		Return the name of the body
+	\item 
+\end{description}
+
+\paragraph{File format}
+Need to determine a good file format for loading/saving bodies.  ASCII is probably best, in some format easily readable by both humans and machines.  Example file format:
+\begin{verbatim}
+name some object
+center x y
+point x y
+point x y
+point x y
+line x1 y1 x2 y2 npts
+circle xc yc radius npts
+raw naca0012.dat
+end
+\end{verbatim}
+Commands should be read until the end of file is reached, or until {\tt end} is read (so that a single Geometry file can contain multiple bodies).
+
+These commands easily map to the methods in the \class{RigidBody} interface, and are much more readable by humans than a raw list of points.  Could easily write a utility for parsing this and converting to a list of points for plotting with Matlab, Tecplot, etc.  This format contains more information than a list of points, since it says something about the structure/connectivity.
+
+\paragraph{Implementation}
+Note that if saving to a file, need to save the information in the RigidBody with more structure, e.g. specifying Point, Line, Circle objects.  Probably best to implement more simply first, just as a raw list of points, and then make more complex if needed.
+
 \subsubsection{Motion}
+Specify a position and orientation as a function of time.
+
+Abstract base class, must be subclassed to be instantiated.
+
+\paragraph{Interface}
+\begin{description}
+	\item Motion() \\
+		Constructor.
+	\item virtual bool \fn{isStationary}() \\
+		Return false.  (Can be overridden by subclasses.)
+	\item Euclidean2D \virtualfn{getPosition}(double time) \\
+		Return a Euclidean transformation at the specified time
+\end{description}
+
+\paragraph{Design notes}
+\fn{isStationary} returns False by default, since presumably the only subclass that would return true is \class{FixedPosition}.  Would probably be better style to make this a pure virtual function, but this way saves a little effort when making subclasses.
+
+\subsubsection{FixedPosition}
+Subclass of \class{Motion}, for a stationary body.
+
+\paragraph{Interface}
+\begin{description}
+	\item FixedPosition(double x, double y, double theta) \\
+		Define a \class{Motion} corresponding to a fixed position, rotation about the center.
+	\item bool \fn{isStationary}()\\
+		Return true.
+\end{description}
+	
+
+\subsubsection{Euclidean2D}
+Perform translations and rotations in 2D, corresponding to the action of the group $SE(2)$.
+
+\paragraph{Interface}
+\begin{description}
+	\item Euclidean2D(double x, double y, double theta)
+		Constructor for a transformation corresponding to rotation by $\theta$, followed by translation by $(x,y)$.
+	\item setVelocity(double xdot, double ydot, double thetadot) \\
+		Set the tangent vector, for use in \fn{mapVelocity}
+	\item mapPosition(double a,double b, double\& a\_new, double\& b\_new)\\
+		Given the point $(a,b)$, compute the mapped point $(a\_\text{new},b\_\text{new})$.
+	\item mapVelocity(double u, double v, double\& u\_new, double\& v\_new)\\
+		Given the velocity $(u,v)$, compute the mapped velocity $(u_\text{new},v_\text{new})$.  If velocity of the mapping has not been set, assume zero velocity $\dot x = \dot y = 0$.
+\end{description}
 
 \bibliographystyle{abbrv}
 \bibliography{jabbrv,master}
