@@ -213,7 +213,7 @@ A \class{TimeStepper} object creates an appropriate \class{ProjectionSolver} obj
 \end{description}
 \paragraph{Protected}
 \begin{description}
-	\item ProjectionSolver\& \fn{createSolver}(double alpha)\\
+	\item ProjectionSolver\& \fn{create\_solver}(double alpha)\\
 		Return a reference to a \class{ProjectionSolver} of the appropriate type (e.g., conjugate gradient or Cholesky), with the appropriate initializations, e.g. for filename or tolerance.
 		
 		\todo{Look up Factory Method design pattern, or what is a standard way to do this: subclasses need to be able to create different ProjectionSolvers, but should not need to mess with logic of choosing Cholesky vs Conj Gradient, specifying tolerance, filenames, etc.}
@@ -256,7 +256,7 @@ Timestepper using Crank-Nicolson for linear terms, Adams Bashforth for nonlinear
 \begin{description}
 	\item void \fn{advance}(State x)\\
 		Advance the state forward one step, overwriting with the new value.  If information about the previous timestep is available, use Adams-Bashforth for nonlinear terms; otherwise, use explicit Euler.
-	\item void \fn{setPreviousState}(State x)\\
+	\item void \fn{set\_previous\_state}(State x)\\
 		Initialize the value of $x$ at the previous timestep.
 \end{description}
 
@@ -343,7 +343,7 @@ This class is used by \class{TimeStepper}, and contains a pointer to a \class{Na
 		Compute $\mathcal{M}f=\mathcal{C}\mathcal{A}^{-1}\mathcal{B}f$, the matrix that must be inverted in the second step of the algorithm~(\ref{eq:projection_alg}).  Note that for the Navier-Stokes equations, this operator should be symmetric ($\mathcal{M}=\mathcal{M}^T$).
 	\item Force \virtualfn{Minv}(Force b)\\
 		Solve $\mathcal{M}f=b$ for $f$.  Pure virtual function: must be overloaded by subclasses.
-	\item const Geometry\& \fn{getGeometry}()\\
+	\item const Geometry\& \fn{get\_geometry}()\\
 		Return a reference to the associated \class{Geometry}.
 \end{description}
 
@@ -355,22 +355,22 @@ This class assumes the matrix~$\mathcal{M}$ is symmetric, and computes the Chole
 \paragraph{Interface}
 \begin{description}
 	\item \fn{CholeskySolver}(NavierStokesModel model, double alpha)\\
-		Constructor.  Note that before using \fn{Minv} (needed by \fn{solve} in the base class), one must first call either \fn{computeCholesky} or \fn{loadCholesky}.
+		Constructor.  Note that before using \fn{Minv} (needed by \fn{solve} in the base class), one must first call either \fn{compute\_cholesky} or \fn{load\_cholesky}.
 	\item Force \fn{Minv}(Force b)\\
 		Solve $\mathcal{M}f = b$ directly using a Cholesky factorization already computed.
-	\item void \fn{computeCholesky}()\\
+	\item void \fn{compute\_cholesky}()\\
 		Compute the Cholesky decomposition of~$\mathcal{M}$, storing it as private data.
-	\item bool \fn{loadCholesky}(string fileName)\\
+	\item bool \fn{load\_cholesky}(string fileName)\\
 		Load a Cholesky decomposition from the specified file.  Returns true if successful.
-	\item bool \fn{saveCholesky}(string fileName)\\
+	\item bool \fn{save\_cholesky}(string fileName)\\
 		Save a Cholesky decomposition to the specified file, overwriting if necessary.  Returns true if successful.
 \end{description}
 
 \paragraph{Design alternatives}
-A different design would be for the constructor to take a filename as an argument (or deduce it from the name in the associated Geometry object), and automatically try to load the file, calling \fn{computeCholesky} if the file was not found, or was invalid.  However, the call to \fn{computeCholesky} can be time consuming, so it seems like a better design to have to explicitly call that, so the constructor does not mysteriously take a very long time.  The approach above also gives greater flexibility in using this class.
+A different design would be for the constructor to take a filename as an argument (or deduce it from the name in the associated Geometry object), and automatically try to load the file, calling \fn{compute\_cholesky} if the file was not found, or was invalid.  However, the call to \fn{compute\_cholesky} can be time consuming, so it seems like a better design to have to explicitly call that, so the constructor does not mysteriously take a very long time.  The approach above also gives greater flexibility in using this class.
 
 \paragraph{Implementation}
-The factorization of $\mathcal{M}$ should of course be stored as private data.  One suggestion is to have a flag to check whether the factorization has been performed, and When saving and loading these factorizations, it would be good to save/load the name of the \class{Geometry} the configuration is being saved for.  This would allow a simple check whether a loaded file matches the current geometry.  Since the solver already knows about the geometry (through the \class{NavierStokesModel} instance passed to the constructor, made available through the \fn{getGeometry} method), this name does not need to be passed explicitly to the \class{CholeskySolver}.
+The factorization of $\mathcal{M}$ should of course be stored as private data.  One suggestion is to have a flag to check whether the factorization has been performed, and When saving and loading these factorizations, it would be good to save/load the name of the \class{Geometry} the configuration is being saved for.  This would allow a simple check whether a loaded file matches the current geometry.  Since the solver already knows about the geometry (through the \class{NavierStokesModel} instance passed to the constructor, made available through the \fn{get\_geometry} method), this name does not need to be passed explicitly to the \class{CholeskySolver}.
 
 \subsubsection{ConjugateGradientSolver}
 Subclass of \class{ProjectionSolver}, in which $\mathcal{M}f=b$ is solved iteratively, using a conjugate gradient method.
@@ -381,8 +381,8 @@ This class assumes the matrix~$\mathcal{M}$ is symmetric, and iterates until a s
 \begin{description}
 	\item \fn{ConjugateGradientSolver}(NavierStokesModel model, double alpha, double tolerance)\\
 		Constructor.  Store tolerance as private data.
-	\item void \fn{setTolerance}(double tolerance)
-	\item double \fn{getTolerance}()
+	\item void \fn{set\_tolerance}(double tolerance)
+	\item double \fn{get\_tolerance}()
 	\item Force \fn{Minv}(Force b)\\
 		Solve $\mathcal{M}f = b$ directly using a conjugate gradient method.
 \end{description}
@@ -400,11 +400,11 @@ This is an abstract base class, and may not be instantiated directly, but all op
 	\item \fn{NavierStokesModel}(Grid grid, Geometry\& geom)\\
 		Constructor.  Set up the appropriate data needed to evaluate $\Lambda$, and the discrete sin transform $S$, $S^{-1}$.  Does not make a local copy of \class{Geometry}, but instead keeps a reference (or pointer) to the one passed.
 	\item \fn{\~NavierStokesModel}()\\
-	\item const Geometry\& \fn{getGeometry}()\\
+	\item const Geometry\& \fn{get\_geometry}()\\
 		Return a reference to the associated \class{Geometry}.
-	\item const Grid\& \fn{getGrid}()\\
+	\item const Grid\& \fn{get\_grid}()\\
 		Return a reference to the associated \class{Grid}.
-	\item const Scalar\& \fn{getLambda}()\\
+	\item const Scalar\& \fn{get\_lambda}()\\
 		Return a reference to the eigenvalues $\Lambda$ of~$L$.
 	\item Scalar \fn{S}(Scalar g)\\
 		Transform to eigenvectors of~$L$ (discrete sin transform).
@@ -416,10 +416,10 @@ This is an abstract base class, and may not be instantiated directly, but all op
 		Return $C\gamma$, as in~(\ref{eq:model}).
 	\item Flux \fn{regularize}(Force f) \\
 		Operator $E^T$ in~(\ref{eq:navier_stokes}).
-	\item Force \fn{regularizeT}(Flux q) \\
+	\item Force \fn{regularize}(Flux q) \\
 		Transpose of regularize, operator $E$ in~(\ref{eq:navier_stokes}).
-	\item void \fn{updateRegularization}() \\
-		Update the operators \fn{regularize}, \fn{regularizeT}.  Must be called whenever the body position changes.
+	\item void \fn{update\_regularization}() \\
+		Update the operators \fn{regularize}.  Must be called whenever the body position changes.
 \end{description}
 \paragraph{Protected}
 \begin{description}
@@ -467,13 +467,13 @@ Use single grid for now.  Will want to extend to multiple grids, but choose to d
 \begin{description}
 	\item Grid(int nx, int ny, double length)\\
 		Constructor, given numbers of gridpoints in $x$ and $y$-directions, length in the $x$-direction.  A square grid is assumed.
-	\item int \fn{getNx}()\\
+	\item int \fn{get\_nx}()\\
 		Return number of points in $x$-direction.
-	\item int \fn{getNy}()\\
+	\item int \fn{get\_ny}()\\
 		Return number of points in $y$-direction.
-	\item double \fn{getLength}()\\
+	\item double \fn{get\_length}()\\
 		Return length in $x$-direction.
-	\item double \fn{getDx}()\\
+	\item double \fn{get\_dx}()\\
 		Return grid spacing (same in $x$- and $y$-directions).
 		
 \end{description}
@@ -486,7 +486,7 @@ Include time, Scalar gamma, Flux q, and Force f.  Possibly also boundary conditi
 \begin{description}
 	\item State(Grid grid, Geometry geom)\\
 		Constructor.  Allocate memory for the associated objects (flux, circulation, and forces).
-	\item \~State()\\
+	\item \~\null State()\\
 		Destructor.
 \end{description}
 
@@ -540,7 +540,7 @@ Each geometry can be saved to or loaded from a file, and the interface should be
 		Constructor
 	\item \fn{\~\null Geometry}() \\
 		Destructor
-	\item void \fn{addBody}(RigidBody body) \\
+	\item void \fn{add\_body}(RigidBody body) \\
 		Append the given \class{RigidBody} to the list of bodies in the current geometry, making a copy of it internally.
 	\item void \fn{load}(istream in) \\
 		Load a geometry from the specified input stream.  The format of the input file is as follows:
@@ -559,17 +559,17 @@ body Airfoil
 end
 		\end{verbatim}
 	 Whitespace at the beginnings of lines is ignored, and comments are started by \#.
-	\item void \fn{setName}(string name) \\
+	\item void \fn{set\_name}(string name) \\
 		Set the name of the current geometry.
-	\item void \fn{setModel}(NavierStokesModel\& model) \\
+	\item void \fn{set\_model}(NavierStokesModel\& model) \\
 		Set an associated \class{NavierStokesModel}.
-	\item void \fn{moveBodies}(double time) \\
+	\item void \fn{move\_bodies}(double time) \\
 		Update the position and velocities of the bodies, as specified by the associated \class{Motion}.  Also updates \fn{regularize} and \fn{regularizeT}, via the associated \class{NavierStokesModel}.
-	\item int \fn{getNumPoints}() \\
+	\item int \fn{get\_num\_points}() \\
 		Return the total number of points in all bodies.
-	\item Force \fn{getPoints}() \\
+	\item Force \fn{get\_points}() \\
 		Return the list of coordinates for each point on each body.
-	\item Force \fn{getVelocities}() \\
+	\item Force \fn{get\_velocities}() \\
 		Return the list of velocities at each point on each body.		
 \end{description}
 
@@ -586,31 +586,31 @@ Specify coordinates and center of a rigid body, and its motion in time.
 \begin{description}
 	\item \fn{RigidBody}() \\
 		Constructor.  Initialize the center to $(0,0)$.
-	\item void \fn{addPoint}(double x, double y) \\
+	\item void \fn{add\_point}(double x, double y) \\
 		Add the specified point to the list of points on the body's boundary.
-	\item void \fn{addCircle}(double xc, double yc, double radius, int numPoints) \\
+	\item void \fn{add\_circle}(double xc, double yc, double radius, int numPoints) \\
 		Add a circle with center $(x_c,y_c)$ and the given radius, with the specified number of points.
-	\item void \fn{addLine}(double x1, double y1, double x2, double y2, int numPoints) \\
+	\item void \fn{add\_line}(double x1, double y1, double x2, double y2, int numPoints) \\
 		Add a line connecting $(x_1,y_1)$ and $(x_2,y_2)$, with the specified number of points.
 	\item void \fn{load}(istream in) \\
 		Load a list of commands from the specified input stream.  See below for file format.
-	\item void \fn{loadRaw}(istream in) \\
+	\item void \fn{load\_raw}(istream in) \\
 		Load a list of points, in ASCII format, with one point per line.  Assumes the center is 
-	\item void \fn{saveRaw}(ostream out) \\
+	\item void \fn{save\_raw}(ostream out) \\
 		Save a list of points to a file with the specified name, overwriting if already present.
-	\item int \fn{getNumPoints}() \\
+	\item int \fn{get\_num\_points}() \\
 		Return the number of points on the body's boundary.
-	\item bool \fn{isStationary}() \\
+	\item bool \fn{is\_stationary}() \\
 		Return true if the body is not moving in time.
-	\item void \fn{setMotion}(Motion motion) \\
+	\item void \fn{set\_motion}(Motion motion) \\
 		Set the evolution of the of the current body (which may be stationary or not).
-	\item void \fn{setCenter}(double x, double y) \\
+	\item void \fn{set\_center}(double x, double y) \\
 		Set the center of the body, about which rotations are defined.
-	\item void \fn{getCenter}(double\& x, double\& y)\\
+	\item void \fn{get\_center}(double\& x, double\& y)\\
 		Get the center of the body, about which rotations are defined.
-	\item void \fn{setName} \\
+	\item void \fn{set\_name} \\
 		Set the name of the body
-	\item string \fn{getName}() \\
+	\item string \fn{get\_name}() \\
 		Return the name of the body
 	\item 
 \end{description}
@@ -644,14 +644,14 @@ Abstract base class, must be subclassed to be instantiated.
 \begin{description}
 	\item Motion() \\
 		Constructor.
-	\item virtual bool \fn{isStationary}() \\
+	\item virtual bool \fn{is\_stationary}() \\
 		Return false.  (Can be overridden by subclasses.)
-	\item Euclidean2D \virtualfn{getPosition}(double time) \\
+	\item Euclidean2D \virtualfn{get\_position}(double time) \\
 		Return a Euclidean transformation at the specified time
 \end{description}
 
 \paragraph{Design notes}
-\fn{isStationary} returns False by default, since presumably the only subclass that would return true is \class{FixedPosition}.  Would probably be better style to make this a pure virtual function, but this way saves a little effort when making subclasses.
+\fn{is\_stationary} returns False by default, since presumably the only subclass that would return true is \class{FixedPosition}.  Would probably be better style to make this a pure virtual function, but this way saves a little effort when making subclasses.
 
 \subsubsection{FixedPosition}
 Subclass of \class{Motion}, for a stationary body.
@@ -660,7 +660,7 @@ Subclass of \class{Motion}, for a stationary body.
 \begin{description}
 	\item FixedPosition(double x, double y, double theta) \\
 		Define a \class{Motion} corresponding to a fixed position, rotation about the center.
-	\item bool \fn{isStationary}()\\
+	\item bool \fn{is\_stationary}()\\
 		Return true.
 \end{description}
 	
@@ -672,11 +672,11 @@ Perform translations and rotations in 2D, corresponding to the action of the gro
 \begin{description}
 	\item Euclidean2D(double x, double y, double theta)
 		Constructor for a transformation corresponding to rotation by $\theta$, followed by translation by $(x,y)$.
-	\item setVelocity(double xdot, double ydot, double thetadot) \\
+	\item set\_velocity(double xdot, double ydot, double thetadot) \\
 		Set the tangent vector, for use in \fn{mapVelocity}
-	\item mapPosition(double a,double b, double\& a\_new, double\& b\_new)\\
+	\item map\_position(double a,double b, double\& a\_new, double\& b\_new)\\
 		Given the point $(a,b)$, compute the mapped point $(a\_\text{new},b\_\text{new})$.
-	\item mapVelocity(double u, double v, double\& u\_new, double\& v\_new)\\
+	\item map\_velocity(double u, double v, double\& u\_new, double\& v\_new)\\
 		Given the velocity $(u,v)$, compute the mapped velocity $(u_\text{new},v_\text{new})$.  If velocity of the mapping has not been set, assume zero velocity $\dot x = \dot y = 0$.
 \end{description}
 
