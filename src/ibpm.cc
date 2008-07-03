@@ -1,16 +1,16 @@
-/**
- * \file ibpm.cc
- *
- * \brief Sample main routine for IBFS code
- * 
- * \author Clancy Rowley
- * \date  3 Jul 2008
- *
- * $Revision$
- * $Date$
- * $Author$
- * $HeadURL$
- */
+/*!
+\file ibpm.cc
+
+\brief Sample main routine for IBFS code
+
+\author Clancy Rowley
+\date  3 Jul 2008
+
+$Revision$
+$Date$
+$Author$
+$HeadURL$
+*/
 
 #include <iostream>
 #include <fstream>

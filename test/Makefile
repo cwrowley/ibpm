@@ -14,14 +14,14 @@ run_tests: runner
 $(IBPMLIB):
 	(cd ../src; make lib)
 
-runner: runner.cpp $(IBPMLIB)
+runner: runner.cc $(IBPMLIB)
 	$(CXX) -o $@ $(INCPATH) $^
 
-runner.cpp: $(TEST_FILES) $(IBPMLIB)
+runner.cc: $(TEST_FILES) $(IBPMLIB)
 	cxxtestgen.pl -o $@ --error-printer $^
 
 clean:
-	/bin/rm -rf *.o runner.cpp
+	/bin/rm -rf *.o runner.cc
 
 distclean: clean
 	/bin/rm -f runner

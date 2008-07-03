@@ -1,14 +1,18 @@
-/**
- * \file Geometry.cc
- *
- * \author Clancy Rowley
- * \date  3 Jul 2008
- *
- * $Revision$
- * $Date$
- * $Author$
- * $HeadURL$
- */
+// Geometry.cc
+//
+// Description:
+//
+// Author(s):
+// Clancy Rowley
+//
+// Date: 3 Jul 2008
+//
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
+// $HeadURL:// $Header$
+
+
 
 #include "Geometry.h"
 

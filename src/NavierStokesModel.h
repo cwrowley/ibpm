@@ -1,16 +1,29 @@
-/*! \file NavierStokesModel.h */
-
 #ifndef _NAVIERSTOKES_H_
 #define _NAVIERSTOKES_H_
 
 class Geometry;
 
-/*! \brief Define operators for the Navier-Stokes equations.
- *  
- */
+/*!
+\file NavierStokesModel.h
+\class NavierStokesModel
+
+\brief Define operators for the Navier-Stokes equations
+
+\author Clancy Rowley
+\date  3 Jul 2008
+
+$Revision$
+$Date$
+$Author$
+$HeadURL$
+*/
+
 class NavierStokesModel {
 private:
 	Geometry* _geometry;
+
+// ...
+
 };
 
 //! Full nonlinear Navier-Stokes equations.

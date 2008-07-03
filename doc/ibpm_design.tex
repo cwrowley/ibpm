@@ -398,7 +398,7 @@ This is an abstract base class, and may not be instantiated directly, but all op
 \paragraph{Interface}
 \begin{description}
 	\item \code|NavierStokesModel(const Grid& grid, const Geometry& geom, double Reynolds)|\\
-		Constructor.  Set up the appropriate data needed to evaluate $\Lambda$, and the discrete sin transform $S$, $S^{-1}$.  Does not make a local copy of \class{Geometry}, but instead keeps a reference (or pointer) to the one passed.
+		Constructor, given a specified \class{Grid} and \class{Geometry}, as well as the Reynolds number.  Set up the appropriate data needed to evaluate $\Lambda$, and the discrete sin transform $S$, $S^{-1}$.  Does not make a local copy of \class{Geometry}, but instead keeps a reference (or pointer) to the one passed.
 	\item \code|~NavierStokesModel()|\\
 	\item \code|Geometry* getGeometry()|\\
 		Return a pointer to the associated \class{Geometry}.
