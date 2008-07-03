@@ -195,17 +195,17 @@ A \class{TimeStepper} object creates an appropriate \class{ProjectionSolver} obj
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|TimeStepper(const NavierStokesModel& model, double timestep)|\\
+	\item \code|TimeStepper(NavierStokesModel* model, double timestep)|\\
 		Constructor.  Setup all routines necessary to use \virtualfn{advance}, to step the solution forward by the given timestep.  Note that creation of the \class{ProjectionSolver} should be deferred to the subclasses, but determination of which type of solver to instantiate should be handled by the base class.
 	\item \code|~TimeStepper()|\\
 		Destructor.
-	\item \code|virtual void advance(State& x) = 0|\\
+	\item \code|virtual void advance(State* x) = 0|\\
 	 	Advance the state $x$ forward one step, overwriting with the new value.  Pure virtual function: subclasses must override this.
 \end{description}
 \paragraph{Protected}
 \begin{description}
 	\item \code|ProjectionSolver* createSolver(double alpha)|\\
-		Return a reference to a \class{ProjectionSolver} of the appropriate type (e.g., conjugate gradient or Cholesky), with the appropriate initializations, e.g. for filename or tolerance.
+		Return a new \class{ProjectionSolver} of the appropriate type (e.g., conjugate gradient or Cholesky), with the appropriate initializations, e.g. for filename or tolerance.
 	\end{description}
 
 \paragraph{Design choices}
@@ -219,7 +219,7 @@ Timestepper using Crank-Nicolson for linear terms, Explicit Euler for nonlinear 
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|void advance(State& x)|\\
+	\item \code|void advance(State* x)|\\
 		Advance the state forward one step, overwriting with the new value.  
 \end{description}
 
@@ -243,10 +243,10 @@ Timestepper using Crank-Nicolson for linear terms, Adams Bashforth for nonlinear
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|void advance(State& x)|\\
+	\item \code|void advance(State* x)|\\
 		Advance the state forward one step, overwriting with the new value.  If information about the previous timestep is available, use Adams-Bashforth for nonlinear terms; otherwise, use explicit Euler.
-	\item \code|void setPreviousState(const State& x)|\\
-		Initialize the value of $x$ at the previous timestep.
+	\item \code|void setPreviousState(State* x)|\\
+		Initialize the value of $x$ at the previous timestep.  Makes a copy of the necessary information internally.
 \end{description}
 
 In particular, \fn{advance}$(\gamma,f)$ returns the solution of
@@ -277,6 +277,12 @@ Uses the scheme given by Peyret, p.~148\cite{Peyret:2002}, for $\alpha=1$, $\bet
 \end{align}
 Note that the equations for $x_1$ correspond to an Euler-CN step.  Conveniently, both steps use the same values of $\mathcal{A}$, $\mathcal{B}$, and $\mathcal{C}$ as \class{Euler} and \class{AdamsBashforth}, so this scheme needs only one \class{ProjectionSolver}.
 
+\paragraph{Interface}
+\begin{description}
+	\item \code|void advance(State* x)|\\
+		Advance the state forward one step, overwriting with the new value.
+\end{description}
+		
 \subsubsection{RungeKutta3}
 Timestepper using Crank-Nicolson for linear terms, 3rd-order Runge-Kutta for nonlinear.
 
@@ -294,6 +300,12 @@ Uses the scheme given by Peyret, p.~149\cite{Peyret:2002}:
 \end{align}
 In this case, we see that we have three different values for the matrices $\mathcal{A}$, $\mathcal{B}$ and $\mathcal{C}$, for the three different stages of the scheme, and three different calls to the \class{ProjectionSolver} are required.  Best to have three different instances of this solver, since in the stationary case, three different Cholesky factorizations need to be computed and stored.
 
+\paragraph{Interface}
+\begin{description}
+	\item \code|void advance(State* x)|\\
+		Advance the state forward one step, overwriting with the new value.
+\end{description}
+		
 \subsection{ProjectionSolver}
 Solve a system of the form
 \begin{equation}
@@ -312,24 +324,24 @@ This class is used by \class{TimeStepper}, and contains a pointer to a \class{Na
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|ProjectionSolver(const NavierStokesModel& model, double alpha)|\\
+	\item \code|ProjectionSolver(const NavierStokesModel* model, double alpha)|\\
 		Constructor.  Setup all routines necessary to use \fn{solve}, including the protected methods \fn{Ainv}, \fn{B}, and \fn{C}.
 	\item \code|~ProjectionSolver()|\\
 		Destructor.
-	\item \code|void solve(const Scalar& a, const BoundaryVector& b, Scalar& gamma, BoundaryVector& f)|\\
+	\item \code|void solve(const Scalar* a, const BoundaryVector* b, Scalar* gamma, BoundaryVector* f)|\\
 	 	Solve the system~(\ref{eq:projection_specific}) using the algorithm~(\ref{eq:projection_alg}.  Inputs are $a$ and $b$, and the solution is returned in $x$, $f$.
 \end{description}
 \paragraph{Protected methods}
 \begin{description}
-	\item \code|Scalar Ainv(const Scalar& x)|\\
-		Compute $\mathcal{A}^{-1}x=(1+(\alpha/2)L)^{-1}x$ for a projection of the form~(\ref{eq:constrained})
-	\item \code|Scalar B(const BoundaryVector& f)|\\
-		Compute $\mathcal{B}f=\alpha Bf$, for a projection of the form~(\ref{eq:constrained}).
-	\item \code|BoundaryVector C(const Scalar& x)|\\
-		Compute $\mathcal{C}x=Cx$ for a projection of the form~(\ref{eq:constrained}).
-	\item \code|BoundaryVector M(const BoundaryVector& f)|\\
-		Compute $\mathcal{M}f=\mathcal{C}\mathcal{A}^{-1}\mathcal{B}f$, the matrix that must be inverted in the second step of the algorithm~(\ref{eq:projection_alg}).  Note that for the Navier-Stokes equations, this operator should be symmetric ($\mathcal{M}=\mathcal{M}^T$).
-	\item \code|virtual BoundaryVector Minv(const BoundaryVector& b) = 0|\\
+	\item \code|void Ainv(const Scalar* x, Scalar* y)|\\
+		Compute $y = \mathcal{A}^{-1}x=(1+(\alpha/2)L)^{-1}x$ for a projection of the form~(\ref{eq:constrained})
+	\item \code|void B(const BoundaryVector* f, Scalar* y)|\\
+		Compute $y = \mathcal{B}f=\alpha Bf$, for a projection of the form~(\ref{eq:constrained}).
+	\item \code|void C(const Scalar* x, BoundaryVector* y)|\\
+		Compute $y = \mathcal{C}x=Cx$ for a projection of the form~(\ref{eq:constrained}).
+	\item \code|void M(const BoundaryVector* f, BoundaryVector* y)|\\
+		Compute $y = \mathcal{M}f=\mathcal{C}\mathcal{A}^{-1}\mathcal{B}f$, the matrix that must be inverted in the second step of the algorithm~(\ref{eq:projection_alg}).  Note that for the Navier-Stokes equations, this operator should be symmetric ($\mathcal{M}=\mathcal{M}^T$).
+	\item \code|virtual void Minv(const BoundaryVector* b, BoundaryVector* f) = 0|\\
 		Solve $\mathcal{M}f=b$ for $f$.  Pure virtual function: must be overloaded by subclasses.
 	\item \code|Geometry* getGeometry()|\\
 		Return a pointer to the associated \class{Geometry}.
@@ -342,10 +354,10 @@ This class assumes the matrix~$\mathcal{M}$ is symmetric, and computes the Chole
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|CholeskySolver(const NavierStokesModel& model, double alpha)|\\
+	\item \code|CholeskySolver(const NavierStokesModel* model, double alpha)|\\
 		Constructor.  Note that before using \fn{Minv} (needed by \fn{solve} in the base class), one must first call either \fn{computeCholesky} or \fn{loadCholesky}.
-	\item \code|BoundaryVector Minv(const BoundaryVector& b)|\\
-		Solve $\mathcal{M}f = b$ directly using a Cholesky factorization already computed.
+	\item \code|void Minv(const BoundaryVector* b, BoundaryVector* f)|\\
+		Solve $\mathcal{M}f = b$ for $f$ directly using a Cholesky factorization already computed.
 	\item \code|void computeCholesky()|\\
 		Compute the Cholesky decomposition of~$\mathcal{M}$, storing it as private data.
 	\item \code|bool loadCholesky(const string& fileName)|\\
@@ -367,12 +379,12 @@ This class assumes the matrix~$\mathcal{M}$ is symmetric, and iterates until a s
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|ConjugateGradientSolver(const NavierStokesModel& model, double alpha, double tolerance)|\\
+	\item \code|ConjugateGradientSolver(const NavierStokesModel\* model, double alpha, double tolerance)|\\
 		Constructor.  Store tolerance as private data.
 	\item \code|void setTolerance(double tolerance)|
 	\item \code|double getTolerance}()|
-	\item \code|BoundaryVector Minv(const BoundaryVector& b)|\\
-		Solve $\mathcal{M}f = b$ iteratively, using a conjugate gradient method.
+	\item \code|void Minv(const BoundaryVector* b, BoundaryVector* f)|\\
+		Solve $\mathcal{M}f = b$ for $f$ iteratively, using a conjugate gradient method.
 \end{description}
 
 
@@ -385,7 +397,7 @@ This is an abstract base class, and may not be instantiated directly, but all op
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|NavierStokesModel(const Grid& grid, const Geometry& geom)|\\
+	\item \code|NavierStokesModel(const Grid* grid, const Geometry* geom, double Reynolds)|\\
 		Constructor.  Set up the appropriate data needed to evaluate $\Lambda$, and the discrete sin transform $S$, $S^{-1}$.  Does not make a local copy of \class{Geometry}, but instead keeps a reference (or pointer) to the one passed.
 	\item \code|~NavierStokesModel()|\\
 	\item \code|Geometry *getGeometry()|\\
@@ -394,44 +406,41 @@ This is an abstract base class, and may not be instantiated directly, but all op
 		Return a pointer to the associated \class{Grid}.
 	\item \code|Scalar* getLambda()|\\
 		Return a reference to the eigenvalues $\Lambda$ of~$L$.
-	\item \code|Scalar S(const Scalar& g)|\\
+	\item \code|void S(const Scalar* g, Scalar* ghat)|\\
 		Transform to eigenvectors of~$L$ (discrete sin transform).
-	\item \code|Scalar Sinv(const Scalar& ghat)|\\
+	\item \code|void Sinv(const Scalar* ghat, Scalar* g)|\\
 		Inverse transform $S^{-1}$.  Note that for the discrete sin transform, $S^{-1}$ should equal~$S$, but in some implementations, these may differ by a normalization constant.
-	\item \code|Scalar B(const BoundaryVector& f)|\\
-		Return $Bf$, as in~(\ref{eq:model}).
-	\item \code|BoundaryVector C(const Scalar& gamma)|\\
-		Return $C\gamma$, as in~(\ref{eq:model}).
-	\item \code|Flux regularize(const BoundaryVector& f)|\\
+	\item \code|void B(const BoundaryVector* f, Scalar* gamma)|\\
+		Compute $\gamma = Bf$, as in~(\ref{eq:model}).
+	\item \code|void C(const Scalar* gamma, BoundaryVector* f)|\\
+		Compute $f = C\gamma$, as in~(\ref{eq:model}).
+	\item \code|void regularize(const BoundaryVector* f, Flux* q)|\\
 		Operator $E^T$ in~(\ref{eq:navier_stokes}).
-	\item \code|BoundaryVector regularize(const Flux& q)|\\
+	\item \code|void regularize(const Flux* q, BoundaryVector* f)|\\
 		Transpose of regularize, operator $E$ in~(\ref{eq:navier_stokes}).
 	\item \code|void updateRegularization()|\\
 		Update the operators \fn{regularize}.  Must be called whenever the body position changes.
-	\item \code|virtual Scalar nonlinear(const State& x) = 0|\\
-		Compute nonlinear terms: pure virtual function, must be overridden by subclasses. 
+	\item \code|virtual void nonlinear(const State* x, Scalar* y) = 0|\\
+		Compute nonlinear terms $y = N(x)$: pure virtual function, must be overridden by subclasses.
 \end{description}
 
 \paragraph{Protected}
 \begin{description}
-	\item \code|Scalar bilinear(const State& x1, const State& x2)|\\
-		Return bilinear term, used by subclasses (e.g. $N(q)=\operatorname{bilinear}(q,q)$).
+	\item \code|void bilinear(const State* x1, const State* x2, Scalar* y)|\\
+		Return bilinear term, used by subclasses (e.g. $y = N(q)=\operatorname{bilinear}(q,q)$).
 \end{description}
 
 \paragraph{Design notes}
 Another option is to define \fn{regularize} in the \class{Geometry} class, so that it can be more easily updated when the body moves (then these updates occur only within one class).  However, this does not seem as appropriate, since otherwise \class{Geometry} does not need to know any information about the \class{Grid}, which is needed to compute regularization operators.  Also, all other operators are defined within the \class{NavierStokesModel}, so \fn{regularize} seems to fit better here.
 
-\paragraph{Implementation}
-In order to compute the regularization, one needs to keep track of which cells are neighbors (within the region of support) of each boundary point.  More specifically, one needs to keep track of which horizontal/vertical forces or velocities are associated with each horizontal/vertical flux value, or vice versa.  In the Fortran 90 code, this is done as follows: for each flux index, one keeps track of a list of associated force indices, and a corresponding weighting factor for the association.  (Presumably, these weights need to satisfy an invariant, such as all weights for a given flux index or force index should sum to one, and this could be verified in tests.)
-
-This is probably not the most efficient implementation, since many flux indices have no associated boundary points, and so these points do not need to be looped over in \fn{reg} or \fn{regT} in the Fortran code.  A better implementation is probably one of the following: for each boundary point, keep a list of associated flux points, and iterate over these; or just keep an unordered list of ``associations'' between flux indices and force indices, that can be looped over.  Note that it may be useful for other reasons to be able to look up the associated boundary points for each cell, but one never actually needs this for computing the regularization, or indeed anywhere else in the Fortran code.
+Because the regularization operations are also required in other parts of the code, unrelated to the Navier-Stokes solver (e.g. computing the lift and drag), it probably makes sense to encapsulate the regularization operators in a separate class, \class{Regularizer}.  The NavierStokesSolver could then point to an instance of Regularizer
 
 \subsubsection{NonlinearNavierStokes}
 Define the nonlinear term for the full nonlinear Navier-Stokes equations.
 \todo{Get the explicit form of this from Sunil, from Tim's papers, or from the old code.}
 \paragraph{Interface}
 \begin{description}
-	\item \code|Scalar nonlinear(const State& x)|
+	\item \code|void nonlinear(const State* x, Scalar* y)|
 \end{description}
 
 \subsubsection{LinearNavierStokes}
@@ -439,9 +448,9 @@ Define the ``nonlinear'' term $N(q)$ for Navier-Stokes equations linearized abou
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|LinearNavierStokes(const Grid& grid, const Geometry& geom, const State& baseflow)|\\
+	\item \code|LinearNavierStokes(const Grid* grid, const Geometry* geom, const State* baseflow)|\\
 		Constructor for Navier-Stokes equations linearized about a constant equilibrium solution given by baseflow.
-	\item \code|Scalar nonlinear(const State& x)|
+	\item \code|void nonlinear(const State* x, Scalar* y)|
 \end{description}
 
 \subsubsection{AdjointNavierStokes}
@@ -449,10 +458,41 @@ Define the ``nonlinear'' term $N(q)$ for adjoint Navier-Stokes equations, linear
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|AdjointNavierStokes(const Grid& grid, const Geometry& geom, const State& baseflow)|\\
+	\item \code|AdjointNavierStokes(const Grid* grid, const Geometry* geom, const State* baseflow)|\\
 		Constructor for adjoint equations for Navier-Stokes linearized about a constant equilibrium solution given by baseflow.
-	\item \code|Scalar nonlinear(const State& x)|
+	\item \code|void nonlinear(const State* x, Scalar* y)|
 \end{description}
+
+\subsection{Regularizer}
+Define regularization operations that lift boundary vectors to a grid, and interpolate from a grid onto boundary locations.
+
+Let $B$ denote a body, and $\xi\in\partial B$ denote points on the boundary.  Then, if $x\in\Omega$ denotes a point in the fluid domain~$\Omega$, we have, by definition of the delta function:
+\begin{align}
+	u(x) &= \int_\Omega u(\xi) \delta(x-\xi)\,d\xi\\
+	u(\xi) &= \int_\Omega u(x) \delta(x-\xi)\,dx,
+\end{align}
+We discretize both of these integrals using a regularized version of the delta function, as in eq~(14) of~\cite{TaiCol-06}, and evaluate the integrals using quadrature.  In the discrete setting, the first equation is called {\em regularizing} from the boundary onto the grid, and the second is called {\em interpolating} from the grid onto the boundary.
+
+\todo{What invariants should be satisfied by these, for testing?  For instance, what are the properties of the discrete delta function~(14) in~\cite{TaiCol-06}?  Should $\operatorname{Interpolate}\circ\operatorname{Regularize} = \operatorname{Identity}$?}
+
+\paragraph{Interface}
+\begin{description}
+	\item \code|Regularizer(const Grid* grid, const Geometry* geom)|
+	\item \code|void update()|\\
+	Update operators, for instance when position of the bodies changes.
+	\item \code|void toGrid(const BoundaryVector* uBoundary, Scalar* uGrid)|\\
+	Regularize boundary data to grid
+	\item \code|void toBoundary(const Scalar* uGrid, BoundaryVector* uBoundary)|\\
+	Interpolate grid data to boundary
+\end{description}
+
+\paragraph{Collaborations}
+Used by \class{NavierStokesModel} for including forcing terms and constraints, and by output routines that compute overall forces and moments on the bodies.
+
+\paragraph{Implementation}
+In order to compute the regularization, one needs to keep track of which cells are neighbors (within the region of support) of each boundary point.  More specifically, one needs to keep track of which horizontal/vertical forces or velocities are associated with each horizontal/vertical flux value, or vice versa.  In the Fortran 90 code, this is done as follows: for each flux index, one keeps track of a list of associated force indices, and a corresponding weighting factor for the association.  (Presumably, these weights need to satisfy an invariant, such as all weights for a given flux index or force index should sum to one, and this could be verified in tests.)
+
+This is probably not the most efficient implementation, since many flux indices have no associated boundary points, and so these points do not need to be looped over in \fn{reg} or \fn{regT} in the Fortran code.  A better implementation is probably one of the following: for each boundary point, keep a list of associated flux points, and iterate over these; or just keep an unordered list of ``associations'' between flux indices and force indices, that can be looped over.  Note that it may be useful for other reasons to be able to look up the associated boundary points for each cell, but one never actually needs this for computing the regularization, or indeed anywhere else in the Fortran code.
 
 \subsection{Grid}
 Define parameters associated with an Eulerian grid.
@@ -480,7 +520,7 @@ Include time, Scalar gamma, Flux q, and BoundaryVector f.  Possibly also boundar
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|State(const Grid& grid, const Geometry& geom)|\\
+	\item \code|State(const Grid* grid, const Geometry* geom)|\\
 		Constructor.  Allocate memory for the associated objects (flux, circulation, and forces).
 	\item \code|~State()|\\
 		Destructor.
@@ -498,14 +538,14 @@ Include time, Scalar gamma, Flux q, and BoundaryVector f.  Possibly also boundar
 \end{description}
 
 \paragraph{Implementation}
-No need to store the Grid and Geometry information in the state, since it is already contained in the contained data structures.
+No need to store the Grid and Geometry information in the state, since it is already contained in the contained data structures.  This should probably be a \code|struct|, not a \code|class|, since it has only public data.
 
 \subsection{Scalar}
 Data structure and interface for storing a 2d array of scalars, located at cell centers, on multiple grids.
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|Scalar(const Grid& grid)|\\
+	\item \code|Scalar(const Grid* grid)|\\
 	Allocate memory for the 2d array.
 	\item Addition/subtraction of two Scalars
 	\item Addition/subtraction of a double and a Scalar
@@ -524,7 +564,7 @@ x = omega(ind);
 
 \paragraph{Routines}
 \begin{description}
-	\item \code|InnerProduct(const Scalar& x, const Scalar& y)|\\
+	\item \code|double InnerProduct(const Scalar* x, const Scalar* y)|\\
 	Standard inner product.  Note that this will need to know the grid spacing, and probably access the internal implementation, so should be a \code|friend|.
 \end{description}
 
@@ -544,7 +584,7 @@ Data structure and interface for storing a 2D array of fluxes, located at cell e
 
 \paragraph{Routines}
 \begin{description}
-	\item \code|InnerProduct(const Flux& x, const Flux& y)|\\
+	\item \code|double InnerProduct(const Flux* x, const Flux* y)|\\
 	Standard inner product of vector fields in $\mathbb{R}^2$.  Note that this will need to know the grid spacing, and probably access the internal implementation, for speed, so should be a \code|friend| of \class{Flux}.
 \end{description}
 
@@ -558,7 +598,7 @@ Data structure and interface for storing vectors located at boundary points (for
 	Constructor, allocating memory for a body with $n$ points on the boundary.
 	\item \code|BoundaryVector(int n, double* data)| \\
 	Constructor using pre-existing data, as a 1d array (as returned by \fn{flatten} below).
-	\item \code|getSize()| \\
+	\item \code|int getSize()| \\
 	Return $n$, the number of points on the boundary.
 	\item Addition/subtraction of BoundaryVectors of the same size.
 	\item Multiplication of BoundaryVector by a double.
@@ -570,7 +610,7 @@ Data structure and interface for storing vectors located at boundary points (for
 
 \paragraph{Routines}
 \begin{description}
-	\item \code|double InnerProduct(BoundaryVector& x, BoundaryVector& y)|
+	\item \code|double InnerProduct(BoundaryVector* x, BoundaryVector* y)|
 \end{description}
 
 \paragraph{Design notes}
@@ -597,7 +637,7 @@ Each geometry can be saved to or loaded from a file, and the interface should be
 		Constructor
 	\item \code|~Geometry()| \\
 		Destructor
-	\item \code|void addBody(const RigidBody& body)| \\
+	\item \code|void addBody(const RigidBody* body)| \\
 		Append the given \class{RigidBody} to the list of bodies in the current geometry, making a copy of it internally.
 	\item \code|void load(const istream& in)| \\
 		Load a geometry from the specified input stream.  The format of the input file is as follows:
@@ -618,15 +658,15 @@ end
 	 Whitespace at the beginnings of lines is ignored, and comments are started by \#.
 	\item \code|void setName(const string& name)| \\
 		Set the name of the current geometry.
-	\item \code|void setModel(const NavierStokesModel& model)| \\
+	\item \code|void setModel(const NavierStokesModel* model)| \\
 		Set an associated \class{NavierStokesModel}.
 	\item \code|void moveBodies(double time)| \\
 		Update the position and velocities of the bodies, as specified by the associated \class{Motion}.  Also updates \fn{regularize} and \fn{regularizeT}, via the associated \class{NavierStokesModel}.
 	\item \code|int getNumPoints()| \\
 		Return the total number of points in all bodies.
-	\item \code|BoundaryVector getPoints()| \\
+	\item \code|void getPoints(BoundaryVector* coords)| \\
 		Return the list of coordinates for each point on each body.
-	\item \code|BoundaryVector getVelocities()| \\
+	\item \code|void getVelocities(BoundaryVector* vel)| \\
 		Return the list of velocities at each point on each body.		
 \end{description}
 
@@ -735,7 +775,7 @@ Store these transformations $(x,y,\theta)\in SE(2)$, and provide their actions o
 \begin{description}
 	\item \code|SE2(double x, double y, double theta)|\\
 		Constructor for a transformation corresponding to rotation by $\theta$, followed by translation by $(x,y)$.
-	\item \code|map(double a, double b, double& a_new, double& b_new)|\\
+	\item \code|void map(double a, double b, double& a_new, double& b_new)|\\
 		Given the point~$(a,b)$, compute the mapped point~$(a_\text{new},a_\text{new})$.
 \end{description}
 
@@ -752,13 +792,13 @@ where here the first two components $(a,b)$ are treated as ``points'' in the pla
 \begin{description}
 	\item \code|TangentSE2(double x, double y, double theta, double xdot, double ydot, double thetadot)|\\
 		Constructor where the base point is $g=(x,y,\theta)\in SE(2)$, and the tangent vector is $\dot g=(\dot x, \dot y, \dot\theta)\in T_g SE(2)$.
-	\item \code|setPosition(double x, double y, double theta)|
-	\item \code|getPosition(double& x, double& y, double& theta)|
-	\item \code|setVelocity(double xdot, double ydot, double thetadot)|
-	\item \code|getVelocity(double& xdot, double& ydot, double& thetadot)|
-	\item \code|mapPosition(double a, double b, double& a_new, double& b_new)|\\
+	\item \code|void setPosition(double x, double y, double theta)|
+	\item \code|void getPosition(double& x, double& y, double& theta)|
+	\item \code|void setVelocity(double xdot, double ydot, double thetadot)|
+	\item \code|void getVelocity(double& xdot, double& ydot, double& thetadot)|
+	\item \code|void mapPosition(double a, double b, double& a_new, double& b_new)|\\
 		Given the point $(a,b)$, compute the mapped point $(a_\text{new},b_\text{new})$.
-	\item \code|mapVelocity(double a, double b, double& u_new, double& v_new)|\\
+	\item \code|void mapVelocity(double a, double b, double& u_new, double& v_new)|\\
 		Given the point $(a,b)$ (with zero initial velocity), compute the mapped velocity $(u_\text{new},v_\text{new})$.
  \end{description}
 
