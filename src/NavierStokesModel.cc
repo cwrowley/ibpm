@@ -1,9 +1,9 @@
-/*! \file NavierStokes.cc
+/*! \file NavierStokesModel.cc
 
 This is an example description.
 */
 
-#include "NavierStokes.h"
+#include "NavierStokesModel.h"
 
 //! Test routine for now.
 /*! \param[in] x

@@ -31,10 +31,10 @@
  * \author Clancy Rowley
  * \date  3 Jul 2008
  *
- * $Revision: $
- * $LastChangedDate: $
- * $LastChangedBy: $
- * $HeadURL: $
+ * $Revision$
+ * $LastChangedDate$
+ * $LastChangedBy$
+ * $HeadURL$
  */
 
 class ProjectionSolver {

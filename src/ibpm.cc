@@ -1,13 +1,28 @@
-/*! \file ibpm2.cc
- *  
- * Sample main routine for IBPM code.
+/**
+ * \file ibpm.cc
+ *
+ * \brief Sample main routine for IBFS code
+ * 
+ * \author Clancy Rowley
+ * \date  3 Jul 2008
+ *
+ * $Revision$
+ * $Date$
+ * $Author$
+ * $HeadURL$
  */
+
 #include <iostream>
 #include <fstream>
+#include "Grid.h"
+#include "Geometry.h"
+#include "NonlinearNavierStokes.h"
+#include "RungeKutta3.h"
 
 using namespace std;
 
-/*! \brief Setup a timestepper and advance the flow in time
+/*! \brief Sample main routine for IBFS code
+ *  Set up a timestepper and advance the flow in time.
  *  Just a skeleton of this for now.  Eventually this should read parameters
  *  from an input file, do checking for bad input, etc.
  */

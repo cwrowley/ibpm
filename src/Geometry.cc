@@ -1,14 +1,17 @@
-/*! \file Geometry.cc
-
-This is an example description.
-*/
+/**
+ * \file Geometry.cc
+ *
+ * \author Clancy Rowley
+ * \date  3 Jul 2008
+ *
+ * $Revision$
+ * $Date$
+ * $Author$
+ * $HeadURL$
+ */
 
 #include "Geometry.h"
 
-//! Test routine for now
-/*! \param[in] i Integer argument
- *  \return argument incremented by 1
- */
 int plus_one(int i) {
 	return i+1;
 }

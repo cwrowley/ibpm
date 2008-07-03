@@ -10,7 +10,8 @@
 
 all: lib ibpm
 	
-OBJS = Geometry.o NavierStokes.o
+OBJS = Geometry.o NavierStokesModel.o
+
 CXX = g++
 CXXFLAGS = -g
 AR = ar
@@ -18,8 +19,6 @@ ARFLAGS = -r
 
 IBPMLIB = ../lib/libibpm.a
 IBPM = ../bin/ibpm
-
-OBJS = Geometry.o NavierStokes.o
 
 .PHONY: ibpm clean
 
