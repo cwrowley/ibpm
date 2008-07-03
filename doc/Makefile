@@ -20,7 +20,7 @@ doc:
 	(pdflatex $<; pdflatex $<)
 
 clean:
-	/bin/rm -f *.aux *.fdb_latexmk *.log *.out *.pdfsync
+	/bin/rm -f *.aux *.toc *.blg *.fdb_latexmk *.log *.out *.pdfsync
 
 distclean: clean
 	/bin/rm -rf html latex ibpm_design.pdf

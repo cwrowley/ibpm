@@ -11,8 +11,8 @@
 \date  3 Jul 2008
 
 $Revision$
-$Date$
-$Author$
+$LastChangedDate$
+$LastChangedBy$
 $HeadURL$
 */
 
