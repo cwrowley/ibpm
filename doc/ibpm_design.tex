@@ -572,18 +572,18 @@ Scalar::Index ind;
 ind = 7,2;         // some pair of indices
 x = omega(ind);
 	\end{lstlisting}
-	\item \code|void curl(const Flux& q)|\\
-	Set \code|*this| (the current Scalar) to the curl of q.
-	\item \code|void sinTransform(const Scalar& gamma)|\\
-	Set \code|*this| to the discrete sin transform of the argument.  (Assumes different chunks of memory.)
-	\item \code|void sinTransformInv(const Scalar& gamma)|\\
-	Set \code|*this| to the inverse discrete sin transform of the argument.
-	\item \code|void laplacian(const Scalar& gamma)|\\
-	Set \code|*this| to the Laplacian of the argument.
-	\item \code|void laplacianInverse(const Scalar& gamma)|\\
-	Assume zero boundary conditions for now (not for multiple grids).
-	\item \code|void divergence(const Flux& q)|\\
-	Set \code|*this| to the divergence of the argument.
+	\item \code|Scalar curl(const Flux& q)|\\
+	Set \code|*this| (the current Scalar) to the curl of q.  Returns \code|*this|.
+	\item \code|Scalar sinTransform(const Scalar& gamma)|\\
+	Set \code|*this| to the discrete sin transform of the argument.  (Assumes different chunks of memory.)   Returns \code|*this|.
+	\item \code|Scalar sinTransformInv(const Scalar& gamma)|\\
+	Set \code|*this| to the inverse discrete sin transform of the argument.   Returns \code|*this|.
+	\item \code|Scalar laplacian(const Scalar& gamma)|\\
+	Set \code|*this| to the Laplacian of the argument.   Returns \code|*this|.
+	\item \code|Scalar laplacianInverse(const Scalar& gamma)|\\
+	Assume zero boundary conditions for now (not for multiple grids).   Returns \code|*this|.
+	\item \code|Scalar divergence(const Flux& q)|\\
+	Set \code|*this| to the divergence of the argument.   Returns \code|*this|.
 	\item \code|double dot(const Scalar& g)|\\
 	Return dot product of \code|*this| and argument.
 	\item May need to provide direct access to the raw data in memory, for computing FFTs (experiment with FFTW to determine a good interface).
@@ -609,10 +609,10 @@ q.x(i,j);   // i in [0,m]
 q.y(i,j);   // i in [0,m-1]
 		    // j in [0,n]
 \end{lstlisting}
-	\item \code|void curl(const Scalar& f)|\\
-	Set \code|*this| to the curl of the argument.
-	\item \code|void gradient(const Scalar& f)|\\
-	Set \code|*this| to the gradient of the argument.
+	\item \code|Flux curl(const Scalar& f)|\\
+	Set \code|*this| to the curl of the argument.  Returns \code|*this|.
+	\item \code|Flux gradient(const Scalar& f)|\\
+	Set \code|*this| to the gradient of the argument.  Returns \code|*this|.
 	\item \code|double dot(const Flux& q)|\\
 	Return the dot product of \code|*this| and the argument.
 	\item Provide an index type \code|Flux::Index| (and possibly an iterator) so that one can refer to individual elements and store these in array (for instance for implementing \code|regularize| in \class{NavierStokesModel}).
