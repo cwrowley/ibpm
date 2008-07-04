@@ -29,6 +29,9 @@ class Scalar {
 public:
 	/// Allocate memory for the 2D array
 	Scalar(const Grid& grid);
+	
+	/// Deallocate memory in the destructor
+	~Scalar();
 
 	// Scalar f, f1, f2;
 	// double a;

@@ -21,28 +21,28 @@
 } 
 
 /// Return the x-coordinate of the center of cell i  (i in 0..m-1)
-double Grid::getXCenter(int i) {
+double Grid::getXCenter(int i) const {
 	assert(i >= 0);
 	assert(i < _nx);
 	return _xOffset + (i+0.5) * _dx;
 }
 
 /// Return the y-coordinate of the center of cell j  (j in 0..n-1)
-double Grid::getYCenter(int j) {
+double Grid::getYCenter(int j) const {
 	assert(j >= 0);
 	assert(j < _ny);
 	return _yOffset + (j+0.5) * _dx;
 }
 
 /// Return the x-coordinate of the left edge of cell i  (i in 0..m)
-double Grid::getXEdge(int i) {
+double Grid::getXEdge(int i) const {
 	assert(i >= 0);
 	assert(i <= _nx);
 	return _xOffset + i * _dx;
 }
 
 /// Return the y-coordinate of the bottom edge of cell j  (j in 0..n)
-double Grid::getYEdge(int j) {
+double Grid::getYEdge(int j) const {
 	assert(j >= 0);
 	assert(j <= _ny);
 	return _yOffset + j * _dx;

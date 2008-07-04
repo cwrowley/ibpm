@@ -14,11 +14,18 @@
 // $HeadURL:// $Header$
 
 #include "Scalar.h"
+#include "Grid.h"
 #include <blitz/array.h>
 
 Scalar::Scalar(const Grid& grid) {
 	_grid = &grid;
+	_nx = _grid->getNx();
+	_ny = _grid->getNy();
 	// allocate memory here
+}
+
+Scalar::~Scalar() {
+	// deallocate memory here
 }
 
 // Scalar f, f1, f2;

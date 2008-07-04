@@ -32,25 +32,25 @@ public:
 	}
 
 	/// Return number of cells in x-direction
-	inline int getNx() { return _nx; }
+	inline int getNx() const { return _nx; }
 	
 	/// Return number of cells in y-direction
-	inline int getNy() { return _ny; }
+	inline int getNy() const { return _ny; }
 	
 	/// Return grid spacing (same in x- and y-directions)
-	inline double getDx() { return _dx; }
+	inline double getDx() const { return _dx; }
 
 	/// Return the x-coordinate of the center of cell i  (i in 0..m-1)
-	double getXCenter(int i);
+	double getXCenter(int i) const;
 	
 	/// Return the y-coordinate of the center of cell j  (j in 0..n-1)
-	double getYCenter(int j);
+	double getYCenter(int j) const;
 
 	/// Return the x-coordinate of the left edge of cell i  (i in 0..m)
-	double getXEdge(int i);
+	double getXEdge(int i) const;
 	
 	/// Return the y-coordinate of the bottom edge of cell j  (j in 0..n)
-	double getYEdge(int j);
+	double getYEdge(int j) const;
 
 
 private:
