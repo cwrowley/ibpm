@@ -8,9 +8,9 @@
 //
 // Date: 3 Jul 2008
 //
-// $Revision: 17 $
-// $LastChangedDate: 2008-07-03 01:55:25 -0400 (Thu, 03 Jul 2008) $
-// $LastChangedBy: clancy $
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
 // $HeadURL:// $Header$
 
 #include "Grid.h"

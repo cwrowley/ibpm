@@ -11,10 +11,10 @@
 	scalars are defined at cell centers and fluxes are defined at cell edges.
 
 	\author Clancy Rowley
-	\author $LastChangedBy: $
+	\author $LastChangedBy$
 	\date  3 Jul 2008
-	\date $LastChangedDate: $
-	\version $Revision: $
+	\date $LastChangedDate$
+	\version $Revision$
 */
 
 class Grid {
