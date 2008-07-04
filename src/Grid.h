@@ -9,6 +9,9 @@
 
 	Uses a staggered grid, suitable for a finite-volume method, in which
 	scalars are defined at cell centers and fluxes are defined at cell edges.
+	
+	\image html grid.pdf "Layout of staggered grid"
+	\image latex grid.pdf "Layout of staggered grid"
 
 	\author Clancy Rowley
 	\author $LastChangedBy$
@@ -57,4 +60,5 @@ private:
 	double _xOffset;
 	double _yOffset;
 };
+
 #endif /* _GRID_H_ */
