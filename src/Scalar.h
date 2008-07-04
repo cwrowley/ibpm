@@ -19,10 +19,10 @@ class Flux;
 	as inner product of scalar fields.
 
 	\author Clancy Rowley
-	\author $LastChangedBy: $
+	\author $LastChangedBy$
 	\date  4 Jul 2008
-	\date $LastChangedDate: $
-	\version $Revision: $
+	\date $LastChangedDate$
+	\version $Revision$
 */
 
 class Scalar {

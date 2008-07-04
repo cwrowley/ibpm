@@ -8,9 +8,9 @@
 //
 // Date: 4 Jul 2008
 //
-// $Revision: 22 $
-// $LastChangedDate: 2008-07-04 00:10:53 -0400 (Fri, 04 Jul 2008) $
-// $LastChangedBy: clancy $
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
 // $HeadURL:// $Header$
 
 #include "Scalar.h"
