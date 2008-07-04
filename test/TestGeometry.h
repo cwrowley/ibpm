@@ -8,4 +8,8 @@ public:
 	{
 		TS_ASSERT_EQUALS(plus_one(5),6);
 	}
+
+	void testPlusOneAgain(void) {
+		TS_ASSERT_EQUALS(plus_one(-1),0);
+	}
 };

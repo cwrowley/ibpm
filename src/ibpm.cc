@@ -59,8 +59,7 @@ int main(int argc, char* argv[]) {
 	int numSteps = 100;
 	for(int i=1; i <= numSteps; ++i) {
 		cout << "step " << i << endl;
-		solver.advance(x);		
-
+		solver.advance(x);
 		// Add something in here to output force data, probe data,
 		// save restart files, etc.
 		// Define a Logger class to handle all of this in one place?

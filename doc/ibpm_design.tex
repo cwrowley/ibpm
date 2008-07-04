@@ -497,26 +497,39 @@ This is probably not the most efficient implementation, since many flux indices 
 \subsection{Grid}
 Define parameters associated with an Eulerian grid.
 
-Use single grid for now.  Will want to extend to multiple grids, but choose to design the interface for a single grid first, so that we can iterate and refine the design before extending to multiple grids.
+A staggered grid is used, as shown in Figure~\ref{fig:grid}, with scalars (e.g., vorticity, streamfunction, pressure) defined at cell centers, and fluxes defined on cell edges.
+\begin{figure}[htbp]
+	\begin{center}
+		\includegraphics[width=4.5in]{Figures/grid.pdf}
+	\end{center}
+	\caption{Staggered grid of size $(m=5,n=4)$.}
+	\label{fig:grid}
+\end{figure}
+We use single grid for now, but will want to extend to multiple grids.  (We choose to design the interface for a single grid first, so that we can iterate and refine the design before extending to multiple grids.)
 
 \paragraph{Interface}
 \begin{description}
-	\item \code|Grid(int nx, int ny, double length)|\\
-		Constructor, given numbers of gridpoints in $x$ and $y$-directions, length in the $x$-direction.  A square grid is assumed.
+	\item \code|Grid(int nx, int ny, double length, double xOffset, double yOffset)|\\
+		Constructor, given numbers of gridpoints in $x$ and $y$-directions, length in the $x$-direction, and coordinates (\code|xOffset|, \code|yOffset|) of lower left gridpoint.  A square grid is assumed.
 	\item \code|int getNx()|\\
 		Return number of points in $x$-direction.
 	\item \code|int getNy()|\\
 		Return number of points in $y$-direction.
-	\item \code|double getLength()|\\
-		Return length in $x$-direction.
 	\item \code|double getDx()|\\
 		Return grid spacing (same in $x$- and $y$-directions).
-		
+	\item \code|double getXCenter(int i)|\\
+		Return the $x$-coordinate of the center of cell $i$, in Fig.~\ref{fig:grid}, for $i\in[0,m-1]$.
+	\item \code|double getYCenter(int j)|\\
+		Return the $y$-coordinate of the center of cell $j$, in Fig.~\ref{fig:grid}, for $j\in[0,n-1]$.
+	\item \code|double getXEdge(int i)|\\
+		Return the $x$-coordinate of the left edge of cell $i$, in Fig.~\ref{fig:grid}, for $i\in[0,m]$.
+	\item \code|double getYEdge(int j)|\\
+		Return the $y$-coordinate of the bottom edge of cell $j$, in Fig.~\ref{fig:grid}, for $j\in[0,n]$.		
 \end{description}
 
 
 \subsection{State}
-Include time, Scalar gamma, Flux q, and BoundaryVector f.  Possibly also boundary conditions?
+Include time, circulation about each cell (Scalar gamma), velocity flux in each direction (Flux q), and forces at the boundary (BoundaryVector f).
 
 \paragraph{Interface}
 \begin{description}
@@ -541,16 +554,16 @@ Include time, Scalar gamma, Flux q, and BoundaryVector f.  Possibly also boundar
 No need to store the Grid and Geometry information in the state, since it is already contained in the contained data structures.  This should probably be a \code|struct|, not a \code|class|, since it has only public data.
 
 \subsection{Scalar}
-Data structure and interface for storing a 2d array of scalars, located at cell centers, on multiple grids.
+Data structure and interface for storing a 2d array of scalars, located at cell centers (on multiple grids eventually).
 
 \paragraph{Interface}
 \begin{description}
 	\item \code|Scalar(const Grid& grid)|\\
 	Allocate memory for the 2d array.
-	\item Addition/subtraction of two Scalars
+	\item Access an element: \code|g(i,j)| for $i\in[0,m-1]$, $j\in[0,n-1]$.
+	\item Addition/subtraction of two Scalars: \code|g1 + g2|
 	\item Addition/subtraction of a double and a Scalar
 	\item Multiplication of a Scalar by a double
-	\item Access individual elements with $(i,j)$
 	\item Provide a type (\code|Scalar::Index|) for accessing indices.  For instance,
 	\begin{lstlisting}
 Scalar omega;
@@ -559,17 +572,27 @@ Scalar::Index ind;
 ind = 7,2;         // some pair of indices
 x = omega(ind);
 	\end{lstlisting}
+	\item \code|void curl(const Flux& q)|\\
+	Set \code|*this| (the current Scalar) to the curl of q.
+	\item \code|void sinTransform(const Scalar& gamma)|\\
+	Set \code|*this| to the discrete sin transform of the argument.  (Assumes different chunks of memory.)
+	\item \code|void sinTransformInv(const Scalar& gamma)|\\
+	Set \code|*this| to the inverse discrete sin transform of the argument.
+	\item \code|void laplacian(const Scalar& gamma)|\\
+	Set \code|*this| to the Laplacian of the argument.
+	\item \code|void laplacianInverse(const Scalar& gamma)|\\
+	Assume zero boundary conditions for now (not for multiple grids).
+	\item \code|void divergence(const Flux& q)|\\
+	Set \code|*this| to the divergence of the argument.
+	\item \code|double dot(const Scalar& g)|\\
+	Return dot product of \code|*this| and argument.
 	\item May need to provide direct access to the raw data in memory, for computing FFTs (experiment with FFTW to determine a good interface).
 \end{description}
 
-\paragraph{Routines}
-\begin{description}
-	\item \code|double InnerProduct(const Scalar& x, const Scalar& y)|\\
-	Standard inner product.  Note that this will need to know the grid spacing, and probably access the internal implementation, so should be a \code|friend|.
-\end{description}
-
 \paragraph{Implementation}
-Probably implement using Boost++, \code|Array<double,2>|.  Need to be able to take an FFT of this, so possibly want to allocate memory using an FFTW memory allocator (which ensures optimal alignment of doubles).  Governing principle: no matter what, make sure that the implementation of the arrays is independent from the interface, so the rest of the code does not need to change if the implementation is changed.
+Laplacian and its inverse should probably be implemented using sin transform and multiplication by eigenvalues (as in f90 code).  Store this matrix of eigenvalues as private class data.
+
+Probably implement using Blitz++, \code|Array<double,2>|.  Need to be able to take an FFT of this, so possibly want to allocate memory using an FFTW memory allocator (which ensures optimal alignment of doubles).  Governing principle: no matter what, make sure that the implementation of the arrays is independent from the interface, so the rest of the code does not need to change if the implementation is changed.
 
 \subsection{Flux}
 Data structure and interface for storing a 2D array of fluxes, located at cell edges.
@@ -578,16 +601,22 @@ Data structure and interface for storing a 2D array of fluxes, located at cell e
 \begin{description}
 	\item Addition/subtraction of Fluxes.
 	\item Multiplication of Flux by a double.
-	\item Access individual elements \todo{Should this interface be as an array of vectors, or as two arrays of scalars?}
+	\item Access individual elements:
+\begin{lstlisting}
+Flux q(m,n);
+q.x(i,j);   // i in [0,m]
+            // j in [0,n-1]
+q.y(i,j);   // i in [0,m-1]
+		    // j in [0,n]
+\end{lstlisting}
+	\item \code|void curl(const Scalar& f)|\\
+	Set \code|*this| to the curl of the argument.
+	\item \code|void gradient(const Scalar& f)|\\
+	Set \code|*this| to the gradient of the argument.
+	\item \code|double dot(const Flux& q)|\\
+	Return the dot product of \code|*this| and the argument.
 	\item Provide an index type \code|Flux::Index| (and possibly an iterator) so that one can refer to individual elements and store these in array (for instance for implementing \code|regularize| in \class{NavierStokesModel}).
 \end{description}
-
-\paragraph{Routines}
-\begin{description}
-	\item \code|double InnerProduct(const Flux& x, const Flux& y)|\\
-	Standard inner product of vector fields in $\mathbb{R}^2$.  Note that this will need to know the grid spacing, and probably access the internal implementation, for speed, so should be a \code|friend| of \class{Flux}.
-\end{description}
-
 
 \subsection{BoundaryVector}
 Data structure and interface for storing vectors located at boundary points (for instance, forces, velocities of the body, and positions of the boundary points).
@@ -597,16 +626,24 @@ Data structure and interface for storing vectors located at boundary points (for
 	\item \code|BoundaryVector(int n)| \\
 	Constructor, allocating memory for a body with $n$ points on the boundary.
 	\item \code|BoundaryVector(int n, double* data)| \\
-	Constructor using pre-existing data, as a 1d array (as returned by \fn{flatten} below).
+	Constructor using pre-existing data, as a 1d array (as returned by \fn{flatten} below).  Here $n$ is still number of boundary points, and \code|*data| has size~$2n$.
+	\item \code|int getNumPoints()|\\
+	Return the number of boundary points.
 	\item \code|int getSize()| \\
-	Return $n$, the number of points on the boundary.
+	Return number of elements in the array, twice the number of points on the boundary.
 	\item Addition/subtraction of BoundaryVectors of the same size.
 	\item Multiplication of BoundaryVector by a double.
 	\item \code|double *flatten()|\\
 	Return a pointer to the data, expressed as a 1d C-style array.
+	\item Access individual elements:
+\begin{lstlisting}
+f.x(i)		// i in [0,n-1]
+f.y(i)		// i in [0,n-1]
+\end{lstlisting}
+	\item \code|double dot(const BoundaryVector& f)|\\
+	Return the dot product of \code|*this| and the argument.
+	
 \end{description}
-
-\todo{Should this be an array of vectors, or two arrays of scalars?  Should be consistent with the Flux interface.}
 
 \paragraph{Routines}
 \begin{description}

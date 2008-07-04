@@ -1,6 +1,9 @@
 #ifndef _PROJECTIONSOLVER_H_
 #define _PROJECTIONSOLVER_H_
 
+class BoundaryVector;
+class Scalar;
+
 /*!
 \file ProjectionSolver.h
 \class ProjectionSolver
@@ -12,7 +15,7 @@ Solve a system of the form
    (1 - \frac{\alpha}{2}L)x + \alpha Bf &= a\\
    Cx &= b
 \f}
-for f and x, using the following algorithm (a fractional step method):
+for \a f and \a x, using the following algorithm (a fractional step method):
 
 \f{align}
    Ax^* &= a\\
