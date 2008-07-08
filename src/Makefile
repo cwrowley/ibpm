@@ -16,11 +16,12 @@ CXX = g++
 CXXFLAGS = -g
 AR = ar
 ARFLAGS = -r
+MAKEDEPEND = gcc -MM
 
 IBPMLIB = ../lib/libibpm.a
 IBPM = ../bin/ibpm
 
-.PHONY: ibpm clean
+.PHONY: ibpm clean depend
 
 lib: $(IBPMLIB)
 
@@ -37,3 +38,8 @@ $(IBPM): ibpm.o $(IBPMLIB)
 
 clean:
 	/bin/rm -rf *.o
+
+.depend:
+	$(MAKEDEPEND) $(CXXFLAGS) *.cc > .depend
+	
+include .depend

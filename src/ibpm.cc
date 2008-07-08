@@ -16,8 +16,8 @@ $HeadURL$
 #include <fstream>
 #include "Grid.h"
 #include "Geometry.h"
-#include "NonlinearNavierStokes.h"
-#include "RungeKutta3.h"
+//#include "NonlinearNavierStokes.h"
+//#include "RungeKutta3.h"
 
 using namespace std;
 
