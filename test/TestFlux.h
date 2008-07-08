@@ -14,6 +14,13 @@ public:
 		Grid grid( nx, ny, length, xOffset, yOffset );
 
 		_f = new Flux( grid );
+		
+		// Is grid dimension equal to flux dimension?
+		TS_ASSERT_DELTA(grid.getNx(),_f->getNx(),_delta);
+		TS_ASSERT_DELTA(grid.getNy(),_f->getNy(),_delta);
+   		// Is grid dimension correct?
+		TS_ASSERT_DELTA(grid.getNx(),nx,_delta);
+		TS_ASSERT_DELTA(grid.getNy(),ny,_delta);
 	}
 
 	void tearDown() {

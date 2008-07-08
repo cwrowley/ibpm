@@ -22,11 +22,15 @@ Flux::Flux(const Grid& grid) {
 	_nx = _grid->getNx();
 	_ny = _grid->getNy();
 	// allocate memory
+	_x.resize(_nx,_ny-1);
+	_y.resize(_nx-1,_ny);
 }
 
 /// Deallocate memory in the destructor
 Flux::~Flux() {
 	// deallocate memory
+	_x.free();
+	_y.free();
 }
 
 /// Set *this to the curl of the argument, returning *this.

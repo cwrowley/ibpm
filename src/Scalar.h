@@ -33,6 +33,14 @@ public:
 	/// Deallocate memory in the destructor
 	~Scalar();
 
+
+	/// Return number of cells in x-direction
+	inline int getNx() const { return _nx; }
+	
+	/// Return number of cells in y-direction
+	inline int getNy() const { return _ny; }
+	
+
 	// Scalar f, f1, f2;
 	// double a;
 	

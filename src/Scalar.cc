@@ -22,10 +22,13 @@ Scalar::Scalar(const Grid& grid) {
 	_nx = _grid->getNx();
 	_ny = _grid->getNy();
 	// allocate memory here
+	_data.resize(_nx,_ny);
+	// could alternately use allocateArrays(shape(_nx,_ny), _data); 
 }
 
 Scalar::~Scalar() {
 	// deallocate memory here
+	_data.free();
 }
 
 // Scalar f, f1, f2;

@@ -1,7 +1,8 @@
 all: run_tests
 
 #TEST_FILES=SimpleTest.h ComplicatedTest.h
-TEST_FILES=TestGrid.h TestGeometry.h TestScalar.h TestFlux.h
+TEST_FILES=TestGrid.h TestGeometry.h TestScalar.h TestFlux.h 
+#TestScalar.h TestFlux.h
 CXX = g++
 INCPATH = -I ../src
 IBPMLIB = ../lib/libibpm.a

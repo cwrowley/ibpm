@@ -1,8 +1,13 @@
 #ifndef _FLUX_H_
 #define _FLUX_H_
 
+#include <blitz/array.h>
+
+BZ_USING_NAMESPACE(blitz)
+
 class Scalar;
 class Grid;
+class Flux;
 
 /*!
 	\file Flux.h
@@ -25,6 +30,12 @@ public:
 	/// Deallocate memory in the destructor
 	~Flux();
 	
+	/// Return number of cells in x-direction
+	inline int getNx() const { return _nx; }
+	
+	/// Return number of cells in y-direction
+	inline int getNy() const { return _ny; }
+	
 	/// Set *this to the curl of the argument, returning *this.
 	Flux curl(const Scalar& f);
 
@@ -40,6 +51,8 @@ private:
 	const Grid* _grid;
 	int _nx;
 	int _ny;
+	Array<double,2> _x;
+	Array<double,2> _y;
 };
 
 #endif /* _FLUX_H_ */

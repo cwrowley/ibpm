@@ -14,6 +14,14 @@ public:
 		Grid grid( nx, ny, length, xOffset, yOffset );
 
 		_f = new Scalar( grid );
+
+		// are grid dimensions equal to scalar dimensions?
+		TS_ASSERT_DELTA(grid.getNx(),_f->getNx(),_delta);
+		TS_ASSERT_DELTA(grid.getNy(),_f->getNy(),_delta);
+                // are grid dimensions correct? 
+		TS_ASSERT_DELTA(grid.getNx(),nx,_delta);
+		TS_ASSERT_DELTA(grid.getNy(),ny,_delta);
+           
 	}
 
 	void tearDown() {
@@ -25,6 +33,7 @@ public:
 	}
 	
 	// WORK HERE: add some real tests
+
 
 private:
 	Scalar* _f;
