@@ -1,9 +1,9 @@
 all: run_tests
 
 #TEST_FILES=SimpleTest.h ComplicatedTest.h
-TEST_FILES=TestGrid.h TestGeometry.h TestScalar.h TestFlux.h 
-#TestScalar.h TestFlux.h
+TEST_FILES=TestGrid.h TestGeometry.h TestScalar.h TestFlux.h TestBoundaryVector.h
 CXX = g++
+CXXFLAGS = -g
 INCPATH = -I ../src
 IBPMLIB = ../lib/libibpm.a
 
@@ -16,7 +16,7 @@ $(IBPMLIB):
 	(cd ../src; make lib)
 
 runner: runner.cc $(IBPMLIB)
-	$(CXX) -o $@ $(INCPATH) $^
+	$(CXX) $(CXXFLAGS) -o $@ $(INCPATH) $^
 
 runner.cc: $(TEST_FILES) $(IBPMLIB)
 	cxxtestgen.pl -o $@ --error-printer $^

@@ -333,15 +333,15 @@ This class is used by \class{TimeStepper}, and contains a pointer to a \class{Na
 \end{description}
 \paragraph{Protected methods}
 \begin{description}
-	\item \code|void Ainv(const Scalar& x, Scalar& y)|\\
+	\item \code|Scalar Ainv(const Scalar& x)|\\
 		Compute $y = \mathcal{A}^{-1}x=(1+(\alpha/2)L)^{-1}x$ for a projection of the form~(\ref{eq:constrained})
-	\item \code|void B(const BoundaryVector& f, Scalar& y)|\\
+	\item \code|Scalar B(const BoundaryVector& f)|\\
 		Compute $y = \mathcal{B}f=\alpha Bf$, for a projection of the form~(\ref{eq:constrained}).
-	\item \code|void C(const Scalar& x, BoundaryVector& y)|\\
+	\item \code|BoundaryVector C(const Scalar& x)|\\
 		Compute $y = \mathcal{C}x=Cx$ for a projection of the form~(\ref{eq:constrained}).
-	\item \code|void M(const BoundaryVector& f, BoundaryVector& y)|\\
+	\item \code|BoundaryVector M(const BoundaryVector& f)|\\
 		Compute $y = \mathcal{M}f=\mathcal{C}\mathcal{A}^{-1}\mathcal{B}f$, the matrix that must be inverted in the second step of the algorithm~(\ref{eq:projection_alg}).  Note that for the Navier-Stokes equations, this operator should be symmetric ($\mathcal{M}=\mathcal{M}^T$).
-	\item \code|virtual void Minv(const BoundaryVector& b, BoundaryVector& f) = 0|\\
+	\item \code|virtual BoundaryVector Minv(const BoundaryVector& b) = 0|\\
 		Solve $\mathcal{M}f=b$ for $f$.  Pure virtual function: must be overloaded by subclasses.
 	\item \code|Geometry* getGeometry()|\\
 		Return a pointer to the associated \class{Geometry}.
@@ -356,7 +356,7 @@ This class assumes the matrix~$\mathcal{M}$ is symmetric, and computes the Chole
 \begin{description}
 	\item \code|CholeskySolver(const NavierStokesModel& model, double alpha)|\\
 		Constructor.  Note that before using \fn{Minv} (needed by \fn{solve} in the base class), one must first call either \fn{computeCholesky} or \fn{loadCholesky}.
-	\item \code|void Minv(const BoundaryVector& b, BoundaryVector& f)|\\
+	\item \code|BoundaryVector Minv(const BoundaryVector& b)|\\
 		Solve $\mathcal{M}f = b$ for $f$ directly using a Cholesky factorization already computed.
 	\item \code|void computeCholesky()|\\
 		Compute the Cholesky decomposition of~$\mathcal{M}$, storing it as private data.
@@ -383,7 +383,7 @@ This class assumes the matrix~$\mathcal{M}$ is symmetric, and iterates until a s
 		Constructor.  Store tolerance as private data.
 	\item \code|void setTolerance(double tolerance)|
 	\item \code|double getTolerance}()|
-	\item \code|void Minv(const BoundaryVector& b, BoundaryVector& f)|\\
+	\item \code|BoundaryVector Minv(const BoundaryVector& b)|\\
 		Solve $\mathcal{M}f = b$ for $f$ iteratively, using a conjugate gradient method.
 \end{description}
 
@@ -395,6 +395,9 @@ The operators $B$, $C$, and~$N$ are specified directly, and $L$ is specified by 
 
 This is an abstract base class, and may not be instantiated directly, but all operators are defined in the base class except for the nonlinear term~$N(q)$.  \todo{Look up how the nonlinear term should be computed, from refs in Tim's paper, or talking to Sunil.  Also look more carefully at the other operators to see whether they need boundary conditions passed as additional parameters, or what else should be included in the objects passed to them.}
 
+\paragraph{Collaborations}
+This class contains an instance of a \class{Grid} and \class{Geometry}, as well as a \class{Regularizer}, which contains operations to regularize values from the boundary to the grid, and interpolate from the grid to the boundary.
+
 \paragraph{Interface}
 \begin{description}
 	\item \code|NavierStokesModel(const Grid& grid, const Geometry& geom, double Reynolds)|\\
@@ -405,42 +408,39 @@ This is an abstract base class, and may not be instantiated directly, but all op
 	\item \code|Grid* getGrid()|\\
 		Return a pointer to the associated \class{Grid}.
 	\item \code|Scalar* getLambda()|\\
-		Return a reference to the eigenvalues $\Lambda$ of~$L$.
-	\item \code|void S(const Scalar& g, Scalar& ghat)|\\
+		Return a pointer to the eigenvalues $\Lambda$ of~$L$.
+	\item \code|Scalar S(const Scalar& g)|\\
 		Transform to eigenvectors of~$L$ (discrete sin transform).
-	\item \code|void Sinv(const Scalar& ghat, Scalar& g)|\\
+	\item \code|Scalar Sinv(const Scalar& ghat)|\\
 		Inverse transform $S^{-1}$.  Note that for the discrete sin transform, $S^{-1}$ should equal~$S$, but in some implementations, these may differ by a normalization constant.
-	\item \code|void B(const BoundaryVector& f, Scalar& gamma)|\\
+	\item \code|Scalar B(const BoundaryVector& f)|\\
 		Compute $\gamma = Bf$, as in~(\ref{eq:model}).
-	\item \code|void C(const Scalar& gamma, BoundaryVector& f)|\\
+	\item \code|BoundaryVector C(const Scalar& gamma)|\\
 		Compute $f = C\gamma$, as in~(\ref{eq:model}).
-	\item \code|void regularize(const BoundaryVector& f, Flux& q)|\\
-		Operator $E^T$ in~(\ref{eq:navier_stokes}).
-	\item \code|void regularize(const Flux& q, BoundaryVector& f)|\\
-		Transpose of regularize, operator $E$ in~(\ref{eq:navier_stokes}).
-	\item \code|void updateRegularization()|\\
-		Update the operators \fn{regularize}.  Must be called whenever the body position changes.
-	\item \code|virtual void nonlinear(const State& x, Scalar& y) = 0|\\
+	\item \code|virtual Scalar nonlinear(const State& x) = 0|\\
 		Compute nonlinear terms $y = N(x)$: pure virtual function, must be overridden by subclasses.
 \end{description}
 
 \paragraph{Protected}
 \begin{description}
-	\item \code|void bilinear(const State& x1, const State& x2, Scalar& y)|\\
+	\item \code|Scalar bilinear(const State& x1, const State& x2)|\\
 		Return bilinear term, used by subclasses (e.g. $y = N(q)=\operatorname{bilinear}(q,q)$).
 \end{description}
 
 \paragraph{Design notes}
-Another option is to define \fn{regularize} in the \class{Geometry} class, so that it can be more easily updated when the body moves (then these updates occur only within one class).  However, this does not seem as appropriate, since otherwise \class{Geometry} does not need to know any information about the \class{Grid}, which is needed to compute regularization operators.  Also, all other operators are defined within the \class{NavierStokesModel}, so \fn{regularize} seems to fit better here.
+Note that some basic mathematical operations (such as curl of a vector, and of a scalar) are defined in the \class{Scalar} and \class{Flux} classes, so this class does not need to define such low-level operations.
 
-Because the regularization operations are also required in other parts of the code, unrelated to the Navier-Stokes solver (e.g. computing the lift and drag), it probably makes sense to encapsulate the regularization operators in a separate class, \class{Regularizer}.  The NavierStokesSolver could then point to an instance of Regularizer
+Also note that the regularization operators ($E$ and $E^T$ in~(\ref{eq:model})) are not defined here.  Because these operations are also required in other parts of the code, unrelated to the Navier-Stokes solver (e.g. computing the lift and drag), it probably makes sense to encapsulate the regularization operators in a separate class, \class{Regularizer}.  The NavierStokesSolver could then point to an instance of Regularizer.
+
+Another option is to define the \fn{regularize} operators in the \class{Geometry} class, so that they can be more easily updated when the body moves (then these updates occur only within one class).  However, this does not seem as appropriate, since otherwise \class{Geometry} does not need to know any information about the \class{Grid}, which is needed to compute regularization operators.
+
 
 \subsubsection{NonlinearNavierStokes}
 Define the nonlinear term for the full nonlinear Navier-Stokes equations.
 \todo{Get the explicit form of this from Sunil, from Tim's papers, or from the old code.}
 \paragraph{Interface}
 \begin{description}
-	\item \code|void nonlinear(const State& x, Scalar& y)|
+	\item \code|Scalar nonlinear(const State& x)|
 \end{description}
 
 \subsubsection{LinearNavierStokes}
@@ -450,7 +450,7 @@ Define the ``nonlinear'' term $N(q)$ for Navier-Stokes equations linearized abou
 \begin{description}
 	\item \code|LinearNavierStokes(const Grid& grid, const Geometry& geom, const State& baseflow)|\\
 		Constructor for Navier-Stokes equations linearized about a constant equilibrium solution given by baseflow.
-	\item \code|void nonlinear(const State& x, Scalar& y)|
+	\item \code|Scalar nonlinear(const State& x)|
 \end{description}
 
 \subsubsection{AdjointNavierStokes}
@@ -460,7 +460,7 @@ Define the ``nonlinear'' term $N(q)$ for adjoint Navier-Stokes equations, linear
 \begin{description}
 	\item \code|AdjointNavierStokes(const Grid& grid, const Geometry& geom, const State& baseflow)|\\
 		Constructor for adjoint equations for Navier-Stokes linearized about a constant equilibrium solution given by baseflow.
-	\item \code|void nonlinear(const State& x, Scalar& y)|
+	\item \code|Scalar nonlinear(const State& x)|
 \end{description}
 
 \subsection{Regularizer}
@@ -480,9 +480,9 @@ We discretize both of these integrals using a regularized version of the delta f
 	\item \code|Regularizer(const Grid& grid, const Geometry& geom)|
 	\item \code|void update()|\\
 	Update operators, for instance when position of the bodies changes.
-	\item \code|void toGrid(const BoundaryVector& uBoundary, Scalar& uGrid)|\\
+	\item \code|Scalar toGrid(const BoundaryVector& u)|\\
 	Regularize boundary data to grid
-	\item \code|void toBoundary(const Scalar& uGrid, BoundaryVector& uBoundary)|\\
+	\item \code|BoundaryVector toBoundary(const Scalar& u)|\\
 	Interpolate grid data to boundary
 \end{description}
 
@@ -572,17 +572,17 @@ Scalar::Index ind;
 ind = 7,2;         // some pair of indices
 x = omega(ind);
 	\end{lstlisting}
-	\item \code|Scalar curl(const Flux& q)|\\
+	\item \code|Scalar& curl(const Flux& q)|\\
 	Set \code|*this| (the current Scalar) to the curl of q.  Returns \code|*this|.
-	\item \code|Scalar sinTransform(const Scalar& gamma)|\\
+	\item \code|Scalar& sinTransform(const Scalar& gamma)|\\
 	Set \code|*this| to the discrete sin transform of the argument.  (Assumes different chunks of memory.)   Returns \code|*this|.
-	\item \code|Scalar sinTransformInv(const Scalar& gamma)|\\
+	\item \code|Scalar& sinTransformInv(const Scalar& gamma)|\\
 	Set \code|*this| to the inverse discrete sin transform of the argument.   Returns \code|*this|.
-	\item \code|Scalar laplacian(const Scalar& gamma)|\\
+	\item \code|Scalar& laplacian(const Scalar& gamma)|\\
 	Set \code|*this| to the Laplacian of the argument.   Returns \code|*this|.
-	\item \code|Scalar laplacianInverse(const Scalar& gamma)|\\
+	\item \code|Scalar& laplacianInverse(const Scalar& gamma)|\\
 	Assume zero boundary conditions for now (not for multiple grids).   Returns \code|*this|.
-	\item \code|Scalar divergence(const Flux& q)|\\
+	\item \code|Scalar& divergence(const Flux& q)|\\
 	Set \code|*this| to the divergence of the argument.   Returns \code|*this|.
 	\item \code|double dot(const Scalar& g)|\\
 	Return dot product of \code|*this| and argument.
@@ -609,9 +609,9 @@ q.x(i,j);   // i in [0,m]
 q.y(i,j);   // i in [0,m-1]
 		    // j in [0,n]
 \end{lstlisting}
-	\item \code|Flux curl(const Scalar& f)|\\
+	\item \code|Flux& curl(const Scalar& f)|\\
 	Set \code|*this| to the curl of the argument.  Returns \code|*this|.
-	\item \code|Flux gradient(const Scalar& f)|\\
+	\item \code|Flux& gradient(const Scalar& f)|\\
 	Set \code|*this| to the gradient of the argument.  Returns \code|*this|.
 	\item \code|double dot(const Flux& q)|\\
 	Return the dot product of \code|*this| and the argument.
@@ -701,9 +701,9 @@ end
 		Update the position and velocities of the bodies, as specified by the associated \class{Motion}.  Also updates \fn{regularize} and \fn{regularizeT}, via the associated \class{NavierStokesModel}.
 	\item \code|int getNumPoints()| \\
 		Return the total number of points in all bodies.
-	\item \code|void getPoints(BoundaryVector& coords)| \\
+	\item \code|BoundaryVector getPoints()| \\
 		Return the list of coordinates for each point on each body.
-	\item \code|void getVelocities(BoundaryVector& vel)| \\
+	\item \code|BoundaryVector getVelocities()| \\
 		Return the list of velocities at each point on each body.		
 \end{description}
 

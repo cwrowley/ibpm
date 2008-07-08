@@ -19,11 +19,53 @@ $HeadURL$
 */
 
 class NavierStokesModel {
+public:
+	/*! \brief Construcor, given a specied grid, geometry, and Reynolds number
+	*/
+	NavierStokesModel(
+		const Grid& grid, const Geometry& geometry, double Reynolds );
+
+	~NavierStokesModel() {}
+
+	/// Return a pointer to the associated Geometry
+	Geometry* getGeometry() { return &_geometry; }
+
+	/// Return a pointer to the associated Grid
+	Grid* getGrid() { return &_grid; }
+
+	Scalar* getLambda() { return &_lambda; }
+	
+	/// Transform to eigenvectors of L (discrete sin transform)
+	Scalar S(const Scalar& g);
+
+	/*! \brief Inverse transform of S.
+	Note that for the discrete sin transform, the S^{-1} should equal S, but
+	in some implementations (e.g. FFTW), these may differ by a normalization
+	constant.
+	*/
+	Scalar Sinv(const Scalar& ghat);
+	
+	/// Compute gamma = B(f) as in (14)
+	Scalar B(const BoundaryVector& f);
+	
+	/// Compute f = C(gamma) as in (14)
+	BoundaryVector C(const Scalar& gamma);
+	
+	/*! \brief Compute nonlinear terms y = N(x)
+	Pure virtual function: must be overridden by subclasses.
+	*/
+	virtual Scalar nonlinear(const State& x) = 0;
+
+protected:
+	/*! \brief Compute bilinear term, used by subclasses
+	(e.g. y = N(q) = bilinear(q,q) )
+	*/
+	Scalar bilinear(const State& x1, const State& x2);
+	
 private:
-	Geometry* _geometry;
-
-// ...
-
+	const Geometry& _geometry;
+	const Grid& _grid;
+	Scalar _lambda;
 };
 
 //! Full nonlinear Navier-Stokes equations.

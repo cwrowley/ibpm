@@ -2,10 +2,10 @@
 #define _SCALAR_H_
 
 #include <blitz/array.h>
+#include "Grid.h"
 
 BZ_USING_NAMESPACE(blitz)
 
-class Grid;
 class Flux;
 
 /*!
@@ -28,71 +28,237 @@ class Flux;
 class Scalar {
 public:
 	/// Allocate memory for the 2D array
-	Scalar(const Grid& grid);
+	Scalar(const Grid& grid) :
+		_grid(grid),
+		_nx(grid.getNx()),
+		_ny(grid.getNy()),
+		_data(_nx,_ny) {};
+	
+	/// Allocate new array, copy the data
+	inline Scalar(const Scalar& f) :
+		_grid(f._grid),
+		_nx(f._nx),
+		_ny(f._ny),
+		_data(_nx,_ny)
+	{
+		// copy data
+		this->_data = f._data;
+	}
 	
 	/// Deallocate memory in the destructor
-	~Scalar();
+	~Scalar() {
+		// deallocation automatic for Blitz++ arrays?
+	};
 
+	const Grid& getGrid() {
+		return _grid;
+	}
 
-	/// Return number of cells in x-direction
-	inline int getNx() const { return _nx; }
-	
-	/// Return number of cells in y-direction
-	inline int getNy() const { return _ny; }
-	
+	/// Copy assignment
+	inline Scalar& operator=(const Scalar& f) {
+		assert(f._nx == this->_nx);
+		assert(f._ny == this->_ny);
+		this->_data = f._data;
+		return *this;
+	};
 
-	// Scalar f, f1, f2;
-	// double a;
-	
-	// TO DO: overload operator f(i,j)
-	
-	// TODO: overload operator for f1 + f2
-	
-	// TODO: overload operator for f1 - f2
+	/// Copy assignment from double
+	inline Scalar& operator=(double a) {
+		this->_data = a;
+		return *this;
+	};
 
-	// TODO: overload operator for a + f
+	/// f(i,j) refers to the value at index (i,j)
+	inline double& operator()(int i, int j) {
+		return _data(i,j);
+	};
 	
-	// TODO: overload operator for a - f
+	/// f += g
+	inline Scalar& operator+=(const Scalar& f) {
+		assert(f._nx == this->_nx);
+		assert(f._ny == this->_ny);
+		this->_data += f._data;
+		return *this;
+	}
 
-	// TODO: overload operator for f + a
+	/// f += a
+	inline Scalar& operator+=(double a) {
+		this->_data += a;
+		return *this;
+	}
+
+	/// f -= g
+	inline Scalar& operator-=(const Scalar& f) {
+		assert(f._nx == this->_nx);
+		assert(f._ny == this->_ny);
+		this->_data -= f._data;
+		return *this;
+	}
+
+	/// f -= a
+	inline Scalar& operator-=(double a) {
+		this->_data -= a;
+		return *this;
+	}
+
+	/// f + g
+	inline Scalar operator+(const Scalar& f) {
+		assert(f._nx == this->_nx);
+		assert(f._ny == this->_ny);
+		Scalar g = *this;
+		g += f;
+		return g;
+	};
 	
-	// TODO: overload operator for f - a
-
-	// TODO: overload operator for a * f
+	/// f + a
+	inline Scalar operator+(double a) {
+		Scalar g = *this;
+		g += a;
+		return g;
+	};
 	
-	// TODO: overload operator for f * a
+	/// f - g
+	inline Scalar operator-(Scalar& f) {
+		assert(f._nx == this->_nx);
+		assert(f._ny == this->_ny);
+		Scalar g = *this;
+		g -= f;
+		return g;
+	};
+	
+	/// f - a
+	inline Scalar operator-(double a) {
+		Scalar g = *this;
+		g -= a;
+		return g;
+	};
+	
+	/// f *= g
+	inline Scalar& operator*=(const Scalar& f) {
+		assert(f._nx == this->_nx);
+		assert(f._ny == this->_ny);
+		this->_data *= f._data;
+		return *this;
+	}
 
-	// TODO: overload operator for f / a
+	/// f *= a
+	inline Scalar& operator*=(double a) {
+		this->_data *= a;
+		return *this;
+	}
+
+	/// f * g
+	inline Scalar operator*(Scalar& f) {
+		assert(f._nx == this->_nx);
+		assert(f._ny == this->_ny);
+		Scalar g = *this;
+		g *= f;
+		return g;
+	};
+	
+	/// f * a
+	inline Scalar operator*(double a) {
+		Scalar g = *this;
+		g *= a;
+		return g;
+	};
+	
+	/// f /= g
+	inline Scalar& operator/=(const Scalar& f) {
+		assert(f._nx == this->_nx);
+		assert(f._ny == this->_ny);
+		this->_data /= f._data;
+		return *this;
+	}
+
+	/// f /= a
+	inline Scalar& operator/=(double a) {
+		this->_data /= a;
+		return *this;
+	}
+
+	/// f / g
+	inline Scalar operator/(Scalar& f) {
+		assert(f._nx == this->_nx);
+		assert(f._ny == this->_ny);
+		Scalar g = *this;
+		g /= f;
+		return g;
+	};
+	
+	/// f / a
+	inline Scalar operator/(double a) {
+		Scalar g = *this;
+		g /= a;
+		return g;
+	};
+	
 	
 	/// Set *this to the curl of q
-	Scalar curl(const Flux& q);
+	Scalar& curl(const Flux& q);
 	
 	/// set *this to the discrete sin transform of f
-	Scalar sinTransform(const Scalar& f);
+	Scalar& sinTransform(const Scalar& f);
 
 	/// set *this to the inverse discrete sin transform of f
-	Scalar sinTransformInv(const Scalar& f);
+	Scalar& sinTransformInv(const Scalar& f);
 	
 	/// set *this to the Laplacian of f
-	Scalar laplacian(const Scalar& f);
+	Scalar& laplacian(const Scalar& f);
 
 	/// set *this to the inverse Laplacian of f
-	Scalar laplacianInverse(const Scalar& f);
+	Scalar& laplacianInverse(const Scalar& f);
 
 	/// set *this to the divergence of q
-	Scalar divergence(const Flux& q);
+	Scalar& divergence(const Flux& q);
 
 	/// return the inner product of f and *this
 	double dot(const Scalar& f);
 	
 private:
 	
-	const Grid* _grid;
-	int _nx;
-	int _ny;
+	const Grid& _grid;
+	const int _nx;
+	const int _ny;
 	Array<double,2> _data;
 	
 	// Declare variables for implementation here
+};
+
+/// -f
+inline Scalar operator-(Scalar& f) {
+	Scalar g = f;
+	g *= -1;
+	return g;
+}
+
+/// a + f
+inline Scalar operator+(double a, Scalar& f) {
+	Scalar g = f;
+	g += a;
+	return g;
+};
+	
+/// a - f
+inline Scalar operator-(double a, Scalar& f) {
+	Scalar g = -f;
+	g += a;
+	return g;
+};
+	
+/// a * f
+inline Scalar operator*(double a, Scalar& f) {
+	Scalar g = f;
+	g *= a;
+	return g;
+};
+
+/// a / f
+inline Scalar operator/(double a, Scalar& f) {
+	Scalar g(f.getGrid());
+	g = a;
+	g /= f;
+	return g;
 };
 
 #endif /* _SCALAR_H_ */
