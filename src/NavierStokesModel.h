@@ -1,7 +1,12 @@
 #ifndef _NAVIERSTOKES_H_
 #define _NAVIERSTOKES_H_
 
+#include "Grid.h"
+
+class Scalar;
 class Geometry;
+class BoundaryVector;
+class State;
 
 /*!
 \file NavierStokesModel.h
@@ -28,12 +33,13 @@ public:
 	~NavierStokesModel() {}
 
 	/// Return a pointer to the associated Geometry
-	Geometry* getGeometry() { return &_geometry; }
+	const Geometry* getGeometry() { return &_geometry; }
 
 	/// Return a pointer to the associated Grid
-	Grid* getGrid() { return &_grid; }
+	const Grid* getGrid() { return &_grid; }
 
-	Scalar* getLambda() { return &_lambda; }
+	/// Return a pointer to the eigenvalues of the linear term L
+	Scalar* getLambda() { return _lambda; }
 	
 	/// Transform to eigenvectors of L (discrete sin transform)
 	Scalar S(const Scalar& g);
@@ -65,7 +71,7 @@ protected:
 private:
 	const Geometry& _geometry;
 	const Grid& _grid;
-	Scalar _lambda;
+	Scalar* _lambda;
 };
 
 //! Full nonlinear Navier-Stokes equations.
