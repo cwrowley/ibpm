@@ -132,3 +132,5 @@ private:
 };
 
 double TestBoundaryVector::_delta = 1e-10;
+
+#undef ASSERT_ALL_EQUAL

@@ -2,6 +2,13 @@
 #include "Grid.h"
 #include "Scalar.h"
 
+#define ASSERT_ALL_EQUAL(a,b)                        \
+	for (int i=0; i<_nx; ++i) {                      \
+		for (int j=0; j<_ny; ++j) {                  \
+			TS_ASSERT_DELTA((a), (b), _delta);       \
+		}                                            \
+	}
+
 class TestScalar : public CxxTest::TestSuite {
 public:
 	void setUp() {
@@ -32,229 +39,117 @@ public:
 
 	void testCopyConstructor() {
 		Scalar h = *_f;
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny; ++j) {
-				TS_ASSERT_DELTA(h(i,j), f(i,j), _delta);
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), f(i,j) );
 	}
 
 	void testCopyFromDouble() {
 		double a = 7;
 		*_f = a;
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny; ++j) {
-				TS_ASSERT_DELTA( (*_f)(i,j), 7, _delta);
-			}
-		}		
+		ASSERT_ALL_EQUAL( (*_f)(i,j), a );
 	}
 
 	void testElements() {
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny; ++j) {
-				TS_ASSERT_DELTA((*_f)(i,j), f(i,j), _delta);
-			}
-		}
+		ASSERT_ALL_EQUAL( (*_f)(i,j), f(i,j) );
 	}
 
 	void testPlusEqualsScalar() {
 		*_g += *_f;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( (*_g)(i,j), f(i,j) + g(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( (*_g)(i,j), f(i,j) + g(i,j) );
 	}
 
 	void testPlusEqualsDouble() {
 		*_g += 6;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( (*_g)(i,j), g(i,j)+6, _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( (*_g)(i,j), g(i,j) + 6 );
 	}
 
 	void testScalarPlusScalar() {
 		Scalar h = (*_f) + (*_g);
-		
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), f(i,j) + g(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), f(i,j) + g(i,j) );
 	}
 
 	void testScalarPlusDouble() {
 		Scalar h = (*_f) + 4;
-		
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), f(i,j) + 4, _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), f(i,j) + 4 );
 	}
 
 	void testDoublePlusScalar() {
 		Scalar h = 4 + (*_f);
-		
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), f(i,j) + 4, _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), f(i,j) + 4 );
 	}
 
 	void testMinusEquals() {
 		*_g -= *_f;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( (*_g)(i,j), g(i,j) - f(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( (*_g)(i,j), g(i,j) - f(i,j) );
 	}
 
 	void testScalarMinusScalar() {
 		Scalar h = *_g - *_f;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), g(i,j) - f(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), g(i,j) - f(i,j) );
 	}
 	
 	void testScalarMinusDouble() {
 		Scalar h = *_g - 9;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), g(i,j) - 9, _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), g(i,j) - 9 );
 	}
 	
 	void testDoubleMinusScalar() {
 		Scalar h = 9 - *_g;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), 9 - g(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), 9 - g(i,j) );
 	}
 	
 	void testTimesEquals() {
 		*_g *= *_f;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( (*_g)(i,j), g(i,j) * f(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( (*_g)(i,j), g(i,j) * f(i,j) );
 	}
 
 	void testTimesEqualsDouble() {
 		*_g *= 3;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( (*_g)(i,j), g(i,j) * 3, _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( (*_g)(i,j), g(i,j) * 3 );
 	}
 
 	void testScalarTimesScalar() {
 		Scalar h = (*_g) * (*_f);
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), g(i,j) * f(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), g(i,j) * f(i,j) );
 	}
 	
 	void testScalarTimesDouble() {
 		Scalar h = (*_g) * 11;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), g(i,j) * 11, _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), g(i,j) * 11 );
 	}
 	
 	void testDoubleTimesScalar() {
 		Scalar h = 11 * (*_g);
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), g(i,j) * 11, _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), g(i,j) * 11 );
 	}
 	
 	void testDivEquals() {
 		*_g /= *_f;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( (*_g)(i,j), g(i,j) / f(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( (*_g)(i,j), g(i,j) / f(i,j) );
 	}
 
 	void testDivEqualsDouble() {
 		*_g /= 3;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( (*_g)(i,j), g(i,j) / 3, _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( (*_g)(i,j), g(i,j) / 3 );
 	}
 
 	void testScalarDivScalar() {
 		Scalar h = (*_g) / (*_f);
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), g(i,j) / f(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), g(i,j) / f(i,j) );
 	}
 	
 	void testScalarDivDouble() {
 		Scalar h = (*_g) / 11;
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), g(i,j) / 11, _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), g(i,j) / 11 );
 	}
 	
 	void testDoubleDivScalar() {
 		Scalar h = 11 / (*_g);
-
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), 11 / g(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), 11 / g(i,j) );
 	}
 	
 	void testUnaryMinus() {
 		Scalar h = -(*_f);
-		
-		for ( int i=0; i<_nx; ++i ) {
-			for ( int j=0; j<_ny; ++j ) {
-				TS_ASSERT_DELTA( h(i,j), -f(i,j), _delta );
-			}
-		}
+		ASSERT_ALL_EQUAL( h(i,j), -f(i,j) );
 	}
 	
 	void tearDown() {
@@ -280,3 +175,5 @@ private:
 };
 
 double TestScalar::_delta = 1e-10;
+
+#undef ASSERT_ALL_EQUAL

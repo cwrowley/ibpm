@@ -189,3 +189,6 @@ private:
 };
 
 double TestFlux::_delta = 1e-10;
+
+#undef ASSERT_ALL_X_EQUAL
+#undef ASSERT_ALL_Y_EQUAL
