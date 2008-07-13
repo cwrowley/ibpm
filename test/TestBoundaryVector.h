@@ -104,8 +104,64 @@ public:
 		ASSERT_ALL_EQUAL( h.y(i), fy(i) / a );
 	}
 
+    void testIteratorCount() {
+        BoundaryVector::iterator i;
+        int n;
+
+        // Loop over X and Y dimensions
+        for (int dim=BoundaryVector::X; dim <= BoundaryVector::Y; ++dim) {
+            // Count number of elements
+            n = 0;
+            for (i = (*_f).begin(dim); i != (*_f).end(dim); ++i) {
+                ++n;
+            }
+            TS_ASSERT_EQUALS(n, _n);
+        }
+    }
+
+    void testIteratorAccess() {
+        BoundaryVector::iterator iter;
+        int i=0;
+
+        // X dimension
+        for (iter=_f->begin(BoundaryVector::X); iter != _f->end(BoundaryVector::X); ++iter) {
+            TS_ASSERT_DELTA( *iter, fx(i), _delta );
+            ++i;
+        }
+        
+        // Y dimension
+        i = 0;
+        for (iter=_f->begin(BoundaryVector::Y); iter != _f->end(BoundaryVector::Y); ++iter) {
+            TS_ASSERT_DELTA( *iter, fy(i), _delta );
+            ++i;
+        }
+    }
+
+    void testIteratorAssignment() {
+        BoundaryVector::iterator iter;
+        int i=0;
+
+        // X dimension
+        for (iter=_f->begin(BoundaryVector::X); iter != _f->end(BoundaryVector::X); ++iter) {
+            *iter = 2 * fx(i) + 3;
+            ++i;
+        }
+        ASSERT_ALL_EQUAL( _f->x(i), 2 * fx(i) + 3 );
+        ASSERT_ALL_EQUAL( _f->y(i), fy(i) ); // y-dir unchanged
+
+        // Y dimension
+        i = 0;
+        for (iter=_g->begin(BoundaryVector::Y); iter != _g->end(BoundaryVector::Y); ++iter) {
+            *iter = 3 * gy(i) + 2;
+            ++i;
+        }
+        ASSERT_ALL_EQUAL( _g->x(i), gx(i) );  // x-dir unchanged
+        ASSERT_ALL_EQUAL( _g->y(i), 3 * gy(i) + 2 );
+    }
+
 	void tearDown() {
 		delete _f;
+        delete _g;
 	}
 
 	double fx(int i) {

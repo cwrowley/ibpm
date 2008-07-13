@@ -54,6 +54,16 @@ public:
 		return _grid;
 	}
 
+    typedef Array<double,2>::iterator iterator;
+
+    inline iterator begin() {
+        return _data.begin();
+    }
+    
+    inline iterator end() {
+        return _data.end();
+    }
+    
 	/// Copy assignment
 	inline Scalar& operator=(const Scalar& f) {
 		assert(f._nx == this->_nx);

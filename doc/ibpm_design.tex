@@ -163,6 +163,12 @@ Since the matrix $\mathcal{A}$ is easily invertible using a sin transform, one m
 
 In the design below, we decouple the algorithm for the timestepper~(\ref{eq:timestepper}) from the algorithm (\ref{eq:projection_alg}) for solving equation~(\ref{eq:constrained}).
 
+\subsection{To do}
+\begin{itemize}
+	\item Who is responsible for storing the potential flow solution $q_\text{pot}$?
+	\item Who is responsible for adding the boundary velocity, determining the RHS of the projection equations?
+\end{itemize}
+
 \section{Classes}
 In this section, we give a high-level description of the classes involved.  A diagram showing the main classes and their collaborations is shown in Figure~\ref{fig:class_diagram}.  Below, we discuss each of these and their interfaces in more detail.
 
@@ -480,9 +486,9 @@ We discretize both of these integrals using a regularized version of the delta f
 	\item \code|Regularizer(const Grid& grid, const Geometry& geom)|
 	\item \code|void update()|\\
 	Update operators, for instance when position of the bodies changes.
-	\item \code|Scalar toGrid(const BoundaryVector& u)|\\
+	\item \code|Flux toGrid(const BoundaryVector& u)|\\
 	Regularize boundary data to grid
-	\item \code|BoundaryVector toBoundary(const Scalar& u)|\\
+	\item \code|BoundaryVector toBoundary(const Flux& u)|\\
 	Interpolate grid data to boundary
 \end{description}
 

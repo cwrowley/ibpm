@@ -16,11 +16,18 @@
 	\version $Revision: $
 */
 
+
 class BoundaryVector {
 public:
+    enum Dimension {X, Y};
+
 	/// \brief Constructor, allocating memory for a body with
 	/// n points on the boundary.
-	BoundaryVector(int n) : _numPoints(n), _data(_numPoints,2) {};
+	BoundaryVector(int n) :
+	    _numPoints(n),
+	    _data(_numPoints, 2),
+	    _xdata( _data(Range::all(), 0) ),
+	    _ydata( _data(Range::all(), 1) ) {};
 
 	/*! \brief Constructor using pre-existing data, as a 1d array.
 
@@ -48,6 +55,24 @@ public:
 	double* flatten();
 	// TODO: Implement this, and write tests
 	
+    typedef Array<double,1>::iterator iterator;
+
+    inline iterator begin(int dim) {
+        assert(dim <= Y);
+        switch (dim) {
+            case X: return _xdata.begin();
+            case Y: return _ydata.begin();
+        }
+    }
+    
+    inline iterator end(int dim) {
+        assert(dim <= Y);
+        switch (dim) {
+            case X: return _xdata.end();
+            case Y: return _ydata.end();
+        }
+    }
+    
 	/// Return the dot product of *this and the argument
 	double dot(BoundaryVector& f);
 	// TODO: Implement this, and write tests
@@ -121,7 +146,9 @@ public:
 
 private:
 	int _numPoints;
-	Array<double,2> _data;
+    Array<double,2> _data;
+    Array<double,1> _xdata; // 1d slice of all x components of _data
+    Array<double,1> _ydata; // 1d slice of all y components of _data
 };
 
 /// -f

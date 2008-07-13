@@ -152,8 +152,48 @@ public:
 		ASSERT_ALL_EQUAL( h(i,j), -f(i,j) );
 	}
 	
+    void testIteratorCount() {
+        Scalar::iterator i;
+        int n=0;
+        for (i = (*_f).begin(); i != (*_f).end(); ++i) {
+            ++n;
+        }
+        TS_ASSERT_EQUALS(n, _nx * _ny);
+    }
+
+    void testIteratorAccess() {
+        Scalar::iterator iter;
+        int i=0;
+        int j=0;
+        for (iter = (*_f).begin(); iter != (*_f).end(); ++iter) {
+            TS_ASSERT_DELTA( *iter, f(i,j), _delta );
+            ++j;
+            if (j >= _ny) {
+                j -= _ny;
+                ++i;
+            }
+        }
+    }
+
+    void testIteratorAssignment() {
+        Scalar::iterator iter;
+        int i=0;
+        int j=0;
+        for (iter = (*_f).begin(); iter != (*_f).end(); ++iter) {
+            *iter = f(i,j) * 2 + 3;
+            ++j;
+            if (j >= _ny) {
+                j -= _ny;
+                ++i;
+            }
+        }
+        ASSERT_ALL_EQUAL( (*_f)(i,j), f(i,j) * 2 + 3 );
+    }
+
 	void tearDown() {
 		delete _f;
+        delete _g;
+        delete _grid;
 	}
 
 	// functions to test
