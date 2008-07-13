@@ -27,6 +27,8 @@ y-direction. These are accessible via q.x(i,j) and q.y(i,j).
 
 class Flux {
 public:
+    enum Dimension {X, Y};
+
 	/// Allocate memory in the constructor
 	Flux(const Grid& grid) :
 		_grid(grid),
@@ -52,6 +54,24 @@ public:
 		return _grid;
 	}
 
+    typedef Array<double,2>::iterator iterator;
+
+    inline iterator begin(int dim) {
+        assert(dim <= Y);
+        switch (dim) {
+            case X: return _xdata.begin();
+            case Y: return _ydata.begin();
+        }
+    }
+    
+    inline iterator end(int dim) {
+        assert(dim <= Y);
+        switch (dim) {
+            case X: return _xdata.end();
+            case Y: return _ydata.end();
+        }
+    }
+    
 	/// Copy assignment
 	inline Flux& operator=(const Flux& q) {
 		assert(q._nx == this->_nx);

@@ -159,6 +159,90 @@ public:
 		ASSERT_ALL_Y_EQUAL( h.y(i,j), fy(i,j) / a );		
 	}
 
+    void testIteratorCount() {
+        Flux::iterator i;
+        int n;
+
+        // X direction
+        // Number of fluxes in X-dir is (nx+1, ny)
+        n = 0;
+        for (i = _f->begin(Flux::X); i != _f->end(Flux::X); ++i) {
+            ++n;
+        }
+        TS_ASSERT_EQUALS(n, (_nx + 1) * _ny );
+
+        // Y direction
+        // Number of fluxes in Y-dir is (nx, ny+1)
+        n = 0;
+        for (i = _f->begin(Flux::Y); i != _f->end(Flux::Y); ++i) {
+            ++n;
+        }
+        TS_ASSERT_EQUALS(n, _nx * (_ny + 1) );
+    }
+
+    void testIteratorAccess() {
+        Flux::iterator iter;
+        int i=0;
+        int j=0;
+    
+        // X dimension
+        for (iter=_f->begin(Flux::X); iter != _f->end(Flux::X); ++iter) {
+            TS_ASSERT_DELTA( *iter, fx(i,j), _delta );
+            ++j;
+            if (j >= _ny) {
+                j -= _ny;
+                ++i;
+            }
+        }
+        
+        // Y dimension
+        // Caution: number of fluxes in Y-dir is ny+1 !
+        i = 0;
+        j = 0;
+        for (iter=_f->begin(Flux::Y); iter != _f->end(Flux::Y); ++iter) {
+            TS_ASSERT_DELTA( *iter, fy(i,j), _delta );
+            ++j;
+            if (j >= (_ny+1)) {
+                j -= (_ny+1);
+                ++i;
+            }
+        }
+    }
+    
+    void testIteratorAssignment() {
+        Flux::iterator iter;
+        int i=0;
+        int j=0;
+    
+        // X dimension
+        for (iter=_f->begin(Flux::X); iter != _f->end(Flux::X); ++iter) {
+            *iter = 2 * fx(i,j) + 3;
+            ++j;
+            if (j >= _ny) {
+                j -= _ny;
+                ++i;
+            }
+        }
+        ASSERT_ALL_X_EQUAL( _f->x(i,j), 2 * fx(i,j) + 3 );
+        ASSERT_ALL_Y_EQUAL( _f->y(i,j), fy(i,j) );
+
+        // Y dimension
+        // Caution: number of fluxes in Y-dir is ny+1 !
+        i = 0;
+        j = 0;
+        for (iter=_g->begin(Flux::Y); iter != _g->end(Flux::Y); ++iter) {
+            *iter = 3 * gy(i,j) + 2;
+            ++j;
+            if (j >= (_ny+1)) {
+                j -= (_ny+1);
+                ++i;
+            }
+        }
+        ASSERT_ALL_X_EQUAL( _g->x(i,j), gx(i,j) );
+        ASSERT_ALL_Y_EQUAL( _g->y(i,j), 3 * gy(i,j) + 2 );
+
+    }
+
 	void tearDown() {
 		delete _f;
 	}
