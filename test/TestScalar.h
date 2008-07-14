@@ -153,15 +153,15 @@ public:
 		ASSERT_ALL_EQUAL( h(i,j), -f(i,j) );
 	}
 	
-	void testScalarCurl() {
+	void testCurlGradientEqualsZero() {
 		// Assume zero b.cs at the bottom and left "ghost edges".
-		// Three tests. (A divergence(curl) test is given in void testDivergence()).
-		// Test 1: Curl of gradient of a non-constant Scalar object.
 		Flux fluxgrad(*_grid);
 		fluxgrad.gradient(*_f);
-		(*_f).curl(fluxgrad);
+		_f->curl(fluxgrad);
 		ASSERT_ALL_EQUAL( (*_f)(i,j), 0 );
-		
+    }
+    
+    void testCurlOfConstantEqualsZero() {		
 		// Test 2: Curl of a non-zero constant Flux object (w/ different Flux.x and Flux.y).
 		Flux fluxc(*_grid);
 		double cx = 8;
@@ -184,7 +184,9 @@ public:
 			TS_ASSERT_DELTA((*_f)(0,j), cy, _delta);
 		}
 		TS_ASSERT_DELTA((*_f)(0,0), cy-cx, _delta);
-								
+    }
+
+	void testCurlValue() {
 		// Test 3: Curl of a non-constant Flux object. 		
 		Flux fluxf(*_grid);
 		for (int i=0; i<_nx+1; ++i) {
@@ -213,9 +215,11 @@ public:
 		ASSERT_ALL_EQUAL((*_f)(i,j), h(i,j)); 
 	}
 	
-	void testScalarDotProduct() {
-		// Two tests.
-		// Test 1.
+    void testDotProductSymmetric() {
+		TS_ASSERT_DELTA( _f->dot(*_g), _g->dot(*_f), _delta);        
+    }
+    
+	void testDotProductValue() {
 		double dp = 0;
 		for (int i = 0; i < _nx; ++i) {
 			for ( int j = 0; j < _ny; ++j) {
@@ -223,19 +227,18 @@ public:
 			}			
 		}						
 		TS_ASSERT_DELTA((*_f).dot(*_g), dp, _delta); 
-		//Test 2. f.g == g.f.
-		TS_ASSERT_DELTA((*_f).dot(*_g), (*_g).dot(*_f), _delta);
 	}
 	
-	void testDivergence() {
-		// Three tests.
-		// Test 1: Divergence of Curl of a non-constant Scalar object.
+	void testDivCurlEqualsZero() {
+		// Divergence of Curl of a non-constant Scalar object.
 		Flux fluxcurl(*_grid);
 		fluxcurl.curl(*_f);		
 		(*_f).divergence(fluxcurl);		
 		ASSERT_ALL_EQUAL( (*_f)(i,j), 0 );		
+    }
 		
-		// Test 2: Divergence of a non-zero constant flux (w/ different Flux.x and Flux.y)
+	void testDivConstantEqualsZero() {
+		// Divergence of a non-zero constant flux (w/ different Flux.x and Flux.y)
 		Flux fluxc(*_grid);
 		double cx = 8;
 		double cy = 7;
@@ -247,8 +250,10 @@ public:
 		}
 		(*_f).divergence(fluxc);
 		ASSERT_ALL_EQUAL((*_f)(i,j), 0);		
-		
-		// Test 3: Divergence of a non-constant flux.
+    }
+    
+	void testDivNonConstantFlux() {
+		// Divergence of a non-constant flux.
 		Flux fluxf(*_grid);
 		for (int i=0; i<_nx+1; ++i) {
 			for (int j=0; j<_ny; ++j) {

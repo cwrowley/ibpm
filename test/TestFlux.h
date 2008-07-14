@@ -159,10 +159,8 @@ public:
 		ASSERT_ALL_Y_EQUAL( h.y(i,j), fy(i,j) / a );		
 	}
 	
-	void testFluxCurl() {
+	void testCurlOfConstantEqualsZero() {
 		// Assume zero b.cs at the ghost cells (nx, :), (:, ny).
-		// Two tests.
-		// Test 1: Curl of a non-zero constant Scalar object.
 		Scalar scalarc(*_grid);
 		double c = 8;
 		scalarc = c;
@@ -187,8 +185,10 @@ public:
 		for ( int i=0; i<_nx; ++i ) {			
 				TS_ASSERT_DELTA( (*_f).y(i,_ny), 0, _delta ); 
 		}
-	
-		// Test 2: Curl of a non-constant Scalar object. 		
+    }
+
+	void testCurlValue() {
+		// Curl of a non-constant Scalar object. 		
 		Scalar scalarf(*_grid);		
 		for (int i=0; i<_nx; ++i) {
 			for (int j=0; j<_ny; ++j) {
@@ -223,14 +223,15 @@ public:
 		ASSERT_ALL_Y_EQUAL((*_f).y(i,j), h.y(i,j));		
 	}
 	
-	void testFluxGradient() {
+	void testGradientOfConstantEqualsZero() {
 		// Assume zero b.cs at the ghost cells (-1,:), (nx, :), (:,-1), (:, ny).
-		// Two tests. (A test on curl(grdient(Scalar object) is given in TestScalar.h.)		
-		// Test 1: Gradient of a non-zero constant Scalar object.
+		// Gradient of a non-zero constant Scalar object.
+		// Note: A test of curl(gradient(Scalar object) is given in
+		//       TestScalar.h.)		
 		Scalar scalarc(*_grid);
 		double c = 6;
 		scalarc = c;
-		(*_f).gradient(scalarc);		
+		(*_f).gradient(scalarc);
 		// Check inner grids.
 		for ( int i=1; i<_nx; ++i ) { 
 			for ( int j=0; j<_ny; ++j ) { 
@@ -243,6 +244,7 @@ public:
 			} 
 		}
 		// Check boundary grids.
+		// CWR: ???  Why should boundary values equal the constant?
 		for ( int j=0; j<_ny; ++j ) { 
 			TS_ASSERT_DELTA( (*_f).x(0,j), c, _delta );
 			TS_ASSERT_DELTA( (*_f).x(_nx,j), -c, _delta );  
@@ -251,7 +253,9 @@ public:
 			TS_ASSERT_DELTA( (*_f).y(i,0), c, _delta );
 			TS_ASSERT_DELTA( (*_f).y(i,_ny), -c, _delta );
 		}
-		
+    }
+
+	void testGradientValue() {
 		// Test 2: Gradient of a non-constant Scalar object.
 		Scalar scalarf(*_grid);
 		for (int i=0; i<_nx; ++i) {
@@ -286,9 +290,11 @@ public:
 		ASSERT_ALL_Y_EQUAL((*_f).y(i,j), h.y(i,j));
 	}
 	
-	void testFluxDotProduct() {
-		// Two tests.
-		// Test 1.
+    void testDotProductSymmetric() {
+		TS_ASSERT_DELTA( _f->dot(*_g), _g->dot(*_f), _delta );
+    }
+
+	void testDotProductValue() {
 		double dp = 0;
 		for (int i = 0; i < _nx+1; ++i) {
 			for ( int j = 0; j < _ny; ++j) {
@@ -300,11 +306,8 @@ public:
 				dp += fy(i, j) * gy(i, j);
 			}			
 		}
-		TS_ASSERT_DELTA((*_f).dot(*_g), dp, _delta); 
-		//Test 2. f.g == g.f
-		TS_ASSERT_DELTA((*_f).dot(*_g), (*_g).dot(*_f), _delta);		
+		TS_ASSERT_DELTA( _f->dot(*_g), dp, _delta ); 
 	}
-
 
     void testIteratorCount() {
         Flux::iterator i;

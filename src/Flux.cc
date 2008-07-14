@@ -26,16 +26,16 @@ Flux& Flux::curl(const Scalar& f) {
 	Range all = Range::all();		
 	// X direction
 	Range J(0, _ny-2);
-	_xdata(Range(0,_nx-1), J) = f.getData()(all, J+1) - f.getData()(all,J);
+	_xdata(Range(0,_nx-1), J) = f._data(all, J+1) - f._data(all,J);
 	// Assume zero b.c.s at ghost cells (nx,:), (:, ny).
-	_xdata(Range(0, _nx-1), _ny-1) = - f.getData()(all, _ny-1); 
+	_xdata(Range(0, _nx-1), _ny-1) = - f._data(all, _ny-1); 
 	_xdata(_nx, all) = 0; 
 		
 	// Y direction
 	Range I(0, _nx-2);	
-	_ydata(I, Range(0, _ny-1)) = f.getData()(I, all) - f.getData()(I+1, all);
+	_ydata(I, Range(0, _ny-1)) = f._data(I, all) - f._data(I+1, all);
 	// Assume zero b.c.s at ghost cells (nx,:), (:, ny).
-	_ydata(_nx-1, Range(0, _ny-1)) = f.getData()(_nx-1,all); 
+	_ydata(_nx-1, Range(0, _ny-1)) = f._data(_nx-1,all); 
 	_ydata(all, _ny) = 0;	
 		
 	return *this;
@@ -49,17 +49,17 @@ Flux& Flux::gradient(const Scalar& f) {
 	Range all = Range::all();			
 	// X direction 	
 	Range I(1, _nx-1);
-	_xdata(I, all) = f.getData()(I,all) - f.getData()(I-1,all); 
+	_xdata(I, all) = f._data(I,all) - f._data(I-1,all); 
 	// Assume zero b.c.s at ghost cells (-1,:), (nx, :).
-	_xdata(0, all) = f.getData()(0, all);	
-	_xdata(_nx,all) = - f.getData()(_nx-1,all); 	
+	_xdata(0, all) = f._data(0, all);	
+	_xdata(_nx,all) = - f._data(_nx-1,all); 	
 
 	// Y direction 	
 	Range J(1, _ny-1);
-	_ydata(all,J) = f.getData()(all, J) - f.getData()(all, J-1);
+	_ydata(all,J) = f._data(all, J) - f._data(all, J-1);
 	// Assume zero b.c.s at ghost cells (:,-1), (:, ny).
-	_ydata(all, 0) = f.getData()(all, 0);		
-	_ydata(all, _ny) = - f.getData()(all, _ny-1);	
+	_ydata(all, 0) = f._data(all, 0);		
+	_ydata(all, _ny) = - f._data(all, _ny-1);	
 		
 	return *this;
 }

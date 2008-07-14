@@ -3,10 +3,11 @@
 
 #include <blitz/array.h>
 #include "Grid.h"
+#include "Flux.h"
 
 BZ_USING_NAMESPACE(blitz)
 
-class Flux;
+//class Flux;
 
 /*!
 	\file Scalar.h
@@ -54,9 +55,9 @@ public:
 		return _grid;
 	}
 	
-	const Array<double, 2>& getData() const {
-		return _data;
-	}
+    // const Array<double, 2>& getData() const {
+    //  return _data;
+    // }
 	
     typedef Array<double,2>::iterator iterator;
 
@@ -229,6 +230,10 @@ public:
 	/// return the inner product of f and *this
 	double dot(const Scalar& f);
 	
+	/// give Flux methods access to private data
+    friend Flux& Flux::curl(const Scalar& f);
+    friend Flux& Flux::gradient(const Scalar& f);
+    
 private:
 	
 	const Grid& _grid;
