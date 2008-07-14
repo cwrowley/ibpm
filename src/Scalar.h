@@ -50,10 +50,14 @@ public:
 		// deallocation automatic for Blitz++ arrays?
 	};
 
-	const Grid& getGrid() {
+	const Grid& getGrid() const{
 		return _grid;
 	}
-
+	
+	const Array<double, 2>& getData() const {
+		return _data;
+	}
+	
     typedef Array<double,2>::iterator iterator;
 
     inline iterator begin() {
@@ -158,7 +162,7 @@ public:
 	}
 
 	/// f * g
-	inline Scalar operator*(Scalar& f) {
+	inline Scalar operator*(const Scalar& f) {
 		assert(f._nx == this->_nx);
 		assert(f._ny == this->_ny);
 		Scalar g = *this;

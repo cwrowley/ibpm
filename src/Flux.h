@@ -50,10 +50,18 @@ public:
 		this->_ydata = q._ydata;
 	}
 
-	const Grid& getGrid() {
+       	const Grid& getGrid() const{
 		return _grid;
 	}
-
+	
+	const Array<double, 2>& getDataX() const {
+		return _xdata;
+	}
+	
+	const Array<double, 2>& getDataY() const {
+		return _ydata;
+		}
+	
     typedef Array<double,2>::iterator iterator;
 
     inline iterator begin(int dim) {
