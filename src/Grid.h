@@ -51,7 +51,10 @@ public:
 	
 	/// Return the y-coordinate of the bottom edge of cell j  (j in 0..n)
 	double getYEdge(int j) const;
-
+	
+	/// Return the area of the domain
+	double getArea() const;
+	
 
 private:
 	int _nx;

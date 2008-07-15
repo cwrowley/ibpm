@@ -48,3 +48,8 @@ double Grid::getYEdge(int j) const {
 	return _yOffset + j * _dx;
 }
 
+/// Return the area of the domain
+double Grid::getArea() const {
+	return _dx * _dx * _nx * _ny;
+}
+
