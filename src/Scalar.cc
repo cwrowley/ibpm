@@ -69,5 +69,6 @@ double Scalar::dot(const Scalar& f) {
 	assert(f._nx == this->_nx);
 	assert(f._ny == this->_ny);
 	double dp = sum(this->_data * f._data);
+	dp *=  pow(this->_grid.getDx(),2); 
 	return dp;
 }

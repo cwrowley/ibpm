@@ -68,6 +68,11 @@ Flux& Flux::gradient(const Scalar& f) {
 double Flux::dot(const Flux& q) const {
 	assert(q._nx == this->_nx);
 	assert(q._ny == this->_ny);
-	double dp = sum(this->_xdata * q._xdata) + sum(this->_ydata * q._ydata);
+	Range all = Range::all();
+	Range I(1,_nx);
+	Range J(1,_ny);
+	double dp = sum(this->_xdata(I,all) * q._xdata(I,all)); 
+	dp +=  sum(this->_ydata(all,J) * q._ydata(all,J));
+	dp *=  pow(this->_grid.getDx(),2); 
 	return dp;	
 }

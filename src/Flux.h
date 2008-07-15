@@ -26,6 +26,7 @@ y-direction. These are accessible via q.x(i,j) and q.y(i,j).
 */
 
 class Flux {
+//friend class Scalar;
 public:
     enum Dimension {X, Y};
 
@@ -213,6 +214,10 @@ public:
 	
 	/// Return the inner product of *this and the argument
 	double dot(const Flux& q) const;
+	
+//	/// give Flux methods access to private data
+//    friend Scalar& Scalar::curl(const Flux& q);
+//    friend Scalar& Scalar::divergence(const Flux& q);
 	
 private:
 	const Grid& _grid;
