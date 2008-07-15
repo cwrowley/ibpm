@@ -293,19 +293,38 @@ public:
     void testDotProductSymmetric() {
 		TS_ASSERT_DELTA( _f->dot(*_g), _g->dot(*_f), _delta );
     }
-
+	
+	void testDotProductDomainArea() {
+		Flux h( *_grid );
+		Flux l( *_grid );
+		for (int i=0; i<_nx+1; ++i) {
+			for (int j=0; j<_ny; ++j) {
+				h.x(i,j) = 1;
+				l.x(i,j) = 0.2;
+			}
+		}
+		for (int i=0; i<_nx; ++i) {
+			for (int j=0; j<_ny+1; ++j) {
+				h.y(i,j) = 0.8;
+				l.y(i,j) = 1;
+			}
+		}
+		TS_ASSERT_DELTA(h.dot(l), (*_grid).getArea(), _delta);
+	}
+		
 	void testDotProductValue() {
 		double dp = 0;
-		for (int i = 0; i < _nx+1; ++i) {
+		for (int i = 1; i < _nx+1; ++i) {
 			for ( int j = 0; j < _ny; ++j) {
 				dp += fx(i, j) * gx(i, j);
 			}			
 		}
 		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny+1; ++j) {
+			for (int j=1; j<_ny+1; ++j) {
 				dp += fy(i, j) * gy(i, j);
 			}			
 		}
+		dp *= pow((*_grid).getDx(), 2);	
 		TS_ASSERT_DELTA( _f->dot(*_g), dp, _delta ); 
 	}
 

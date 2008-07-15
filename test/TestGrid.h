@@ -43,6 +43,9 @@ public:
 		TS_ASSERT_DELTA(_grid->getYEdge(10),-1, _delta);
 		TS_ASSERT_DELTA(_grid->getYEdge(20), 1, _delta);		
 	}
+	void testArea() {
+		TS_ASSERT_DELTA(_grid->getArea(), 0.2*0.2*200, _delta);
+	}
     // void testBoundaries() {
     //  TS_ASSERT_THROWS_ANYTHING(_grid->getXCenter(-1));
     //  TS_ASSERT_THROWS_ANYTHING(_grid->getYCenter(-1));

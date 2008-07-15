@@ -219,13 +219,26 @@ public:
 		TS_ASSERT_DELTA( _f->dot(*_g), _g->dot(*_f), _delta);        
     }
     
+	void testDotProductDomainArea() {
+		Scalar h( *_grid );
+		Scalar l( *_grid );
+		for (int i=0; i<_nx; ++i) {
+			for (int j=0; j<_ny; ++j) {
+				h(i,j) = 1;
+				l(i,j) = 1;
+			}
+		}
+		TS_ASSERT_DELTA(h.dot(l), (*_grid).getArea(), _delta);
+	}
+	
 	void testDotProductValue() {
 		double dp = 0;
 		for (int i = 0; i < _nx; ++i) {
 			for ( int j = 0; j < _ny; ++j) {
 				dp += f(i, j) * g(i, j);
 			}			
-		}						
+		}		
+		dp *= pow((*_grid).getDx(), 2);					
 		TS_ASSERT_DELTA((*_f).dot(*_g), dp, _delta); 
 	}
 	
