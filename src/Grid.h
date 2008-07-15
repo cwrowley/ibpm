@@ -8,8 +8,10 @@
 	\brief Define parameters associated with a uniform staggered grid
 
 	Uses a staggered grid, suitable for a finite-volume method, in which
-	scalars are defined at cell centers and fluxes are defined at cell edges.
-	
+	scalars (such as streamfunction and vorticity) are defined at cell nodes
+	and fluxes are defined at cell edges.  (Note that pressure is normally
+	defined at cell centers, but pressure is not needed in this simulation.)
+
 	\image html grid.pdf "Layout of staggered grid"
 	\image latex grid.pdf "Layout of staggered grid"
 
