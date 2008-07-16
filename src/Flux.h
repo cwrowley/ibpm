@@ -26,7 +26,12 @@ y-direction. These are accessible via q.x(i,j) and q.y(i,j).
 */
 
 class Flux {
-//friend class Scalar;
+	/// give VectorOperation functions access to private data
+    friend Scalar curl(const Flux& q);
+    friend Scalar divergence(const Flux& q);
+	friend Flux curl(const Scalar& f);
+	friend Flux gradient(const Scalar& f); 
+	
 public:
     enum Dimension {X, Y};
 
@@ -55,13 +60,13 @@ public:
 		return _grid;
 	}
 	
-	const Array<double, 2>& getDataX() const {
-		return _xdata;
-	}
-	
-	const Array<double, 2>& getDataY() const {
-		return _ydata;
-		}
+//	const Array<double, 2>& getDataX() const {
+//		return _xdata;
+//	}
+//	
+//	const Array<double, 2>& getDataY() const {
+//		return _ydata;
+//		}
 	
     typedef Array<double,2>::iterator iterator;
 
@@ -205,19 +210,10 @@ public:
 		g /= a;
 		return g;
 	}
-
-	/// Set *this to the curl of the argument, returning *this.
-	Flux& curl(const Scalar& f);
-
-	/// Set *this to the gradient of the argument, returning *this.
-	Flux& gradient(const Scalar& f);
 	
 	/// Return the inner product of *this and the argument
 	double dot(const Flux& q) const;
-	
-//	/// give Flux methods access to private data
-//    friend Scalar& Scalar::curl(const Flux& q);
-//    friend Scalar& Scalar::divergence(const Flux& q);
+
 	
 private:
 	const Grid& _grid;

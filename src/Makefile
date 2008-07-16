@@ -10,7 +10,7 @@
 
 all: lib ibpm
 	
-OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o
+OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o VectorOperations.o
 
 CXX = g++
 CXXFLAGS = -g

@@ -13,11 +13,15 @@ BZ_USING_NAMESPACE(blitz)
 	\file Scalar.h
 	\class Scalar
 
-	\brief Store a 2D array of scalar values, located at cell centers.
+	\brief Store a 2D array of scalar values, located at cell nodes.
 	
-	Also provides scalar-valued math operations, such as curl and divergence
-	of a Flux, discrete sin transform, and Laplacian and its inverse, as well
-	as inner product of scalar fields.
+	For a grid with nx cells in the x-direction and ny cells in the y-direction,
+	there are (nx+1)*(ny+1) cells nodes.  
+	
+	There are (nx-1)*(ny-1) inner cell nodes, and 2*(nx+ny) boundary nodes.
+	
+	Also provides scalar-valued math operations, such as discrete sin transform, 
+	and Laplacian and its inverse, as well as inner product of scalar fields.
 
 	\author Clancy Rowley
 	\author $LastChangedBy$
@@ -27,20 +31,26 @@ BZ_USING_NAMESPACE(blitz)
 */
 
 class Scalar {
+	/// give VectorOperation functions access to private data
+    friend Scalar curl(const Flux& q);
+    friend Scalar divergence(const Flux& q);
+	friend Flux curl(const Scalar& f);
+	friend Flux gradient(const Scalar& f); 
+
 public:
 	/// Allocate memory for the 2D array
 	Scalar(const Grid& grid) :
 		_grid(grid),
 		_nx(grid.getNx()),
 		_ny(grid.getNy()),
-		_data(_nx,_ny) {};
+		_data(_nx+1,_ny+1) {};
 	
 	/// Allocate new array, copy the data
 	inline Scalar(const Scalar& f) :
 		_grid(f._grid),
 		_nx(f._nx),
 		_ny(f._ny),
-		_data(_nx,_ny)
+		_data(_nx+1,_ny+1)
 	{
 		// copy data
 		this->_data = f._data;
@@ -85,6 +95,8 @@ public:
 
 	/// f(i,j) refers to the value at index (i,j)
 	inline double& operator()(int i, int j) {
+		assert(i>=0  && i<=_nx);
+		assert(j>=0  && j<=_ny);
 		return _data(i,j);
 	};
 	
@@ -209,9 +221,6 @@ public:
 	};
 	
 	
-	/// Set *this to the curl of q
-	Scalar& curl(const Flux& q);
-	
 	/// set *this to the discrete sin transform of f
 	Scalar& sinTransform(const Scalar& f);
 
@@ -224,15 +233,9 @@ public:
 	/// set *this to the inverse Laplacian of f
 	Scalar& laplacianInverse(const Scalar& f);
 
-	/// set *this to the divergence of q
-	Scalar& divergence(const Flux& q);
-
+	
 	/// return the inner product of f and *this
 	double dot(const Scalar& f);
-	
-	/// give Flux methods access to private data
-    friend Flux& Flux::curl(const Scalar& f);
-    friend Flux& Flux::gradient(const Scalar& f);
     
 private:
 	
