@@ -1,7 +1,7 @@
 all: run_tests
 
 #TEST_FILES=SimpleTest.h ComplicatedTest.h
-TEST_FILES=TestGrid.h TestGeometry.h TestScalar.h TestFlux.h TestBoundaryVector.h
+TEST_FILES=TestGrid.h TestGeometry.h TestScalar.h TestFlux.h TestBoundaryVector.h TestVectorOperations.h
 CXX = g++
 CXXFLAGS = -g
 INCPATH = -I ../src

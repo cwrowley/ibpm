@@ -42,6 +42,7 @@ public:
 		}
 	}
 
+
 	void testAssignment() {
 		_f->x(1,3) = 73;
 		TS_ASSERT_DELTA(_f->x(1,3), 73, _delta);
@@ -157,138 +158,7 @@ public:
 		Flux h = (*_f) / a;
 		ASSERT_ALL_X_EQUAL( h.x(i,j), fx(i,j) / a );
 		ASSERT_ALL_Y_EQUAL( h.y(i,j), fy(i,j) / a );		
-	}
-	
-	void testCurlOfConstantEqualsZero() {
-		// Assume zero b.cs at the ghost cells (nx, :), (:, ny).
-		Scalar scalarc(*_grid);
-		double c = 8;
-		scalarc = c;
-		(*_f).curl(scalarc);		
-		// X direction.
-		for ( int i=0; i<_nx; ++i ) { 
-			for ( int j=0; j<_ny-1; ++j ) { 
-				TS_ASSERT_DELTA( (*_f).x(i,j), 0, _delta );				 
-			}
-			TS_ASSERT_DELTA( (*_f).x(i,_ny-1), -c, _delta ); 
-		}
-		for ( int j=0; j<_ny; ++j ) { 
-				TS_ASSERT_DELTA( (*_f).x(_nx,j), 0, _delta );				 
-		}
-		// Y direction.
-		for ( int j=0; j<_ny; ++j ) { 
-			for ( int i=0; i<_nx-1; ++i ) {			
-				TS_ASSERT_DELTA( (*_f).y(i,j), 0, _delta ); 
-			}
-			TS_ASSERT_DELTA( (*_f).y(_nx-1,j), c, _delta ); 
-		}
-		for ( int i=0; i<_nx; ++i ) {			
-				TS_ASSERT_DELTA( (*_f).y(i,_ny), 0, _delta ); 
-		}
-    }
-
-	void testCurlValue() {
-		// Curl of a non-constant Scalar object. 		
-		Scalar scalarf(*_grid);		
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny; ++j) {
-				scalarf(i,j) = f(i,j);				
-			}
-		}
-		
-		Flux h(*_grid);
-		// X direction.
-		for (int i = 0; i < _nx; ++i) {
-			for ( int j = 0; j < _ny-1; ++j) {
-				h.x(i,j) = f(i,j+1) - f(i,j);
-			}
-			h.x(i,_ny-1) = - f (i,_ny-1);			
-		}
-		for (int j = 0; j < _ny; ++j) {
-			h.x(_nx, j) = 0;
-		}		
-			
-		// Y direction.
-		for (int j=0; j<_ny; ++j) {
-			for (int i=0; i<_nx-1; ++i) {
-				h.y(i,j) = f(i,j) - f(i+1,j);
-			}
-			h.y(_nx-1,j) = f(_nx-1,j);						
-		}
-		for (int i = 0; i < _nx; ++i) {
-			h.y(i, _ny) = 0;
-		}
-		(*_f).curl(scalarf);		
-		ASSERT_ALL_X_EQUAL((*_f).x(i,j), h.x(i,j)); 
-		ASSERT_ALL_Y_EQUAL((*_f).y(i,j), h.y(i,j));		
-	}
-	
-	void testGradientOfConstantEqualsZero() {
-		// Assume zero b.cs at the ghost cells (-1,:), (nx, :), (:,-1), (:, ny).
-		// Gradient of a non-zero constant Scalar object.
-		// Note: A test of curl(gradient(Scalar object) is given in
-		//       TestScalar.h.)		
-		Scalar scalarc(*_grid);
-		double c = 6;
-		scalarc = c;
-		(*_f).gradient(scalarc);
-		// Check inner grids.
-		for ( int i=1; i<_nx; ++i ) { 
-			for ( int j=0; j<_ny; ++j ) { 
-				TS_ASSERT_DELTA( (*_f).x(i,j), 0, _delta ); 
-			} 
-		}
-		for ( int i=0; i<_nx; ++i ) { 
-			for ( int j=1; j<_ny; ++j ) { 
-				TS_ASSERT_DELTA( (*_f).y(i,j), 0, _delta ); 
-			} 
-		}
-		// Check boundary grids.
-		// CWR: ???  Why should boundary values equal the constant?
-		for ( int j=0; j<_ny; ++j ) { 
-			TS_ASSERT_DELTA( (*_f).x(0,j), c, _delta );
-			TS_ASSERT_DELTA( (*_f).x(_nx,j), -c, _delta );  
-		}
-		for ( int i=0; i<_nx; ++i ) { 
-			TS_ASSERT_DELTA( (*_f).y(i,0), c, _delta );
-			TS_ASSERT_DELTA( (*_f).y(i,_ny), -c, _delta );
-		}
-    }
-
-	void testGradientValue() {
-		// Test 2: Gradient of a non-constant Scalar object.
-		Scalar scalarf(*_grid);
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny; ++j) {
-				scalarf(i,j) = f(i,j);				
-			}
-		}
-		
-		Flux h( *_grid );
-		// X direction.		
-		for ( int j = 0; j < _ny; ++j) {
-				h.x(0,j) = f(0,j);
-				h.x(_nx,j) = -f(_nx-1,j);
-			}
-		for (int i = 1; i < _nx; ++i) {
-			for ( int j = 0; j < _ny; ++j) {
-				h.x(i,j) = f(i,j) - f(i-1,j);
-			}			
-		}
-		// Y direction.
-		for ( int i = 0; i < _nx; ++i) {
-			h.y(i,0) = f(i,0);
-			h.y(i,_ny) = -f(i,_ny-1);
-		}
-		for (int i=0; i<_nx; ++i) {
-			for (int j=1; j<_ny; ++j) {
-				h.y(i,j) = f(i,j) - f(i,j-1);
-			}			
-		}
-		(*_f).gradient(scalarf); 		
-		ASSERT_ALL_X_EQUAL((*_f).x(i,j), h.x(i,j)); 
-		ASSERT_ALL_Y_EQUAL((*_f).y(i,j), h.y(i,j));
-	}
+	}	
 	
     void testDotProductSymmetric() {
 		TS_ASSERT_DELTA( _f->dot(*_g), _g->dot(*_f), _delta );
@@ -309,21 +179,19 @@ public:
 				l.y(i,j) = 1;
 			}
 		}
-		TS_ASSERT_DELTA(h.dot(l), (*_grid).getArea(), _delta);
+		double innerarea = (*_grid).getArea() * 
+							(_nx - 1) *( _ny - 1) / ( _nx * _ny );
+		TS_ASSERT_DELTA(h.dot(l), innerarea, _delta);
 	}
 		
 	void testDotProductValue() {
 		double dp = 0;
-		for (int i = 1; i < _nx+1; ++i) {
-			for ( int j = 0; j < _ny; ++j) {
+		for (int i = 1; i < _nx; ++i) {
+			for ( int j = 1; j < _ny; ++j) {
 				dp += fx(i, j) * gx(i, j);
-			}			
-		}
-		for (int i=0; i<_nx; ++i) {
-			for (int j=1; j<_ny+1; ++j) {
 				dp += fy(i, j) * gy(i, j);
 			}			
-		}
+		}		
 		dp *= pow((*_grid).getDx(), 2);	
 		TS_ASSERT_DELTA( _f->dot(*_g), dp, _delta ); 
 	}

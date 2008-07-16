@@ -4,8 +4,8 @@
 #include "Flux.h"
 
 #define ASSERT_ALL_EQUAL(a,b)                        \
-	for (int i=0; i<_nx; ++i) {                      \
-		for (int j=0; j<_ny; ++j) {                  \
+	for (int i=0; i<_nx+1; ++i) {                      \
+		for (int j=0; j<_ny+1; ++j) {                  \
 			TS_ASSERT_DELTA((a), (b), _delta);       \
 		}                                            \
 	}
@@ -23,8 +23,8 @@ public:
 
 		_f = new Scalar( *_grid );
 		_g = new Scalar( *_grid );
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny; ++j) {
+		for (int i=0; i<_nx+1; ++i) {
+			for (int j=0; j<_ny+1; ++j) {
 				(*_f)(i,j) = f(i,j);
 				(*_g)(i,j) = g(i,j);
 			}
@@ -152,69 +152,7 @@ public:
 		Scalar h = -(*_f);
 		ASSERT_ALL_EQUAL( h(i,j), -f(i,j) );
 	}
-	
-	void testCurlGradientEqualsZero() {
-		// Assume zero b.cs at the bottom and left "ghost edges".
-		Flux fluxgrad(*_grid);
-		fluxgrad.gradient(*_f);
-		_f->curl(fluxgrad);
-		ASSERT_ALL_EQUAL( (*_f)(i,j), 0 );
-    }
-    
-    void testCurlOfConstantEqualsZero() {		
-		// Test 2: Curl of a non-zero constant Flux object (w/ different Flux.x and Flux.y).
-		Flux fluxc(*_grid);
-		double cx = 8;
-		double cy = 5;
-		fluxc = cx;
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny+1; ++j) {
-				fluxc.y(i,j) = cy;
-			}
-		}
 		
-		(*_f).curl(fluxc);		
-		for (int i=1; i<_nx; ++i) {
-			for (int j=1; j<_ny; ++j) {
-				TS_ASSERT_DELTA((*_f)(i,j), 0, _delta); 
-			}
-			TS_ASSERT_DELTA((*_f)(i,0), -cx, _delta);			
-		}
-		for (int j = 1; j < _ny; ++j) {
-			TS_ASSERT_DELTA((*_f)(0,j), cy, _delta);
-		}
-		TS_ASSERT_DELTA((*_f)(0,0), cy-cx, _delta);
-    }
-
-	void testCurlValue() {
-		// Test 3: Curl of a non-constant Flux object. 		
-		Flux fluxf(*_grid);
-		for (int i=0; i<_nx+1; ++i) {
-			for (int j=0; j<_ny; ++j) {
-				fluxf.x(i,j) = fx(i,j);				
-			}
-		}
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny+1; ++j) {
-				fluxf.y(i,j) = fy(i,j);				
-			}
-		}
-		
-		Scalar h(*_grid);
-		for (int i = 1; i < _nx; ++i) {
-			for (int j=1; j<_ny; ++j) {
-				h(i,j) = fy(i,j) - fy(i-1,j) - fx(i,j) + fx(i,j-1);
-			}
-			h(i,0) = fy(i,0) - fy(i-1,0) - fx(i,0);
-		}
-		for (int j = 1; j < _ny; ++j) {
-			h(0,j) = fy(0,j) - fx(0,j) + fx(0,j-1);
-		}
-		h(0,0) = fy(0,0) - fx(0,0);
-		(*_f).curl(fluxf);		
-		ASSERT_ALL_EQUAL((*_f)(i,j), h(i,j)); 
-	}
-	
     void testDotProductSymmetric() {
 		TS_ASSERT_DELTA( _f->dot(*_g), _g->dot(*_f), _delta);        
     }
@@ -228,98 +166,59 @@ public:
 				l(i,j) = 1;
 			}
 		}
-		TS_ASSERT_DELTA(h.dot(l), (*_grid).getArea(), _delta);
+		double innerarea = (*_grid).getArea() * 
+							(_nx - 1) *( _ny - 1) / ( _nx * _ny );
+		TS_ASSERT_DELTA(h.dot(l), innerarea, _delta);
 	}
 	
 	void testDotProductValue() {
 		double dp = 0;
-		for (int i = 0; i < _nx; ++i) {
-			for ( int j = 0; j < _ny; ++j) {
+		for (int i = 1; i < _nx; ++i) {
+			for ( int j = 1; j < _ny; ++j) {
 				dp += f(i, j) * g(i, j);
 			}			
 		}		
 		dp *= pow((*_grid).getDx(), 2);					
 		TS_ASSERT_DELTA((*_f).dot(*_g), dp, _delta); 
-	}
-	
-	void testDivCurlEqualsZero() {
-		// Divergence of Curl of a non-constant Scalar object.
-		Flux fluxcurl(*_grid);
-		fluxcurl.curl(*_f);		
-		(*_f).divergence(fluxcurl);		
-		ASSERT_ALL_EQUAL( (*_f)(i,j), 0 );		
-    }
-		
-	void testDivConstantEqualsZero() {
-		// Divergence of a non-zero constant flux (w/ different Flux.x and Flux.y)
-		Flux fluxc(*_grid);
-		double cx = 8;
-		double cy = 7;
-		fluxc = cx;
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny+1; ++j) {
-				fluxc.y(i,j) = cy;
-			}
-		}
-		(*_f).divergence(fluxc);
-		ASSERT_ALL_EQUAL((*_f)(i,j), 0);		
-    }
-    
-	void testDivNonConstantFlux() {
-		// Divergence of a non-constant flux.
-		Flux fluxf(*_grid);
-		for (int i=0; i<_nx+1; ++i) {
-			for (int j=0; j<_ny; ++j) {
-				fluxf.x(i,j) = fx(i,j);				
-			}
-		}
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny+1; ++j) {
-				fluxf.y(i,j) = fy(i,j);				
-			}
-		}		
-
-		(*_f).divergence(fluxf);
-		ASSERT_ALL_EQUAL( (*_f)(i,j), fx(i+1,j) - fx(i,j) + fy(i,j+1) -fy(i,j) );	
 	}	
 
-    void testIteratorCount() {
-        Scalar::iterator i;
-        int n=0;
-        for (i = (*_f).begin(); i != (*_f).end(); ++i) {
-            ++n;
-        }
-        TS_ASSERT_EQUALS(n, _nx * _ny);
-    }
-
-    void testIteratorAccess() {
-        Scalar::iterator iter;
-        int i=0;
-        int j=0;
-        for (iter = (*_f).begin(); iter != (*_f).end(); ++iter) {
-            TS_ASSERT_DELTA( *iter, f(i,j), _delta );
-            ++j;
-            if (j >= _ny) {
-                j -= _ny;
-                ++i;
-            }
-        }
-    }
-
-    void testIteratorAssignment() {
-        Scalar::iterator iter;
-        int i=0;
-        int j=0;
-        for (iter = (*_f).begin(); iter != (*_f).end(); ++iter) {
-            *iter = f(i,j) * 2 + 3;
-            ++j;
-            if (j >= _ny) {
-                j -= _ny;
-                ++i;
-            }
-        }
-        ASSERT_ALL_EQUAL( (*_f)(i,j), f(i,j) * 2 + 3 );
-    }
+//    void testIteratorCount() {
+//        Scalar::iterator i;
+//        int n=0;
+//        for (i = (*_f).begin(); i != (*_f).end(); ++i) {
+//            ++n;
+//        }
+//        TS_ASSERT_EQUALS(n, _nx * _ny);
+//    }
+//
+//    void testIteratorAccess() {
+//        Scalar::iterator iter;
+//        int i=0;
+//        int j=0;
+//        for (iter = (*_f).begin(); iter != (*_f).end(); ++iter) {
+//            TS_ASSERT_DELTA( *iter, f(i,j), _delta );
+//            ++j;
+//            if (j >= _ny) {
+//                j -= _ny;
+//                ++i;
+//            }
+//        }
+//    }
+//
+//    void testIteratorAssignment() {
+//        Scalar::iterator iter;
+//        int i=0;
+//        int j=0;
+//        for (iter = (*_f).begin(); iter != (*_f).end(); ++iter) {
+//            *iter = f(i,j) * 2 + 3;
+//            ++j;
+//            if (j >= _ny) {
+//                j -= _ny;
+//                ++i;
+//            }
+//        }
+//        ASSERT_ALL_EQUAL( (*_f)(i,j), f(i,j) * 2 + 3 );
+//    }
 
 	void tearDown() {
 		delete _f;
