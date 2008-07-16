@@ -16,9 +16,9 @@ BZ_USING_NAMESPACE(blitz)
 	\brief Store a 2D array of scalar values, located at cell nodes.
 	
 	For a grid with nx cells in the x-direction and ny cells in the y-direction,
-	there are (nx+1)*(ny+1) cells nodes.  
+	there are (nx+1)*(ny+1) nodes.  
 	
-	There are (nx-1)*(ny-1) inner cell nodes, and 2*(nx+ny) boundary nodes.
+	There are (nx-1)*(ny-1) inner nodes, and 2*(nx+ny) boundary nodes.
 	
 	Also provides scalar-valued math operations, such as discrete sin transform, 
 	and Laplacian and its inverse, as well as inner product of scalar fields.
@@ -244,7 +244,6 @@ private:
 	const int _ny;
 	Array<double,2> _data;
 	
-	// Declare variables for implementation here
 };
 
 /// -f

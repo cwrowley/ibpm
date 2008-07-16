@@ -24,17 +24,13 @@ class Flux;
 	\version $Revision: $
 */
 
-/// Return the curl of Flux q, as a Scalar object. Return zero at boundary nodes.
+/*! \brief Return the curl of Flux q, as a Scalar object.
+
+The curl is defined only at the interior nodes, and this routine returns zero at the boundary nodes.
+*/
 Scalar curl(const Flux& q); 		 				 
 	
-/// Return the divergence of Flux q, as a Scalar object
-Scalar divergence(const Flux& q);
-
 /// Return the curl of Scalar f, as a Flux object. 
 Flux curl(const Scalar& f);
-
-/// Return the gradient of Scalar f, as a Scalar object.
-Flux gradient(const Scalar& f);
-
 
 #endif /* _VECTOROPERATIONS_H_ */
