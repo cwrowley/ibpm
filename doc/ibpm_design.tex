@@ -570,13 +570,21 @@ Data structure and interface for storing a 2d array of scalars, located at cell 
 	\item Addition/subtraction of two Scalars: \code|g1 + g2|
 	\item Addition/subtraction of a double and a Scalar
 	\item Multiplication of a Scalar by a double
-	\item Provide a type (\code|Scalar::Index|) for accessing indices.  For instance,
+	\item Retrieve x- and y-coordinates of the corresponding value:
+	\begin{lstlisting}
+x = omega.x(i,j);
+y = omega.y(i,j);
+x = omega.x(ind);
+y = omega.y(ind);
+	\end{lstlisting}
+	\item Provide a type (\code|Scalar::index|) for accessing values.  For instance,
 	\begin{lstlisting}
 Scalar omega;
-double x;
-Scalar::Index ind;
-ind = 7,2;         // some pair of indices
-x = omega(ind);
+Scalar::index ind;
+for (ind = omega.begin(); ind != omega.end(); ++ind) {
+	omega(ind) = ...
+}
+ind = omega.getIndex(i,j)
 	\end{lstlisting}
 	\item \code|Scalar& curl(const Flux& q)|\\
 	Set \code|*this| (the current Scalar) to the curl of q.  Returns \code|*this|.
@@ -610,11 +618,36 @@ Data structure and interface for storing a 2D array of fluxes, located at cell e
 	\item Access individual elements:
 \begin{lstlisting}
 Flux q(m,n);
-q.x(i,j);   // i in [0,m]
+q(X,i,j);   // i in [0,m]
             // j in [0,n-1]
-q.y(i,j);   // i in [0,m-1]
+q(Y,i,j);   // i in [0,m-1]
 		    // j in [0,n]
+
 \end{lstlisting}
+	\item Retrieve x- and y-coordinates of the corresponding value:
+	\begin{lstlisting}
+x = q.x(dir,i,j);
+y = q.y(dir,i,j);
+x = q.x(ind);
+y = q.y(ind);
+	\end{lstlisting}
+	\item Provide a type (\code|Flux::index|) for accessing values.  If two different Fluxes use the same grid, the same index can be used to access values from both Fluxes.  For instance,
+	\begin{lstlisting}
+Flux q1;
+Flux q2;
+Flux::index ind;
+for (ind = q1.begin(); ind != q1.end(); ++ind) {
+	q1(ind) = q2(ind) + ... // loop over all points
+}
+for (ind = q1.begin(X); ind != q1.end(X); ++ind) {
+	// loop over fluxes in X-direction
+}
+for (ind = q1.begin(Y); ind != q1.end(Y); ++ind) {
+	// loop over fluxes in Y-direction
+}
+ind = q.getIndex(dir,i,j)
+	\end{lstlisting}
+	
 	\item \code|Flux& curl(const Scalar& f)|\\
 	Set \code|*this| to the curl of the argument.  Returns \code|*this|.
 	\item \code|Flux& gradient(const Scalar& f)|\\
@@ -643,9 +676,27 @@ Data structure and interface for storing vectors located at boundary points (for
 	Return a pointer to the data, expressed as a 1d C-style array.
 	\item Access individual elements:
 \begin{lstlisting}
-f.x(i)		// i in [0,n-1]
-f.y(i)		// i in [0,n-1]
+f(X,i)		// i in [0,n-1]
+f(Y,i)		// i in [0,n-1]
+f(ind)
 \end{lstlisting}
+	\item Provide a type (\code|BoundaryVector::index|) for accessing values.  If two different BoundaryVectors have the same number of points, the same index can be used to access values from both BoundaryVectors.  For instance,
+	\begin{lstlisting}
+BoundaryVector f;
+BoundaryVector f2;
+BoundaryVector::index ind;
+for (ind = f.begin(); ind != f.end(); ++ind) {
+	f(ind) = f2(ind) + ... // loop over all points
+}
+for (ind = f.begin(X); ind != f.end(X); ++ind) {
+	// loop over values in X-direction
+}
+for (ind = f.begin(Y); ind != f.end(Y); ++ind) {
+	// loop over values in Y-direction
+}
+ind = f.getIndex(dir,i)
+	\end{lstlisting}
+
 	\item \code|double dot(const BoundaryVector& f)|\\
 	Return the dot product of \code|*this| and the argument.
 	

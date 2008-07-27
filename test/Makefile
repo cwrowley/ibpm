@@ -1,7 +1,8 @@
 all: run_tests
 
 #TEST_FILES=SimpleTest.h ComplicatedTest.h
-TEST_FILES=TestGrid.h TestGeometry.h TestScalar.h TestFlux.h TestBoundaryVector.h TestVectorOperations.h
+TEST_FILES=GridTest.cc GeometryTest.cc BoundaryVectorTest.cc FluxTest.cc \
+	ScalarTest.cc VectorOperationsTest.cc
 CXX = g++
 CXXFLAGS = -g
 INCPATH = -I ../src
@@ -15,14 +16,11 @@ run_tests: runner
 $(IBPMLIB):
 	(cd ../src; make lib)
 
-runner: runner.cc $(IBPMLIB)
-	$(CXX) $(CXXFLAGS) -o $@ $(INCPATH) $^
-
-runner.cc: $(TEST_FILES) $(IBPMLIB)
-	cxxtestgen.pl -o $@ --error-printer $^
+runner: $(TEST_FILES) $(IBPMLIB)
+	$(CXX) $(CXXFLAGS) -o $@ $(INCPATH) $^ -lgtest -lgtest_main
 
 clean:
-	/bin/rm -rf *.o runner.cc
+	/bin/rm -rf *.o
 
 distclean: clean
 	/bin/rm -f runner

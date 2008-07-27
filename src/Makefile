@@ -21,7 +21,7 @@ MAKEDEPEND = gcc -MM
 IBPMLIB = ../lib/libibpm.a
 IBPM = ../bin/ibpm
 
-.PHONY: ibpm clean depend
+.PHONY: ibpm clean
 
 lib: $(IBPMLIB)
 

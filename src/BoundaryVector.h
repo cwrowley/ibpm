@@ -1,6 +1,11 @@
 #ifndef _BOUNDARYVECTOR_H_
 #define _BOUNDARYVECTOR_H_
 
+#include <blitz/array.h>
+#include "Direction.h"
+
+BZ_USING_NAMESPACE(blitz)
+
 /*!
 	\file BoundaryVector.h
 	\class BoundaryVector
@@ -19,15 +24,11 @@
 
 class BoundaryVector {
 public:
-    enum Dimension {X, Y};
-
 	/// \brief Constructor, allocating memory for a body with
 	/// n points on the boundary.
 	BoundaryVector(int n) :
 	    _numPoints(n),
-	    _data(_numPoints, 2),
-	    _xdata( _data(Range::all(), 0) ),
-	    _ydata( _data(Range::all(), 1) ) {};
+	    _data( XY, _numPoints) {};
 
 	/*! \brief Constructor using pre-existing data, as a 1d array.
 
@@ -45,33 +46,34 @@ public:
 	*/
 	inline int getSize() { return 2*_numPoints; }
 	
-	/// Reference to the x-component at boundary point i
-	inline double& x(int i) { return _data(i,0); }
-	
-	/// Reference to the y-component at boundary point i
-	inline double& y(int i) { return _data(i,1); }
+	/// f(dir,i) refers to the value in direction dir (X or Y) at point i
+	inline double& operator()(int dir, int i) {
+		assert(dir>=X  && dir<=Y);
+		assert(i>=0  && i<_numPoints);
+		return _data(dir,i);
+	};
 	
 	/// Return a pointer to the data, expressed as a C-style array.
 	double* flatten();
 	// TODO: Implement this, and write tests
 	
-    typedef Array<double,1>::iterator iterator;
-
-    inline iterator begin(int dim) {
-        assert(dim <= Y);
-        switch (dim) {
-            case X: return _xdata.begin();
-            case Y: return _ydata.begin();
-        }
-    }
-    
-    inline iterator end(int dim) {
-        assert(dim <= Y);
-        switch (dim) {
-            case X: return _xdata.end();
-            case Y: return _ydata.end();
-        }
-    }
+    // typedef Array<double,1>::iterator iterator;
+    // 
+    // inline iterator begin(int dim) {
+    //     assert(dim <= Y);
+    //     switch (dim) {
+    //         case X: return _xdata.begin();
+    //         case Y: return _ydata.begin();
+    //     }
+    // }
+    // 
+    // inline iterator end(int dim) {
+    //     assert(dim <= Y);
+    //     switch (dim) {
+    //         case X: return _xdata.end();
+    //         case Y: return _ydata.end();
+    //     }
+    // }
     
 	/// Return the dot product of *this and the argument
 	double dot(BoundaryVector& f);
@@ -147,8 +149,6 @@ public:
 private:
 	int _numPoints;
     Array<double,2> _data;
-    Array<double,1> _xdata; // 1d slice of all x components of _data
-    Array<double,1> _ydata; // 1d slice of all y components of _data
 };
 
 /// -f

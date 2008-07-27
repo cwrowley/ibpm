@@ -2,6 +2,7 @@
 #define _FLUX_H_
 
 #include "Grid.h"
+#include "Direction.h"
 #include <blitz/array.h>
 
 BZ_USING_NAMESPACE(blitz)
@@ -33,8 +34,6 @@ class Flux {
 	friend Flux gradient(const Scalar& f); 
 	
 public:
-    enum Dimension {X, Y};
-
 	/// Allocate memory in the constructor
 	Flux(const Grid& grid) :
 		_grid(grid),
@@ -102,19 +101,33 @@ public:
 		return *this;
 	}
 
-	/// q.x(i,j) refers to the x-flux at the left edge of cell (i,j)
-	inline double& x(int i, int j) {
-		assert(i < _nx+1);
-		assert(j < _ny);
-		return _xdata(i,j);
-	}
+    // /// q.x(i,j) refers to the x-flux at the left edge of cell (i,j)
+    // inline double& x(int i, int j) {
+    //  assert(i < _nx+1);
+    //  assert(j < _ny);
+    //  return _xdata(i,j);
+    // }
+    // 
+    // /// q.y(i,j) refers to the y-flux at the bottom edge of cell (i,j)
+    // inline double& y(int i, int j) {
+    //  assert(i < _nx);
+    //  assert(j < _ny+1);
+    //  return _ydata(i,j);
+    // }
 
-	/// q.y(i,j) refers to the y-flux at the bottom edge of cell (i,j)
-	inline double& y(int i, int j) {
-		assert(i < _nx);
-		assert(j < _ny+1);
-		return _ydata(i,j);
-	}
+    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
+	inline double& operator()(int dir, int i, int j) {
+		assert(dir>=X  && dir<=Y);
+        assert((dir == X) ? i < _nx+1 : i < _nx);
+        assert((dir == Y) ? j < _ny+1 : j < _ny);
+        assert(i >= 0 && j >= 0);
+        if (dir == X) {
+            return _xdata(i,j);
+        } else {
+            return _ydata(i,j);
+        }
+	};
+	
 
 	/// Deallocate memory in the destructor
 	~Flux() {};  // deallocation automatic for Blitz++ arrays?
