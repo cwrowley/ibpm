@@ -21,6 +21,7 @@ BZ_USING_NAMESPACE(blitz)
 	\version $Revision: $
 */
 
+class BoundaryVectorIndex;
 
 class BoundaryVector {
 public:
@@ -53,6 +54,18 @@ public:
 		return _data(dir,i);
 	};
 	
+    typedef BoundaryVectorIndex index;
+
+	inline double& operator()(index ind) {
+        return _data(ind.getIndex());
+	}
+
+    inline index getIndex(int dir, int i) {
+		assert(dir>=X  && dir<=Y);
+		assert(i>=0  && i<_numPoints);
+        index ind = getIndex(*this, dir, i);
+        return ind;
+    }
 	/// Return a pointer to the data, expressed as a C-style array.
 	double* flatten();
 	// TODO: Implement this, and write tests
@@ -165,7 +178,39 @@ inline BoundaryVector operator*(double a, const BoundaryVector& f) {
 	return g;
 }
 	
-
+// /// Type for referencing an element of a BoundaryVector
+// class BoundaryVectorIndex {
+// public:
+//     BoundaryVectorIndex() {
+//         _numPoints = 0;
+//         ind = 0,0;
+//     }
+// 
+//     BoundaryVectorIndex(BoundaryVector& f) {
+//         _numPoints = f.getNumPoints();
+//         ind = 0,0;
+//     }
+// 
+//     // public data: should clean this up later
+//     TinyVector<2,int> ind;
+// 
+//     inline BoundaryVectorIndex operator++(BoundaryVectorIndex& index) {
+//         if (++(index.ind(1)) >= _numPoints) {
+//             index.ind(1) = 0;
+//             ++(index.ind(0));
+//         };
+//     }
+//     
+// private:
+//     int _numPoints
+// }
+// 
+// /// Return an index for a given pair (dir, i), for a specified BV f
+// BoundaryVectorIndex getIndex(BoundaryVector& f, Direction dir, int i) {
+//     index = BoundaryVectorIndex(f);
+//     index.ind = dir, i;
+//     return index;
+// }
 
 
 #endif /* _BOUNDARYVECTOR_H_ */
