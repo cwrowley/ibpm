@@ -54,11 +54,24 @@ public:
 		return _data(dir * _numPoints + i);
 	}
 	
+	/// f(dir,i) refers to the value in direction dir (X or Y) at point i
+	inline double operator()(int dir, int i) const {
+		assert(dir>=X  && dir<=Y);
+		assert(i>=0  && i<_numPoints);
+		return _data(dir * _numPoints + i);
+	}
+	
 	/// Type used for referencing elements
     typedef int index;
     
     /// f(ind) refers to the value corresponding to the given index ind
 	inline double& operator()(index ind) {
+        assert( (ind >= 0) && (ind < _numPoints * XY) );
+        return _data(ind);
+	}
+
+    /// f(ind) refers to the value corresponding to the given index ind
+	inline double operator()(index ind) const {
         assert( (ind >= 0) && (ind < _numPoints * XY) );
         return _data(ind);
 	}

@@ -1,6 +1,7 @@
 #ifndef _GEOMETRY_H_
 #define _GEOMETRY_H_
 
+#include "BoundaryVector.h"
 /*!
 \file Geometry.h
 \class Geometry
@@ -17,6 +18,16 @@ $HeadURL$
 */
 
 class Geometry {
+public:
+    int getNumPoints() const {
+        return 1;
+    }
+
+    BoundaryVector getPoints() const {
+        BoundaryVector coords(1);
+        coords = 0;
+        return coords;
+    }
 	// ...
 };
 

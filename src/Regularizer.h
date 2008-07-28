@@ -1,6 +1,13 @@
 #ifndef _REGULARIZER_H_
 #define _REGULARIZER_H_
 
+#include <vector>
+#include "Flux.h"
+#include "BoundaryVector.h"
+
+class Grid;
+class Geometry;
+
 /*!
 \file Regularizer.h
 \class Regularizer
@@ -38,11 +45,13 @@ function, with finite support, as in (14) of Taira & Colonius (J Comput Phys,
 
 class Regularizer {
 public:
-	/// Constructor: allocates memory for internal data structures
-	Regularizer(const Grid& grid, const Geometry& geometry);
+	/// Constructor
+    Regularizer(const Grid& grid, const Geometry& geometry) :
+        _grid(grid),
+        _geometry(geometry) {};
 	
-	/// Destructor: deallocate memory for internal data structures
-    ~Regularizer();
+	/// Destructor
+    ~Regularizer() {};
 	
 	/// Update operators, for instance when the position of the bodies changes
 	void update();
@@ -54,9 +63,17 @@ public:
 	BoundaryVector toBoundary(const Flux& u);
 
 private:
-	double deltaFunction(double r);
 	const Grid& _grid;
 	const Geometry& _geometry;
+
+    // Associations between BoundaryVector points and nearby Flux values
+    struct Association {
+        BoundaryVector::index boundaryIndex;
+        Flux::index fluxIndex;
+        double weight;
+    };
+    
+    vector<Association> _associations;
 };
 
 #endif /* _REGULARIZER_H_ */

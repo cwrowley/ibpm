@@ -95,6 +95,31 @@ public:
 		return *this;
 	}
 
+    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
+	inline double& operator()(int dir, int i, int j) {
+        return _data(this->getIndex(dir,i,j));
+	};
+
+    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
+	inline double operator()(int dir, int i, int j) const {
+        return _data(this->getIndex(dir,i,j));
+	};
+
+	/// Type used for referencing elements
+    typedef int index;
+    
+    /// f(ind) refers to the value corresponding to the given index ind
+	inline double& operator()(index ind) {
+        assert( (ind >= 0) && (ind < _numFluxes) );
+        return _data(ind);
+	}
+
+    /// f(ind) refers to the value corresponding to the given index ind
+	inline double operator()(index ind) const {
+        assert( (ind >= 0) && (ind < _numFluxes) );
+        return _data(ind);
+	}
+
     /// q.x(dir,i) refers to the x-coordinate of the flux (dir,i,j)
     inline double x(int dir, int i) {
         assert( (dir >= X) && (dir <= Y) );
@@ -109,9 +134,19 @@ public:
     }
 
     /// q.x(ind) returns the x-coordinate of the flux specified by ind
-    // inline double x(index ind) {
-    //     
-    // }
+    inline double x(index ind) {
+        int dir = ind / _numXFluxes;
+        int i = (ind - dir*_numXFluxes) / (_ny+dir);
+        return x(dir,i);
+    }
+    
+    /// q.y(ind) returns the x-coordinate of the flux specified by ind
+    inline double y(index ind) {
+        int dir = ind / _numXFluxes;
+        int i = (ind - dir*_numXFluxes) / (_ny+dir);
+        int j = ind - dir*_numXFluxes - i * (_ny+dir);
+        return y(dir,j);
+    }
     
     /// q.y(dir,j) refers to the y-coordinate of the flux (dir,i,j)
     inline double y(int dir, int j) {
@@ -125,15 +160,6 @@ public:
             return _grid.getYEdge(j);
         }
     }
-
-	/// Type used for referencing elements
-    typedef int index;
-    
-    /// f(ind) refers to the value corresponding to the given index ind
-	inline double& operator()(index ind) {
-        assert( (ind >= 0) && (ind < _numFluxes) );
-        return _data(ind);
-	}
 
     /// Returns an index that refers to the first element
     inline index begin() { return 0; }
@@ -169,16 +195,6 @@ public:
 		return dir * _numXFluxes + i * (_ny+dir) + j;
 	}
 	
-    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
-	inline double& operator()(int dir, int i, int j) {
-        return _data(this->getIndex(dir,i,j));
-	};
-
-    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
-	inline double operator()(int dir, int i, int j) const {
-        return _data(this->getIndex(dir,i,j));
-	};
-
 	/// f += g
 	inline Flux& operator+=(const Flux& f) {
 		assert(f._nx == this->_nx);

@@ -1,4 +1,4 @@
-// Scalar.cc
+// Regularizer.cc
 //
 // Description:
 // Implementation of the Regularizer class
@@ -14,70 +14,111 @@
 // $HeadURL:// $Header$
 
 #include "Regularizer.h"
-#include <math>
+#include "Grid.h"
+#include "Geometry.h"
+#include "Flux.h"
+#include <vector>
+//#include <math>
 
-Regularizer(const Grid& grid, const Geometry& geometry) : 
-	_grid(grid),
-	_geometry(geom)
-{
-	// TODO: allocate memory for internal data structures
+namespace {
+
+// number of cells over which delta function has support
+const double deltaSupportRadius = 1.5;
+
+// Return the value of the regularized delta function phi(r)
+// where delta(x) \approx phi(x/h) / h, where h is the grid spacing
+//
+// From Roma, Peskin, and Berger, JCP 1999, eq (22)
+// Note that the input r is given in numbers of cells
+// (e.g. normalized by the cell width)
+inline double deltaFunction(double r) {
+	if (r > deltaSupportRadius) {
+		return 0;
+	}
+	else {
+		if (r <= 0.5)
+			return (1 + sqrt(1 - 3*r*r)) / 3;
+		else
+			return (5 - 3*r - sqrt(1 - 3*(1-r)*(1-r)) ) / 6;
+	}
 }
+
+// inline double distance(double x1, double y1, double x2, double y2) {
+//     double dx = x1-x2;
+//     double dy = y1-y2;
+//     return dx*dx + dy*dy;
+// }
 
 // Update list of relationships between boundary points and cells, and the
 // corresponding weights
 void Regularizer::update() {
-    // TODO: work here
-    // For each direction (x and y)
-    //     For each point on the boundary
-    //         Clear the list of associated cells
-    //         For each cell
-    //             Find distance between boundary point and cell
-    //             If cell is within the radius of support of the delta function
-    //                 Add to list of associated cells
-    //                 Compute the weight factor
+    Direction dir;
+    Flux f(_grid);
+    int i;
+    Flux::index j;
+    double dx, dy;
+    double h = _grid.getDx();  // mesh spacing
+    Association a;
 
-    // Note: use function templates to handle x and y directions?
-    // First code in one direction without templates.
+    // Clear the list of associated Flux and BoundaryVector points
+    _associations.clear();
+
+    // Get the coordinates of the body
+    BoundaryVector bodyCoords = _geometry.getPoints();
+
+    // For each direction (x and y)
+    for (dir = X; dir <= Y; ++dir) {
+        // For each point on the boundary
+        for (i = 0; i < bodyCoords.getNumPoints(); ++i) {
+            // For each cell
+            for (j = f.begin(dir); j != f.end(dir); ++j) {
+                // Find x and y distances between boundary point and cell
+                dx = abs(f.x(j) - bodyCoords(X,i)) / h;
+                dy = abs(f.y(j) - bodyCoords(Y,i)) / h;
+                // If cell is within the radius of support of delta function
+                if ((dx < deltaSupportRadius) && (dy < deltaSupportRadius)) {
+                    // Compute the weight factor
+                    a.weight = deltaFunction(dx) * deltaFunction(dy);
+                    a.fluxIndex = j;
+                    a.boundaryIndex = bodyCoords.getIndex(X,i);
+                    // Add to list of associated cells
+                    _associations.push_back(a);
+                }
+            }
+        }
+    }
 }
 
 Flux Regularizer::toGrid(const BoundaryVector& u1) {
+    // Allocate a new Flux field, initialized to zero
 	Flux u2(_grid);
 	u2 = 0;
-    // TODO: work here
-    // Allocate a new Flux field, initialized to zero
-    // For each direction (x and y)
-    //     For each point on the boundary
-    //         For each associated cell
-    //             Add the weight factor times the boundary value to the flux field
+
+    // For each association between cells and boundary points
+    vector<Association>::iterator a;
+    for (a = _associations.begin(); a != _associations.end(); ++a) {
+        // add the weight factor times the boundary value to the flux
+        u2(a->fluxIndex) += a->weight * u1(a->boundaryIndex);
+    }
+
     // Return the new flux field
     return u2;
 }
 
 BoundaryVector Regularizer::toBoundary(const Flux& u2) {
+    // Allocate a new BoundaryVector, initialized to zero
 	BoundaryVector u1(_geometry.getNumPoints());
 	u1 = 0;
-    // TODO: work here
-    // Allocate a new BoundaryVector, initialized to zero
-    // For each direction (x and y)
-    //     For each point on the boundary
-    //         For each associated cell
-    //             Add the weight factor times the flux value to the boundary value
+
+    // For each association between cells and boundary points
+    vector<Association>::iterator a;
+    for (a = _associations.begin(); a != _associations.end(); ++a) {
+        // Add the weight factor times the flux value to the boundary
+        u1(a->boundaryIndex) += a->weight * u2(a->fluxIndex);
+    }
+
     // Return the new BoundaryVector
 	return u1;
 }
 
-// Return the value of the regularized delta function
-// From Roma, Peskin, and Berger, JCP 1999, eq (22)
-double Regularizer::deltaFunction(double x) {
-	double h = _grid.getDx();
-	double r = abs(x) / h;
-	if (r > 1.5) {
-		return 0;
-	}
-	else {
-		if (r <= 0.5)
-			return (1 + sqrt(1 - 3*r*r))/(3*h);
-		else
-			return (5 - 3*r - sqrt(1 - 3*(1-r)*(1-r)) ) / (6*h);
-	}
-}
+} // namespace

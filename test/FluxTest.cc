@@ -281,5 +281,12 @@ TEST_F(FluxTest, GetIndex) {
     EXPECT_ALL_Y_EQUAL( _f(_f.getIndex(Y,i,j)), _f(Y,i,j) );
 }
 
+TEST_F(FluxTest, GridValues) {
+    EXPECT_ALL_X_EQUAL( _f.x(_f.getIndex(X,i,j)), _f.x(X,i) );
+    EXPECT_ALL_Y_EQUAL( _f.x(_f.getIndex(Y,i,j)), _f.x(Y,i) );    
+    EXPECT_ALL_X_EQUAL( _f.y(_f.getIndex(X,i,j)), _f.y(X,j) );
+    EXPECT_ALL_Y_EQUAL( _f.y(_f.getIndex(Y,i,j)), _f.y(Y,j) );    
+}
+
 #undef EXPECT_ALL_X_EQUAL
 #undef EXPECT_ALL_Y_EQUAL
