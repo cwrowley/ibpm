@@ -183,6 +183,13 @@ TEST_F(FluxTest, FluxDivDouble) {
 	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) / a );		
 }	
 
+TEST_F(FluxTest, FluxCoordinates) {
+    EXPECT_ALL_X_EQUAL( _f.x(X,i), _grid.getXEdge(i) );
+    EXPECT_ALL_X_EQUAL( _f.y(X,j), _grid.getYCenter(j) );
+    EXPECT_ALL_Y_EQUAL( _f.x(Y,i), _grid.getXCenter(i) );
+    EXPECT_ALL_Y_EQUAL( _f.y(Y,j), _grid.getYEdge(j) );
+}
+
 TEST_F(FluxTest, DotProductSymmetric) {
 	EXPECT_DOUBLE_EQ( _f.dot(_g), _g.dot(_f) );
 }
@@ -219,90 +226,60 @@ TEST_F(FluxTest, DotProductValue) {
 	EXPECT_DOUBLE_EQ( _f.dot(_g), dp ); 
 }
 
-// void testIteratorCount() {
-//     Flux::iterator i;
-//     int n;
-// 
-//     // X direction
-//     // Number of fluxes in X-dir is (nx+1, ny)
-//     n = 0;
-//     for (i = _f->begin(Flux::X); i != _f->end(Flux::X); ++i) {
-//         ++n;
-//     }
-//     TS_ASSERT_EQUALS(n, (_nx + 1) * _ny );
-// 
-//     // Y direction
-//     // Number of fluxes in Y-dir is (nx, ny+1)
-//     n = 0;
-//     for (i = _f->begin(Flux::Y); i != _f->end(Flux::Y); ++i) {
-//         ++n;
-//     }
-//     TS_ASSERT_EQUALS(n, _nx * (_ny + 1) );
-// }
-// 
-// void testIteratorAccess() {
-//     Flux::iterator iter;
-//     int i=0;
-//     int j=0;
-// 
-//     // X dimension
-//     for (iter=_f->begin(Flux::X); iter != _f->end(Flux::X); ++iter) {
-//         TS_ASSERT_DELTA( *iter, fx(i,j), _delta );
-//         ++j;
-//         if (j >= _ny) {
-//             j -= _ny;
-//             ++i;
-//         }
-//     }
-//     
-//     // Y dimension
-//     // Caution: number of fluxes in Y-dir is ny+1 !
-//     i = 0;
-//     j = 0;
-//     for (iter=_f->begin(Flux::Y); iter != _f->end(Flux::Y); ++iter) {
-//         TS_ASSERT_DELTA( *iter, fy(i,j), _delta );
-//         ++j;
-//         if (j >= (_ny+1)) {
-//             j -= (_ny+1);
-//             ++i;
-//         }
-//     }
-// }
-// 
-// void testIteratorAssignment() {
-//     Flux::iterator iter;
-//     int i=0;
-//     int j=0;
-// 
-//     // X dimension
-//     for (iter=_f->begin(Flux::X); iter != _f->end(Flux::X); ++iter) {
-//         *iter = 2 * fx(i,j) + 3;
-//         ++j;
-//         if (j >= _ny) {
-//             j -= _ny;
-//             ++i;
-//         }
-//     }
-//     ASSERT_ALL_X_EQUAL( _f->x(i,j), 2 * fx(i,j) + 3 );
-//     ASSERT_ALL_Y_EQUAL( _f->y(i,j), fy(i,j) );
-// 
-//     // Y dimension
-//     // Caution: number of fluxes in Y-dir is ny+1 !
-//     i = 0;
-//     j = 0;
-//     for (iter=_g->begin(Flux::Y); iter != _g->end(Flux::Y); ++iter) {
-//         *iter = 3 * gy(i,j) + 2;
-//         ++j;
-//         if (j >= (_ny+1)) {
-//             j -= (_ny+1);
-//             ++i;
-//         }
-//     }
-//     ASSERT_ALL_X_EQUAL( _g->x(i,j), gx(i,j) );
-//     ASSERT_ALL_Y_EQUAL( _g->y(i,j), 3 * gy(i,j) + 2 );
-// 
-// }
+TEST_F(FluxTest, IndexCount) {
+    Flux::index ind;
+    int count=0;
+    for (ind = _f.begin(); ind != _f.end(); ++ind) {
+        ++count;
+    }
+    EXPECT_EQ(count, 2*_nx*_ny + _nx + _ny);
 
+    count=0;
+    for (ind = _f.begin(X); ind != _f.end(X); ++ind) {
+        ++count;
+    }
+    EXPECT_EQ(count, _nx*_ny + _ny);
+    
+    count=0;
+    for (ind = _f.begin(Y); ind != _f.end(Y); ++ind) {
+        ++count;
+    }
+    EXPECT_EQ(count, _nx*_ny + _nx);
+}
+
+TEST_F(FluxTest, IndexReference) {
+    Flux::index ind;
+
+    // loop over all values
+    for (ind = _f.begin(); ind != _f.end(); ++ind) {
+        _f(ind) = 35;
+    }
+    EXPECT_ALL_X_EQUAL( _f(X,i,j), 35 );
+    EXPECT_ALL_Y_EQUAL( _f(Y,i,j), 35 );
+    for (ind = _f.begin(); ind != _f.end(); ++ind) {
+        EXPECT_DOUBLE_EQ( _f(ind), 35 );
+    }
+    
+    // loop over X alone
+    for (ind = _f.begin(X); ind != _f.end(X); ++ind) {
+        _f(ind) = 53;
+    }
+    EXPECT_ALL_X_EQUAL( _f(X,i,j), 53 );
+    EXPECT_ALL_Y_EQUAL( _f(Y,i,j), 35 );
+
+    // loop over Y alone
+    for (ind = _f.begin(Y); ind != _f.end(Y); ++ind) {
+        _f(ind) = 350;
+    }
+    EXPECT_ALL_X_EQUAL( _f(X,i,j), 53 );
+    EXPECT_ALL_Y_EQUAL( _f(Y,i,j), 350 );
+
+}
+
+TEST_F(FluxTest, GetIndex) {
+    EXPECT_ALL_X_EQUAL( _f(_f.getIndex(X,i,j)), _f(X,i,j) );
+    EXPECT_ALL_Y_EQUAL( _f(_f.getIndex(Y,i,j)), _f(Y,i,j) );
+}
 
 #undef EXPECT_ALL_X_EQUAL
 #undef EXPECT_ALL_Y_EQUAL

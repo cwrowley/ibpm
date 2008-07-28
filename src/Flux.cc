@@ -22,11 +22,20 @@
 double Flux::dot(const Flux& q) const {
 	assert(q._nx == this->_nx);
 	assert(q._ny == this->_ny);
-	Range all = Range::all();
-	Range I(1,_nx-1);
-	Range J(1,_ny-1);
-	double dp = sum(this->_xdata(I,J) * q._xdata(I,J)); 
-	dp +=  sum(this->_ydata(I,J) * q._ydata(I,J));
-	dp *=  pow(this->_grid.getDx(),2); 
-	return dp;	
+    double dp = 0;
+    // Add x-fluxes
+    for (int i=1; i<q._nx; ++i) {
+        for (int j=1; j<q._ny; ++j) {
+            dp += q(X,i,j) * (*this)(X,i,j);
+        }
+    }
+    
+    // Add y-fluxes
+    for (int i=1; i<q._nx; ++i) {
+        for (int j=1; j<q._ny; ++j) {
+            dp += q(Y,i,j) * (*this)(Y,i,j);
+        }
+    }
+    double dx = this->_grid.getDx();
+    return dp * dx * dx;
 }

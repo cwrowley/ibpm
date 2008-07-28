@@ -39,112 +39,157 @@ public:
 		_grid(grid),
 		_nx(grid.getNx()),
 		_ny(grid.getNy()),
-		_xdata(_nx+1,_ny),
-		_ydata(_nx,_ny+1) {};
+		_numXFluxes(_nx * _ny + _ny),
+		_numFluxes(2 * _nx * _ny + _nx + _ny),
+        _data(_numFluxes) {};
 	
 	/// Allocate new array, copy the data
 	inline Flux(const Flux& q) :
 		_grid(q._grid),
 		_nx(q._nx),
 		_ny(q._ny),
-		_xdata(_nx+1,_ny),
-		_ydata(_nx,_ny+1)
+		_numXFluxes(q._numXFluxes),
+		_numFluxes(q._numFluxes),
+		_data(_numFluxes)
 	{
 		// copy data
-		this->_xdata = q._xdata;
-		this->_ydata = q._ydata;
+		this->_data = q._data;
 	}
 
        	const Grid& getGrid() const{
 		return _grid;
 	}
 	
-//	const Array<double, 2>& getDataX() const {
-//		return _xdata;
-//	}
-//	
-//	const Array<double, 2>& getDataY() const {
-//		return _ydata;
-//		}
-	
-    typedef Array<double,2>::iterator iterator;
+	/// Deallocate memory in the destructor
+	~Flux() {};  // deallocation automatic for Blitz++ arrays?
 
-    inline iterator begin(int dim) {
-        assert(dim <= Y);
-        switch (dim) {
-            case X: return _xdata.begin();
-            case Y: return _ydata.begin();
-        }
-    }
-    
-    inline iterator end(int dim) {
-        assert(dim <= Y);
-        switch (dim) {
-            case X: return _xdata.end();
-            case Y: return _ydata.end();
-        }
-    }
+    // typedef Array<double,2>::iterator iterator;
+    // 
+    // inline iterator begin(int dim) {
+    //     assert(dim >= X && dim <= Y);
+    //     switch (dim) {
+    //         case X: return _xdata.begin();
+    //         case Y: return _ydata.begin();
+    //     }
+    // }
+    // 
+    // inline iterator end(int dim) {
+    //     assert(dim <= Y);
+    //     switch (dim) {
+    //         case X: return _xdata.end();
+    //         case Y: return _ydata.end();
+    //     }
+    // }
     
 	/// Copy assignment
 	inline Flux& operator=(const Flux& q) {
 		assert(q._nx == this->_nx);
 		assert(q._ny == this->_ny);
-		this->_xdata = q._xdata;
-		this->_ydata = q._ydata;
+		this->_data = q._data;
 		return *this;
 	}
 
 	/// Copy assignment from double
 	inline Flux& operator=(double a) {
-		this->_xdata = a;
-		this->_ydata = a;
+		this->_data = a;
 		return *this;
 	}
 
-    // /// q.x(i,j) refers to the x-flux at the left edge of cell (i,j)
-    // inline double& x(int i, int j) {
-    //  assert(i < _nx+1);
-    //  assert(j < _ny);
-    //  return _xdata(i,j);
-    // }
-    // 
-    // /// q.y(i,j) refers to the y-flux at the bottom edge of cell (i,j)
-    // inline double& y(int i, int j) {
-    //  assert(i < _nx);
-    //  assert(j < _ny+1);
-    //  return _ydata(i,j);
-    // }
+    /// q.x(dir,i) refers to the x-coordinate of the flux (dir,i,j)
+    inline double x(int dir, int i) {
+        assert( (dir >= X) && (dir <= Y) );
+        assert(i >= 0);
+        if (dir == X) {
+            assert( i < _nx+1 );
+            return _grid.getXEdge(i);
+        } else {
+            assert( i < _nx );
+            return _grid.getXCenter(i);
+        }
+    }
 
-    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
-	inline double& operator()(int dir, int i, int j) {
-		assert(dir>=X  && dir<=Y);
+    /// q.x(ind) returns the x-coordinate of the flux specified by ind
+    // inline double x(index ind) {
+    //     
+    // }
+    
+    /// q.y(dir,j) refers to the y-coordinate of the flux (dir,i,j)
+    inline double y(int dir, int j) {
+        assert( (dir >= X) && (dir <= Y) );
+        assert(j >= 0);
+        if (dir == X) {
+            assert( j < _ny );
+            return _grid.getYCenter(j);
+        } else {
+            assert( j < _ny+1 );
+            return _grid.getYEdge(j);
+        }
+    }
+
+	/// Type used for referencing elements
+    typedef int index;
+    
+    /// f(ind) refers to the value corresponding to the given index ind
+	inline double& operator()(index ind) {
+        assert( (ind >= 0) && (ind < _numFluxes) );
+        return _data(ind);
+	}
+
+    /// Returns an index that refers to the first element
+    inline index begin() { return 0; }
+
+    /// Returns an index that is one past the last element
+    inline index end() { return _numFluxes; }
+
+    /// Returns an index for the first element in direction dir (X or Y)
+	inline index begin(int dir) {
+        assert ((dir >= X) && (dir <= Y));
+        return dir * _numXFluxes;
+	}
+
+    /// Returns an index one past the last element in direction dir (X or Y)
+    inline index end(int dir) {
+        assert ((dir >= X) && (dir <= Y));
+        if (dir == X) {
+            return _numXFluxes;
+        } else {
+            return _numFluxes;
+        }
+    }
+    
+    /// Returns an index for the value in direction dir at point (i,j)
+	inline index getIndex(int dir, int i, int j) const {
+	    assert(dir>=X  && dir<=Y);
+        assert(i >= 0 && j >= 0);
         assert((dir == X) ? i < _nx+1 : i < _nx);
         assert((dir == Y) ? j < _ny+1 : j < _ny);
-        assert(i >= 0 && j >= 0);
-        if (dir == X) {
-            return _xdata(i,j);
-        } else {
-            return _ydata(i,j);
-        }
-	};
+        // Tricky expression:
+        //   j in [0..ny-1] for X fluxes (dir = X)
+        //   j in [0..ny] for Y fluxes   (dir = Y)
+		return dir * _numXFluxes + i * (_ny+dir) + j;
+	}
 	
+    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
+	inline double& operator()(int dir, int i, int j) {
+        return _data(this->getIndex(dir,i,j));
+	};
 
-	/// Deallocate memory in the destructor
-	~Flux() {};  // deallocation automatic for Blitz++ arrays?
+    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
+	inline double operator()(int dir, int i, int j) const {
+        return _data(this->getIndex(dir,i,j));
+	};
 
 	/// f += g
 	inline Flux& operator+=(const Flux& f) {
 		assert(f._nx == this->_nx);
 		assert(f._ny == this->_ny);
-		this->_xdata += f._xdata;
-		this->_ydata += f._ydata;
+		this->_data += f._data;
 		return *this;
 	}
 
 	/// f += a
 	inline Flux& operator+=(double a) {
-		this->_xdata += a;
-		this->_ydata += a;
+		this->_data += a;
 		return *this;
 	}
 	
@@ -152,15 +197,13 @@ public:
 	inline Flux& operator-=(const Flux& f) {
 		assert(f._nx == this->_nx);
 		assert(f._ny == this->_ny);
-		this->_xdata -= f._xdata;
-		this->_ydata -= f._ydata;
+		this->_data -= f._data;
 		return *this;
 	}
 
 	/// f -= a
 	inline Flux& operator-=(double a) {
-		this->_xdata -= a;
-		this->_ydata -= a;
+		this->_data -= a;
 		return *this;
 	}
 	
@@ -198,15 +241,13 @@ public:
 
 	/// f *= a
 	inline Flux& operator*=(double a) {
-		this->_xdata *= a;
-		this->_ydata *= a;
+		this->_data *= a;
 		return *this;
 	}
 
 	/// f /= a
 	inline Flux& operator/=(double a) {
-		this->_xdata /= a;
-		this->_ydata /= a;
+		this->_data /= a;
 		return *this;
 	}
 
@@ -232,8 +273,9 @@ private:
 	const Grid& _grid;
 	const int _nx;
 	const int _ny;
-	Array<double,2> _xdata;
-	Array<double,2> _ydata;	
+    const int _numXFluxes;
+    const int _numFluxes;
+	Array<double,1> _data;
 };
 
 /// -f
