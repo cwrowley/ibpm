@@ -29,7 +29,7 @@ public:
 	/// n points on the boundary.
 	BoundaryVector(int n) :
 	    _numPoints(n),
-	    _data( XY, _numPoints) {};
+	    _data( _numPoints * XY ) {};
 
 	/*! \brief Constructor using pre-existing data, as a 1d array.
 
@@ -45,27 +45,49 @@ public:
 	
 	(twice the number of boundary points)
 	*/
-	inline int getSize() { return 2*_numPoints; }
+	inline int getSize() { return XY*_numPoints; }
 	
 	/// f(dir,i) refers to the value in direction dir (X or Y) at point i
 	inline double& operator()(int dir, int i) {
 		assert(dir>=X  && dir<=Y);
 		assert(i>=0  && i<_numPoints);
-		return _data(dir,i);
-	};
+		return _data(dir * _numPoints + i);
+	}
 	
-    typedef BoundaryVectorIndex index;
-
+	/// Type used for referencing elements
+    typedef int index;
+    
+    /// f(ind) refers to the value corresponding to the given index ind
 	inline double& operator()(index ind) {
-        return _data(ind.getIndex());
+        assert( (ind >= 0) && (ind < _numPoints * XY) );
+        return _data(ind);
 	}
 
-    inline index getIndex(int dir, int i) {
-		assert(dir>=X  && dir<=Y);
-		assert(i>=0  && i<_numPoints);
-        index ind = getIndex(*this, dir, i);
-        return ind;
+    /// Returns an index that refers to the first element
+    inline index begin() { return 0; }
+
+    /// Returns an index that is one past the last element
+    inline index end() { return _numPoints * XY; }
+
+    /// Returns an index for the first element in direction dir (X or Y)
+	inline index begin(int dir) {
+        assert ((dir >= X) && (dir <= Y));
+        return dir * _numPoints;
+	}
+
+    /// Returns an index one past the last element in direction dir (X or Y)
+    inline index end(int dir) {
+        assert ((dir >= X) && (dir <= Y));
+        return (dir+1) * _numPoints;
     }
+    
+    /// Returns an index for the value in direction dir at point i
+	inline index getIndex(int dir, int i) {
+	    assert(dir>=X  && dir<=Y);
+		assert(i>=0  && i<_numPoints);
+		return dir * _numPoints + i;
+	}
+	
 	/// Return a pointer to the data, expressed as a C-style array.
 	double* flatten();
 	// TODO: Implement this, and write tests
@@ -161,7 +183,7 @@ public:
 
 private:
 	int _numPoints;
-    Array<double,2> _data;
+    Array<double,1> _data;
 };
 
 /// -f
@@ -177,40 +199,5 @@ inline BoundaryVector operator*(double a, const BoundaryVector& f) {
 	g *= a;
 	return g;
 }
-	
-// /// Type for referencing an element of a BoundaryVector
-// class BoundaryVectorIndex {
-// public:
-//     BoundaryVectorIndex() {
-//         _numPoints = 0;
-//         ind = 0,0;
-//     }
-// 
-//     BoundaryVectorIndex(BoundaryVector& f) {
-//         _numPoints = f.getNumPoints();
-//         ind = 0,0;
-//     }
-// 
-//     // public data: should clean this up later
-//     TinyVector<2,int> ind;
-// 
-//     inline BoundaryVectorIndex operator++(BoundaryVectorIndex& index) {
-//         if (++(index.ind(1)) >= _numPoints) {
-//             index.ind(1) = 0;
-//             ++(index.ind(0));
-//         };
-//     }
-//     
-// private:
-//     int _numPoints
-// }
-// 
-// /// Return an index for a given pair (dir, i), for a specified BV f
-// BoundaryVectorIndex getIndex(BoundaryVector& f, Direction dir, int i) {
-//     index = BoundaryVectorIndex(f);
-//     index.ind = dir, i;
-//     return index;
-// }
-
 
 #endif /* _BOUNDARYVECTOR_H_ */

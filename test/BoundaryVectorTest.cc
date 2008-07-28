@@ -118,4 +118,66 @@ TEST_F(BoundaryVectorTest, DivDouble) {
 	EXPECT_ALL_EQUAL( h(Y,i), fy(i) / a );
 }
 
+TEST_F(BoundaryVectorTest, IndexCount) {
+    BoundaryVector::index ind;
+    int count=0;
+    for (ind = _f.begin(); ind != _f.end(); ++ind) {
+        ++count;
+    }
+    EXPECT_EQ(count, _n*2);
+
+    count=0;
+    for (ind = _f.begin(X); ind != _f.end(X); ++ind) {
+        ++count;
+    }
+    EXPECT_EQ(count, _n);
+    
+    count=0;
+    for (ind = _f.begin(Y); ind != _f.end(Y); ++ind) {
+        ++count;
+    }
+    EXPECT_EQ(count, _n);
+}
+
+TEST_F(BoundaryVectorTest, IndexReference) {
+    BoundaryVector::index ind;
+
+    // loop over all values
+    for (ind = _f.begin(); ind != _f.end(); ++ind) {
+        _f(ind) = 35;
+    }
+    EXPECT_ALL_EQUAL( _f(X,i), 35 );
+    EXPECT_ALL_EQUAL( _f(Y,i), 35 );
+    for (ind = _f.begin(); ind != _f.end(); ++ind) {
+        EXPECT_DOUBLE_EQ( _f(ind), 35 );
+    }
+    
+    // loop over X alone
+    for (ind = _f.begin(X); ind != _f.end(X); ++ind) {
+        _f(ind) = 53;
+    }
+    EXPECT_ALL_EQUAL( _f(X,i), 53 );
+    EXPECT_ALL_EQUAL( _f(Y,i), 35 );
+
+    // loop over Y alone
+    for (ind = _f.begin(Y); ind != _f.end(Y); ++ind) {
+        _f(ind) = 350;
+    }
+    EXPECT_ALL_EQUAL( _f(X,i), 53 );
+    EXPECT_ALL_EQUAL( _f(Y,i), 350 );
+
+}
+
+TEST_F(BoundaryVectorTest, GetIndex) {
+    BoundaryVector::index ind;
+    for (int i = 0; i < _n; ++i) {
+        ind = _f.getIndex(X, i);
+        _f(ind) = gx(i);
+        ind = _f.getIndex(Y, i);
+        _f(ind) = gy(i);
+    }
+    EXPECT_ALL_EQUAL( _f(X,i), gx(i) );
+    EXPECT_ALL_EQUAL( _f(Y,i), gy(i) );    
+}
+
 #undef EXPECT_ALL_EQUAL
