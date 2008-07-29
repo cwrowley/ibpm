@@ -80,7 +80,7 @@ void Regularizer::update() {
                     // Compute the weight factor
                     a.weight = deltaFunction(dx) * deltaFunction(dy);
                     a.fluxIndex = j;
-                    a.boundaryIndex = bodyCoords.getIndex(X,i);
+                    a.boundaryIndex = bodyCoords.getIndex(dir,i);
                     // Add to list of associated cells
                     _associations.push_back(a);
                 }

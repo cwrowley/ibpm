@@ -1,6 +1,5 @@
 /*!
     \file Direction.h
-    \class Direction
 
     \brief Type for specifying directions of vectors (X or Y)
 
