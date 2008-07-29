@@ -72,19 +72,6 @@ TEST_F(RegularizerTest, True) {
     EXPECT_EQ(1,1);
 }
 
-// Do not test delta function--test only the public interface
-// TEST_F(RegularizerTest, DeltaContinuous) {
-//     double xmin = -3;
-//     double dx = 0.1;
-//     double xmax = 3;
-//     double eps = 0.001;
-//     
-//     // Test that abs(slope) <= 1 for all x
-//     for (double x = xmin; x <= xmax; x += dx) {
-//         EXPECT_LT( abs(delta(x+eps) - delta(x)), 1.1*eps );
-//     }
-// }
-
 TEST_F(RegularizerTest, FluxIntegratesToOne) {
     Flux::index ind;
     double total = 0;
