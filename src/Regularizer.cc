@@ -43,12 +43,6 @@ inline double deltaFunction(double r) {
 	}
 }
 
-// inline double distance(double x1, double y1, double x2, double y2) {
-//     double dx = x1-x2;
-//     double dy = y1-y2;
-//     return dx*dx + dy*dy;
-// }
-
 // Update list of relationships between boundary points and cells, and the
 // corresponding weights
 void Regularizer::update() {
