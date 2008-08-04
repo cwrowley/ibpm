@@ -176,34 +176,6 @@ TEST_F(ScalarTest, UnaryMinus) {
 	EXPECT_ALL_EQUAL( h(i,j), -f(i,j) );
 }
 	
-TEST_F(ScalarTest, DotProductSymmetric) {
-	EXPECT_DOUBLE_EQ( _f.dot(_g), _g.dot(_f) );        
-}
-
-TEST_F(ScalarTest, DotProductDomainArea) {
-	Scalar h( _grid );
-	Scalar l( _grid );
-	for (int i=0; i<_nx; ++i) {
-		for (int j=0; j<_ny; ++j) {
-			h(i,j) = 1;
-			l(i,j) = 1;
-		}
-	}
-	double innerarea = _grid.getArea() * 
-						(_nx - 1) *( _ny - 1) / ( _nx * _ny );
-	EXPECT_DOUBLE_EQ(h.dot(l), innerarea);
-}
-
-TEST_F(ScalarTest, DotProductValue) {
-	double dp = 0;
-	for (int i = 1; i < _nx; ++i) {
-		for ( int j = 1; j < _ny; ++j) {
-			dp += f(i, j) * g(i, j);
-		}			
-	}		
-	dp *= pow(_grid.getDx(), 2);					
-	EXPECT_DOUBLE_EQ(_f.dot(_g), dp); 
-}	
 
 //    void testIteratorCount() {
 //        Scalar::iterator i;

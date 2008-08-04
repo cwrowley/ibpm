@@ -21,7 +21,7 @@ BZ_USING_NAMESPACE(blitz)
 	There are (nx-1)*(ny-1) inner nodes, and 2*(nx+ny) boundary nodes.
 	
 	Also provides scalar-valued math operations, such as discrete sin transform, 
-	and Laplacian and its inverse, as well as inner product of scalar fields.
+	and Laplacian and its inverse, of scalar fields.
 
 	\author Clancy Rowley
 	\author $LastChangedBy$
@@ -31,12 +31,6 @@ BZ_USING_NAMESPACE(blitz)
 */
 
 class Scalar {
-	/// give VectorOperation functions access to private data
-    friend Scalar curl(const Flux& q);
-    friend Scalar divergence(const Flux& q);
-	friend Flux curl(const Scalar& f);
-	friend Flux gradient(const Scalar& f); 
-
 public:
 	/// Allocate memory for the 2D array
 	Scalar(const Grid& grid) :
@@ -95,6 +89,13 @@ public:
 
 	/// f(i,j) refers to the value at index (i,j)
 	inline double& operator()(int i, int j) {
+		assert(i>=0  && i<=_nx);
+		assert(j>=0  && j<=_ny);
+		return _data(i,j);
+	};
+	
+	/// f(i,j) refers to the value at index (i,j)
+	inline double operator()(int i, int j) const{
 		assert(i>=0  && i<=_nx);
 		assert(j>=0  && j<=_ny);
 		return _data(i,j);
@@ -233,9 +234,6 @@ public:
 	/// set *this to the inverse Laplacian of f
 	Scalar& laplacianInverse(const Scalar& f);
 
-	
-	/// return the inner product of f and *this
-	double dot(const Scalar& f);
     
 private:
 	

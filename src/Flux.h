@@ -27,12 +27,6 @@ y-direction. These are accessible via q.x(i,j) and q.y(i,j).
 */
 
 class Flux {
-	/// give VectorOperation functions access to private data
-    friend Scalar curl(const Flux& q);
-    friend Scalar divergence(const Flux& q);
-	friend Flux curl(const Scalar& f);
-	friend Flux gradient(const Scalar& f); 
-	
 public:
 	/// Allocate memory in the constructor
 	Flux(const Grid& grid) :
@@ -56,7 +50,7 @@ public:
 		this->_data = q._data;
 	}
 
-       	const Grid& getGrid() const{
+	const Grid& getGrid() const{
 		return _grid;
 	}
 	
@@ -280,11 +274,7 @@ public:
 		g /= a;
 		return g;
 	}
-	
-	/// Return the inner product of *this and the argument
-	double dot(const Flux& q) const;
-
-	
+		
 private:
 	const Grid& _grid;
 	const int _nx;

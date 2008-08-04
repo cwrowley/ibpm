@@ -190,42 +190,6 @@ TEST_F(FluxTest, FluxCoordinates) {
     EXPECT_ALL_Y_EQUAL( _f.y(Y,j), _grid.getYEdge(j) );
 }
 
-TEST_F(FluxTest, DotProductSymmetric) {
-	EXPECT_DOUBLE_EQ( _f.dot(_g), _g.dot(_f) );
-}
-
-TEST_F(FluxTest, DotProductDomainArea) {
-	Flux h( _grid );
-	Flux l( _grid );
-	for (int i=0; i<_nx+1; ++i) {
-		for (int j=0; j<_ny; ++j) {
-			h(X,i,j) = 1;
-			l(X,i,j) = 0.2;
-		}
-	}
-	for (int i=0; i<_nx; ++i) {
-		for (int j=0; j<_ny+1; ++j) {
-			h(Y,i,j) = 0.8;
-			l(Y,i,j) = 1;
-		}
-	}
-	double innerarea = (_grid).getArea() * 
-						(_nx - 1) *( _ny - 1) / ( _nx * _ny );
-	EXPECT_DOUBLE_EQ(h.dot(l), innerarea);
-}
-	
-TEST_F(FluxTest, DotProductValue) {
-	double dp = 0;
-	for (int i = 1; i < _nx; ++i) {
-		for ( int j = 1; j < _ny; ++j) {
-			dp += fx(i, j) * gx(i, j);
-			dp += fy(i, j) * gy(i, j);
-		}			
-	}		
-	dp *= pow(_grid.getDx(), 2);	
-	EXPECT_DOUBLE_EQ( _f.dot(_g), dp ); 
-}
-
 TEST_F(FluxTest, IndexCount) {
     Flux::index ind;
     int count=0;
