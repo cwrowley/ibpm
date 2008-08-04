@@ -1,6 +1,10 @@
 #ifndef _TIMESTEPPER_H_
 #define _TIMESTEPPER_H_
 
+class NavierStokesModel;
+class ProjectionSolver;
+class State;
+
 /*!
     \file TimeStepper.h
     \class TimeStepper
@@ -58,14 +62,7 @@ protected:
 */
 ProjectionSolver* createSolver(double alpha);
 
-
-//
-// Protected data
-//
-	double _timestep;
-	const NavierStokesModel& _model;
-	
-}
+};
 
 
 #endif /* _TIMESTEPPER_H_ */
