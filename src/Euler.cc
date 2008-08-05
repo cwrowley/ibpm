@@ -31,5 +31,5 @@ void Euler::advance(State& x) {
     _solver->solve( a, b, x.gamma, x.f );
     
     // Compute the corresponding flux
-    x.updateFlux();
+    _model.computeFlux( x.gamma, x.f );
 }

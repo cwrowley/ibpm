@@ -33,8 +33,8 @@ void advance(State& x);
 
 private:
     NavierStokesModel _model;
-    ProjectionSolver* _solver
-    double _timestep;    
+    ProjectionSolver* _solver;
+    double _timestep;
 };
 
 

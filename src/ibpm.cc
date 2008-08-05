@@ -43,7 +43,10 @@ int main(int argc, char* argv[]) {
 
 	// Setup equations to solve
 	double Reynolds=100;
-	NonlinearNavierStokes model(grid, geom, Reynolds);
+    double magnitude = 1;
+    double alpha = 0;  // angle of background flow
+    Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
+	NonlinearNavierStokes model( grid, geom, Reynolds, q_potential );
 	model.init();
 
 	// Setup timestepper

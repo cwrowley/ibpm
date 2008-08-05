@@ -16,8 +16,7 @@
 #include "NavierStokesModel.h"
 #include "Geometry.h"
 
-TimeStepper(const NavierStokesModel& model, double timestep) :
-    _model(model), _timestep(timestep) {}
+TimeStepper(const NavierStokesModel& model, double timestep) {}
 
 ProjectionSolver* TimeStepper::createSolver(double alpha) {
     // TODO: Check whether all bodies are stationary

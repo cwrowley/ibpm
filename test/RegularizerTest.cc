@@ -68,10 +68,6 @@ protected:
 //     5. phi(r-i)^2 = 1/2 for all r
 //         - (boundary -> grid -> boundary) should give 1/4 * original value
 
-TEST_F(RegularizerTest, True) {
-    EXPECT_EQ(1,1);
-}
-
 TEST_F(RegularizerTest, FluxIntegratesToOne) {
     Flux::index ind;
     double total = 0;
