@@ -13,9 +13,10 @@
 // $LastChangedBy: zma $
 // $HeadURL:// $Header$
 
+#include "Grid.h"
 #include "Scalar.h"
 #include "Flux.h"
-#include "Grid.h"
+#include "BoundaryVector.h"
 
 // Return the curl of Flux q, as a Scalar object
 Scalar curl(const Flux& q) { 
@@ -118,3 +119,19 @@ double InnerProduct (const Flux& p, const Flux& q){
     double dx = p.getGrid().getDx();
     return dp * dx * dx;
 }
+
+// Return the inner product of BoundaryVectors x and y.
+// NOTE: The implementation below uses only the public interface.
+//       A version using private data is contained in BoundaryVector.h
+// double InnerProduct(
+//     const BoundaryVector& x,
+//     const BoundaryVector& y
+//     ) {
+//     BoundaryVector::index ind;
+//     double ip = 0;
+// 
+//     for (ind = x.begin(); ind != x.end(); ++ind) {
+//         ip += x(ind) * y(ind);
+//     }
+//     return ip;
+// }

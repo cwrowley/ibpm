@@ -3,6 +3,7 @@
 
 class Scalar;
 class Flux;
+class BoundaryVector;
 
 /*!
 	\file VectorOperations.h
@@ -32,9 +33,12 @@ Scalar curl(const Flux& q);
 Flux curl(const Scalar& f);
 	
 /// Return the inner product of Scalar f and Scalar g.
-double InnerProduct (const Scalar& f, const Scalar& g);
+double InnerProduct( const Scalar& f, const Scalar& g );
 
 /// Return the inner product of Flux p and Flux q.
-double InnerProduct (const Flux& p, const Flux& q);
+double InnerProduct( const Flux& p, const Flux& q );
+
+/// Return the inner product of BoundaryVectors x and y.
+// double InnerProduct( const BoundaryVector& x, const BoundaryVector& y );
 
 #endif /* _VECTOROPERATIONS_H_ */

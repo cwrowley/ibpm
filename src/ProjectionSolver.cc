@@ -47,7 +47,8 @@ void ProjectionSolver::solve(
     const Scalar& a,
     const BoundaryVector& b,
     Scalar& gamma,
-    BoundaryVector& f) {
+    BoundaryVector& f
+    ) {
     
     // A gamma^* = a
     Scalar gammaStar = Ainv(a);
@@ -55,7 +56,7 @@ void ProjectionSolver::solve(
     // C A^{-1}B f = C gamma^* - b
     BoundaryVector rhs = C(gammaStar);
     rhs -= b;
-    f = Minv(rhs);
+    Minv(rhs, f);
 
     // gamma = gamma^* - A^{-1} B f
     Scalar Bf = B(f);

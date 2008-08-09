@@ -78,25 +78,25 @@ public:
 	}
 
     /// Returns an index that refers to the first element
-    inline index begin() { return 0; }
+    inline index begin() const { return 0; }
 
     /// Returns an index that is one past the last element
-    inline index end() { return _numPoints * XY; }
+    inline index end() const { return _numPoints * XY; }
 
     /// Returns an index for the first element in direction dir (X or Y)
-	inline index begin(int dir) {
+	inline index begin(int dir) const {
         assert ((dir >= X) && (dir <= Y));
         return dir * _numPoints;
 	}
 
     /// Returns an index one past the last element in direction dir (X or Y)
-    inline index end(int dir) {
+    inline index end(int dir) const {
         assert ((dir >= X) && (dir <= Y));
         return (dir+1) * _numPoints;
     }
     
     /// Returns an index for the value in direction dir at point i
-	inline index getIndex(int dir, int i) {
+	inline index getIndex(int dir, int i) const {
 	    assert(dir>=X  && dir<=Y);
 		assert(i>=0  && i<_numPoints);
 		return dir * _numPoints + i;
@@ -195,6 +195,8 @@ public:
 		return g;
 	}
 
+    friend double InnerProduct(BoundaryVector& x, BoundaryVector& y);
+    
 private:
 	int _numPoints;
     Array<double,1> _data;
@@ -212,6 +214,21 @@ inline BoundaryVector operator*(double a, const BoundaryVector& f) {
 	BoundaryVector g = f;
 	g *= a;
 	return g;
+}
+
+/// Return the inner product of BoundaryVectors x and y.
+inline double InnerProduct(BoundaryVector& x, BoundaryVector& y) {
+    // // Implementation using only public interface
+    // BoundaryVector::index ind;
+    // double ip = 0;
+    // 
+    // for (ind = x.begin(); ind != x.end(); ++ind) {
+    //     ip += x(ind) * y(ind);
+    // }    
+    // return ip;
+    
+    // Implementation using Blitz arrays
+    return sum(x._data * y._data);
 }
 
 #endif /* _BOUNDARYVECTOR_H_ */

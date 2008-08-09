@@ -73,7 +73,8 @@ public:
         const Scalar& a,
         const BoundaryVector& b,
         Scalar& gamma,
-        BoundaryVector& f);
+        BoundaryVector& f
+    );
 
 //
 // Protected methods
@@ -108,8 +109,11 @@ protected:
         BoundaryVector y = C(Ainv_B_f);
     }
     
-    /// Compute \f$ f = M^{-1} b \f$.
-    virtual BoundaryVector Minv(const BoundaryVector& b) = 0;
+    /// Compute \f$ x = M^{-1} b \f$.
+    virtual void Minv(
+        const BoundaryVector& b,
+        BoundaryVector& x
+    ) = 0;
     
     /// Return a pointer to the associated geometry
     inline const Geometry* getGeometry() {

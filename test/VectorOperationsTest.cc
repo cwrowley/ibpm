@@ -1,6 +1,7 @@
 #include "Grid.h"
 #include "Scalar.h"
 #include "Flux.h"
+#include "BoundaryVector.h"
 #include "VectorOperations.h"
 #include <gtest/gtest.h>
 
@@ -202,6 +203,29 @@ TEST_F(VectorOperationsTest, FluxCurlOfSimplePolyFunction) {
 	EXPECT_ALL_Y_EQUAL(fluxf(Y, i, j), 10*i-3*j+5);  	
 }
 
+TEST_F(VectorOperationsTest, BoundaryVectorInnerProduct) {
+    const int n=10;
+    BoundaryVector x(n);
+    BoundaryVector y(n);
+    BoundaryVector::index ind;
+    
+    x = 1;
+    y = 1;
+    EXPECT_DOUBLE_EQ( InnerProduct(x,y), 2.0*n );
+
+    // loop over x-components
+    for (ind = x.begin(X); ind != x.end(X); ++ind) {
+        x(ind) = 2;
+        y(ind) = 3;
+    }
+    // loop over y-components
+    for (ind = x.begin(Y); ind != x.end(Y); ++ind) {
+        x(ind) = 5;
+        y(ind) = 7;
+    }
+    EXPECT_DOUBLE_EQ( InnerProduct(x,y), 6*n + 35*n );
+
+}
 
 #undef EXPECT_ALL_EQUAL
 #undef EXPECT_ALL_X_EQUAL
