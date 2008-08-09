@@ -1,8 +1,9 @@
 all: run_tests
 
-#TEST_FILES=SimpleTest.h ComplicatedTest.h
 TEST_FILES=GridTest.cc GeometryTest.cc BoundaryVectorTest.cc FluxTest.cc \
-	ScalarTest.cc RegularizerTest.cc VectorOperationsTest.cc
+	ScalarTest.cc RegularizerTest.cc VectorOperationsTest.cc \
+	ProjectionSolverTest.cc
+
 CXX = g++
 CXXFLAGS = -g
 INCPATH = -I ../src

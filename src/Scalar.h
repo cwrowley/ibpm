@@ -47,7 +47,7 @@ public:
 		_data(_nx+1,_ny+1)
 	{
 		// copy data
-		this->_data = f._data;
+		_data = f._data;
 	}
 	
 	/// Deallocate memory in the destructor
@@ -75,15 +75,15 @@ public:
     
 	/// Copy assignment
 	inline Scalar& operator=(const Scalar& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
-		this->_data = f._data;
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
+		_data = f._data;
 		return *this;
 	};
 
 	/// Copy assignment from double
 	inline Scalar& operator=(double a) {
-		this->_data = a;
+		_data = a;
 		return *this;
 	};
 
@@ -103,36 +103,36 @@ public:
 	
 	/// f += g
 	inline Scalar& operator+=(const Scalar& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
-		this->_data += f._data;
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
+		_data += f._data;
 		return *this;
 	}
 
 	/// f += a
 	inline Scalar& operator+=(double a) {
-		this->_data += a;
+		_data += a;
 		return *this;
 	}
 
 	/// f -= g
 	inline Scalar& operator-=(const Scalar& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
-		this->_data -= f._data;
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
+		_data -= f._data;
 		return *this;
 	}
 
 	/// f -= a
 	inline Scalar& operator-=(double a) {
-		this->_data -= a;
+		_data -= a;
 		return *this;
 	}
 
 	/// f + g
 	inline Scalar operator+(const Scalar& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
 		Scalar g = *this;
 		g += f;
 		return g;
@@ -147,8 +147,8 @@ public:
 	
 	/// f - g
 	inline Scalar operator-(Scalar& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
 		Scalar g = *this;
 		g -= f;
 		return g;
@@ -163,22 +163,22 @@ public:
 	
 	/// f *= g
 	inline Scalar& operator*=(const Scalar& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
-		this->_data *= f._data;
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
+		_data *= f._data;
 		return *this;
 	}
 
 	/// f *= a
 	inline Scalar& operator*=(double a) {
-		this->_data *= a;
+		_data *= a;
 		return *this;
 	}
 
 	/// f * g
 	inline Scalar operator*(const Scalar& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
 		Scalar g = *this;
 		g *= f;
 		return g;
@@ -193,22 +193,22 @@ public:
 	
 	/// f /= g
 	inline Scalar& operator/=(const Scalar& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
-		this->_data /= f._data;
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
+		_data /= f._data;
 		return *this;
 	}
 
 	/// f /= a
 	inline Scalar& operator/=(double a) {
-		this->_data /= a;
+		_data /= a;
 		return *this;
 	}
 
 	/// f / g
 	inline Scalar operator/(Scalar& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
 		Scalar g = *this;
 		g /= f;
 		return g;

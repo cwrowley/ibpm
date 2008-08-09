@@ -33,34 +33,34 @@ public:
 	~NavierStokesModel() {}
 
 	/// Return a pointer to the associated Geometry
-	const Geometry* getGeometry() { return &_geometry; }
+	const Geometry* getGeometry() const { return &_geometry; }
 
 	/// Return a pointer to the associated Grid
-	const Grid* getGrid() { return &_grid; }
+	const Grid* getGrid() const { return &_grid; }
 
 	/// Return a pointer to the eigenvalues of the linear term L
-	Scalar* getLambda() { return _lambda; }
+	Scalar* getLambda() const { return _lambda; }
 	
 	/// Transform to eigenvectors of L (discrete sin transform)
-	Scalar S(const Scalar& g);
+	Scalar S(const Scalar& g) const;
 
 	/*! \brief Inverse transform of S.
 	Note that for the discrete sin transform, the S^{-1} should equal S, but
 	in some implementations (e.g. FFTW), these may differ by a normalization
 	constant.
 	*/
-	Scalar Sinv(const Scalar& ghat);
+	Scalar Sinv(const Scalar& ghat) const;
 	
 	/// Compute gamma = B(f) as in (14)
-	Scalar B(const BoundaryVector& f);
+	Scalar B(const BoundaryVector& f) const;
 	
 	/// Compute f = C(gamma) as in (14)
-	BoundaryVector C(const Scalar& gamma);
+	BoundaryVector C(const Scalar& gamma) const;
 	
 	/*! \brief Compute nonlinear terms y = N(x)
 	Pure virtual function: must be overridden by subclasses.
 	*/
-	virtual Scalar nonlinear(const State& x) = 0;
+	virtual Scalar nonlinear(const State& x) const = 0;
 
 protected:
 	/*! \brief Compute bilinear term, used by subclasses

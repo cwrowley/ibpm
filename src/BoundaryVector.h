@@ -129,40 +129,40 @@ public:
 
 	/// Copy assignment
 	inline BoundaryVector& operator=(const BoundaryVector& f) {
-		assert(f._numPoints == this->_numPoints);
-		this->_data = f._data;
+		assert(f._numPoints == _numPoints);
+		_data = f._data;
 		return *this;
 	};
 
 	/// Copy assignment from double
 	inline BoundaryVector& operator=(double a) {
-		this->_data = a;
+		_data = a;
 		return *this;
 	};
 
 	/// f += g
 	inline BoundaryVector& operator+=(const BoundaryVector& f) {
-		assert(f._numPoints == this->_numPoints);
-		this->_data += f._data;
+		assert(f._numPoints == _numPoints);
+		_data += f._data;
 		return *this;
 	}
 
 	/// f -= g
 	inline BoundaryVector& operator-=(const BoundaryVector& f) {
-		assert(f._numPoints == this->_numPoints);
-		this->_data -= f._data;
+		assert(f._numPoints == _numPoints);
+		_data -= f._data;
 		return *this;
 	}
 
 	/// f *= a
 	inline BoundaryVector& operator*=(double a) {
-		this->_data *= a;
+		_data *= a;
 		return *this;
 	}
 	
 	/// f /= a
 	inline BoundaryVector& operator/=(double a) {
-		this->_data /= a;
+		_data /= a;
 		return *this;
 	}
 	

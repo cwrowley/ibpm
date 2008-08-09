@@ -11,7 +11,7 @@
 all: lib ibpm
 	
 OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o \
-	VectorOperations.o Regularizer.o
+	VectorOperations.o Regularizer.o ProjectionSolver.o
 
 CXX = g++
 CXXFLAGS = -g

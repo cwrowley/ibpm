@@ -14,11 +14,7 @@
 // $HeadURL:// $Header$
 
 #include "Grid.h"
-
-//#include <assert.h>
-#define assert( condition ) { 		\
-	if ( !(condition) ) throw -1;	\
-} 
+#include <assert.h>
 
 /// Return the x-coordinate of the center of cell i  (i in 0..m-1)
 double Grid::getXCenter(int i) const {

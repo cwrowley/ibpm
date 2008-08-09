@@ -47,7 +47,7 @@ public:
 		_data(_numFluxes)
 	{
 		// copy data
-		this->_data = q._data;
+		_data = q._data;
 	}
 
 	const Grid& getGrid() const{
@@ -77,26 +77,26 @@ public:
     
 	/// Copy assignment
 	inline Flux& operator=(const Flux& q) {
-		assert(q._nx == this->_nx);
-		assert(q._ny == this->_ny);
-		this->_data = q._data;
+		assert(q._nx == _nx);
+		assert(q._ny == _ny);
+		_data = q._data;
 		return *this;
 	}
 
 	/// Copy assignment from double
 	inline Flux& operator=(double a) {
-		this->_data = a;
+		_data = a;
 		return *this;
 	}
 
     /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
 	inline double& operator()(int dir, int i, int j) {
-        return _data(this->getIndex(dir,i,j));
+        return _data(getIndex(dir,i,j));
 	};
 
     /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
 	inline double operator()(int dir, int i, int j) const {
-        return _data(this->getIndex(dir,i,j));
+        return _data(getIndex(dir,i,j));
 	};
 
 	/// Type used for referencing elements
@@ -191,36 +191,36 @@ public:
 	
 	/// f += g
 	inline Flux& operator+=(const Flux& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
-		this->_data += f._data;
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
+		_data += f._data;
 		return *this;
 	}
 
 	/// f += a
 	inline Flux& operator+=(double a) {
-		this->_data += a;
+		_data += a;
 		return *this;
 	}
 	
 	/// f -= g
 	inline Flux& operator-=(const Flux& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
-		this->_data -= f._data;
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
+		_data -= f._data;
 		return *this;
 	}
 
 	/// f -= a
 	inline Flux& operator-=(double a) {
-		this->_data -= a;
+		_data -= a;
 		return *this;
 	}
 	
 	/// f + g
 	inline Flux operator+(const Flux& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
 		Flux g = *this;
 		g += f;
 		return g;
@@ -235,8 +235,8 @@ public:
 
 	/// f - g
 	inline Flux operator-(const Flux& f) {
-		assert(f._nx == this->_nx);
-		assert(f._ny == this->_ny);
+		assert(f._nx == _nx);
+		assert(f._ny == _ny);
 		Flux g = *this;
 		g -= f;
 		return g;
@@ -251,13 +251,13 @@ public:
 
 	/// f *= a
 	inline Flux& operator*=(double a) {
-		this->_data *= a;
+		_data *= a;
 		return *this;
 	}
 
 	/// f /= a
 	inline Flux& operator/=(double a) {
-		this->_data /= a;
+		_data /= a;
 		return *this;
 	}
 
