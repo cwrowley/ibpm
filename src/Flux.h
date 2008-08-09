@@ -35,7 +35,8 @@ public:
 		_ny(grid.getNy()),
 		_numXFluxes(_nx * _ny + _ny),
 		_numFluxes(2 * _nx * _ny + _nx + _ny),
-        _data(_numFluxes) {};
+        _data(_numFluxes)
+        {}
 	
 	/// Allocate new array, copy the data
 	inline Flux(const Flux& q) :
@@ -44,8 +45,8 @@ public:
 		_ny(q._ny),
 		_numXFluxes(q._numXFluxes),
 		_numFluxes(q._numFluxes),
-		_data(_numFluxes)
-	{
+		_data(_numFluxes) {
+
 		// copy data
 		_data = q._data;
 	}
@@ -121,7 +122,8 @@ public:
         if (dir == X) {
             assert( i < _nx+1 );
             return _grid.getXEdge(i);
-        } else {
+        }
+        else {
             assert( i < _nx );
             return _grid.getXCenter(i);
         }
@@ -149,7 +151,8 @@ public:
         if (dir == X) {
             assert( j < _ny );
             return _grid.getYCenter(j);
-        } else {
+        }
+        else {
             assert( j < _ny+1 );
             return _grid.getYEdge(j);
         }
@@ -172,7 +175,8 @@ public:
         assert ((dir >= X) && (dir <= Y));
         if (dir == X) {
             return _numXFluxes;
-        } else {
+        }
+        else {
             return _numFluxes;
         }
     }
@@ -282,7 +286,7 @@ private:
     const int _numXFluxes;
     const int _numFluxes;
 	Array<double,1> _data;
-};
+};  // class Flux
 
 /// -f
 inline Flux operator-(const Flux& f) {

@@ -48,10 +48,11 @@ public:
 	/// Constructor
     Regularizer(const Grid& grid, const Geometry& geometry) :
         _grid(grid),
-        _geometry(geometry) {};
+        _geometry(geometry)
+        {}
 	
 	/// Destructor
-    ~Regularizer() {};
+    ~Regularizer() {}
 	
 	/// Update operators, for instance when the position of the bodies changes
 	void update();
@@ -73,7 +74,7 @@ private:
         double weight;
     };
     
-    vector<Association> _associations;
+    vector<Association> _neighbors;
 };
 
 #endif /* _REGULARIZER_H_ */

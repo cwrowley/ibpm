@@ -28,7 +28,10 @@ public:
 	/*! \brief Construcor, given a specied grid, geometry, and Reynolds number
 	*/
 	NavierStokesModel(
-		const Grid& grid, const Geometry& geometry, double Reynolds );
+		const Grid& grid,
+		const Geometry& geometry,
+		double Reynolds
+	);
 
 	~NavierStokesModel() {}
 

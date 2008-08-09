@@ -29,8 +29,7 @@ public:
 		_nx(nx),
 		_ny(ny),
 		_xOffset(xOffset),
-		_yOffset(yOffset)
-	{
+		_yOffset(yOffset) {
 		_dx = length / nx;
 	}
 

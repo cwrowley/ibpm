@@ -29,7 +29,8 @@ public:
 	/// n points on the boundary.
 	BoundaryVector(int n) :
 	    _numPoints(n),
-	    _data( _numPoints * XY ) {};
+	    _data( _numPoints * XY )
+	    {};
 
 	/*! \brief Constructor using pre-existing data, as a 1d array.
 
@@ -197,7 +198,7 @@ public:
 private:
 	int _numPoints;
     Array<double,1> _data;
-};
+};  // class BoundaryVector
 
 /// -f
 inline BoundaryVector operator-(const BoundaryVector& f) {

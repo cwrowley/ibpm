@@ -44,8 +44,7 @@ public:
 		_grid(f._grid),
 		_nx(f._nx),
 		_ny(f._ny),
-		_data(_nx+1,_ny+1)
-	{
+		_data(_nx+1,_ny+1) {
 		// copy data
 		_data = f._data;
 	}
@@ -53,7 +52,7 @@ public:
 	/// Deallocate memory in the destructor
 	~Scalar() {
 		// deallocation automatic for Blitz++ arrays?
-	};
+	}
 
 	const Grid& getGrid() const{
 		return _grid;
@@ -79,27 +78,27 @@ public:
 		assert(f._ny == _ny);
 		_data = f._data;
 		return *this;
-	};
+	}
 
 	/// Copy assignment from double
 	inline Scalar& operator=(double a) {
 		_data = a;
 		return *this;
-	};
+	}
 
 	/// f(i,j) refers to the value at index (i,j)
 	inline double& operator()(int i, int j) {
 		assert(i>=0  && i<=_nx);
 		assert(j>=0  && j<=_ny);
 		return _data(i,j);
-	};
+	}
 	
 	/// f(i,j) refers to the value at index (i,j)
 	inline double operator()(int i, int j) const{
 		assert(i>=0  && i<=_nx);
 		assert(j>=0  && j<=_ny);
 		return _data(i,j);
-	};
+	}
 	
 	/// f += g
 	inline Scalar& operator+=(const Scalar& f) {
@@ -136,14 +135,14 @@ public:
 		Scalar g = *this;
 		g += f;
 		return g;
-	};
+	}
 	
 	/// f + a
 	inline Scalar operator+(double a) {
 		Scalar g = *this;
 		g += a;
 		return g;
-	};
+	}
 	
 	/// f - g
 	inline Scalar operator-(Scalar& f) {
@@ -152,14 +151,14 @@ public:
 		Scalar g = *this;
 		g -= f;
 		return g;
-	};
+	}
 	
 	/// f - a
 	inline Scalar operator-(double a) {
 		Scalar g = *this;
 		g -= a;
 		return g;
-	};
+	}
 	
 	/// f *= g
 	inline Scalar& operator*=(const Scalar& f) {
@@ -182,14 +181,14 @@ public:
 		Scalar g = *this;
 		g *= f;
 		return g;
-	};
+	}
 	
 	/// f * a
 	inline Scalar operator*(double a) {
 		Scalar g = *this;
 		g *= a;
 		return g;
-	};
+	}
 	
 	/// f /= g
 	inline Scalar& operator/=(const Scalar& f) {
@@ -212,14 +211,14 @@ public:
 		Scalar g = *this;
 		g /= f;
 		return g;
-	};
+	}
 	
 	/// f / a
 	inline Scalar operator/(double a) {
 		Scalar g = *this;
 		g /= a;
 		return g;
-	};
+	}
 	
 	
 	/// set *this to the discrete sin transform of f
@@ -256,21 +255,21 @@ inline Scalar operator+(double a, Scalar& f) {
 	Scalar g = f;
 	g += a;
 	return g;
-};
+}
 	
 /// a - f
 inline Scalar operator-(double a, Scalar& f) {
 	Scalar g = -f;
 	g += a;
 	return g;
-};
+}
 	
 /// a * f
 inline Scalar operator*(double a, Scalar& f) {
 	Scalar g = f;
 	g *= a;
 	return g;
-};
+}
 
 /// a / f
 inline Scalar operator/(double a, Scalar& f) {
@@ -278,6 +277,6 @@ inline Scalar operator/(double a, Scalar& f) {
 	g = a;
 	g /= f;
 	return g;
-};
+}
 
 #endif /* _SCALAR_H_ */

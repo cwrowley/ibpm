@@ -56,8 +56,7 @@ class ProjectionSolver {
 public:
 
     /// Constructor
-    ProjectionSolver(void);
-    ProjectionSolver(NavierStokesModel& model, double alpha);
+    ProjectionSolver(const NavierStokesModel& model, double alpha);
 
     /// Destructor
     ~ProjectionSolver();
@@ -122,7 +121,7 @@ protected:
 //
 private:
 	double _alpha;
-	NavierStokesModel* _model;
+	const NavierStokesModel* _model;
     Scalar _eigenvaluesOfAinv;	
 };
 

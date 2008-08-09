@@ -20,7 +20,9 @@
 
 // Constructor: initialize private data for eigenvalues of Ainv
 
-ProjectionSolver::ProjectionSolver(NavierStokesModel& model, double alpha) :
+ProjectionSolver::ProjectionSolver(
+    const NavierStokesModel& model,
+    double alpha) :
 	_alpha(alpha),
 	_model(&model),
     _eigenvaluesOfAinv(*( _model->getGrid() )) {

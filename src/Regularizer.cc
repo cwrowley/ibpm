@@ -55,7 +55,7 @@ void Regularizer::update() {
     Association a;
 
     // Clear the list of associated Flux and BoundaryVector points
-    _associations.clear();
+    _neighbors.clear();
 
     // Get the coordinates of the body
     BoundaryVector bodyCoords = _geometry.getPoints();
@@ -76,7 +76,7 @@ void Regularizer::update() {
                     a.fluxIndex = j;
                     a.boundaryIndex = bodyCoords.getIndex(dir,i);
                     // Add to list of associated cells
-                    _associations.push_back(a);
+                    _neighbors.push_back(a);
                 }
             }
         }
@@ -90,7 +90,7 @@ Flux Regularizer::toGrid(const BoundaryVector& u1) {
 
     // For each association between cells and boundary points
     vector<Association>::iterator a;
-    for (a = _associations.begin(); a != _associations.end(); ++a) {
+    for (a = _neighbors.begin(); a != _neighbors.end(); ++a) {
         // add the weight factor times the boundary value to the flux
         u2(a->fluxIndex) += a->weight * u1(a->boundaryIndex);
     }
@@ -106,7 +106,7 @@ BoundaryVector Regularizer::toBoundary(const Flux& u2) {
 
     // For each association between cells and boundary points
     vector<Association>::iterator a;
-    for (a = _associations.begin(); a != _associations.end(); ++a) {
+    for (a = _neighbors.begin(); a != _neighbors.end(); ++a) {
         // Add the weight factor times the flux value to the boundary
         u1(a->boundaryIndex) += a->weight * u2(a->fluxIndex);
     }
