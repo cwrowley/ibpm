@@ -18,15 +18,6 @@
 #include "Grid.h"
 #include <blitz/array.h>
 
-Scalar& Scalar::sinTransform(const Scalar& f) {
-	// WORK HERE
-	return *this;
-}
-
-Scalar& Scalar::sinTransformInv(const Scalar& f) {
-	// WORK HERE
-	return *this;
-}
 
 Scalar& Scalar::laplacian(const Scalar& f) {
 	// WORK HERE

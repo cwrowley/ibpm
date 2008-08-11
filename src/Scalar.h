@@ -221,11 +221,11 @@ public:
 	}
 	
 	
-	/// set *this to the discrete sin transform of f
-	Scalar& sinTransform(const Scalar& f);
-
-	/// set *this to the inverse discrete sin transform of f
-	Scalar& sinTransformInv(const Scalar& f);
+//	/// set *this to the discrete sin transform of f
+//	Scalar& sinTransform(const Scalar& f);
+//
+//	/// set *this to the inverse discrete sin transform of f
+//	Scalar& sinTransformInv(const Scalar& f);
 	
 	/// set *this to the Laplacian of f
 	Scalar& laplacian(const Scalar& f);

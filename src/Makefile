@@ -15,21 +15,21 @@ OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o \
 	ConjugateGradientSolver.o
 
 CXX = g++
-CXXFLAGS = -g
+CXXFLAGS = -g 
 AR = ar
 ARFLAGS = -r
 MAKEDEPEND = gcc -MM
 
-IBPMLIB = ../lib/libibpm.a
+IBPMLIB = ../lib/libibpm.a 
 IBPM = ../bin/ibpm
 
 .PHONY: ibpm clean
 
-lib: $(IBPMLIB)
+lib: $(IBPMLIB) 
 
 ibpm: $(IBPM)
 
-$(IBPMLIB): $(OBJS)
+$(IBPMLIB): $(OBJS) 
 	$(AR) $(ARFLAGS) $(IBPMLIB) $(OBJS)
 
 $(IBPM): ibpm.o $(IBPMLIB)

@@ -10,8 +10,8 @@ namespace {
 class VectorOperationsTest : public testing::Test {
 protected:
     VectorOperationsTest() : 
-        _nx(3),
-        _ny(5),
+        _nx(4),
+        _ny(8),
         _grid(_nx, _ny, 2, -1, -3),
         _f(_grid),
 		_g(_grid),
@@ -187,6 +187,46 @@ TEST_F(VectorOperationsTest, ScalarCurlOfSimplePolyFunctions) {
 	}  		
 }
 
+TEST_F(VectorOperationsTest, SineTransformGivesZeroBCs) {
+	Scalar f_fft = sinTransform(_f);
+	for (int i=0; i<_nx+1; ++i) {
+		EXPECT_DOUBLE_EQ( f_fft(i,0), 0 );
+		EXPECT_DOUBLE_EQ( f_fft(i,_ny), 0 );
+	}
+	for (int j=0; j<_ny+1; ++j) {       
+		EXPECT_DOUBLE_EQ( f_fft(0,j), 0 );
+		EXPECT_DOUBLE_EQ( f_fft(_nx,j), 0 );  
+	} 
+}
+
+TEST_F(VectorOperationsTest, SineTransformOfZeroEqualsZero) {	
+	Scalar Szero(_grid);
+	Szero = 0; 	
+	
+	Scalar S_fft = sinTransform(Szero);
+	EXPECT_ALL_EQUAL(S_fft(i,j), 0);
+}
+
+TEST_F(VectorOperationsTest, SineTransformTwiceGivesOriginalScalar) {
+	Scalar f_fft = sinTransform(_f);
+	Scalar f_f_fft = sinTransform(f_fft);
+	double normalization = 2 * _nx * 2 * _ny; //normalization needed (see FFTW3 manual)
+	for (int i = 1; i<_nx; ++i) {
+		for (int j = 1; j<_ny; ++j) {
+			EXPECT_DOUBLE_EQ( f_f_fft(i,j)/normalization, _f(i,j) ); 
+		}	
+	}		
+}
+
+//TEST_F(VectorOperationsTest, SineTransformUsingDirectDST) {
+//	Scalar f_fft = sinTransform(_f);
+//	// to do: Compare the fft (RODFT00) result with the result by using DST-I definition...  
+//}
+
+//TEST_F(VectorOperationsTest, SineTransformOfSineFunction) {
+// should give a const..  
+//}
+
 //	Tests on Flux functions (that return Flux)
 TEST_F(VectorOperationsTest, FluxCurlOfConstantEqualsZero) {
 	Scalar scalarc(_grid);
@@ -201,6 +241,64 @@ TEST_F(VectorOperationsTest, FluxCurlOfSimplePolyFunction) {
 	Flux fluxf = curl(_g);	// scalar g(i, j) = -5i^2+3*i*j+ 2j^2;
 	EXPECT_ALL_X_EQUAL(fluxf(X, i, j), 3*i+4*j+2);
 	EXPECT_ALL_Y_EQUAL(fluxf(Y, i, j), 10*i-3*j+5);  	
+}
+
+TEST_F(VectorOperationsTest, FluxCrossProductZeroBCs) {
+	Flux fluxf = crossproduct(_q, _g);	
+	for (int j=0; j<_ny; ++j) {
+		EXPECT_DOUBLE_EQ( fluxf(X,0,j), 0 );
+		EXPECT_DOUBLE_EQ( fluxf(X,_nx,j), 0 );
+	}
+	for (int i=0; i<_nx; ++i) {       
+		EXPECT_DOUBLE_EQ( fluxf(Y,i,0), 0 );
+		EXPECT_DOUBLE_EQ( fluxf(Y,i,_ny), 0 );  
+	} 	
+}
+
+TEST_F(VectorOperationsTest, FluxCrossProductOfConstFluxAndScalar) {
+	Scalar scalarc(_grid);
+	double cs = 10;
+	scalarc = cs;
+	Flux fluxc(_grid);
+	double cx = 8;
+	double cy = 3;
+	fluxc = cx;
+	for (int i=0; i<_nx; ++i) {
+		for (int j=0; j<_ny+1; ++j) {
+			fluxc(Y,i,j) = cy;
+		}
+	}
+	Flux fluxf = crossproduct(fluxc, scalarc);
+	double a;
+	for (int i=1; i<_nx; ++i) {
+		for (int j=0; j<_ny; ++j){
+			a = cy * cs;
+			EXPECT_DOUBLE_EQ( fluxf(X,i,j), a); 
+		}
+	}
+	for (int i=0; i<_nx; ++i) {
+		for (int j=1; j<_ny; ++j){
+			a = -cx * cs;
+			EXPECT_DOUBLE_EQ( fluxf(Y,i,j), a); 
+		}
+	}
+}
+
+TEST_F(VectorOperationsTest, FluxCrossProductOfSimpleFluxAndScalar) {
+	Flux fluxf = crossproduct(_p, _g); // _p.X = 2i+3j; _p.Y=ij-10; _g=-5i^2+3ij+2j^2.
+	double a;
+	for (int i=1; i<_nx; ++i) {
+		for (int j=0; j<_ny; ++j){
+			a = 0.5*((i*j-10-j*0.5)*g(i,j)+(i*(j+1)-10-(j+1)*0.5)*g(i,j+1));
+			EXPECT_DOUBLE_EQ( fluxf(X,i,j), a); 
+		}
+	}
+	for (int i=0; i<_nx; ++i) {
+		for (int j=1; j<_ny; ++j){
+			a = -0.5*((2*i+3*j-3*0.5)*g(i,j)+(2*(i+1)+3*j-3*0.5)*g(i+1,j));
+			EXPECT_DOUBLE_EQ( fluxf(Y,i,j), a); 
+		}
+	}
 }
 
 TEST_F(VectorOperationsTest, BoundaryVectorInnerProduct) {

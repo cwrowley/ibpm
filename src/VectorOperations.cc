@@ -17,6 +17,10 @@
 #include "Scalar.h"
 #include "Flux.h"
 #include "BoundaryVector.h"
+#include <fftw3.h>
+//#include <blitz/array.h>
+//
+//BZ_USING_NAMESPACE(blitz)
 
 // Return the curl of Flux q, as a Scalar object
 Scalar curl(const Flux& q) { 
@@ -119,6 +123,107 @@ double InnerProduct (const Flux& p, const Flux& q){
     double dx = p.getGrid().getDx();
     return dp * dx * dx;
 }
+
+// sine transform of a Scalar object using fft (type DST-I).
+// (fftw library is used(kind: RODFT00); Only interior nodes are considered.)
+Scalar sinTransform(const Scalar& f) {
+	Scalar f_fft(f.getGrid());
+	int nx = f.getGrid().getNx();
+	int ny = f.getGrid().getNy();
+	
+	double *in;
+	in = (double*) fftw_malloc(sizeof(double) * (nx-1) * (ny-1));
+	
+	fftw_plan p;
+	p = fftw_plan_r2r_2d(nx-1, ny-1, in, in,
+						 FFTW_RODFT00, FFTW_RODFT00, FFTW_EXHAUSTIVE); 	
+	
+	for (int i = 0; i < nx-1; ++i){
+		for (int j = 0; j<ny-1; ++j){
+			*(in+i*(ny-1)+j) = f(i+1,j+1);
+		}
+	}
+	
+	fftw_execute(p); 
+
+	for (int i = 0; i < nx-1; ++i){
+		for (int j = 0; j<ny-1; ++j){
+			f_fft(i+1,j+1) = *(in+i*(ny-1)+j);	     
+		}	  
+	}
+	
+	fftw_destroy_plan(p);
+	fftw_free(in);
+	
+	//boundary elements are set zero:
+	for (int i=0; i<nx+1; ++i) {
+		f_fft(i, 0) = 0;
+		f_fft(i,ny) = 0;
+	}
+	for (int j=0; j<ny+1; ++j) {       
+		f_fft(0,j)=0;
+		f_fft(nx,j)=0 ;  
+	}           
+		
+	return f_fft;
+ }
+
+// inverse sine transform of a Scalar object using fft.(fftw library is used.)
+//Scalar sinTransformInv(const Scalar& f) {
+//	// WORK HERE
+//	//return *this;
+//}
+
+// Return 'cross product' of a Flux and a Scalar object, as a Flux object.
+Flux crossproduct(const Flux& q, const Scalar& f){
+	Flux p(q.getGrid());
+	int nx = q.getGrid().getNx();
+	int ny = q.getGrid().getNy();
+	assert(nx == f.getGrid().getNx());
+	assert(ny == f.getGrid().getNy());
+	
+	Scalar temp(q.getGrid()); // intermidiate Scalar oject: 'average of flux' 	
+	// q.Y average
+	for (int i = 1; i < nx; ++i) {
+		for (int j= 0; j<ny+1; ++j) {
+			temp(i, j) = 0.5 * (q(Y,i,j) + q(Y,i-1,j)); // q.Y average
+		}
+	}
+	
+	// X direction flux (the p.X at i = 0 and nx are set zero)
+	temp *= f;
+	for (int j= 0; j<ny; ++j)  {
+		for (int i = 1; i < nx; ++i){
+			p(X,i,j) = 0.5 * (temp(i,j) + temp(i,j+1));
+		}
+		p(X,0,j) = 0;
+		p(X,nx,j) = 0; 
+	}
+	
+	// q.X average
+	for (int i = 0; i < nx+1; ++i) {
+		for (int j= 1; j<ny; ++j) {
+			temp(i, j) = 0.5 * (q(X,i,j) + q(X,i,j-1)); 
+		}
+	}
+	
+	// Y direction flux (the p.Y at j = 0 and ny are set zero)
+	temp *= f;
+	for  (int i = 0; i < nx; ++i) {
+		for (int j= 1; j<ny; ++j){
+			p(Y,i,j) = -0.5 * (temp(i,j) + temp(i+1,j));
+		}
+		p(Y,i,0) = 0;
+		p(Y,i,ny) = 0;
+	}
+	
+	return p;  
+}
+
+/// Return the 'cross product'  of two Flux objects, as a Scalar object.
+Scalar crossproduct(const Flux& q, const Flux& p){
+// work here;
+};
 
 // Return the inner product of BoundaryVectors x and y.
 // NOTE: The implementation below uses only the public interface.

@@ -18,7 +18,7 @@ $(IBPMLIB):
 	(cd ../src; make lib)
 
 runner: $(TEST_FILES) $(IBPMLIB)
-	$(CXX) $(CXXFLAGS) -o $@ $(INCPATH) $^ -lgtest -lgtest_main
+	$(CXX) $(CXXFLAGS) -o $@ $(INCPATH) $^ -lgtest -lgtest_main -lfftw3 -lm
 
 clean:
 	/bin/rm -rf *.o
