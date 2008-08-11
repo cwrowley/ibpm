@@ -13,9 +13,9 @@
 // $LastChangedBy$
 // $HeadURL:// $Header$
 
-Euler(NavierStokesModel& model, double timestep) :
-    _model(model), _timestep(timestep)
-{
+Euler::Euler(NavierStokesModel& model, double timestep) :
+    _model(model),
+    _timestep(timestep) {
     _solver = createSolver(timestep);
 }
 
@@ -31,5 +31,5 @@ void Euler::advance(State& x) {
     _solver->solve( a, b, x.gamma, x.f );
     
     // Compute the corresponding flux
-    _model.computeFlux( x.gamma, x.f );
+    _model.computeFlux( x.gamma, x.q );
 }

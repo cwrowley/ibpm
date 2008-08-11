@@ -16,7 +16,6 @@
 #include "NavierStokesModel.h"
 #include "ProjectionSolver.h"
 #include "ConjugateGradientSolver.h"
-#include "VectorOperations.h"
 
 namespace {
 
