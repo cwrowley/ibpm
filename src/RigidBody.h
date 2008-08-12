@@ -5,9 +5,15 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
+// using std::istream;
+// using std::ostream;
+// using std::strin
+
 class BoundaryVector;
-class Point;
 class Motion;
+struct Point;
 
 /*!
 \file RigidBody.h
@@ -30,7 +36,7 @@ public:
     RigidBody();
 
     /// Destructor
-    ~RigidBody() {}
+    ~RigidBody();
     
     /// Add the specified point to the list of points on the body's boundary
     void addPoint(double x, double y);    
@@ -65,9 +71,7 @@ public:
     void saveRaw(ostream& out);
     
     /// Return the number of points on the body's boundary
-    inline int getNumPoints() const {
-        return _points.size();
-    };
+    int getNumPoints() const;
     
     /// Return the list of coordinates for each point ont he body
     BoundaryVector getPoints();
@@ -79,10 +83,16 @@ public:
     void setMotion(const Motion& motion);
     
     /// Set the center of the body, about which rotations are defined
-    void setCenter(double x, double y);
+    inline void setCenter(double x, double y) {
+        _xCenter = x;
+        _yCenter = y;
+    }
 
     /// Get the center of the body, about which rotations are defined
-    void getCenter(double& x, double& y) const;
+    inline void getCenter(double& x, double& y) const {
+        x = _xCenter;
+        y = _yCenter;
+    }
     
     /// Set the name of the body
     void setName(string name);

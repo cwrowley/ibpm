@@ -2,7 +2,7 @@ all: run_tests
 
 TEST_FILES=GridTest.cc GeometryTest.cc BoundaryVectorTest.cc FluxTest.cc \
 	ScalarTest.cc RegularizerTest.cc VectorOperationsTest.cc \
-	ProjectionSolverTest.cc
+	ProjectionSolverTest.cc RigidBodyTest.cc
 
 CXX = g++
 CXXFLAGS = -g

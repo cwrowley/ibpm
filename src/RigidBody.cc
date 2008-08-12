@@ -34,10 +34,16 @@ RigidBody::RigidBody() {
     _yCenter = 0;
 }
 
+RigidBody::~RigidBody() {}
+
 void RigidBody::addPoint(double x, double y) {
     Point p(x,y);
     _points.push_back(p);
 }
+
+int RigidBody::getNumPoints() const {
+    return _points.size();
+};
 
 /// Return the list of coordinates for each point on the body
 BoundaryVector RigidBody::getPoints() {
