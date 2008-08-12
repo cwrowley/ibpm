@@ -12,7 +12,7 @@ all: lib ibpm
 	
 OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o \
 	VectorOperations.o Regularizer.o ProjectionSolver.o \
-	ConjugateGradientSolver.o TimeStepper.o Euler.o
+	ConjugateGradientSolver.o TimeStepper.o Euler.o RigidBody.o
 
 CXX = g++
 CXXFLAGS = -g 

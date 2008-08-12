@@ -1,3 +1,6 @@
+#ifndef _DIRECTION_H_
+#define _DIRECTION_H_
+
 /*!
     \file Direction.h
 
@@ -9,10 +12,6 @@
     \date $LastChangedDate: $
     \version $Revision: $
 */
-
-#ifndef _DIRECTION_H_
-#define _DIRECTION_H_
-
 enum Direction {X, Y, XY};
 
 /// Postfix operator dir++

@@ -1,8 +1,9 @@
 #ifndef _PROJECTIONSOLVER_H_
 #define _PROJECTIONSOLVER_H_
 
-class BoundaryVector;
-class Scalar;
+#include "Scalar.h"
+#include "BoundaryVector.h"
+#include "NavierStokesModel.h"
 
 /*!
 \file ProjectionSolver.h
@@ -43,10 +44,6 @@ $LastChangedDate$
 $LastChangedBy$
 $HeadURL$
 */
-
-#include "Scalar.h"
-#include "BoundaryVector.h"
-#include "NavierStokesModel.h"
 
 class ProjectionSolver {
 

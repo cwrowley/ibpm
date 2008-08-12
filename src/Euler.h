@@ -1,6 +1,8 @@
 #ifndef _EULER_H_
 #define _EULER_H_
 
+#include "TimeStepper.h"
+
 /*!
     \file Euler.h
     \class Euler
@@ -21,7 +23,6 @@
     \date $LastChangedDate$
     \version $Revision$
 */
-#include "TimeStepper.h"
 
 class Euler : public TimeStepper {
 public:

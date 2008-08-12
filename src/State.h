@@ -1,6 +1,12 @@
 #ifndef _STATE_H_
 #define _STATE_H_
 
+#include "Grid.h"
+#include "Geometry.h"
+#include "Flux.h"
+#include "Scalar.h"
+#include "BoundaryVector.h"
+
 /*!
 	\file State.h
 	\class State
@@ -13,15 +19,6 @@
 	\date $LastChangedDate: $
 	\version $Revision: $
 */
-
-#include "Grid.h"
-#include "Geometry.h"
-class Flux;
-class Scalar;
-class BoundaryVector;
-#include "Flux.h"
-#include "Scalar.h"
-#include "BoundaryVector.h"
 
 struct State {
 	State(const Grid& grid, const Geometry& geom) :

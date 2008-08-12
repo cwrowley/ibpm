@@ -6,6 +6,8 @@
 
 BZ_USING_NAMESPACE(blitz)
 
+class BoundaryVectorIndex;
+
 /*!
 	\file BoundaryVector.h
 	\class BoundaryVector
@@ -20,8 +22,6 @@ BZ_USING_NAMESPACE(blitz)
 	\date $LastChangedDate: $
 	\version $Revision: $
 */
-
-class BoundaryVectorIndex;
 
 class BoundaryVector {
 public:
