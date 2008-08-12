@@ -21,20 +21,19 @@
     \date $LastChangedDate$
     \version $Revision$
 */
+#include "TimeStepper.h"
 
 class Euler : public TimeStepper {
 public:
 
     /// Instantiate an Euler solver
-    Euler( NavierStokesModel& model, double timestep );
+    Euler( const NavierStokesModel& model, double timestep );
 
     /// Advance the state forward one step, using explicit Euler
     void advance(State& x);
 
 private:
-    NavierStokesModel _model;
     ProjectionSolver* _solver;
-    double _timestep;
 };
 
 

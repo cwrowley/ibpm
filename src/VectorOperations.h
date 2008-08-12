@@ -51,6 +51,7 @@ Scalar sinTransform(const Scalar& f);
 // double InnerProduct( const BoundaryVector& x, const BoundaryVector& y );
 
 /// Return the 'cross product'  of a Flux object and a Scalar object, as a Flux object.
+/// Boundary conditions on the Flux returned???
 Flux crossproduct(const Flux& q, const Scalar& f);
 
 /// Return the 'cross product'  of two Flux objects, as a Scalar object.

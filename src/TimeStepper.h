@@ -52,10 +52,13 @@ public:
     virtual void advance(State& x) = 0;
 
 //
-// Protected methods
+// Protected data and methods
 //
 protected:
-    
+
+    const NavierStokesModel* _model;
+    double _timestep;
+
     /*! \brief Return a new ProjectionSolver of the appropriate type
     
     \param[in] alpha    Parameter passed to the appropriate ProjectionSolver

@@ -27,7 +27,7 @@ public:
     
     /// Constructor.  Store the tolerance as private data
     ConjugateGradientSolver(
-        NavierStokesModel& model,
+        const NavierStokesModel& model,
         double alpha,
         double tolerance
     );

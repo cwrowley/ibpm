@@ -7,6 +7,7 @@ class Scalar;
 class Geometry;
 class BoundaryVector;
 class State;
+class Flux;
 
 /*!
 \file NavierStokesModel.h
@@ -64,6 +65,9 @@ public:
 	Pure virtual function: must be overridden by subclasses.
 	*/
 	virtual Scalar nonlinear(const State& x) const = 0;
+	
+	/// Compute flux q from circulation gamma
+    void computeFlux( const Scalar& gamma, Flux& q ) const;
 
 protected:
 	/*! \brief Compute bilinear term, used by subclasses

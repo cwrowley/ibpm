@@ -22,7 +22,7 @@ namespace {
 const int MAX_ITERATIONS = 50;
 
 ConjugateGradientSolver::ConjugateGradientSolver(
-    NavierStokesModel& model,
+    const NavierStokesModel& model,
     double alpha,
     double tolerance
     ) :

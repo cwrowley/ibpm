@@ -13,9 +13,16 @@
 // $LastChangedBy$
 // $HeadURL:// $Header$
 
-Euler::Euler(NavierStokesModel& model, double timestep) :
-    _model(model),
-    _timestep(timestep) {
+#include "BoundaryVector.h"
+#include "Geometry.h"
+#include "State.h"
+#include "NavierStokesModel.h"
+#include "ProjectionSolver.h"
+#include "Timestepper.h"
+#include "Euler.h"
+
+Euler::Euler(const NavierStokesModel& model, double timestep) :
+    TimeStepper(model, timestep) {
     _solver = createSolver(timestep);
 }
 
@@ -24,12 +31,12 @@ void Euler::advance(State& x) {
     Scalar a = x.gamma;
     
     // Evaluate Right-Hand-Side (b) for second equation of ProjecitonSolver
-    Geometry* geom = _model.getGeometry();
-    BoundaryVector b = geom.getVelocities();
+    const Geometry* geom = _model->getGeometry();
+    BoundaryVector b = geom->getVelocities();
     
     // Call the ProjectionSolver to determine the circulation and forces
     _solver->solve( a, b, x.gamma, x.f );
     
     // Compute the corresponding flux
-    _model.computeFlux( x.gamma, x.q );
+    _model->computeFlux( x.gamma, x.q );
 }

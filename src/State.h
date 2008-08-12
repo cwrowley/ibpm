@@ -14,19 +14,28 @@
 	\version $Revision: $
 */
 
+#include "Grid.h"
+#include "Geometry.h"
+class Flux;
+class Scalar;
+class BoundaryVector;
+#include "Flux.h"
+#include "Scalar.h"
+#include "BoundaryVector.h"
+
 struct State {
 	State(const Grid& grid, const Geometry& geom) :
 		q(grid),
 		gamma(grid),
-		f(geom) {};
+		f(geom.getNumPoints()) {}
 
-	~State() {};
+	~State() {}
 	
 	int timestep;
 	double time;
 	Flux q;
 	Scalar gamma;
 	BoundaryVector f;
-}
+};
 
 #endif /* _STATE_H_ */

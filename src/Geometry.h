@@ -28,6 +28,12 @@ public:
         coords = 0;
         return coords;
     }
+    
+    BoundaryVector getVelocities() const {
+        BoundaryVector velocities(1);
+        velocities = 0;
+        return velocities;
+    }
 	// ...
 };
 
