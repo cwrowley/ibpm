@@ -20,12 +20,6 @@ class TangentSE2;
 
 class Motion {
 public:
-    /// Constructor
-    Motion();
-    
-    /// Destructor
-    ~Motion();
-
     /// True if the body is moving (default is False)
     virtual bool isStationary() { return false; }
 

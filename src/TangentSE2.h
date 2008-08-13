@@ -36,7 +36,7 @@ public:
         _ydot(ydot),
         _thetadot(thetadot) {
     }
-
+    
     inline void setPosition(
         double x,
         double y,
@@ -55,6 +55,26 @@ public:
         x = _x;
         y = _y;
         theta = _theta;
+    }
+
+    inline void setVelocity(
+        double xdot,
+        double ydot,
+        double thetadot
+        ) {
+        _xdot = xdot;
+        _ydot = ydot;
+        _thetadot = thetadot;    
+    }
+
+    inline void getVelocity(
+        double& xdot,
+        double& ydot,
+        double& thetadot
+        ) {
+        xdot = _xdot;
+        ydot = _ydot;
+        thetadot = _thetadot;
     }
 
     /// Given the point (a,b), compute the mapped point (a_new, b_new)
