@@ -104,6 +104,7 @@ protected:
         Scalar Bf = B(f);
         Scalar Ainv_B_f = Ainv(Bf);
         BoundaryVector y = C(Ainv_B_f);
+        return y;
     }
     
     /// Compute \f$ x = M^{-1} b \f$.

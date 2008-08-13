@@ -8,6 +8,7 @@
 #include "BoundaryVector.h"
 #include "State.h"
 #include "VectorOperations.h"
+#include "Regularizer.h"
 #include <math.h>
 
 
@@ -99,7 +100,8 @@ public:
         int ny = _grid.getNy();
         double normalization = (nx-1) * (ny-1) * 4;
         g *= normalization;
-	};
+        return g;
+	}
 	
 	/// Compute gamma = B(f) as in (14)
 	inline Scalar B(const BoundaryVector& f) const {

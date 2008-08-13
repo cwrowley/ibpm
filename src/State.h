@@ -28,6 +28,8 @@ struct State {
 
 	~State() {}
 	
+	void loadRestartFile(string filename) {}
+	
 	int timestep;
 	double time;
 	Flux q;

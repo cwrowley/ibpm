@@ -2,6 +2,9 @@
 #define _GEOMETRY_H_
 
 #include "BoundaryVector.h"
+#include <iostream>
+using namespace std;
+
 /*!
 \file Geometry.h
 \class Geometry
@@ -45,6 +48,8 @@ public:
         // TODO: Update the positions of the associated RigidBodies and
         // recompute Regularizer operations
     }
+    
+    void load(const istream& in) {}
     
 private:
     

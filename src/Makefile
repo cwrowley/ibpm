@@ -16,6 +16,7 @@ OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o \
 
 CXX = g++
 CXXFLAGS = -g 
+LFLAGS = -lfftw3 -lm
 AR = ar
 ARFLAGS = -r
 MAKEDEPEND = gcc -MM
@@ -33,7 +34,7 @@ $(IBPMLIB): $(OBJS)
 	$(AR) $(ARFLAGS) $(IBPMLIB) $(OBJS)
 
 $(IBPM): ibpm.o $(IBPMLIB)
-	$(CXX) -o $@ $^
+	$(CXX) -o $@ $^ $(LFLAGS)
 
 .cc.o:
 	$(CXX) -c $(CXXFLAGS) $<

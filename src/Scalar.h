@@ -74,6 +74,7 @@ public:
     
 	/// Copy assignment
 	inline Scalar& operator=(const Scalar& f) {
+        assert(&f != this);
 		assert(f._nx == _nx);
 		assert(f._ny == _ny);
 		_data = f._data;

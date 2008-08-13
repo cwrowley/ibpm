@@ -210,6 +210,20 @@ TEST_F(VectorOperationsTest, SineTransformOfZeroEqualsZero) {
 	EXPECT_ALL_EQUAL(S_fft(i,j), 0);
 }
 
+// Sine transform gives a Scalar of the same size as its argument
+TEST_F(VectorOperationsTest, SineTransformOutputSize) {
+    Scalar a(_grid);
+    a = 0;
+    
+    Scalar b = sinTransform(a);
+    
+    // compare grids
+    Grid g1 = a.getGrid();
+    Grid g2 = b.getGrid();
+    EXPECT_EQ( g1.getNy(), g2.getNy() );
+    EXPECT_EQ( g1.getNy(), g2.getNy() );
+}
+
 // Do Sine transform twice and obtain the original data, upto the normalization parameter.
 TEST_F(VectorOperationsTest, SineTransformTwiceGivesOriginalScalar) {
 	Scalar f_fft = sinTransform(_f);
