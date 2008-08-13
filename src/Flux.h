@@ -4,6 +4,7 @@
 #include "Grid.h"
 #include "Direction.h"
 #include <blitz/array.h>
+#include <math.h>
 
 BZ_USING_NAMESPACE(blitz)
 
@@ -278,6 +279,27 @@ public:
 		g /= a;
 		return g;
 	}
+
+	/// Return Flux for a uniform flow with the specified magnitude and dir
+	static inline Flux UniformFlow(
+	    const Grid& grid,
+	    double magnitude,
+	    double angle
+	    ) {
+	    double dx = grid.getDx();
+        double u = magnitude * cos( angle ) * dx;
+        double v = magnitude * sin( angle ) * dx;
+        
+        Flux q(grid);
+        Flux::index ind;
+        for (ind = q.begin(X); ind != q.end(X); ++ind) {
+            q(ind) = u;
+        }    
+        for (ind = q.begin(Y); ind != q.end(Y); ++ind) {
+            q(ind) = v;
+        }    
+        return q;
+	}    
 		
 private:
 	const Grid& _grid;

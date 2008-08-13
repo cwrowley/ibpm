@@ -1,11 +1,19 @@
 #include "Grid.h"
 #include "Flux.h"
+#include <math.h>
 #include <gtest/gtest.h>
 
 #define EXPECT_ALL_X_EQUAL(a,b)           \
 	for ( int i=0; i<_nx+1; ++i ) {       \
         for ( int j=0; j<_ny; ++j ) {     \
 		    EXPECT_DOUBLE_EQ( (a), (b) ); \
+        }                                 \
+	}
+
+#define EXPECT_ALL_X_NEAR(a,b,tol)        \
+	for ( int i=0; i<_nx+1; ++i ) {       \
+        for ( int j=0; j<_ny; ++j ) {     \
+		    EXPECT_NEAR( (a), (b), tol ); \
         }                                 \
 	}
 
@@ -250,6 +258,20 @@ TEST_F(FluxTest, GridValues) {
     EXPECT_ALL_Y_EQUAL( _f.x(_f.getIndex(Y,i,j)), _f.x(Y,i) );    
     EXPECT_ALL_X_EQUAL( _f.y(_f.getIndex(X,i,j)), _f.y(X,j) );
     EXPECT_ALL_Y_EQUAL( _f.y(_f.getIndex(Y,i,j)), _f.y(Y,j) );    
+}
+
+TEST_F(FluxTest, UniformFlow) {
+    double mag = 3.;
+    double angle = 0.;
+    Flux q = Flux::UniformFlow( _grid, mag, angle );
+    EXPECT_ALL_X_EQUAL( q(X,i,j), mag * _grid.getDx() );
+    EXPECT_ALL_Y_EQUAL( q(Y,i,j), 0. );
+
+    double pi = 4. * atan(1.);
+    angle = pi/2.;
+    q = Flux::UniformFlow( _grid, mag, angle );
+    EXPECT_ALL_X_NEAR( q(X,i,j), 0., 1e-15 );
+    EXPECT_ALL_Y_EQUAL( q(Y,i,j), mag * _grid.getDx() );
 }
 
 #undef EXPECT_ALL_X_EQUAL
