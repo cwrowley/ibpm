@@ -22,6 +22,10 @@
 //
 //BZ_USING_NAMESPACE(blitz)
 
+// Declarations of functions used only in this file
+Scalar fluxXAverage(const Flux& q);
+Scalar fluxYAverage(const Flux& q);
+
 // Return the curl of Flux q, as a Scalar object
 Scalar curl(const Flux& q) { 
 	Scalar f(q.getGrid());
