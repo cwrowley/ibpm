@@ -231,7 +231,7 @@ TEST_F(VectorOperationsTest, SineTransformTwiceGivesOriginalScalar) {
 	double normalization = 2 * _nx * 2 * _ny; //normalization needed (see FFTW3 manual)
 	for (int i = 1; i<_nx; ++i) {
 		for (int j = 1; j<_ny; ++j) {
-			EXPECT_DOUBLE_EQ( f_f_fft(i,j)/normalization, _f(i,j) ); 
+			EXPECT_NEAR( f_f_fft(i,j)/normalization, _f(i,j) ); 
 		}	
 	}		
 }

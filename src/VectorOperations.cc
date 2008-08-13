@@ -174,42 +174,6 @@ Scalar sinTransform(const Scalar& f) {
 //	//return *this;
 //}
 
-// Return the average of a flux in x direction, as a Scalar object: 
-// BCs: By supposing zero 'ghost flux.x' outside of the domain.  
-Scalar fluxXAverage(const Flux& q){
-	Scalar f(q.getGrid());
-	int nx = q.getGrid().getNx();
-	int ny = q.getGrid().getNy();
-	
-	for (int i = 0; i < nx+1; ++i) {
-		for (int j= 1; j<ny; ++j) {
-			f(i, j) = 0.5 * (q(X,i,j) + q(X,i,j-1)); // at 'inner nodes'
-		}
-		// at 'boundary nodes' j = 0 and ny:
-		f(i, 0) = 0.5 * q(X, i, 0); 
-		f(i, ny) = 0.5 * q(X, i, ny-1);
-	}
-	return f;		
-}
-
-// Return the average of a flux in y direction, as a Scalar object: 
-// BCs: By supposing zero 'ghost flux.y' outside of the domain.  
-Scalar fluxYAverage(const Flux& q){
-	Scalar f(q.getGrid());
-	int nx = q.getGrid().getNx();
-	int ny = q.getGrid().getNy();
-	
-	for (int j = 0; j < ny+1; ++j) {
-		for (int i= 1; i<nx; ++i) {
-			f(i, j) = 0.5 * (q(Y,i,j) + q(Y,i-1,j)); // at 'inner nodes'
-		}
-		// at 'boundary nodes' i = 0 and nx:
-		f(0, j) = 0.5 * q(Y, 0, j); 
-		f(nx, j) = 0.5 * q(Y, nx-1, j);
-	}
-	return f;		
-}
-
 // Return 'cross product' of a Flux and a Scalar object, as a Flux object.
 Flux crossproduct(const Flux& q, const Scalar& f){
 	Flux p(q.getGrid());
@@ -258,6 +222,43 @@ Scalar crossproduct(const Flux& q, const Flux& p){
 	
 	return f;
 };
+
+/// Return the average of a flux in x direction, taken at nodes, as a Scalar object. 
+/// BCs: By supposing zero 'ghost flux.x' outside of the domain.  
+Scalar fluxXAverage(const Flux& q){
+	Scalar f(q.getGrid());
+	int nx = q.getGrid().getNx();
+	int ny = q.getGrid().getNy();
+	
+	for (int i = 0; i < nx+1; ++i) {
+		for (int j= 1; j<ny; ++j) {
+			f(i, j) = 0.5 * (q(X,i,j) + q(X,i,j-1)); // at 'inner nodes'
+		}
+		// at 'boundary nodes' j = 0 and ny:
+		f(i, 0) = 0.5 * q(X, i, 0); 
+		f(i, ny) = 0.5 * q(X, i, ny-1);
+	}
+	return f;		
+}
+
+/// Return the average of a flux in y direction, taken at nodes, as a Scalar object. 
+/// BCs: By supposing zero 'ghost flux.y' outside of the domain.  
+Scalar fluxYAverage(const Flux& q){
+	Scalar f(q.getGrid());
+	int nx = q.getGrid().getNx();
+	int ny = q.getGrid().getNy();
+	
+	for (int j = 0; j < ny+1; ++j) {
+		for (int i= 1; i<nx; ++i) {
+			f(i, j) = 0.5 * (q(Y,i,j) + q(Y,i-1,j)); // at 'inner nodes'
+		}
+		// at 'boundary nodes' i = 0 and nx:
+		f(0, j) = 0.5 * q(Y, 0, j); 
+		f(nx, j) = 0.5 * q(Y, nx-1, j);
+	}
+	return f;		
+}
+
 
 // Return the inner product of BoundaryVectors x and y.
 // NOTE: The implementation below uses only the public interface.

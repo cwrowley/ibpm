@@ -50,13 +50,6 @@ Scalar sinTransform(const Scalar& f);
 /// Return the inner product of BoundaryVectors x and y.
 // double InnerProduct( const BoundaryVector& x, const BoundaryVector& y );
 
-/// Return the average of a flux in x direction, taken at nodes, as a Scalar object. 
-/// BCs: By supposing zero 'ghost flux.x' outside of the domain.  
-Scalar fluxXAverage(const Flux& q);
-
-/// Return the average of a flux in y direction, taken at nodes, as a Scalar object. 
-/// BCs: By supposing zero 'ghost flux.y' outside of the domain.  
-Scalar fluxYAverage(const Flux& q);
 
 /*! \brief Return the 'cross product'  of a Flux object q and a Scalar object f, as a Flux object.
 
