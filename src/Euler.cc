@@ -18,7 +18,7 @@
 #include "State.h"
 #include "NavierStokesModel.h"
 #include "ProjectionSolver.h"
-#include "Timestepper.h"
+#include "TimeStepper.h"
 #include "Euler.h"
 
 Euler::Euler(const NavierStokesModel& model, double timestep) :

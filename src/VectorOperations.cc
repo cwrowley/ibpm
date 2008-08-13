@@ -174,44 +174,69 @@ Scalar sinTransform(const Scalar& f) {
 //	//return *this;
 //}
 
+// Return the average of a flux in x direction, as a Scalar object: 
+// BCs: By supposing zero 'ghost flux.x' outside of the domain.  
+Scalar fluxXAverage(const Flux& q){
+	Scalar f(q.getGrid());
+	int nx = q.getGrid().getNx();
+	int ny = q.getGrid().getNy();
+	
+	for (int i = 0; i < nx+1; ++i) {
+		for (int j= 1; j<ny; ++j) {
+			f(i, j) = 0.5 * (q(X,i,j) + q(X,i,j-1)); // at 'inner nodes'
+		}
+		// at 'boundary nodes' j = 0 and ny:
+		f(i, 0) = 0.5 * q(X, i, 0); 
+		f(i, ny) = 0.5 * q(X, i, ny-1);
+	}
+	return f;		
+}
+
+// Return the average of a flux in y direction, as a Scalar object: 
+// BCs: By supposing zero 'ghost flux.y' outside of the domain.  
+Scalar fluxYAverage(const Flux& q){
+	Scalar f(q.getGrid());
+	int nx = q.getGrid().getNx();
+	int ny = q.getGrid().getNy();
+	
+	for (int j = 0; j < ny+1; ++j) {
+		for (int i= 1; i<nx; ++i) {
+			f(i, j) = 0.5 * (q(Y,i,j) + q(Y,i-1,j)); // at 'inner nodes'
+		}
+		// at 'boundary nodes' i = 0 and nx:
+		f(0, j) = 0.5 * q(Y, 0, j); 
+		f(nx, j) = 0.5 * q(Y, nx-1, j);
+	}
+	return f;		
+}
+
 // Return 'cross product' of a Flux and a Scalar object, as a Flux object.
 Flux crossproduct(const Flux& q, const Scalar& f){
 	Flux p(q.getGrid());
 	int nx = q.getGrid().getNx();
 	int ny = q.getGrid().getNy();
 	assert(nx == f.getGrid().getNx());
-	assert(ny == f.getGrid().getNy());
+	assert(ny == f.getGrid().getNy());                                                                                                                                                                 
 	
-	Scalar temp(q.getGrid()); // intermidiate Scalar oject: 'average of flux' 	
-	// q.Y average
-	for (int i = 1; i < nx; ++i) {
-		for (int j= 0; j<ny+1; ++j) {
-			temp(i, j) = 0.5 * (q(Y,i,j) + q(Y,i-1,j)); // q.Y average
-		}
-	}
-	
+	Scalar tempY = fluxYAverage(q);//Y direction average of flux.
+
 	// X direction flux (the p.X at i = 0 and nx are set zero)
-	temp *= f;
+	tempY *= f;
 	for (int j= 0; j<ny; ++j)  {
 		for (int i = 1; i < nx; ++i){
-			p(X,i,j) = 0.5 * (temp(i,j) + temp(i,j+1));
+			p(X,i,j) = 0.5 * (tempY(i,j) + tempY(i,j+1));
 		}
 		p(X,0,j) = 0;
 		p(X,nx,j) = 0; 
-	}
+	}	
 	
-	// q.X average
-	for (int i = 0; i < nx+1; ++i) {
-		for (int j= 1; j<ny; ++j) {
-			temp(i, j) = 0.5 * (q(X,i,j) + q(X,i,j-1)); 
-		}
-	}
+	Scalar tempX = fluxXAverage(q);// X direction average of flux.
 	
 	// Y direction flux (the p.Y at j = 0 and ny are set zero)
-	temp *= f;
+	tempX *= f;
 	for  (int i = 0; i < nx; ++i) {
 		for (int j= 1; j<ny; ++j){
-			p(Y,i,j) = -0.5 * (temp(i,j) + temp(i+1,j));
+			p(Y,i,j) = -0.5 * (tempX(i,j) + tempX(i+1,j));
 		}
 		p(Y,i,0) = 0;
 		p(Y,i,ny) = 0;
@@ -220,9 +245,18 @@ Flux crossproduct(const Flux& q, const Scalar& f){
 	return p;  
 }
 
-/// Return the 'cross product'  of two Flux objects, as a Scalar object.
+// Return q cross p, 'cross product'  of two Flux objects q, p, as a Scalar object.
 Scalar crossproduct(const Flux& q, const Flux& p){
-// work here;
+	assert(q.getGrid().getNx() == p.getGrid().getNx());
+	assert(q.getGrid().getNy() == p.getGrid().getNy());
+	
+	Scalar f = fluxXAverage(q);
+	f *= fluxYAverage(p);
+	Scalar tmp = fluxYAverage(q);
+	tmp *= fluxXAverage(p);
+	f -= tmp;
+	
+	return f;
 };
 
 // Return the inner product of BoundaryVectors x and y.
