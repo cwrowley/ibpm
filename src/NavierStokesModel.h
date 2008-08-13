@@ -2,18 +2,22 @@
 #define _NAVIERSTOKES_H_
 
 #include "Grid.h"
+#include "Geometry.h"
+#include "Scalar.h"
+#include "Flux.h"
+#include "BoundaryVector.h"
+#include "State.h"
+#include "VectorOperations.h"
+#include <math.h>
 
-class Scalar;
-class Geometry;
-class BoundaryVector;
-class State;
-class Flux;
 
 /*!
 \file NavierStokesModel.h
 \class NavierStokesModel
 
 \brief Define operators for the Navier-Stokes equations
+
+Note: This is an abstract base class, and may not be instantiated directly
 
 \author Clancy Rowley
 \date  3 Jul 2008
@@ -26,13 +30,43 @@ $HeadURL$
 
 class NavierStokesModel {
 public:
-	/*! \brief Construcor, given a specied grid, geometry, and Reynolds number
+	/*! \brief Constructor, given a specified grid, geometry, and Reynolds number
 	*/
 	NavierStokesModel(
 		const Grid& grid,
 		const Geometry& geometry,
-		double Reynolds
-	);
+		double Reynolds,
+		const Flux& q_potential
+	    ) :
+	    _grid(grid),
+	    _geometry(geometry),
+        _regularizer( grid, geometry ),
+        _linearTermEigenvalues( grid ),
+        _inverseLaplacianEigenvalues( grid ),
+        _baseFlow(q_potential),
+	    _ReynoldsNumber(Reynolds)
+	    {
+        
+        // calculate eigenvalues of Laplacian
+        int nx = grid.getNx();
+        int ny = grid.getNy();    
+        const double pi = 4. * atan(1.);
+        Scalar eigLaplacian(grid);
+        eigLaplacian = 1.;
+        // Loop over only interior points
+        for (int i=1; i < nx; ++i ) {
+            for (int j=1; j < ny; ++j ) {
+                eigLaplacian(i,j) = 2. * ( cos( (pi * i) / nx ) +
+                                           cos( (pi * j) / ny ) - 2. );
+            }
+        }
+            
+        _inverseLaplacianEigenvalues = 1. / eigLaplacian;
+        
+        // calculate linear term
+        double beta = 1 / (Reynolds * grid.getDx());
+        _linearTermEigenvalues = beta * eigLaplacian;
+    }
 
 	~NavierStokesModel() {}
 
@@ -43,23 +77,44 @@ public:
 	const Grid* getGrid() const { return &_grid; }
 
 	/// Return a pointer to the eigenvalues of the linear term L
-	Scalar* getLambda() const { return _lambda; }
+	const Scalar* getLambda() const { return &_linearTermEigenvalues; }
 	
 	/// Transform to eigenvectors of L (discrete sin transform)
-	Scalar S(const Scalar& g) const;
+	inline Scalar S(const Scalar& g) const {
+        Scalar ghat = sinTransform( g );
+        return ghat;
+	}
 
 	/*! \brief Inverse transform of S.
 	Note that for the discrete sin transform, the S^{-1} should equal S, but
 	in some implementations (e.g. FFTW), these may differ by a normalization
 	constant.
 	*/
-	Scalar Sinv(const Scalar& ghat) const;
+	Scalar Sinv(const Scalar& ghat) const {
+        Scalar g = sinTransform( ghat );
+        // multiply by normalization factor
+        // TODO: keep track of this normalization factor within a class
+        //       containing sinTransform -- perhaps NavierStokesModel??
+        int nx = _grid.getNx();
+        int ny = _grid.getNy();
+        double normalization = (nx-1) * (ny-1) * 4;
+        g *= normalization;
+	};
 	
 	/// Compute gamma = B(f) as in (14)
-	Scalar B(const BoundaryVector& f) const;
+	inline Scalar B(const BoundaryVector& f) const {
+        Flux q = _regularizer.toGrid( f );
+        Scalar gamma = curl( q );
+        return gamma;
+	}
 	
 	/// Compute f = C(gamma) as in (14)
-	BoundaryVector C(const Scalar& gamma) const;
+	inline BoundaryVector C(const Scalar& gamma) const {
+        Flux q(_grid);
+        computeFlux( gamma, q );
+        BoundaryVector f = _regularizer.toBoundary( q );
+        return f;
+	}
 	
 	/*! \brief Compute nonlinear terms y = N(x)
 	Pure virtual function: must be overridden by subclasses.
@@ -67,9 +122,24 @@ public:
 	virtual Scalar nonlinear(const State& x) const = 0;
 	
 	/// Compute flux q from circulation gamma
-    void computeFlux( const Scalar& gamma, Flux& q ) const;
+    void computeFlux( const Scalar& gamma, Flux& q ) const {
+        Scalar streamfunction = inverseLaplacian( gamma );
+        q = curl( streamfunction );
+        q += _baseFlow;
+    }
 
 protected:
+    
+    /*! \brief Return the inverse Laplacian of gamma
+    Assumptions about boundary conditions??
+    */
+    inline Scalar inverseLaplacian(const Scalar& gamma) const {
+        Scalar ghat = S( gamma );
+        ghat *= _inverseLaplacianEigenvalues;
+        ghat = Sinv( ghat );
+        return ghat;
+    }
+    
 	/*! \brief Compute bilinear term, used by subclasses
 	(e.g. y = N(q) = bilinear(q,q) )
 	*/
@@ -78,11 +148,35 @@ protected:
 private:
 	const Geometry& _geometry;
 	const Grid& _grid;
-	Scalar* _lambda;
+    Regularizer _regularizer;
+	Scalar _linearTermEigenvalues;
+    Scalar _inverseLaplacianEigenvalues;
+    Flux _baseFlow;
+    double _ReynoldsNumber;
 };
 
 //! Full nonlinear Navier-Stokes equations.
-class NonlinearNavierStokes : public NavierStokesModel {};
+class NonlinearNavierStokes : public NavierStokesModel {
+public:
+	NonlinearNavierStokes(
+		const Grid& grid,
+		const Geometry& geometry,
+		double Reynolds,
+		const Flux& q_potential
+	    ) :
+        NavierStokesModel( grid, geometry, Reynolds, q_potential ) {}
+
+
+	/*! \brief Compute nonlinear terms y = N(x)
+	for full nonlinear Navier-Stokes equations
+	*/
+	inline Scalar nonlinear(const State& x) const {
+        Flux v = crossproduct( x.q, x.gamma );
+        Scalar g = curl( v );
+        return g;
+	};
+    
+};
 
 //! Navier-Stokes equations linearized about an equilibrium point.
 class LinearizedNavierStokes : public NavierStokesModel {};

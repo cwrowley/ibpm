@@ -34,7 +34,20 @@ public:
         velocities = 0;
         return velocities;
     }
-	// ...
+
+    inline bool isStationary() const { 
+        // TODO: call the isStationary methods of the associated RigidBodies
+        // or save an instance variable with the value of this flag
+        return true;
+    }
+
+    inline void moveBodies(double time) const {
+        // TODO: Update the positions of the associated RigidBodies and
+        // recompute Regularizer operations
+    }
+    
+private:
+    
 };
 
 /*! \brief Test routine for now

@@ -83,13 +83,13 @@ void Regularizer::update() {
     }
 }
 
-Flux Regularizer::toGrid(const BoundaryVector& u1) {
+Flux Regularizer::toGrid(const BoundaryVector& u1) const {
     // Allocate a new Flux field, initialized to zero
 	Flux u2(_grid);
 	u2 = 0;
 
     // For each association between cells and boundary points
-    vector<Association>::iterator a;
+    vector<Association>::const_iterator a;
     for (a = _neighbors.begin(); a != _neighbors.end(); ++a) {
         // add the weight factor times the boundary value to the flux
         u2(a->fluxIndex) += a->weight * u1(a->boundaryIndex);
@@ -99,13 +99,13 @@ Flux Regularizer::toGrid(const BoundaryVector& u1) {
     return u2;
 }
 
-BoundaryVector Regularizer::toBoundary(const Flux& u2) {
+BoundaryVector Regularizer::toBoundary(const Flux& u2) const {
     // Allocate a new BoundaryVector, initialized to zero
 	BoundaryVector u1(_geometry.getNumPoints());
 	u1 = 0;
 
     // For each association between cells and boundary points
-    vector<Association>::iterator a;
+    vector<Association>::const_iterator a;
     for (a = _neighbors.begin(); a != _neighbors.end(); ++a) {
         // Add the weight factor times the flux value to the boundary
         u1(a->boundaryIndex) += a->weight * u2(a->fluxIndex);

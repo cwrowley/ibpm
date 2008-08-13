@@ -35,6 +35,7 @@ public:
 
 private:
     ProjectionSolver* _solver;
+    Scalar _linearTermEigenvalues;
 };
 
 
