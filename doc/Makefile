@@ -17,7 +17,7 @@ doc:
 	doxygen
 
 .tex.pdf:
-	(pdflatex $<; pdflatex $<)
+	(pdflatex $<; pdflatex $<; pdflatex $<)
 
 clean:
 	/bin/rm -f *.aux *.toc *.blg *.fdb_latexmk *.log *.out *.pdfsync

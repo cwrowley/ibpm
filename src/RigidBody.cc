@@ -17,17 +17,6 @@
 #include "BoundaryVector.h"
 #include "RigidBody.h"
 
-// Define a small class for keeping track of points in 2d
-// (This class is only available within this file, so is not included in
-// the header file)
-struct Point {
-    Point(double x_in, double y_in) {
-        x = x_in;
-        y = y_in;
-    }
-    double x;
-    double y;
-};
 
 RigidBody::RigidBody() {
     _xCenter = 0;
@@ -46,7 +35,7 @@ int RigidBody::getNumPoints() const {
 };
 
 /// Return the list of coordinates for each point on the body
-BoundaryVector RigidBody::getPoints() {
+BoundaryVector RigidBody::getPoints() const {
     int n = getNumPoints();
     BoundaryVector pointList(n);
 

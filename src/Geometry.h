@@ -3,7 +3,10 @@
 
 #include "BoundaryVector.h"
 #include <iostream>
+#include <vector>
 using namespace std;
+
+class RigidBody;
 
 /*!
 \file Geometry.h
@@ -22,43 +25,32 @@ $HeadURL$
 
 class Geometry {
 public:
-    int getNumPoints() const {
-        return 1;
-    }
-
-    BoundaryVector getPoints() const {
-        BoundaryVector coords(1);
-        coords = 0;
-        return coords;
-    }
+    /// Constructor
+    Geometry();
     
-    BoundaryVector getVelocities() const {
-        BoundaryVector velocities(1);
-        velocities = 0;
-        return velocities;
-    }
+    /// Destructor
+    ~Geometry();
 
-    inline bool isStationary() const { 
-        // TODO: call the isStationary methods of the associated RigidBodies
-        // or save an instance variable with the value of this flag
-        return true;
-    }
+    /// \brief Append the given RigidBody to the list of bodies in the 
+    /// current geometry.
+    /// Makes a copy of it internally.
+    void addBody(const RigidBody& body);
 
-    inline void moveBodies(double time) const {
-        // TODO: Update the positions of the associated RigidBodies and
-        // recompute Regularizer operations
-    }
+    int getNumPoints() const;
+
+    BoundaryVector getPoints() const;
     
-    void load(const istream& in) {}
+    BoundaryVector getVelocities() const;
+
+    bool isStationary() const;
+
+    void moveBodies(double time) const;
+    
+    void load(const istream& in);
     
 private:
-    
+    vector<RigidBody> _bodies;
+    int _numPoints;
 };
-
-/*! \brief Test routine for now
-\param[in] i Integer argument
-\return argument incremented by 1
-*/
-int plus_one(int i);
 
 #endif /* _GEOMETRY_H_ */

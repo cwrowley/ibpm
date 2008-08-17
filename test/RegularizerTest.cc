@@ -1,5 +1,6 @@
 #include "Regularizer.h"
 #include "Grid.h"
+#include "RigidBody.h"
 #include "Geometry.h"
 #include <gtest/gtest.h>
 #include <iostream>
@@ -21,9 +22,9 @@ protected:
     {
         // Create a geometry with one point
         // NOTE: For now, Geometry stub returns a single point at the origin
-        // RigidBody body;
-        // body.addPoint(0,0);
-        // _geom.addBody(body);
+        RigidBody body;
+        body.addPoint(0,0);
+        _geom.addBody(body);
         _regularizer = new Regularizer(_grid, _geom);
         _regularizer->update();
 

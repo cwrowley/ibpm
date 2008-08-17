@@ -74,7 +74,7 @@ public:
     int getNumPoints() const;
     
     /// Return the list of coordinates for each point ont he body
-    BoundaryVector getPoints();
+    BoundaryVector getPoints() const;
     
     /// Return true if the body is not moving in time
     bool isStationary();
@@ -105,6 +105,16 @@ private:
     double _xCenter;  ///< x-coordinate of center
     double _yCenter;  ///< y-coordinate of center
     vector<Point> _points;
+};
+
+// Define a small class for keeping track of points in 2d
+struct Point {
+    Point(double x_in, double y_in) {
+        x = x_in;
+        y = y_in;
+    }
+    double x;
+    double y;
 };
 
 #endif /* _RIGIDBODY_H_ */
