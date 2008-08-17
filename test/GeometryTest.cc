@@ -59,18 +59,22 @@ TEST_F(GeometryTest, TwoBodies) {
     const double x[3] = {3, 5, 7};
     const double y[3] = {10, 20, 30};
 
-    // Define a RigidBody with one point
-    RigidBody body1;
-    body1.addPoint( x[0], y[0] );
     Geometry geom;
-    geom.addBody(body1);
+
+    // Define a RigidBody with one point
+    RigidBody* body;
+    body = new RigidBody();
+    body->addPoint( x[0], y[0] );
+    geom.addBody( *body );
+    delete body;
     EXPECT_EQ( geom.getNumPoints(), 1 );
-    
-    // Define a RigidBody wth two points
-    RigidBody body2;
-    body2.addPoint( x[1], y[1] );
-    body2.addPoint( x[2], y[2] );
-    geom.addBody(body2);
+
+    // Define a RigidBody with two points
+    body = new RigidBody();
+    body->addPoint( x[1], y[1] );
+    body->addPoint( x[2], y[2] );
+    geom.addBody( *body );
+    delete body;
     EXPECT_EQ( geom.getNumPoints(), 3 );
 
     BoundaryVector points = geom.getPoints();
@@ -78,6 +82,7 @@ TEST_F(GeometryTest, TwoBodies) {
         EXPECT_DOUBLE_EQ( points(X,i), x[i] );
         EXPECT_DOUBLE_EQ( points(Y,i), y[i] );
     }
+    
 }
 
 
