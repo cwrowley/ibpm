@@ -35,6 +35,8 @@ ProjectionSolver::ProjectionSolver(
     _eigenvaluesOfAinv = 1 / eigA;
 }
 
+ProjectionSolver::~ProjectionSolver() {}
+
 // Solve for gamma and f for a system of the form
 //   A gamma + B f = a
 //   C gamma = b

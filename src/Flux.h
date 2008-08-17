@@ -300,7 +300,7 @@ public:
         }    
         return q;
 	}    
-		
+
 private:
 	const Grid& _grid;
 	const int _nx;

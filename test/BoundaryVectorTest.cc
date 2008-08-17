@@ -180,4 +180,9 @@ TEST_F(BoundaryVectorTest, GetIndex) {
     EXPECT_ALL_EQUAL( _f(Y,i), gy(i) );    
 }
 
+TEST_F(BoundaryVectorTest, NoPoints) {
+    BoundaryVector b(0);
+    EXPECT_EQ( b.getNumPoints(), 0 );
+}
+
 #undef EXPECT_ALL_EQUAL

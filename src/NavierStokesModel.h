@@ -65,7 +65,7 @@ public:
         _inverseLaplacianEigenvalues = 1. / eigLaplacian;
         
         // calculate linear term
-        double beta = 1 / (Reynolds * grid.getDx());
+        double beta = 1 / ( Reynolds * grid.getDx() * grid.getDx() );
         _linearTermEigenvalues = beta * eigLaplacian;
     }
 
