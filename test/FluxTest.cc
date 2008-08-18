@@ -81,6 +81,7 @@ TEST_F(FluxTest, Assignment) {
 
 TEST_F(FluxTest, CopyConstructor) {
 	Flux h = _f;
+    _f = 0.;
 	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) );
 	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) );
 }

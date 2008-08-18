@@ -44,12 +44,8 @@ TEST_F(BoundaryVectorTest, TestAssignment) {
 
 TEST_F(BoundaryVectorTest, testCopyConstructor) {
 	BoundaryVector h = _f;
-	EXPECT_ALL_EQUAL( h(X,i), fx(i) );
-	EXPECT_ALL_EQUAL( h(Y,i), fy(i) );
-
-    // Change _f, h should remain unchanged;
     _f = 0.;
-    EXPECT_ALL_EQUAL( h(X,i), fx(i) );
+	EXPECT_ALL_EQUAL( h(X,i), fx(i) );
 	EXPECT_ALL_EQUAL( h(Y,i), fy(i) );
 }
 

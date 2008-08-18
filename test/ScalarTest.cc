@@ -63,6 +63,7 @@ TEST_F(ScalarTest, Assignment) {
 
 TEST_F(ScalarTest, CopyConstructor) {
 	Scalar h = _f;
+    _f = 0.;
 	EXPECT_ALL_EQUAL( h(i,j), f(i,j) );
 }
 
