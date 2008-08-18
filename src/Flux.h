@@ -5,6 +5,8 @@
 #include "Direction.h"
 #include <blitz/array.h>
 #include <math.h>
+#include <iostream>
+using namespace std;
 
 BZ_USING_NAMESPACE(blitz)
 
@@ -59,23 +61,23 @@ public:
 	/// Deallocate memory in the destructor
 	~Flux() {};  // deallocation automatic for Blitz++ arrays?
 
-    // typedef Array<double,2>::iterator iterator;
-    // 
-    // inline iterator begin(int dim) {
-    //     assert(dim >= X && dim <= Y);
-    //     switch (dim) {
-    //         case X: return _xdata.begin();
-    //         case Y: return _ydata.begin();
-    //     }
-    // }
-    // 
-    // inline iterator end(int dim) {
-    //     assert(dim <= Y);
-    //     switch (dim) {
-    //         case X: return _xdata.end();
-    //         case Y: return _ydata.end();
-    //     }
-    // }
+    // Print the X and Y components to standard out (for debugging)
+    void print() {
+        cout << "X:" << endl;
+        for (int i=0; i<=_nx; ++i) {
+            for (int j=0; j<_ny; ++j) {
+                cout << (*this)(X,i,j) << " ";
+            }
+            cout << endl;
+        }
+        cout << "Y:" << endl;
+        for (int i=0; i<_nx; ++i) {
+            for (int j=0; j<=_ny; ++j) {
+                cout << (*this)(Y,i,j) << " ";
+            }
+            cout << endl;
+        }
+    }
     
 	/// Copy assignment
 	inline Flux& operator=(const Flux& q) {

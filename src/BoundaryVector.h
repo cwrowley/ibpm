@@ -32,6 +32,13 @@ public:
 	    _data( _numPoints * XY )
 	    {};
 
+    /// Allocate a new BoundaryVector, copy the data
+    inline BoundaryVector(const BoundaryVector& f) :
+        _numPoints(f._numPoints),
+        _data( _numPoints * XY ) {
+        _data = f._data;
+    }
+
 	/*! \brief Constructor using pre-existing data, as a 1d array.
 
 	Here, n is the number of boundary points, and *data has size 2n.
@@ -47,6 +54,11 @@ public:
 	(twice the number of boundary points)
 	*/
 	inline int getSize() { return XY*_numPoints; }
+	
+	// Print the contents to standard output, for debugging
+	inline void print() {
+        cout << _data << endl;
+	}
 	
 	/// f(dir,i) refers to the value in direction dir (X or Y) at point i
 	inline double& operator()(int dir, int i) {

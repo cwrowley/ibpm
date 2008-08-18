@@ -67,6 +67,9 @@ public:
         // calculate linear term
         double beta = 1. / Reynolds;
         _linearTermEigenvalues = beta * eigLaplacian;
+
+        // Update regularizer
+        _regularizer.update();
     }
 
 	~NavierStokesModel() {}

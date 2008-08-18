@@ -72,6 +72,9 @@ public:
         return _data.end();
     }
     
+    // Print the whole field to standard output
+    void print() const;
+    
 	/// Copy assignment
 	inline Scalar& operator=(const Scalar& f) {
         assert(&f != this);

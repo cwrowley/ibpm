@@ -39,7 +39,8 @@ public:
     inline double getTolerance() {
         return sqrt(_toleranceSquared);
     }
-    
+
+protected:
     /// \brief Solve Mf = b for f iteratively, using a conjugate-gradient method.
     /// Assumes M is symmetric
     void Minv(
