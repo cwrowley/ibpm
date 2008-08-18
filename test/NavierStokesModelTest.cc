@@ -2,22 +2,26 @@
 #include "Geometry.h"
 #include "NavierStokesModel.h"
 #include <gtest/gtest.h>
+#include <iostream>
+using namespace std;
 
 namespace {
+
+// Print a Scalar to standard out
+void print(const Scalar& f);
 
 class NavierStokesModelTest : public testing::Test {
 protected:
     NavierStokesModelTest() :
-        _nx(10),
-        _ny(20),
-        _length(2),
+        _nx(4),
+        _ny(4),
+        _length(4.*atan(1.)), // length is pi
         _xOffset(-1),
         _yOffset(-3),
         _grid( _nx, _ny, _length, _xOffset, _yOffset ) {
         
         // Choose Reynolds number such that linear term is Laplacian
-        _Reynolds = 1. / ( _grid.getDx() * _grid.getDx() );
-
+        _Reynolds = 1.;
         // Add the geometry
         // NOTE: For now, Geometry stub returns a single point at the origin
         RigidBody body;
@@ -35,6 +39,19 @@ protected:
         a = _model->Sinv( a );
         return a;
     }
+    
+    // Return Laplacian of the given Scalar, returning zero at the boundary
+    Scalar Laplacian(const Scalar& g) {
+        Scalar Lg(g.getGrid());
+        Lg = 0;
+        for (int i=1; i<_nx; ++i) {
+            for (int j=1; j<_ny; ++j) {
+                Lg(i,j) = g(i-1,j) + g(i+1,j) + g(i,j-1) + g(i,j+1) -4*g(i,j);
+                Lg(i,j) /= _grid.getDx() * _grid.getDx();
+            }
+        }
+        return Lg;
+    }
 
     // data
     int _nx;
@@ -48,41 +65,80 @@ protected:
     NavierStokesModel* _model;
 };
 
+// Set the output Scalar f equal to sin(kx * x) * sin(ky * y)
+// with the specified wavenumbers in x and y
+void InitializeSingleWavenumber(
+    int xWavenumber,
+    int yWavenumber,
+    Scalar& f
+    ) {
+    const double pi = 4 * atan(1);
+    const Grid& grid = f.getGrid();
+    const int nx = grid.getNx();
+    const int ny = grid.getNy();
+    const double xLength = grid.getXEdge(nx) - grid.getXEdge(0);
+    const double yLength = grid.getYEdge(ny) - grid.getYEdge(0);
+    const double kx = xWavenumber * pi / xLength;
+    const double ky = yWavenumber * pi / yLength;
+    const double deltaX = grid.getDx();
+    
+    for (int i=0; i <= nx; ++i) {
+        double x = i * deltaX;
+        for (int j=0; j <= ny; ++j) {
+            double y = j * deltaX;
+            f(i,j) = sin(kx * x) * sin(ky * y);
+        }
+    }
+}
+
+void print(const Scalar& f) {
+    int nx = f.getGrid().getNx();
+    int ny = f.getGrid().getNy();
+    for(int i = 0; i <= nx; ++i) {
+        for (int j=0; j <= ny; ++j) {
+            cout << f(i,j) << " ";
+        }
+        cout << endl;
+    }
+}
+
 #define EXPECT_ALL_EQ(a,b)                  \
 	for (int i=0; i<_nx+1; ++i) {           \
 		for (int j=0; j<_ny+1; ++j) {       \
-			EXPECT_DOUBLE_EQ((a), (b));     \
+			EXPECT_NEAR((a), (b), 3e-15);   \
 		}                                   \
 	}
+
+TEST_F( NavierStokesModelTest, SOfSinvEqualsIdentity ) {
+    Scalar gamma(_grid);
+    InitializeSingleWavenumber( 1, 1, gamma );
+    Scalar Sgamma = _model->S( gamma );
+    Scalar SinvSgamma = _model->Sinv( Sgamma );
+    EXPECT_ALL_EQ( SinvSgamma(i,j), gamma(i,j) );
+#ifdef DEBUG
+    cout << "gamma:" << endl;
+    print(gamma);
+    cout << "Sgamma:" << endl;
+    print(Sgamma);
+    cout << "SinvSgamma:" << endl;
+    print(SinvSgamma);
+#endif
+
+}
 
 // If Reynolds number = 1, linear term should be Laplacian
 TEST_F( NavierStokesModelTest, LinearTerm ) {
     // Test Laplacian of sinusoids
     Scalar gamma(_grid);
-    Scalar L_gammaExact(_grid);
-    const double pi = 4 * atan(1.);
     
     // For a range of wavenumbers
-    for (int wavenumber = 0; wavenumber < 2; ++wavenumber ) {
-        double length = _grid.getXEdge(_nx);
-        double k = pi * wavenumber / length;
-        
-        // Define a Scalar as sin(kx)
-        for (int i=0; i < _nx+1; ++i) {
-            for (int j=0; j < _ny+1; ++j) {
-                double x = _grid.getXEdge(i);
-                gamma(i,j) = sin( k * x );
-                L_gammaExact(i,j) = - k * k * gamma(i,j);
-            }
+    for (int xWavenumber = 0; xWavenumber < _nx; ++xWavenumber ) {
+        for (int yWavenumber = 0; yWavenumber < _ny; ++yWavenumber) {
+            InitializeSingleWavenumber( xWavenumber, yWavenumber, gamma );
+            Scalar L_gamma = linearTerm( gamma );
+            Scalar LaplacianGamma = Laplacian( gamma );
+            EXPECT_ALL_EQ( LaplacianGamma(i,j), L_gamma(i,j) );            
         }
-        
-        // Take its Laplacian
-        // Scalar L_gamma = linearTerm( gamma );
-        Flux f = curl(gamma);
-        Scalar L_gamma = curl(f);
-
-        // Compare them
-        EXPECT_ALL_EQ( L_gammaExact(i,j), L_gamma(i,j) );
     }
 }
 

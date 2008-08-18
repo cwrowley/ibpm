@@ -11,7 +11,7 @@ MAKEDEPEND = gcc -MM
 INCPATH = -I ../src
 IBPMLIB = ../lib/libibpm.a
 
-.PHONY: $(IBPMLIB) clean distclean
+.PHONY: $(IBPMLIB) clean distclean .depend
 
 run_tests: runner
 	./runner

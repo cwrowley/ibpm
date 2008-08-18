@@ -11,7 +11,6 @@
 #include "Regularizer.h"
 #include <math.h>
 
-
 /*!
 \file NavierStokesModel.h
 \class NavierStokesModel
@@ -58,14 +57,15 @@ public:
         for (int i=1; i < nx; ++i ) {
             for (int j=1; j < ny; ++j ) {
                 eigLaplacian(i,j) = 2. * ( cos( (pi * i) / nx ) +
-                                           cos( (pi * j) / ny ) - 2. );
+                                           cos( (pi * j) / ny ) - 2. ) / 
+                                    ( _grid.getDx() * _grid.getDx() );
             }
         }
             
         _inverseLaplacianEigenvalues = 1. / eigLaplacian;
         
         // calculate linear term
-        double beta = 1 / ( Reynolds * grid.getDx() * grid.getDx() );
+        double beta = 1. / Reynolds;
         _linearTermEigenvalues = beta * eigLaplacian;
     }
 
@@ -98,7 +98,7 @@ public:
         //       containing sinTransform -- perhaps NavierStokesModel??
         int nx = _grid.getNx();
         int ny = _grid.getNy();
-        double normalization = (nx-1) * (ny-1) * 4;
+        double normalization = 1.0 / ( nx * ny * 4 );
         g *= normalization;
         return g;
 	}
