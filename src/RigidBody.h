@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <math.h>
 
 using namespace std;
 
@@ -47,7 +48,7 @@ public:
         double xc,
         double yc,
         double radius,
-        double numPoints
+        int numPoints
     );
 
     /// Add a line connecting (x1,y1) and (x2,y2)
