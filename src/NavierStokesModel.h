@@ -116,7 +116,7 @@ public:
 	/// Compute f = C(gamma) as in (14)
 	inline BoundaryVector C(const Scalar& gamma) const {
         Flux q(_grid);
-        computeFlux( gamma, q );
+        computeFluxWithoutBaseFlow( gamma, q );
         BoundaryVector f = _regularizer.toBoundary( q );
         return f;
 	}
@@ -127,11 +127,22 @@ public:
 	virtual Scalar nonlinear(const State& x) const = 0;
 	
 	/// Compute flux q from circulation gamma
-    void computeFlux( const Scalar& gamma, Flux& q ) const {
+    inline void computeFluxWithoutBaseFlow(const Scalar& gamma, Flux& q ) const {
         Scalar streamfunction = inverseLaplacian( gamma );
         q = curl( streamfunction );
+    }
+
+    /// Compute flux q from circulation gamma, including base flow q0
+    inline void computeFlux(const Scalar& gamma, Flux& q ) const {
+        computeFluxWithoutBaseFlow( gamma, q );
         q += _baseFlow;
     }
+
+    inline BoundaryVector getBaseFlowBoundaryVelocities() const {
+        BoundaryVector velocity = _regularizer.toBoundary( _baseFlow );
+        return velocity;
+    }
+
 
 protected:
     

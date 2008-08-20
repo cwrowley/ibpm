@@ -46,8 +46,10 @@ void Euler::advance(State& x) {
     Scalar nonlinear = _model->nonlinear( x );
     a += _timestep * nonlinear;
     
-    // Evaluate Right-Hand-Side (b) for second equation of ProjecitonSolver
+    // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
     BoundaryVector b = geom->getVelocities();
+    BoundaryVector b0 = _model->getBaseFlowBoundaryVelocities();
+    b -= b0;
     
     // Call the ProjectionSolver to determine the circulation and forces
     _solver->solve( a, b, x.gamma, x.f );

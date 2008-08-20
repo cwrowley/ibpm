@@ -6,7 +6,7 @@
 #include "Geometry.h"
 #include "ProjectionSolver.h"
 #include "ConjugateGradientSolver.h"
-//#include "SingleWavenumber.h"
+#include "SingleWavenumber.h"
 #include <gtest/gtest.h>
 
 namespace {
@@ -29,8 +29,8 @@ protected:
         body.addPoint(0.25,0.25);
         _geom.addBody(body);
         _nPoints = _geom.getNumPoints();
-        // _q0 = Flux::UniformFlow( _grid, 1.0, 0. );
-        _q0 = 0.;
+        _q0 = Flux::UniformFlow( _grid, 1.0, 0. );
+        // _q0 = 0.;
         _model = new NonlinearNavierStokes( _grid, _geom, _Reynolds, _q0 );
         _solver = new ConjugateGradientSolver( *_model, _timestep, tolerance);
     }
@@ -81,51 +81,51 @@ protected:
 //     EXPECT_ALL_EQ( AinvAGamma(i,j), gamma(i,j) );
 // }
 
-//TEST_F(ProjectionSolverTest, NoConstraints) {
+TEST_F(ProjectionSolverTest, NoConstraints) {
 
     // Define a solver for an empty Geometry: no boundary points
-//    Geometry emptyGeom;
-//    NonlinearNavierStokes model( _grid, emptyGeom, _Reynolds, _q0 );
-//    ConjugateGradientSolver solver( model, _timestep, 1e-10 );
+    Geometry emptyGeom;
+    NonlinearNavierStokes model( _grid, emptyGeom, _Reynolds, _q0 );
+    ConjugateGradientSolver solver( model, _timestep, 1e-10 );
 
-//    BoundaryVector emptyVector(0);
-//    Scalar rhs(_grid);
-//    InitializeSingleWavenumber( 1, 1, rhs );
-//    Scalar gamma(_grid);
-//    gamma = 0;
-//    BoundaryVector f(0);
+    BoundaryVector emptyVector(0);
+    Scalar rhs(_grid);
+    InitializeSingleWavenumber( 1, 1, rhs );
+    Scalar gamma(_grid);
+    gamma = 0;
+    BoundaryVector f(0);
     
-//    solver.solve( rhs, emptyVector, gamma, f );
-//    Scalar lhs = ComputeLinearTerm( &model, gamma );
-//    EXPECT_ALL_EQ( rhs(i,j), lhs(i,j) );
+    solver.solve( rhs, emptyVector, gamma, f );
+    Scalar lhs = ComputeLinearTerm( &model, gamma );
+    EXPECT_ALL_EQ( rhs(i,j), lhs(i,j) );
 
-//}
+}
 
-//TEST_F(ProjectionSolverTest, WithConstraints) {
+TEST_F(ProjectionSolverTest, WithConstraints) {
     // Variables on rhs of projection equations
-//    Scalar a(_grid);
-//    InitializeSingleWavenumber( 1, 1, a );
-//    BoundaryVector b(_geom.getNumPoints());
-//    b = 3.;
-//    // Variables to solve for
-//    Scalar gamma(_grid);
-//    gamma = 0;
-//    BoundaryVector f(_geom.getNumPoints());
-//    f = 0;
-//
-//    _solver->solve( a, b, gamma, f );
+    Scalar a(_grid);
+    InitializeSingleWavenumber( 1, 1, a );
+    BoundaryVector b(_geom.getNumPoints());
+    b = 3.;
+    // Variables to solve for
+    Scalar gamma(_grid);
+    gamma = 0;
+    BoundaryVector f(_geom.getNumPoints());
+    f = 0;
+
+    _solver->solve( a, b, gamma, f );
 
     // Verify equations are satisfied to specified tolerance
-//    Scalar lhs = ComputeLinearTerm( _model, gamma );
-//    Scalar forcingTerm = _model->B( f );
-//    lhs += _timestep * forcingTerm;
-//    EXPECT_ALL_EQ( a(i,j), lhs(i,j) );
+    Scalar lhs = ComputeLinearTerm( _model, gamma );
+    Scalar forcingTerm = _model->B( f );
+    lhs += _timestep * forcingTerm;
+    EXPECT_ALL_EQ( a(i,j), lhs(i,j) );
 
     // Verify constraint is satisfied
-//    BoundaryVector constraint = _model->C( gamma );
-//    EXPECT_ALL_BV_EQ( b(X,i), constraint(X,i) );
-//    EXPECT_ALL_BV_EQ( b(Y,i), constraint(Y,i) );
+    BoundaryVector constraint = _model->C( gamma );
+    EXPECT_ALL_BV_EQ( b(X,i), constraint(X,i) );
+    EXPECT_ALL_BV_EQ( b(Y,i), constraint(Y,i) );
     
-//}
+}
 
 } // namespace
