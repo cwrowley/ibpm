@@ -74,7 +74,7 @@ public:
     /// Return the number of points on the body's boundary
     int getNumPoints() const;
     
-    /// Return the list of coordinates for each point ont he body
+    /// Return the list of coordinates for each point on the body
     BoundaryVector getPoints() const;
     
     /// Return true if the body is not moving in time
