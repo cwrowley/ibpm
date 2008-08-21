@@ -1,9 +1,14 @@
 #include "RigidBody.h"
 #include "Direction.h"
 #include "BoundaryVector.h"
+#include <iostream>
+#include <fstream>
 #include <gtest/gtest.h>
 
+using namespace std;
+
 double tol = 1e-14;
+double lowtol = 1e-5;
 
 class RigidBodyTest : public testing::Test {
 protected:
@@ -126,4 +131,52 @@ TEST_F( RigidBodyTest, AddCircle ) {
     EXPECT_NEAR( b(X, south), xc,          tol );
     EXPECT_NEAR( b(Y, south), yc - radius, tol );
 
+}
+
+TEST_F( RigidBodyTest, IORaw1 ) {
+    int numPoints = 3;
+    double x1 = 1.;
+    double y1 = 2.;
+    double x2 = 1./3;
+    double y2 = 1./4;
+    double x3 = 4. * atan(1.);
+    double y3 = sqrt(2);
+    filebuf fb;
+    fb.open ("./output/saveRaw.dat",ios::out);
+    ostream out(&fb);
+
+    // Add Three Points
+    body.addPoint(x1,y1);
+    body.addPoint(x2,y2);
+    body.addPoint(x3,y3);
+    body.saveRaw(out);   
+    fb.close();
+}
+
+TEST_F( RigidBodyTest, IORaw2 ) {
+    int numPoints = 3;
+    double x1 = 1.;
+    double y1 = 2.;
+    double x2 = 1./3;
+    double y2 = 1./4;
+    double x3 = 4. * atan(1.);
+    double y3 = sqrt(2);
+    filebuf fb;
+    fb.open ("./output/saveRaw.dat",ios::in);
+    istream in(&fb);
+
+    body.loadRaw(in);
+    fb.close();
+    BoundaryVector b = body.getPoints();
+
+    // Check that numPoints is correct
+    EXPECT_EQ( body.getNumPoints() , numPoints );
+    
+    // Check that three points are correct
+    EXPECT_NEAR( b(X, 0), x1 , lowtol );
+    EXPECT_NEAR( b(Y, 0), y1 , lowtol );
+    EXPECT_NEAR( b(X, 1), x2 , lowtol ); 
+    EXPECT_NEAR( b(Y, 1), y2 , lowtol );
+    EXPECT_NEAR( b(X, 2), x3 , lowtol );
+    EXPECT_NEAR( b(Y, 2), y3 , lowtol );
 }

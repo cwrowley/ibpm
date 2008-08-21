@@ -71,13 +71,21 @@ int RigidBody::getNumPoints() const {
 
 void RigidBody::saveRaw(ostream& out) {
     int n = getNumPoints();
+    out << n;
     for(int i=0; i<n; i++) {
-       out << _points[i].x << _points[i].y << "\n"; 	
+       out << "\n" << setw(10) << _points[i].x << setw(10) << _points[i].y; 	
     }
 }
 
-void RigidBody::setName(string name) {
-    _name = name;
+
+void RigidBody::loadRaw(istream& in) {
+    int n = getNumPoints();
+    double x,y;
+    in >> n;
+    for(int i=0; i<n; i++) { 
+       in >> x >> y;
+       addPoint(x,y); 
+    }
 }
 
 string RigidBody::getName() {
