@@ -103,9 +103,10 @@ TEST_F( RigidBodyTest, AddCircle ) {
     double distanceSquared = dx * dx + dy * dy;
 
     // Check that spacing is the same each time
-    for( int i = 1; i < numPoints-1; i++ ) {
-        dx = b(X,i+1) - b(X,i);
-        dy = b(Y,i+1) - b(Y,i);
+    for( int i = 0; i < numPoints; i++ ) {
+        int iNext = (i+1) % numPoints;
+        dx = b(X,iNext) - b(X,i);
+        dy = b(Y,iNext) - b(Y,i);
         EXPECT_NEAR( distanceSquared, dx*dx + dy*dy, tol );
     }
     
