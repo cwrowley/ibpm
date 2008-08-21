@@ -76,37 +76,53 @@ TEST_F( RigidBodyTest, AddLine ) {
 }
 
 TEST_F( RigidBodyTest, AddCircle ) {
-    double xp, yp;
+    double dx, dy;
     double d1, d2;
-    // Add a circle with 360 points w/ center (2.5,2.5) and radius 2.5
-    body.addCircle( 2.5, 2.5, 2.5, 360 );
+    double xc = 2.; // coordinates of center of circle
+    double yc = 3.; 
+    double radius = 1.5;
+    int numPoints = 8;
+
+    // Add a circle
+    body.addCircle( xc, yc, radius, numPoints );
     BoundaryVector b = body.getPoints();
 
     // Check that numPoints is correct
-    EXPECT_EQ( body.getNumPoints(), 360 );
+    EXPECT_EQ( body.getNumPoints(), numPoints );
  
     // Check that radius is correct for every point
-    for( int i = 0; i < 360; i++ ) {
-       xp = b(X,i) - 2.5;
-       yp = b(Y,i) - 2.5;
-       EXPECT_NEAR( sqrt( xp*xp + yp*yp ) , 2.5 , tol ); 
-    }  
-
-    // Check that spacing is the same each time
-    for( int i = 0; i < 358; i++ ) {
-       d1 = sqrt( (b(X,i+1)-b(X,i))*(b(X,i+1)-b(X,i)) + (b(Y,i+1)-b(Y,i))*(b(Y,i+1)-b(Y,i)) );      
-       d2 = sqrt( (b(X,i+2)-b(X,i+1))*(b(X,i+2)-b(X,i+1)) + (b(Y,i+2)-b(Y,i+1))*(b(Y,i+2)-b(Y,i+1)) );
-       EXPECT_NEAR( d1, d2, tol );
+    for( int i = 0; i < numPoints; i++ ) {
+        dx = b(X,i) - xc;
+        dy = b(Y,i) - yc;
+        EXPECT_NEAR( dx*dx + dy*dy , radius * radius , tol ); 
     }
 
-    // Check that 0, pi/2, pi, 3*pi/2 are at the correct places
-    EXPECT_NEAR( b(X, 0), 5., tol );
-    EXPECT_NEAR( b(Y, 0), 2.5, tol ); 
-    EXPECT_NEAR( b(X, 90), 2.5, tol );
-    EXPECT_NEAR( b(Y, 90), 5., tol );
-    EXPECT_NEAR( b(X, 180), 0., tol );
-    EXPECT_NEAR( b(Y, 180), 2.5, tol );
-    EXPECT_NEAR( b(X, 270), 2.5, tol );
-    EXPECT_NEAR( b(Y, 270), 0., tol );
+    // Compute distance^2 between first two points
+    dx = b(X,1) - b(X,0);
+    dy = b(Y,1) - b(Y,0);
+    double distanceSquared = dx * dx + dy * dy;
+
+    // Check that spacing is the same each time
+    for( int i = 1; i < numPoints-1; i++ ) {
+        dx = b(X,i+1) - b(X,i);
+        dy = b(Y,i+1) - b(Y,i);
+        EXPECT_NEAR( distanceSquared, dx*dx + dy*dy, tol );
+    }
+    
+    // find indices of points at north, south, east, and west points on circle
+    int east = 0;
+    int north = numPoints / 4;
+    int west = numPoints / 2;
+    int south = 3 * numPoints / 4;
+    
+    // Check that north, south, east, and west are at the correct places
+    EXPECT_NEAR( b(X, east),  xc + radius, tol );
+    EXPECT_NEAR( b(Y, east),  yc,          tol ); 
+    EXPECT_NEAR( b(X, north), xc,          tol );
+    EXPECT_NEAR( b(Y, north), yc + radius, tol );
+    EXPECT_NEAR( b(X, west),  xc - radius, tol );
+    EXPECT_NEAR( b(Y, west),  yc,          tol );
+    EXPECT_NEAR( b(X, south), xc,          tol );
+    EXPECT_NEAR( b(Y, south), yc - radius, tol );
 
 }
