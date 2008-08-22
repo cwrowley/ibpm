@@ -16,10 +16,13 @@ $HeadURL$
 #include <fstream>
 #include <string>
 #include "Grid.h"
+#include "RigidBody.h"
 #include "Geometry.h"
 #include "NavierStokesModel.h"
 #include "Euler.h"
 #include "State.h"
+#include "Logger.h"
+#include "OutputTecplot.h"
 
 using namespace std;
 
@@ -40,10 +43,17 @@ int main(int argc, char* argv[]) {
 	Grid grid( nx, ny, length, xOffset, yOffset );
 	
 	// Setup geometry
-    ifstream infile("geom.inp");
-    assert(infile.good());
+    // ifstream infile("geom.inp");
+    // assert(infile.good());
 	Geometry geom;
-	geom.load(infile);
+    RigidBody circle;
+    double radius = 0.5;
+    double dTheta = grid.getDx() / radius;
+    double pi = 4. * atan(1.);
+    int numPoints = 2 * pi / dTheta + 1;
+    circle.addCircle( 0, 0, radius, numPoints );
+    geom.addBody( circle );
+    // geom.load(infile);
 
 	// Setup equations to solve
 	double Reynolds=100;
@@ -54,23 +64,30 @@ int main(int argc, char* argv[]) {
     // model.init();
 
 	// Setup timestepper
-	double dt = 0.01;
+	double dt = 0.1;
 	Euler solver(model, dt);
 
 	// Load initial condition
 	string icFile = "initial.bin";
 	State x(grid, geom);
 	x.loadRestartFile(icFile);	
+    x.gamma = 0.;
 
+    // Setup output routines
+    OutputTecplot tecplot( "ibpm%03d.plt", "Test run, step %03d" );
+    Logger logger;
+    // Output Tecplot file every timestep
+    logger.addOutput( &tecplot, 10 );
+    logger.init();
+    logger.doOutput( x );
+    
 	// Step
-	int numSteps = 10;
+	int numSteps = 100;
 	for(int i=1; i <= numSteps; ++i) {
 		cout << "step " << i << endl;
-		solver.advance(x);
-		// Add something in here to output force data, probe data,
-		// save restart files, etc.
-		// Define a Logger class to handle all of this in one place?
+		solver.advance( x );
+        logger.doOutput( x );
 	}
-		
+    logger.cleanup();
 	return 0;
 }

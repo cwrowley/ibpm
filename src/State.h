@@ -24,7 +24,11 @@ struct State {
 	State(const Grid& grid, const Geometry& geom) :
 		q(grid),
 		gamma(grid),
-		f(geom.getNumPoints()) {}
+		f(geom.getNumPoints()
+		) {
+        time = 0;
+        timestep = 0;    
+	}
 
 	~State() {}
 	

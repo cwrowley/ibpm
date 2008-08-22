@@ -36,7 +36,7 @@ protected:
     }
 
     // Compute the linear term on the LHS of the projection equations:
-    //   (1 + h/2 L) gamma
+    //   (1 - h/2 L) gamma
     // where L is given by the associated NavierStokesModel
     Scalar ComputeLinearTerm(NavierStokesModel* model, const Scalar& gamma) {
         Scalar result = model->S( gamma );
@@ -71,15 +71,6 @@ protected:
     for (int i=0; i<_nPoints; ++i) {        \
         EXPECT_NEAR( (a), (b), tolerance ); \
     }
-
-// TEST_F(ProjectionSolverTest, AOfAinvEqualsIdentity ) {
-//     Scalar gamma(_grid);
-//     InitializeSingleWavenumber( 1, 1, gamma );
-//     
-//     Scalar ATimesGamma = ComputeLinearTerm( _model, gamma );
-//     Scalar AinvAGamma = _solver->Ainv( ATimesGamma );
-//     EXPECT_ALL_EQ( AinvAGamma(i,j), gamma(i,j) );
-// }
 
 TEST_F(ProjectionSolverTest, NoConstraints) {
 

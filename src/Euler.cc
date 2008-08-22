@@ -59,4 +59,5 @@ void Euler::advance(State& x) {
     
     // Update the value of the time
     x.time += _timestep;
+    ++x.timestep;
 }
