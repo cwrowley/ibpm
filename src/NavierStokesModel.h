@@ -130,6 +130,9 @@ public:
     inline void computeFluxWithoutBaseFlow(const Scalar& gamma, Flux& q ) const {
         Scalar streamfunction = inverseLaplacian( gamma );
         q = curl( streamfunction );
+        Grid grid = gamma.getGrid();
+        double dx = grid.getDx();
+        q *= -1./ (dx * dx);
     }
 
     /// Compute flux q from circulation gamma, including base flow q0

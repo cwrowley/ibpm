@@ -4,14 +4,15 @@
 // Definition of VectorOperations functions.
 //
 // Author(s):
-// Clancy Rowley, Zhanhua Ma
+// Clancy Rowley
+// Zhanhua Ma
 //
 // Date: 15 Jul 2008
 //
 // $Revision: $
 // $LastChangedDate: $
 // $LastChangedBy: zma $
-// $HeadURL:// $Header$
+// $HeadURL: $
 
 #include "Grid.h"
 #include "Scalar.h"
@@ -27,6 +28,8 @@ Scalar fluxXAverage(const Flux& q);
 Scalar fluxYAverage(const Flux& q);
 
 // Return the curl of Flux q, as a Scalar object
+// TODO: Shouldn't this divide by the grid spacing squared, so that it is
+// actually the curl?
 Scalar curl(const Flux& q) { 
 	Scalar f(q.getGrid());
 	int nx = f.getGrid().getNx();

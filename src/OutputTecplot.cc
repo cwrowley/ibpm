@@ -91,8 +91,12 @@ bool OutputTecplot::doOutput(const State& state) {
     Scalar u(grid);
     Scalar v(grid);
     // TODO: Calculate u and v from fluxes
-    u = x;
-    v = y;
+    for (int i=1; i<nx; ++i) {
+        for (int j=1; j<ny; ++j) {
+            u(i,j) = 0.5 * ( state.q(X,i,j) + state.q(X,i,j-1) ) / dx;
+            v(i,j) = 0.5 * ( state.q(Y,i,j) + state.q(Y,i-1,j) ) / dx;
+        }
+    }
         
     // Store pointers to variables and corresponding names in vectors
     VarList list;

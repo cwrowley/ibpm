@@ -22,6 +22,9 @@ $(IBPMLIB):
 runner: $(TEST_FILES) $(IBPMLIB)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
 
+oseen: Oseen.o $(IBPMLIB)
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lfftw3 -lm	
+
 .cc.o:
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) $<
 

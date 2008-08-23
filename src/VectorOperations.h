@@ -17,6 +17,7 @@ class BoundaryVector;
 	Functions in this module are friends of classes Scalar and Flux.	 
 
 	\author Clancy Rowley
+	\author Zhanhua Ma
 	\author $LastChangedBy: zma $
 	\date  15 Jul 2008
 	\date $LastChangedDate: $
