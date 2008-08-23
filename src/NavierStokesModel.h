@@ -42,7 +42,7 @@ public:
 	    _geometry(geometry),
         _regularizer( grid, geometry ),
         _linearTermEigenvalues( grid ),
-        _inverseLaplacianEigenvalues( grid ),
+        _minusInverseLaplacianEigenvalues( grid ),
         _baseFlow(q_potential),
 	    _ReynoldsNumber(Reynolds)
 	    {
@@ -62,7 +62,7 @@ public:
             }
         }
             
-        _inverseLaplacianEigenvalues = 1. / eigLaplacian;
+        _minusInverseLaplacianEigenvalues = -1. / eigLaplacian;
         
         // calculate linear term
         double beta = 1. / Reynolds;
@@ -128,11 +128,11 @@ public:
 	
 	/// Compute flux q from circulation gamma
     inline void computeFluxWithoutBaseFlow(const Scalar& gamma, Flux& q ) const {
-        Scalar streamfunction = inverseLaplacian( gamma );
+        Scalar streamfunction = minusInverseLaplacian( gamma );
         q = curl( streamfunction );
         Grid grid = gamma.getGrid();
         double dx = grid.getDx();
-        q *= -1./ (dx * dx);
+        q *= 1./ (dx * dx);
     }
 
     /// Compute flux q from circulation gamma, including base flow q0
@@ -149,27 +149,23 @@ public:
 
 protected:
     
-    /*! \brief Return the inverse Laplacian of gamma
-    Assumptions about boundary conditions??
+    /*! \brief Return the minus inverse Laplacian of gamma,
+        for computing streamfunction from circulation.
+    TODO: Assumptions about boundary conditions??
     */
-    inline Scalar inverseLaplacian(const Scalar& gamma) const {
+    inline Scalar minusInverseLaplacian(const Scalar& gamma) const {
         Scalar ghat = S( gamma );
-        ghat *= _inverseLaplacianEigenvalues;
+        ghat *= _minusInverseLaplacianEigenvalues;
         ghat = Sinv( ghat );
         return ghat;
     }
-    
-	/*! \brief Compute bilinear term, used by subclasses
-	(e.g. y = N(q) = bilinear(q,q) )
-	*/
-	Scalar bilinear(const State& x1, const State& x2);
 	
 private:
 	const Geometry& _geometry;
 	const Grid& _grid;
     Regularizer _regularizer;
 	Scalar _linearTermEigenvalues;
-    Scalar _inverseLaplacianEigenvalues;
+    Scalar _minusInverseLaplacianEigenvalues;
     Flux _baseFlow;
     double _ReynoldsNumber;
 };

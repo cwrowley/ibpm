@@ -23,7 +23,6 @@ protected:
         // Choose Reynolds number such that linear term is Laplacian
         _Reynolds = 1.;
         // Add the geometry
-        // NOTE: For now, Geometry stub returns a single point at the origin
         RigidBody body;
         body.addPoint(0,0);
         _geom.addBody(body);

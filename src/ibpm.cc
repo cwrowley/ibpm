@@ -77,12 +77,12 @@ int main(int argc, char* argv[]) {
     OutputTecplot tecplot( "ibpm%03d.plt", "Test run, step %03d" );
     Logger logger;
     // Output Tecplot file every timestep
-    logger.addOutput( &tecplot, 10 );
+    logger.addOutput( &tecplot, 100 );
     logger.init();
     logger.doOutput( x );
     
 	// Step
-	int numSteps = 100;
+	int numSteps = 1000;
 	for(int i=1; i <= numSteps; ++i) {
 		cout << "step " << i << endl;
 		solver.advance( x );
