@@ -16,6 +16,7 @@
 #include "OutputTecplot.h"
 #include "State.h"
 #include "Output.h"
+#include "VectorOperations.h"
 #include <stdio.h>
 #include <string>
 #include <vector>
@@ -67,7 +68,7 @@ bool OutputTecplot::doOutput(const State& state) {
     sprintf( title, _title.c_str(), state.timestep );
     
     // Get grid dimensions
-    Grid grid = state.gamma.getGrid();
+    const Grid& grid = state.gamma.getGrid();
     int nx = grid.getNx();
     int ny = grid.getNy();
     double dx = grid.getDx();
@@ -90,13 +91,7 @@ bool OutputTecplot::doOutput(const State& state) {
     // Calculate velocities
     Scalar u(grid);
     Scalar v(grid);
-    // TODO: Calculate u and v from fluxes
-    for (int i=1; i<nx; ++i) {
-        for (int j=1; j<ny; ++j) {
-            u(i,j) = 0.5 * ( state.q(X,i,j) + state.q(X,i,j-1) ) / dx;
-            v(i,j) = 0.5 * ( state.q(Y,i,j) + state.q(Y,i-1,j) ) / dx;
-        }
-    }
+    FluxToVelocity( state.q, u, v );
         
     // Store pointers to variables and corresponding names in vectors
     VarList list;
@@ -122,7 +117,7 @@ bool writeTecplotFileASCII(
     int numVars = list.getNumVars();
     assert( numVars > 0 );
     // Get grid information
-    Grid grid = list.getVariable(0)->getGrid();
+    const Grid& grid = list.getVariable(0)->getGrid();
     int nx = grid.getNx();
     int ny = grid.getNy();
 

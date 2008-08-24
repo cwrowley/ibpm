@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 	NonlinearNavierStokes model( grid, geom, Reynolds, q0 );
 
 	// Setup timestepper
-	double dt = 0.1;
+	double dt = 0.05;
 	Euler solver( model, dt );
 
 	// Setup initial condition
@@ -98,8 +98,8 @@ int main(int argc, char* argv[]) {
     outputError.doOutput( error );
 
 	// Step
-	int numSteps = 100;
-    int iskip = 10;
+	int numSteps = 200;
+    int iskip = 20;
 	for(int i=1; i <= numSteps; ++i) {
 		cout << "step " << i << endl;
 		solver.advance( x );
@@ -128,7 +128,7 @@ void computeExactSolution(
     int timestep,
     State& exact
     ) {
-    Grid grid = exact.gamma.getGrid();
+    const Grid& grid = exact.gamma.getGrid();
     int nx = grid.getNx();
     int ny = grid.getNy();
     double dx = grid.getDx();

@@ -3,7 +3,7 @@ all: run_tests
 TEST_FILES=GridTest.o GeometryTest.o BoundaryVectorTest.o FluxTest.o \
 	ScalarTest.o RegularizerTest.o VectorOperationsTest.o \
 	ProjectionSolverTest.o RigidBodyTest.o TangentSE2Test.o \
-	MotionTest.o 
+	MotionTest.o NavierStokesModelTest.o
 
 CXX = g++
 CXXFLAGS = -g

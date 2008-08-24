@@ -42,7 +42,7 @@ public:
 	    _geometry(geometry),
         _regularizer( grid, geometry ),
         _linearTermEigenvalues( grid ),
-        _minusInverseLaplacianEigenvalues( grid ),
+        _eigGammaToStreamfunction( grid ),
         _baseFlow(q_potential),
 	    _ReynoldsNumber(Reynolds)
 	    {
@@ -61,8 +61,14 @@ public:
                                     ( _grid.getDx() * _grid.getDx() );
             }
         }
-            
-        _minusInverseLaplacianEigenvalues = -1. / eigLaplacian;
+
+        // eigenvalues of the linear operation from circulation to
+        // streamfunction:
+        //    Laplacian psi = - omega
+        //    gamma = omega * dx^2
+        //    psi = (-Laplacian^{-1} / dx^2) gamma
+        _eigGammaToStreamfunction = -1/( _grid.getDx() * _grid.getDx() ) /
+                                    eigLaplacian;
         
         // calculate linear term
         double beta = 1. / Reynolds;
@@ -85,7 +91,7 @@ public:
 	
 	/// Transform to eigenvectors of L (discrete sin transform)
 	inline Scalar S(const Scalar& g) const {
-        Scalar ghat = sinTransform( g );
+        Scalar ghat = SinTransform( g );
         return ghat;
 	}
 
@@ -95,10 +101,10 @@ public:
 	constant.
 	*/
 	Scalar Sinv(const Scalar& ghat) const {
-        Scalar g = sinTransform( ghat );
+        Scalar g = SinTransform( ghat );
         // multiply by normalization factor
         // TODO: keep track of this normalization factor within a class
-        //       containing sinTransform -- perhaps NavierStokesModel??
+        //       containing SinTransform -- perhaps NavierStokesModel??
         int nx = _grid.getNx();
         int ny = _grid.getNy();
         double normalization = 1.0 / ( nx * ny * 4 );
@@ -109,7 +115,7 @@ public:
 	/// Compute gamma = B(f) as in (14)
 	inline Scalar B(const BoundaryVector& f) const {
         Flux q = _regularizer.toGrid( f );
-        Scalar gamma = curl( q );
+        Scalar gamma = Curl( q );
         return gamma;
 	}
 	
@@ -128,11 +134,8 @@ public:
 	
 	/// Compute flux q from circulation gamma
     inline void computeFluxWithoutBaseFlow(const Scalar& gamma, Flux& q ) const {
-        Scalar streamfunction = minusInverseLaplacian( gamma );
-        q = curl( streamfunction );
-        Grid grid = gamma.getGrid();
-        double dx = grid.getDx();
-        q *= 1./ (dx * dx);
+        Scalar streamfunction = gammaToStreamfunction( gamma );
+        q = Curl( streamfunction );
     }
 
     /// Compute flux q from circulation gamma, including base flow q0
@@ -149,15 +152,15 @@ public:
 
 protected:
     
-    /*! \brief Return the minus inverse Laplacian of gamma,
-        for computing streamfunction from circulation.
+    /*! \brief Given the circulation gamma, return the streamfunction psi.
+
     TODO: Assumptions about boundary conditions??
     */
-    inline Scalar minusInverseLaplacian(const Scalar& gamma) const {
-        Scalar ghat = S( gamma );
-        ghat *= _minusInverseLaplacianEigenvalues;
-        ghat = Sinv( ghat );
-        return ghat;
+    inline Scalar gammaToStreamfunction(const Scalar& gamma) const {
+        Scalar psi = S( gamma );
+        psi *= _eigGammaToStreamfunction;
+        psi = Sinv( psi );
+        return psi;
     }
 	
 private:
@@ -165,7 +168,7 @@ private:
 	const Grid& _grid;
     Regularizer _regularizer;
 	Scalar _linearTermEigenvalues;
-    Scalar _minusInverseLaplacianEigenvalues;
+    Scalar _eigGammaToStreamfunction;
     Flux _baseFlow;
     double _ReynoldsNumber;
 };
@@ -186,8 +189,8 @@ public:
 	for full nonlinear Navier-Stokes equations
 	*/
 	inline Scalar nonlinear(const State& x) const {
-        Flux v = crossproduct( x.q, x.gamma );
-        Scalar g = curl( v );
+        Flux v = CrossProduct( x.q, x.gamma );
+        Scalar g = Curl( v );
         return g;
 	};
     
