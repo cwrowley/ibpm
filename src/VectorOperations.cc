@@ -131,6 +131,37 @@ double InnerProduct (const Flux& p, const Flux& q){
     return ip;
 }
 
+// Sum of X-component of Flux q
+double XSum( const Flux& q ) {
+   const Grid& grid = q.getGrid();
+   int nx = grid.getNx();
+   int ny = grid.getNy();
+   double qsumx = 0;
+   // Sum x-fluxes 
+   for (int j=0; j<ny; ++j) {
+       for (int i=0; i<=nx; ++i){  		
+	   qsumx += q(X,i,j);
+       }
+   }
+   return qsumx;
+}
+
+// Sum of Y-component of Flux q
+double YSum( const Flux& q) {
+   const Grid& grid = q.getGrid();
+   int nx = grid.getNx();
+   int ny = grid.getNy();
+   double qsumy = 0;
+   // Sum y-fluxes
+   for (int i=0; i<nx; ++i) {
+       for (int j=0; j<=ny; ++j) {
+           qsumy += q(Y,i,j);
+       } 
+   } 
+   return qsumy;
+}	
+
+
 // sine transform of a Scalar object using fft (type DST-I).
 // (fftw library is used(kind: RODFT00); Only interior nodes are considered.)
 Scalar SinTransform(const Scalar& f) {

@@ -144,6 +144,13 @@ public:
         q += _baseFlow;
     }
 
+    /// Compute forces from boundary vector x.f
+    inline void computeForce( BoundaryVector f, const double& dt, double& forcex, double& forcey) const {
+        Flux qf = _regularizer.toGrid( f/dt ); 
+        forcex = XSum( qf ) * 2 * _grid.getDx();
+        forcey = YSum( qf ) * 2 * _grid.getDx();
+    } 
+
     inline BoundaryVector getBaseFlowBoundaryVelocities() const {
         BoundaryVector velocity = _regularizer.toBoundary( _baseFlow );
         return velocity;

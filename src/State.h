@@ -36,6 +36,8 @@ struct State {
 	
 	int timestep;
 	double time;
+	double forcex;
+	double forcey;
 	Flux q;
 	Scalar gamma;
 	BoundaryVector f;

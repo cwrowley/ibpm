@@ -16,7 +16,7 @@ OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o \
 	Logger.o OutputRestart.o OutputTecplot.o
 
 CXX = g++
-CXXFLAGS = -g 
+CXXFLAGS = -fast -funroll-loops -DNDEBUG
 LFLAGS = -lfftw3 -lm
 AR = ar
 ARFLAGS = -r

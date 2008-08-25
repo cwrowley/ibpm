@@ -39,6 +39,12 @@ double InnerProduct( const Scalar& f, const Scalar& g );
 /// \brief Return the inner product of Flux p and Flux q.
 double InnerProduct( const Flux& p, const Flux& q );
 
+/// \brief Return the sum of all x-components of Flux q
+double XSum( const Flux& q ); 
+
+/// \brief Return the sum of all y-components of Flux q
+double YSum( const Flux& q ); 
+
 /*! Return the sine transform of a Scalar object using DST-I.
 (fftw library is used (real fft kind:RODFT00); only interior nodes are considered.)
 */
