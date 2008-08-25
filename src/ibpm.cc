@@ -35,11 +35,11 @@ int main(int argc, char* argv[]) {
 	cout << "Hello world!\n";
 	
 	// Setup grid
-	int nx = 20;
-	int ny = 20;
-	double length = 2.0;
-    double xOffset = -1;
-    double yOffset = -1;
+	int nx = 400;
+	int ny = 400;
+	double length = 4.0;
+    double xOffset = -2;
+    double yOffset = -2;
 	Grid grid( nx, ny, length, xOffset, yOffset );
 	
 	// Setup geometry
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     // model.init();
 
 	// Setup timestepper
-	double dt = 0.1;
+	double dt = 0.005;
 	Euler solver(model, dt);
 
 	// Load initial condition
@@ -77,12 +77,12 @@ int main(int argc, char* argv[]) {
     OutputTecplot tecplot( "ibpm%03d.plt", "Test run, step %03d" );
     Logger logger;
     // Output Tecplot file every timestep
-    logger.addOutput( &tecplot, 100 );
+    logger.addOutput( &tecplot, 10 );
     logger.init();
     logger.doOutput( x );
     
 	// Step
-	int numSteps = 1000;
+	int numSteps = 5000;
 	for(int i=1; i <= numSteps; ++i) {
 		cout << "step " << i << endl;
 		solver.advance( x );
