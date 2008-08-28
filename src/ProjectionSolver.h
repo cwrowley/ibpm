@@ -56,7 +56,7 @@ public:
     ProjectionSolver(const NavierStokesModel& model, double alpha);
 
     /// Destructor
-    ~ProjectionSolver();
+    virtual ~ProjectionSolver();
 
     /*! \brief Solve for \a gamma and \a f using a fractional step method.
     Solves equations (1-2) using the algorithm (3-5).

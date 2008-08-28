@@ -16,7 +16,10 @@ OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o \
 	Logger.o OutputRestart.o OutputTecplot.o
 
 CXX = g++
-CXXFLAGS = -fast -funroll-loops -DNDEBUG
+#CXXFLAGS = -Wall -O3 -funroll-loops -fstrict-aliasing -fomit-frame-pointer \
+	-ffast-math -DUSE_LIBBLAS -DNDEBUG
+CXXFLAGS = -Wall -g -fast -funroll-loops -DNDEBUG
+# CXXFLAGS = -Wall -g
 LFLAGS = -lfftw3 -lm
 AR = ar
 ARFLAGS = -r
@@ -25,7 +28,7 @@ MAKEDEPEND = gcc -MM
 IBPMLIB = ../lib/libibpm.a 
 IBPM = ../bin/ibpm
 
-.PHONY: ibpm clean
+.PHONY: ibpm clean .depend
 
 lib: $(IBPMLIB) 
 

@@ -55,7 +55,8 @@ int main(int argc, char* argv[]) {
     double radius = 0.5;
     double dTheta = grid.getDx() / radius;
     double pi = 4. * atan(1.);
-    int numPoints = 2 * pi / dTheta + 1;
+    // int numPoints = 2 * pi / dTheta + 1;
+    int numPoints = 314;
     circle.addCircle( 0, 0, radius, numPoints );
     geom.addBody( circle );
     // geom.load(infile);

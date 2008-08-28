@@ -44,6 +44,8 @@ public:
     */
     TimeStepper(const NavierStokesModel& model, double timestep);
 
+    virtual ~TimeStepper() {}
+
     /*! \brief Advance the state forward in time.
     
     Pure virtual method: must be overridden by subclasses

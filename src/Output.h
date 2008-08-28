@@ -19,6 +19,8 @@ Subclasses provide a callback routine for writing output in various forms.
 */
 class Output {
 public:
+    virtual ~Output() {}
+
     /// \brief Provide initialization, if needed (e.g. opening a file).
     /// Returns true if successful
     virtual bool init() { return true; }
