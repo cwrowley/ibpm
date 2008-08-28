@@ -8,7 +8,7 @@ TEST_FILES=GridTest.o GeometryTest.o BoundaryVectorTest.o FluxTest.o \
 CXX = g++
 CXXFLAGS = -g
 MAKEDEPEND = gcc -MM
-INCPATH = -I ../src
+INCPATH = -I../src
 IBPMLIB = ../lib/libibpm.a
 
 .PHONY: $(IBPMLIB) clean distclean .depend
@@ -18,6 +18,9 @@ run_tests: runner
 
 $(IBPMLIB):
 	(cd ../src; make lib)
+
+CholeskyTest: CholeskyTest.o $(IBPMLIB)
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
 
 runner: $(TEST_FILES) $(IBPMLIB)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm

@@ -2,6 +2,9 @@
 #define _CHOLESKYSOLVER_H_
 
 #include "ProjectionSolver.h"
+#include <blitz/array.h>
+
+BZ_USING_NAMESPACE(blitz)
 
 /*!
     \file CholeskySolver.h
@@ -53,7 +56,12 @@ protected:
     );
 
 private:
-    double* _M;
+    int _numPoints;  // number of points in the geometry
+    int _size;       // size of the vectors: numPoints * 2
+    Array<double,2> _lower;
+    Array<double,1> _diagonal;
+    void computeMatrixM( Array<double,2>& M );
+    void computeFactorization( const Array<double,2>& M );
 };
 
 

@@ -15,7 +15,7 @@ include make.inc
 OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o \
 	VectorOperations.o Regularizer.o ProjectionSolver.o \
 	ConjugateGradientSolver.o TimeStepper.o Euler.o RigidBody.o \
-	Logger.o OutputRestart.o OutputTecplot.o CholeskySolver.o
+	Logger.o OutputRestart.o OutputTecplot.o CholeskySolver.o Cholesky.o
 
 LDFLAGS = -lfftw3 -lm
 AR = ar

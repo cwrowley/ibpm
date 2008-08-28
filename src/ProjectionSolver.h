@@ -86,6 +86,14 @@ protected:
         return y;
     }
     
+    /// Solve \f$ y = A^{-1} b \f$.
+    inline Scalar Ainv(const Scalar& b, Scalar& y ) {
+        y = _model->S( b );
+        y *= _eigenvaluesOfAinv;
+        y = _model->Sinv( y );
+        return y;
+    }
+
     /// Compute \a y = B(\a f)
     inline Scalar B(const BoundaryVector& f) {
         Scalar y = _model->B( f );
@@ -99,6 +107,11 @@ protected:
         return y;
     }
     
+    /// Compute \a y = C(\a x)
+    inline void C(const Scalar& x, BoundaryVector& y ) {
+        y = _model->C( x );
+    }
+    
     /// Compute \a y = M(\a f), where \f$ M = C A^{-1} B \f$.
     inline BoundaryVector M(const BoundaryVector& f) {
         Scalar Bf = B(f);
@@ -107,6 +120,13 @@ protected:
         return y;
     }
     
+    /// Compute \a y = M(\a f), where \f$ M = C A^{-1} B \f$.
+    inline void M(const BoundaryVector& f, BoundaryVector& y ) {
+        Scalar Bf = B( f );
+        Ainv( Bf, Bf );
+        C( Bf, y );
+    }    
+
     /// Compute \f$ x = M^{-1} b \f$.
     virtual void Minv(
         const BoundaryVector& b,

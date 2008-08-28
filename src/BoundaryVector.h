@@ -6,8 +6,6 @@
 
 BZ_USING_NAMESPACE(blitz)
 
-class BoundaryVectorIndex;
-
 /*!
 	\file BoundaryVector.h
 	\class BoundaryVector
@@ -116,6 +114,7 @@ public:
 	
 	/// Return a pointer to the data, expressed as a C-style array.
 	double* flatten();
+    
 	// TODO: Implement this, and write tests
 	
     // typedef Array<double,1>::iterator iterator;

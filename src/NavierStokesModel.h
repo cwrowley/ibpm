@@ -37,57 +37,18 @@ public:
 		const Geometry& geometry,
 		double Reynolds,
 		const Flux& q_potential
-	    ) :
-	    _grid(grid),
-	    _geometry(geometry),
-        _regularizer( grid, geometry ),
-        _linearTermEigenvalues( grid ),
-        _eigGammaToStreamfunction( grid ),
-        _baseFlow(q_potential),
-	    _ReynoldsNumber(Reynolds)
-	    {
-        
-        // calculate eigenvalues of Laplacian
-        int nx = grid.getNx();
-        int ny = grid.getNy();    
-        const double pi = 4. * atan(1.);
-        Scalar eigLaplacian(grid);
-        eigLaplacian = 1.;
-        // Loop over only interior points
-        for (int i=1; i < nx; ++i ) {
-            for (int j=1; j < ny; ++j ) {
-                eigLaplacian(i,j) = 2. * ( cos( (pi * i) / nx ) +
-                                           cos( (pi * j) / ny ) - 2. ) / 
-                                    ( _grid.getDx() * _grid.getDx() );
-            }
-        }
-
-        // eigenvalues of the linear operation from circulation to
-        // streamfunction:
-        //    Laplacian psi = - omega
-        //    gamma = omega * dx^2
-        //    psi = (-Laplacian^{-1} / dx^2) gamma
-        _eigGammaToStreamfunction = -1/( _grid.getDx() * _grid.getDx() ) /
-                                    eigLaplacian;
-        
-        // calculate linear term
-        double beta = 1. / Reynolds;
-        _linearTermEigenvalues = beta * eigLaplacian;
-
-        // Update regularizer
-        _regularizer.update();
-    }
-
-	virtual ~NavierStokesModel() {}
+    );
+    
+    virtual ~NavierStokesModel();
 
 	/// Return a pointer to the associated Geometry
-	const Geometry* getGeometry() const { return &_geometry; }
+	inline const Geometry* getGeometry() const { return &_geometry; }
 
 	/// Return a pointer to the associated Grid
-	const Grid* getGrid() const { return &_grid; }
+	inline const Grid* getGrid() const { return &_grid; }
 
 	/// Return a pointer to the eigenvalues of the linear term L
-	const Scalar* getLambda() const { return &_linearTermEigenvalues; }
+	inline const Scalar* getLambda() const { return &_linearTermEigenvalues; }
 	
 	/// Transform to eigenvectors of L (discrete sin transform)
 	inline Scalar S(const Scalar& g) const {
@@ -112,19 +73,31 @@ public:
         return g;
 	}
 	
-	/// Compute gamma = B(f) as in (14)
+	/// Convenience form
 	inline Scalar B(const BoundaryVector& f) const {
-        Flux q = _regularizer.toGrid( f );
-        Scalar gamma = Curl( q );
+        Scalar gamma( _grid );
+        B( f, gamma );
         return gamma;
+	}
+
+	/// Compute gamma = B(f) as in (14)
+	inline void B(const BoundaryVector& f, Scalar& gamma ) const {
+        Flux q = _regularizer.toGrid( f );
+        gamma = Curl( q );
 	}
 	
 	/// Compute f = C(gamma) as in (14)
 	inline BoundaryVector C(const Scalar& gamma) const {
+        BoundaryVector f( _geometry.getNumPoints() );
+        C( gamma, f );
+        return f;
+	}
+	
+	/// Compute f = C(gamma) as in (14)
+	inline void C(const Scalar& gamma, BoundaryVector& f) const {
         Flux q(_grid);
         computeFluxWithoutBaseFlow( gamma, q );
-        BoundaryVector f = _regularizer.toBoundary( q );
-        return f;
+        f = _regularizer.toBoundary( q );
 	}
 	
 	/*! \brief Compute nonlinear terms y = N(x)
