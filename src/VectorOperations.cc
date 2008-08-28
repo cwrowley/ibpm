@@ -161,6 +161,15 @@ double YSum( const Flux& q) {
    return qsumy;
 }	
 
+// Routine for computing X & Y forces
+void computeNetForce( BoundaryVector& f, double& xforce, double& yforce) {
+   xforce = 0;
+   yforce = 0;
+   for( int i=0; i<f.getNumPoints(); i++ ) {
+      xforce += f(X,i);
+      yforce += f(Y,i);
+   }  
+}
 
 // sine transform of a Scalar object using fft (type DST-I).
 // (fftw library is used(kind: RODFT00); Only interior nodes are considered.)

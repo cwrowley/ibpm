@@ -57,9 +57,6 @@ void Euler::advance(State& x) {
     // Compute the corresponding flux
     _model->computeFlux( x.gamma, x.q );
    
-    // Compute the forces
-    _model->computeForce( x.f, _timestep, x.forcex, x.forcey );
- 
     // Update the value of the time
     x.time += _timestep;
     ++x.timestep;

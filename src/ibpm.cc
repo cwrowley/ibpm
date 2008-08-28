@@ -23,6 +23,7 @@ $HeadURL$
 #include "State.h"
 #include "Logger.h"
 #include "OutputTecplot.h"
+#include "VectorOperations.h"
 
 using namespace std;
 
@@ -33,6 +34,10 @@ using namespace std;
  */
 int main(int argc, char* argv[]) {
 	cout << "Hello world!\n";
+
+     // lift and drag
+     double lift = 0.;
+     double drag = 0.;
 	
 	// Setup grid
 	int nx = 400;
@@ -86,7 +91,8 @@ int main(int argc, char* argv[]) {
 	for(int i=1; i <= numSteps; ++i) {
 		cout << "step " << i << endl;
 		solver.advance( x );
-                cout << "x force : " << setw(16) << x.forcex << " , y force : " << setw(16) << x.forcey << "\n";
+                computeNetForce(x.f, drag, lift);
+                cout << "x force : " << setw(16) << drag/dt << " , y force : " << setw(16) << lift/dt << "\n";
         logger.doOutput( x );
 	}
     logger.cleanup();
