@@ -1,0 +1,6 @@
+# standard config file, using gcc compiler
+
+CXX = g++
+CXXFLAGS = -Wall -g -fast -funroll-loops -DNDEBUG
+# for debugging, uncomment the following line
+CXXFLAGS = -Wall -g

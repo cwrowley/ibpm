@@ -10,25 +10,25 @@
 
 all: lib ibpm
 	
+include make.inc
+
 OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o \
 	VectorOperations.o Regularizer.o ProjectionSolver.o \
 	ConjugateGradientSolver.o TimeStepper.o Euler.o RigidBody.o \
 	Logger.o OutputRestart.o OutputTecplot.o
 
-CXX = g++
-#CXXFLAGS = -Wall -O3 -funroll-loops -fstrict-aliasing -fomit-frame-pointer \
-	-ffast-math -DUSE_LIBBLAS -DNDEBUG
-# CXXFLAGS = -Wall -g -fast -funroll-loops -DNDEBUG
-CXXFLAGS = -Wall -g
-LFLAGS = -lfftw3 -lm
+LDFLAGS = -lfftw3 -lm
 AR = ar
 ARFLAGS = -r
 MAKEDEPEND = gcc -MM
 
+LDFLAGS += $(lib_dirs)
+CXXFLAGS += $(include_dirs)
+
 IBPMLIB = ../lib/libibpm.a 
 IBPM = ../bin/ibpm
 
-.PHONY: ibpm clean .depend
+.PHONY: ibpm clean depend
 
 lib: $(IBPMLIB) 
 
@@ -38,15 +38,12 @@ $(IBPMLIB): $(OBJS)
 	$(AR) $(ARFLAGS) $(IBPMLIB) $(OBJS)
 
 $(IBPM): ibpm.o $(IBPMLIB)
-	$(CXX) -o $@ $^ $(LFLAGS)
-
-.cc.o:
-	$(CXX) -c $(CXXFLAGS) $<
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 clean:
 	/bin/rm -rf *.o
 
-.depend:
+depend:
 	$(MAKEDEPEND) $(CXXFLAGS) *.cc > .depend
 	
 include .depend
