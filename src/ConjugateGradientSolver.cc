@@ -1,4 +1,4 @@
-// ProjectionSolver.cc
+// ConjugateGradientSolver.cc
 //
 // Description:
 // Implementation of the ConjugateGradientSolver class
