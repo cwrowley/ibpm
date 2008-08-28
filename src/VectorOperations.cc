@@ -224,10 +224,8 @@ Scalar SinTransform(const Scalar& f) {
 
 Flux CrossProduct(const Flux& q, const Scalar& f){
     const Grid& grid = f.getGrid();
-	int nx = grid.getNx();
-	int ny = grid.getNy();
-	assert(nx == q.getGrid().getNx());
-	assert(ny == q.getGrid().getNy());                                                                                                                                                                 
+	assert(grid.getNx() == q.getGrid().getNx());
+	assert(grid.getNy() == q.getGrid().getNy());                                                                                                                                                                 
 
     Scalar u(grid);
     Scalar v(grid);
