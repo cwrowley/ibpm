@@ -39,9 +39,8 @@ public:
     void advance(State& x);
 private:
     ProjectionSolver* _solver;
-    const Geometry* _geom;
-    const Grid* _grid; 
     Scalar _linearTermEigenvalues;
+    State _x1;
 };
 
 

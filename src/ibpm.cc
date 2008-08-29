@@ -67,13 +67,15 @@ int main(int argc, char* argv[]) {
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
+    cout << "Setting up Navier Stokes model..." << flush;
 	NonlinearNavierStokes model( grid, geom, Reynolds, q_potential );
     // model.init();
+    cout << "done" << endl;
 
 	// Setup timestepper
 	double dt = 0.005;
-	//Euler solver(model, dt);
-        RungeKutta2 solver(model, dt);
+    // Euler solver(model, dt);
+    RungeKutta2 solver(model, dt);
 	// Load initial condition
 	string icFile = "initial.bin";
 	State x(grid, geom);
@@ -84,17 +86,18 @@ int main(int argc, char* argv[]) {
     OutputTecplot tecplot( "ibpm%03d.plt", "Test run, step %03d" );
     Logger logger;
     // Output Tecplot file every timestep
-    logger.addOutput( &tecplot, 25 );
+    logger.addOutput( &tecplot, 251 );
     logger.init();
     logger.doOutput( x );
     
 	// Step
-	int numSteps = 5000;
+	int numSteps = 250;
 	for(int i=1; i <= numSteps; ++i) {
 		cout << "step " << i << endl;
 		solver.advance( x );
-                computeNetForce(x.f, drag, lift);
-                cout << "x force : " << setw(16) << drag/dt << " , y force : " << setw(16) << lift/dt << "\n";
+        computeNetForce(x.f, drag, lift);
+        cout << "x force : " << setw(16) << drag/dt << " , y force : "
+            << setw(16) << lift/dt << "\n";
         logger.doOutput( x );
 	}
     logger.cleanup();

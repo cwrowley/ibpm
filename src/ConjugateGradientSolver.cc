@@ -19,7 +19,7 @@
 
 namespace {
 
-const int MAX_ITERATIONS = 50;
+const int MAX_ITERATIONS = 3000;
 
 ConjugateGradientSolver::ConjugateGradientSolver(
     const NavierStokesModel& model,

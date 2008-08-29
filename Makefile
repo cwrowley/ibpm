@@ -14,21 +14,23 @@ all: lib test ibpm
 DIRS = src doc test
 
 lib:
-	(cd src; make lib)
+	cd src && $(MAKE) lib
 
 test:
-	(cd test; make run_tests)
+	cd test && $(MAKE) run_tests
 
 ibpm:
-	(cd src; make ibpm)
+	cd src && $(MAKE) ibpm
 
 doc:
-	(cd doc; make doc)
+	cd doc && $(MAKE) doc
 
 clean:
-	for dir in $(DIRS); do (cd $$dir; make clean); done
+	for dir in $(DIRS); do ( cd $$dir && $(MAKE) clean; ) done
 
 distclean: clean
-	for dir in $(DIRS); do (cd $$dir; make distclean); done
+	for dir in $(DIRS); do \
+	  ( cd $$dir && $(MAKE) distclean; )\
+	done
 	/bin/rm -f bin/ibpm
 	/bin/rm -f lib/libibpm.a

@@ -14,53 +14,7 @@ namespace {
 
 const double tolerance = 1e-10;
     
-class ProjectionSolverTest : public testing::Test {
-protected:
-    ProjectionSolverTest() : 
-        _nx(6),
-        _ny(6),
-        _timestep(0.123),
-        _grid(_nx, _ny, 2., -1, -1),
-        _q0(_grid) {
-
-        // Choose Reynolds number such that linear term is Laplacian
-        _Reynolds = 1.;
-
-        RigidBody body;
-        body.addPoint(0.25,0.25);
-        // body.addPoint(0.,0.);
-        _geom.addBody(body);
-        _nPoints = _geom.getNumPoints();
-        _q0 = Flux::UniformFlow( _grid, 1.0, 0. );
-        // _q0 = 0.;
-        _model = new NonlinearNavierStokes( _grid, _geom, _Reynolds, _q0 );
-        _solver = new ConjugateGradientSolver( *_model, _timestep, tolerance);
-    }
-
-    // Compute the linear term on the LHS of the projection equations:
-    //   (1 - h/2 L) gamma
-    // where L is given by the associated NavierStokesModel
-    Scalar ComputeLinearTerm(NavierStokesModel* model, const Scalar& gamma) {
-        Scalar result = model->S( gamma );
-        result *= *( model->getLambda() );
-        result = model->Sinv( result );
-        result *= -_timestep / 2.;
-        result += gamma;
-        return result;
-    }
-    
-    // data
-    int _nx;
-    int _ny;
-    int _nPoints;
-    double _timestep;
-    double _Reynolds;
-    Grid _grid;
-    Flux _q0;
-    Geometry _geom;
-    NavierStokesModel* _model;
-    ProjectionSolver* _solver;
-};
+Scalar ComputeLinearTerm(NavierStokesModel& model, const Scalar& gamma);
 
 #define EXPECT_ALL_EQ(a,b)                      \
 	for (int i=0; i<_nx+1; ++i) {               \
@@ -69,107 +23,121 @@ protected:
 		}                                       \
 	}
 
-#define EXPECT_ALL_BV_EQ(a,b)               \
-    for (int i=0; i<_nPoints; ++i) {        \
+#define EXPECT_ALL_BV_EQ(a,b,nPoints)               \
+    for (int i=0; i < nPoints; ++i) {        \
         EXPECT_NEAR( (a), (b), tolerance ); \
     }
 
-TEST_F(ProjectionSolverTest, NoConstraints) {
+class ProjectionSolverTest : public testing::Test {
+protected:
+    ProjectionSolverTest() :
+        _nx(6),
+        _ny(6),
+        _timestep(0.123),
+        _grid(_nx, _ny, 2., -1, -1) {
 
-    // Define a solver for an empty Geometry: no boundary points
-    Geometry emptyGeom;
-    NonlinearNavierStokes model( _grid, emptyGeom, _Reynolds, _q0 );
-    ConjugateGradientSolver solver( model, _timestep, 1e-10 );
+        // Choose Reynolds number such that linear term is Laplacian
+        double Reynolds = 1.;
 
-    BoundaryVector emptyVector(0);
-    Scalar rhs(_grid);
-    InitializeSingleWavenumber( 1, 1, rhs );
-    Scalar gamma(_grid);
-    gamma = 0;
-    BoundaryVector f(0);
+        // Define two geometries: one with and one without a body
+        RigidBody body;
+        _emptyGeometry.addBody(body);
+
+        int nPoints = 4;
+        body.addLine( -0.75, 0, 0.75, 0, nPoints );
+        _nonemptyGeometry.addBody(body);
+
+        Flux q0 = Flux::UniformFlow( _grid, 1.0, 0. );
+
+        _modelWithNoBodies = new NonlinearNavierStokes(
+            _grid, _emptyGeometry, Reynolds, q0 );
+        _modelWithBodies = new NonlinearNavierStokes(
+            _grid, _nonemptyGeometry, Reynolds, q0 );
+    }
+
+    ~ProjectionSolverTest() {
+        delete _modelWithNoBodies;
+        delete _modelWithBodies;
+    }
+
+    // Compute the linear term on the LHS of the projection equations:
+    //   (1 - h/2 L) gamma
+    // where L is given by the associated NavierStokesModel
+    Scalar ComputeLinearTerm(NavierStokesModel& model, const Scalar& gamma) {
+        Scalar result = model.S( gamma );
+        result *= *( model.getLambda() );
+        result = model.Sinv( result );
+        result *= -_timestep / 2.;
+        result += gamma;
+        return result;
+    }
     
-    solver.solve( rhs, emptyVector, gamma, f );
-    Scalar lhs = ComputeLinearTerm( &model, gamma );
-    EXPECT_ALL_EQ( rhs(i,j), lhs(i,j) );
+    // Verify that the projection equations are satisfied by the solution of
+    // the given solver, for the given model:
+    //  (1 - h/2 L) gamma + h B f = a
+    //                      C f = b
+    void verify(
+        NavierStokesModel& model,
+        ProjectionSolver& solver
+        ) {
+        const int nPoints = model.getGeometry()->getNumPoints();
+        // Variables on rhs of projection equations
+        Scalar a(_grid);
+        InitializeSingleWavenumber( 1, 1, a );
+        BoundaryVector b(nPoints);
+        b = 3.;
+        // Variables to solve for
+        Scalar gamma(_grid);
+        gamma = 0;
+        BoundaryVector f(nPoints);
+        f = 0;
 
+        solver.solve( a, b, gamma, f );
+
+        // Verify equations are satisfied to specified tolerance
+        Scalar lhs = ComputeLinearTerm( model, gamma );
+        Scalar forcingTerm = model.B( f );
+        lhs += _timestep * forcingTerm;
+        EXPECT_ALL_EQ( a(i,j), lhs(i,j) );
+
+        // Verify constraint is satisfied
+        BoundaryVector constraint = model.C( gamma );
+        EXPECT_ALL_BV_EQ( b(X,i), constraint(X,i), nPoints );
+        EXPECT_ALL_BV_EQ( b(Y,i), constraint(Y,i), nPoints );
+    }
+
+    // data
+    int _nx;
+    int _ny;
+    double _timestep;
+    Grid _grid;
+    Geometry _emptyGeometry;
+    Geometry _nonemptyGeometry;
+    NavierStokesModel* _modelWithNoBodies;
+    NavierStokesModel* _modelWithBodies;
+};
+
+typedef ProjectionSolverTest CGSolverTest;
+typedef ProjectionSolverTest CholeskySolverTest;
+
+TEST_F(CGSolverTest, NoConstraints) {
+    ConjugateGradientSolver solver(*_modelWithNoBodies, _timestep, tolerance);
+    verify( *_modelWithNoBodies, solver );
 }
 
-TEST_F(ProjectionSolverTest, CholeskyNoConstraints) {
-
-    // Define a solver for an empty Geometry: no boundary points
-    Geometry emptyGeom;
-    NonlinearNavierStokes model( _grid, emptyGeom, _Reynolds, _q0 );
-    CholeskySolver solver( model, _timestep );
-
-    BoundaryVector emptyVector(0);
-    Scalar rhs(_grid);
-    InitializeSingleWavenumber( 1, 1, rhs );
-    Scalar gamma(_grid);
-    gamma = 0;
-    BoundaryVector f(0);
-    
-    solver.solve( rhs, emptyVector, gamma, f );
-    Scalar lhs = ComputeLinearTerm( &model, gamma );
-    EXPECT_ALL_EQ( rhs(i,j), lhs(i,j) );
-
+TEST_F(CGSolverTest, WithConstraints) {
+    ConjugateGradientSolver solver( *_modelWithBodies, _timestep, tolerance);
+    verify( *_modelWithBodies, solver );
 }
 
-TEST_F(ProjectionSolverTest, WithConstraints) {
-    // Variables on rhs of projection equations
-    Scalar a(_grid);
-    InitializeSingleWavenumber( 1, 1, a );
-    BoundaryVector b(_geom.getNumPoints());
-    b = 3.;
-    // Variables to solve for
-    Scalar gamma(_grid);
-    gamma = 0;
-    BoundaryVector f(_geom.getNumPoints());
-    f = 0;
-
-    _solver->solve( a, b, gamma, f );
-
-    // Verify equations are satisfied to specified tolerance
-    Scalar lhs = ComputeLinearTerm( _model, gamma );
-    Scalar forcingTerm = _model->B( f );
-    lhs += _timestep * forcingTerm;
-    EXPECT_ALL_EQ( a(i,j), lhs(i,j) );
-
-    // Verify constraint is satisfied
-    BoundaryVector constraint = _model->C( gamma );
-    EXPECT_ALL_BV_EQ( b(X,i), constraint(X,i) );
-    EXPECT_ALL_BV_EQ( b(Y,i), constraint(Y,i) );
-    
+TEST_F(CholeskySolverTest, NoConstraints) {
+    CholeskySolver solver( *_modelWithNoBodies, _timestep );
+    verify( *_modelWithNoBodies, solver );
 }
 
-TEST_F(ProjectionSolverTest, CholeskyWithConstraints) {
-    // Variables on rhs of projection equations
-    Scalar a(_grid);
-    InitializeSingleWavenumber( 1, 1, a );
-    BoundaryVector b(_geom.getNumPoints());
-    b = 3.;
-    // Variables to solve for
-    Scalar gamma(_grid);
-    gamma = 0;
-    BoundaryVector f(_geom.getNumPoints());
-    f = 0;
-
-    CholeskySolver solver( *_model, _timestep );
-    
-    solver.solve( a, b, gamma, f );
-
-    // Verify equations are satisfied to specified tolerance
-    Scalar lhs = ComputeLinearTerm( _model, gamma );
-    Scalar forcingTerm = _model->B( f );
-    lhs += _timestep * forcingTerm;
-    EXPECT_ALL_EQ( a(i,j), lhs(i,j) );
-
-    // Verify constraint is satisfied
-    BoundaryVector constraint = _model->C( gamma );
-    EXPECT_ALL_BV_EQ( b(X,i), constraint(X,i) );
-    EXPECT_ALL_BV_EQ( b(Y,i), constraint(Y,i) );
-    
+TEST_F(CholeskySolverTest, WithConstraints) {
+    CholeskySolver solver( *_modelWithBodies, _timestep );
+    verify( *_modelWithBodies, solver );
 }
-
-
 
 } // namespace

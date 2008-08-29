@@ -11,13 +11,16 @@ MAKEDEPEND = gcc -MM
 INCPATH = -I../src
 IBPMLIB = ../lib/libibpm.a
 
-.PHONY: $(IBPMLIB) clean distclean .depend
+.PHONY: $(IBPMLIB) clean distclean depend
 
 run_tests: runner
 	./runner
 
 $(IBPMLIB):
-	(cd ../src; make lib)
+	cd ../src && $(MAKE) lib
+
+% : %.o $(IBPMLIB)
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
 
 CholeskyTest: CholeskyTest.o $(IBPMLIB)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
@@ -37,7 +40,7 @@ clean:
 distclean: clean
 	/bin/rm -f runner
 
-.depend:
+depend:
 	$(MAKEDEPEND) $(CXXFLAGS) $(INCPATH) *.cc > .depend
 
-include .depend
+-include .depend
