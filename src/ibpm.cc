@@ -73,8 +73,8 @@ int main(int argc, char* argv[]) {
     cout << "done" << endl;
 
 	// Setup timestepper
-	double dt = 0.005;
-    // Euler solver(model, dt);
+	double dt = 0.01;
+    //Euler solver(model, dt);
     RungeKutta2 solver(model, dt);
 	// Load initial condition
 	string icFile = "initial.bin";
@@ -96,8 +96,8 @@ int main(int argc, char* argv[]) {
 		cout << "step " << i << endl;
 		solver.advance( x );
         computeNetForce(x.f, drag, lift);
-        cout << "x force : " << setw(16) << drag/dt << " , y force : "
-            << setw(16) << lift/dt << "\n";
+        cout << "x force : " << setw(16) << drag*2*nx/length << " , y force : "
+            << setw(16) << lift*2*ny/length << "\n";
         logger.doOutput( x );
 	}
     logger.cleanup();
