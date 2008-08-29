@@ -20,6 +20,7 @@ $HeadURL$
 #include "Geometry.h"
 #include "NavierStokesModel.h"
 #include "Euler.h"
+#include "RungeKutta2.h"
 #include "State.h"
 #include "Logger.h"
 #include "OutputTecplot.h"
@@ -71,8 +72,8 @@ int main(int argc, char* argv[]) {
 
 	// Setup timestepper
 	double dt = 0.005;
-	Euler solver(model, dt);
-
+	//Euler solver(model, dt);
+        RungeKutta2 solver(model, dt);
 	// Load initial condition
 	string icFile = "initial.bin";
 	State x(grid, geom);

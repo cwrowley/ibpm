@@ -17,6 +17,7 @@
 #include "Geometry.h"
 #include "ProjectionSolver.h"
 #include "ConjugateGradientSolver.h"
+#include "CholeskySolver.h"
 #include "TimeStepper.h"
 
 TimeStepper::TimeStepper(
@@ -30,8 +31,10 @@ ProjectionSolver* TimeStepper::createSolver(double alpha) {
     // TODO: Check whether all bodies are stationary
     //      If so, return a CholeskySolver
     //      If not, return a ConjugateGradientSolver
-    double tol = 1e-10;
-    
+    //double tol = 1e-10;
+
+    return new CholeskySolver( *_model, alpha);
+
     // For now, just return a ConjugateGradientSolver
-    return new ConjugateGradientSolver( *_model, alpha, tol );
+    //return new ConjugateGradientSolver( *_model, alpha, tol );
 }
