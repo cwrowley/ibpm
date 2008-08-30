@@ -22,23 +22,17 @@ $(IBPMLIB):
 % : %.o $(IBPMLIB)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
 
-CholeskyTest: CholeskyTest.o $(IBPMLIB)
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
-
 runner: $(TEST_FILES) $(IBPMLIB)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
 
-oseen: Oseen.o $(IBPMLIB)
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lfftw3 -lm	
-
-.cc.o:
+%.o : %.cc
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) $<
 
 clean:
-	/bin/rm -rf *.o
+	-$(RM) -r *.o
 
 distclean: clean
-	/bin/rm -f runner
+	-$(RM) runner
 
 depend:
 	$(MAKEDEPEND) $(CXXFLAGS) $(INCPATH) *.cc > .depend

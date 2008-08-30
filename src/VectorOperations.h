@@ -8,33 +8,32 @@ class Flux;
 class BoundaryVector;
 
 /*!
-	\file VectorOperations.h
-	\module VectorOperations
+    \file VectorOperations.h
+    \module VectorOperations
 
-	\brief Do vector operations on Scalar and Flux objects.
-	
-	Operations include curl on scalars and fluxes, inner products of two scalars or two fluxes,
-	sine transform of scalars, and 'cross product' between fluxes/scalars.  
-		
-	Functions in this module are friends of classes Scalar and Flux.	 
+    \brief Collection of vector operations on Scalar and Flux objects.
+    
+    Operations include curl on scalars and fluxes, inner products of two 
+    scalars or two fluxes, sine transform of scalars, and 'cross product'
+    between fluxes/scalars.
 
-	\author Clancy Rowley
-	\author Zhanhua Ma
-	\author $LastChangedBy: zma $
-	\date  15 Jul 2008
-	\date $LastChangedDate: $
-	\version $Revision: $
+    \author Clancy Rowley
+    \author Zhanhua Ma
+    \author $LastChangedBy: zma $
+    \date  15 Jul 2008
+    \date $LastChangedDate: $
+    \version $Revision: $
 */
 
 /*! \brief Return the curl of Flux q, as a Scalar object.
 
 The curl is defined only at the interior nodes, and this routine returns zero at the boundary nodes.
 */
-Scalar Curl(const Flux& q); 		 				 
-	
+Scalar Curl(const Flux& q);                          
+    
 /// \brief Return the curl of Scalar f, as a Flux object. 
 Flux Curl(const Scalar& f);
-	
+    
 /// \brief Return the inner product of Scalar f and Scalar g.
 double InnerProduct( const Scalar& f, const Scalar& g );
 
@@ -53,7 +52,7 @@ void computeNetForce( BoundaryVector& f, double& xforce, double& yforce);
 /*! Return the sine transform of a Scalar object using DST-I.
 (fftw library is used (real fft kind:RODFT00); only interior nodes are considered.)
 */
-Scalar SinTransform(const Scalar& f);
+Scalar SinTransform(const Scalar& f, bool normalize=false);
 
 /*! \brief Return the cross product of a Flux q and a Scalar f, as a Flux.
 
@@ -69,8 +68,8 @@ Flux CrossProduct(const Flux& q, const Scalar& f);
 
     q1 x q2 = u1 v2 - u2 v1
 
-	This routine is designed so that the following identity holds at the
-	discrete level:
+    This routine is designed so that the following identity holds at the
+    discrete level:
         < a, q1 x q2 > = < q1, q2 x a >
 */
 Scalar CrossProduct(const Flux& q, const Flux& p);

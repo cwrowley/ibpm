@@ -9,10 +9,10 @@ namespace ibpm {
     \brief Type for specifying directions of vectors (X or Y)
 
     \author Clancy Rowley
-    \author $LastChangedBy: $
+    \author $LastChangedBy$
     \date 27 Jul 2008
-    \date $LastChangedDate: $
-    \version $Revision: $
+    \date $LastChangedDate$
+    \version $Revision$
 */
 enum Direction {X, Y, XY};
 

@@ -12,18 +12,18 @@ class RigidBody;
 class Regularizer;
 
 /*!
-\file Geometry.h
-\class Geometry
-
-\brief Create, load, and save geometries composed of RigidBody objects.
-
-\author Clancy Rowley
-\date  3 Jul 2008
-
-$Revision$
-$LastChangedDate$
-$LastChangedBy$
-$HeadURL$
+    \file Geometry.h
+    \class Geometry
+    
+    \brief Create, load, and save geometries composed of RigidBody objects.
+    
+    \author Clancy Rowley
+    \date  3 Jul 2008
+    
+    $Revision$
+    $LastChangedDate$
+    $LastChangedBy$
+    $HeadURL$
 */
 
 class Geometry {

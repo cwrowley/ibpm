@@ -10,7 +10,7 @@
 // $Revision$
 // $LastChangedDate$
 // $LastChangedBy$
-// $HeadURL:// $Header$
+// $HeadURL$
 
 #include "NavierStokesModel.h"
 

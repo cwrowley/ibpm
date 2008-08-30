@@ -120,6 +120,7 @@ private:
 };
 
 // Define a small class for keeping track of points in 2d
+// NOTE: needs to be in this header file, because vector<Point> needs it
 struct Point {
     Point(double x_in, double y_in) {
         x = x_in;

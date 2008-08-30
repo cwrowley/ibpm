@@ -11,7 +11,7 @@
 // $Revision: 28 $
 // $LastChangedDate: 2008-07-04 01:35:13 -0400 (Fri, 04 Jul 2008) $
 // $LastChangedBy: clancy $
-// $HeadURL:// $Header$
+// $HeadURL: Header$
 
 #include "Regularizer.h"
 #include "Grid.h"
@@ -39,15 +39,15 @@ const double deltaSupportRadius = 1.5;
 // Note that the input r is given in numbers of cells
 // (e.g. normalized by the cell width)
 inline double deltaFunction(double r) {
-	if (r > deltaSupportRadius) {
-		return 0;
-	}
-	else {
-		if (r <= 0.5)
-			return (1 + sqrt(1 - 3*r*r)) / 3;
-		else
-			return (5 - 3*r - sqrt(1 - 3*(1-r)*(1-r)) ) / 6;
-	}
+    if (r > deltaSupportRadius) {
+        return 0;
+    }
+    else {
+        if (r <= 0.5)
+            return (1 + sqrt(1 - 3*r*r)) / 3;
+        else
+            return (5 - 3*r - sqrt(1 - 3*(1-r)*(1-r)) ) / 6;
+    }
 }
 
 // Update list of relationships between boundary points and cells, and the
@@ -92,8 +92,8 @@ void Regularizer::update() {
 
 Flux Regularizer::toGrid(const BoundaryVector& u1) const {
     // Allocate a new Flux field, initialized to zero
-	Flux u2(_grid);
-	u2 = 0;
+    Flux u2(_grid);
+    u2 = 0;
 
     // For each association between cells and boundary points
     vector<Association>::const_iterator a;
@@ -108,8 +108,8 @@ Flux Regularizer::toGrid(const BoundaryVector& u1) const {
 
 BoundaryVector Regularizer::toBoundary(const Flux& u2) const {
     // Allocate a new BoundaryVector, initialized to zero
-	BoundaryVector u1(_geometry.getNumPoints());
-	u1 = 0;
+    BoundaryVector u1(_geometry.getNumPoints());
+    u1 = 0;
 
     // For each association between cells and boundary points
     vector<Association>::const_iterator a;
@@ -119,7 +119,7 @@ BoundaryVector Regularizer::toBoundary(const Flux& u2) const {
     }
 
     // Return the new BoundaryVector
-	return u1;
+    return u1;
 }
 
 } // namespace

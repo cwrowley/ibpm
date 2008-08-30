@@ -14,10 +14,11 @@ namespace ibpm {
 \brief Output routines for writing ASCII Tecplot files
 
 \author Clancy Rowley
-\author $LastChangedBy: $
 \date 22 Aug 2008
-\date $LastChangedDate: $
-\version $Revision: $
+
+\author $LastChangedBy$
+\date $LastChangedDate$
+\version $Revision$
 */
 
 class OutputTecplot : public Output {

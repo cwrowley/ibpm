@@ -17,7 +17,7 @@ protected:
       _yOffset(-3),
       _grid(_nx, _ny, _length, _xOffset, _yOffset) {}
 
-	virtual ~GridTest() {}
+    virtual ~GridTest() {}
 
     int _nx;
     int _ny;
@@ -36,7 +36,7 @@ TEST_F(GridTest, TestXCenter) {
      EXPECT_DOUBLE_EQ(_grid.getXCenter(9), 0.9); 
      EXPECT_NEAR(_grid.getXCenter(5), 0.1, tol);
 }
-// 
+
 TEST_F(GridTest, testYCenter) {
      EXPECT_DOUBLE_EQ(_grid.getYCenter(0), -2.9);
      EXPECT_DOUBLE_EQ(_grid.getYCenter(10),-0.9);    
@@ -54,24 +54,6 @@ TEST_F(GridTest, testYEdge) {
     EXPECT_DOUBLE_EQ(_grid.getYEdge(10),-1);
     EXPECT_DOUBLE_EQ(_grid.getYEdge(20), 1);        
 }
-
-// NOTE: For Google Test, Death tests available only under Linux.
-//
-// TEST(GridTest, testBoundaries) {
-//     EXPECT_DEATH(_grid.getXCenter(-1),"");
-// }
-
-//  void testBoundaries() {
-//      TS_ASSERT_THROWS_ANYTHING(_grid->getXCenter(-1));
-//      TS_ASSERT_THROWS_ANYTHING(_grid->getYCenter(-1));
-//      TS_ASSERT_THROWS_ANYTHING(_grid->getXCenter(10));
-//      TS_ASSERT_THROWS_ANYTHING(_grid->getYCenter(20));
-//      TS_ASSERT_THROWS_ANYTHING(_grid->getXEdge(-1));
-//      TS_ASSERT_THROWS_ANYTHING(_grid->getYEdge(-1));
-//      TS_ASSERT_THROWS_ANYTHING(_grid->getXEdge(11));
-//      TS_ASSERT_THROWS_ANYTHING(_grid->getYEdge(21));
-//  }
-// 
 
 }  // namespace
 

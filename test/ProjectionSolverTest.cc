@@ -19,11 +19,11 @@ const double tolerance = 1e-10;
 Scalar ComputeLinearTerm(NavierStokesModel& model, const Scalar& gamma);
 
 #define EXPECT_ALL_EQ(a,b)                      \
-	for (int i=0; i<_nx+1; ++i) {               \
-		for (int j=0; j<_ny+1; ++j) {           \
-			EXPECT_NEAR( (a), (b), tolerance ); \
-		}                                       \
-	}
+    for (int i=0; i<_nx+1; ++i) {               \
+        for (int j=0; j<_ny+1; ++j) {           \
+            EXPECT_NEAR( (a), (b), tolerance ); \
+        }                                       \
+    }
 
 #define EXPECT_ALL_BV_EQ(a,b,nPoints)               \
     for (int i=0; i < nPoints; ++i) {        \
@@ -67,7 +67,7 @@ protected:
     // where L is given by the associated NavierStokesModel
     Scalar ComputeLinearTerm(NavierStokesModel& model, const Scalar& gamma) {
         Scalar result = model.S( gamma );
-        result *= *( model.getLambda() );
+        result *= model.getLambda();
         result = model.Sinv( result );
         result *= -_timestep / 2.;
         result += gamma;
@@ -82,7 +82,7 @@ protected:
         NavierStokesModel& model,
         ProjectionSolver& solver
         ) {
-        const int nPoints = model.getGeometry()->getNumPoints();
+        const int nPoints = model.getGeometry().getNumPoints();
         // Variables on rhs of projection equations
         Scalar a(_grid);
         InitializeSingleWavenumber( 1, 1, a );

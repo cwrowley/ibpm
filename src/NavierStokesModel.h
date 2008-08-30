@@ -44,13 +44,13 @@ public:
     virtual ~NavierStokesModel();
 
     /// Return a pointer to the associated Geometry
-    inline const Geometry* getGeometry() const { return &_geometry; }
+    inline const Geometry& getGeometry() const { return _geometry; }
 
     /// Return a pointer to the associated Grid
-    inline const Grid* getGrid() const { return &_grid; }
+    inline const Grid& getGrid() const { return _grid; }
 
     /// Return a pointer to the eigenvalues of the linear term L
-    inline const Scalar* getLambda() const { return &_linearTermEigenvalues; }
+    inline const Scalar& getLambda() const { return _linearTermEigenvalues; }
     
     /// Transform to eigenvectors of L (discrete sin transform)
     inline Scalar S(const Scalar& g) const {
@@ -63,15 +63,9 @@ public:
     in some implementations (e.g. FFTW), these may differ by a normalization
     constant.
     */
-    Scalar Sinv(const Scalar& ghat) const {
-        Scalar g = SinTransform( ghat );
-        // multiply by normalization factor
-        // TODO: keep track of this normalization factor within a class
-        //       containing SinTransform -- perhaps NavierStokesModel??
-        int nx = _grid.getNx();
-        int ny = _grid.getNy();
-        double normalization = 1.0 / ( nx * ny * 4 );
-        g *= normalization;
+    inline Scalar Sinv(const Scalar& ghat) const {
+        const bool normalize = true;
+        Scalar g = SinTransform( ghat, normalize );
         return g;
     }
     

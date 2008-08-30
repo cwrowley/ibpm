@@ -14,10 +14,10 @@ namespace ibpm {
     \brief Subclass of Motion, for a pitching and plunging body
 
     \author Clancy Rowley
-    \author $LastChangedBy: $
+    \author $LastChangedBy$
     \date 29 Aug 2008
-    \date $LastChangedDate: $
-    \version $Revision: $
+    \date $LastChangedDate$
+    \version $Revision$
 */
 
 class PitchPlunge : public Motion {
@@ -45,7 +45,7 @@ public:
     
     /// Returns transformation for sinusoidal pitch/plunge:
     ///    (0, y(t), theta(t), 0, ydot(t), thetadot(t))
-    TangentSE2 getTransformation(double time) const {
+    inline TangentSE2 getTransformation(double time) const {
         double y    = _plungeAmp * sin( _plungeFreq * time );
         double ydot = _plungeAmp * _plungeFreq * cos( _plungeFreq * time );
         double theta    = _pitchAmp * sin( _pitchFreq * time );

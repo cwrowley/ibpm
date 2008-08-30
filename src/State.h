@@ -10,37 +10,36 @@
 namespace ibpm {
 
 /*!
-	\file State.h
-	\class State
+    \file State.h
+    \class State
 
-	\brief Structure for grouping state variables
+    \brief Structure for grouping state variables
 
-	\author Clancy Rowley
-	\author $LastChangedBy: $
-	\date  7 Jul 2008
-	\date $LastChangedDate: $
-	\version $Revision: $
+    \author Clancy Rowley
+    \author $LastChangedBy$
+    \date  7 Jul 2008
+    \date $LastChangedDate$
+    \version $Revision$
 */
 
 struct State {
-	State(const Grid& grid, const Geometry& geom) :
-		q(grid),
-		gamma(grid),
-		f(geom.getNumPoints()
-		) {
-        time = 0;
-        timestep = 0;    
-	}
+    State(const Grid& grid, const Geometry& geom) :
+        q(grid),
+        gamma(grid),
+        f( geom.getNumPoints() ),
+        timestep(0),
+        time(0.)
+    {}
 
-	~State() {}
-	
-	void loadRestartFile(string filename) {}
-	
-	int timestep;
-	double time;
-	Flux q;
-	Scalar gamma;
-	BoundaryVector f;
+    ~State() {}
+    
+    void loadRestartFile(string filename) {}
+    
+    Flux q;
+    Scalar gamma;
+    BoundaryVector f;
+    int timestep;
+    double time;
 };
 
 } // namespace ibpm

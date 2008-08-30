@@ -15,110 +15,78 @@ namespace ibpm {
 class Scalar;
 
 /*!
-\file Flux.h
-\class Flux
-
-\brief Store a 2D array of fluxes, located at cell edges
-
-For a grid with nx cells in the x-direction and ny cells in the y-direction,
-there are (nx+1,ny) fluxes in the x-direction, and (nx,ny+1) fluxes in the
-y-direction. These are accessible via q.x(i,j) and q.y(i,j).
-
-\author Clancy Rowley
-\author $LastChangedBy: $
-\date  4 Jul 2008
-\date $LastChangedDate: $
-\version $Revision: $
+    \file Flux.h
+    \class Flux
+    
+    \brief Store a 2D array of fluxes, located at cell edges
+    
+    For a grid with nx cells in the x-direction and ny cells in the 
+    y-direction, there are (nx+1,ny) fluxes in the x-direction, and (nx,ny+1) 
+    fluxes in the y-direction. These are accessible via q.x(i,j) and q.y(i,j).
+    
+    \author Clancy Rowley
+    \author $LastChangedBy$
+    \date  4 Jul 2008
+    \date $LastChangedDate$
+    \version $Revision$
 */
 
 class Flux {
 public:
-	/// Allocate memory in the constructor
-	Flux(const Grid& grid) :
-		_grid(grid),
-		_nx(grid.getNx()),
-		_ny(grid.getNy()),
-		_numXFluxes(_nx * _ny + _ny),
-		_numFluxes(2 * _nx * _ny + _nx + _ny),
-        _data(_numFluxes)
-        {}
-	
-	/// Allocate new array, copy the data
-	inline Flux(const Flux& q) :
-		_grid(q._grid),
-		_nx(q._nx),
-		_ny(q._ny),
-		_numXFluxes(q._numXFluxes),
-		_numFluxes(q._numFluxes),
-		_data(_numFluxes) {
+    /// Constructor
+    Flux(const Grid& grid);
 
-		// copy data
-		_data = q._data;
-	}
+    /// Constructor, making a copy of the data
+    Flux(const Flux& q);
 
-	const Grid& getGrid() const{
-		return _grid;
-	}
-	
-	/// Deallocate memory in the destructor
-	~Flux() {};  // deallocation automatic for Blitz++ arrays?
-
-    // Print the X and Y components to standard out (for debugging)
-    void print() {
-        cout << "X:" << endl;
-        for (int i=0; i<=_nx; ++i) {
-            for (int j=0; j<_ny; ++j) {
-                cout << (*this)(X,i,j) << " ";
-            }
-            cout << endl;
-        }
-        cout << "Y:" << endl;
-        for (int i=0; i<_nx; ++i) {
-            for (int j=0; j<=_ny; ++j) {
-                cout << (*this)(Y,i,j) << " ";
-            }
-            cout << endl;
-        }
+    /// Deallocate memory in the destructor
+    ~Flux();
+    
+    inline const Grid& getGrid() const {
+        return _grid;
     }
     
-	/// Copy assignment
-	inline Flux& operator=(const Flux& q) {
-		assert(q._nx == _nx);
-		assert(q._ny == _ny);
-		_data = q._data;
-		return *this;
-	}
+    /// Print the X and Y components to standard out (for debugging)
+    void print();
+    
+    /// Copy assignment
+    inline Flux& operator=(const Flux& q) {
+        assert(q._nx == _nx);
+        assert(q._ny == _ny);
+        _data = q._data;
+        return *this;
+    }
 
-	/// Copy assignment from double
-	inline Flux& operator=(double a) {
-		_data = a;
-		return *this;
-	}
-
-    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
-	inline double& operator()(int dir, int i, int j) {
-        return _data(getIndex(dir,i,j));
-	};
+    /// Copy assignment from double
+    inline Flux& operator=(double a) {
+        _data = a;
+        return *this;
+    }
 
     /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
-	inline double operator()(int dir, int i, int j) const {
+    inline double& operator()(int dir, int i, int j) {
         return _data(getIndex(dir,i,j));
-	};
+    };
 
-	/// Type used for referencing elements
+    /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
+    inline double operator()(int dir, int i, int j) const {
+        return _data(getIndex(dir,i,j));
+    };
+
+    /// Type used for referencing elements
     typedef int index;
     
     /// f(ind) refers to the value corresponding to the given index ind
-	inline double& operator()(index ind) {
+    inline double& operator()(index ind) {
         assert( (ind >= 0) && (ind < _numFluxes) );
         return _data(ind);
-	}
+    }
 
     /// f(ind) refers to the value corresponding to the given index ind
-	inline double operator()(index ind) const {
+    inline double operator()(index ind) const {
         assert( (ind >= 0) && (ind < _numFluxes) );
         return _data(ind);
-	}
+    }
 
     /// q.x(dir,i) refers to the x-coordinate of the flux (dir,i,j)
     inline double x(int dir, int i) {
@@ -170,10 +138,10 @@ public:
     inline index end() { return _numFluxes; }
 
     /// Returns an index for the first element in direction dir (X or Y)
-	inline index begin(int dir) {
+    inline index begin(int dir) {
         assert ((dir >= X) && (dir <= Y));
         return dir * _numXFluxes;
-	}
+    }
 
     /// Returns an index one past the last element in direction dir (X or Y)
     inline index end(int dir) {
@@ -187,159 +155,145 @@ public:
     }
     
     /// Returns an index for the value in direction dir at point (i,j)
-	inline index getIndex(int dir, int i, int j) const {
-	    assert(dir>=X  && dir<=Y);
+    inline index getIndex(int dir, int i, int j) const {
+        assert(dir>=X  && dir<=Y);
         assert(i >= 0 && j >= 0);
         assert((dir == X) ? i < _nx+1 : i < _nx);
         assert((dir == Y) ? j < _ny+1 : j < _ny);
         // Tricky expression:
         //   j in [0..ny-1] for X fluxes (dir = X)
         //   j in [0..ny] for Y fluxes   (dir = Y)
-		return dir * _numXFluxes + i * (_ny+dir) + j;
-	}
-	
-	/// f += g
-	inline Flux& operator+=(const Flux& f) {
-		assert(f._nx == _nx);
-		assert(f._ny == _ny);
-		_data += f._data;
-		return *this;
-	}
+        return dir * _numXFluxes + i * (_ny+dir) + j;
+    }
+    
+    /// f += g
+    inline Flux& operator+=(const Flux& f) {
+        assert(f._nx == _nx);
+        assert(f._ny == _ny);
+        _data += f._data;
+        return *this;
+    }
 
-	/// f += a
-	inline Flux& operator+=(double a) {
-		_data += a;
-		return *this;
-	}
-	
-	/// f -= g
-	inline Flux& operator-=(const Flux& f) {
-		assert(f._nx == _nx);
-		assert(f._ny == _ny);
-		_data -= f._data;
-		return *this;
-	}
+    /// f += a
+    inline Flux& operator+=(double a) {
+        _data += a;
+        return *this;
+    }
+    
+    /// f -= g
+    inline Flux& operator-=(const Flux& f) {
+        assert(f._nx == _nx);
+        assert(f._ny == _ny);
+        _data -= f._data;
+        return *this;
+    }
 
-	/// f -= a
-	inline Flux& operator-=(double a) {
-		_data -= a;
-		return *this;
-	}
-	
-	/// f + g
-	inline Flux operator+(const Flux& f) {
-		assert(f._nx == _nx);
-		assert(f._ny == _ny);
-		Flux g = *this;
-		g += f;
-		return g;
-	};
-	
-	/// f + a
-	inline Flux operator+(double a) {
-		Flux g = *this;
-		g += a;
-		return g;
-	};
+    /// f -= a
+    inline Flux& operator-=(double a) {
+        _data -= a;
+        return *this;
+    }
+    
+    /// f + g
+    inline Flux operator+(const Flux& f) {
+        assert(f._nx == _nx);
+        assert(f._ny == _ny);
+        Flux g = *this;
+        g += f;
+        return g;
+    };
+    
+    /// f + a
+    inline Flux operator+(double a) {
+        Flux g = *this;
+        g += a;
+        return g;
+    };
 
-	/// f - g
-	inline Flux operator-(const Flux& f) {
-		assert(f._nx == _nx);
-		assert(f._ny == _ny);
-		Flux g = *this;
-		g -= f;
-		return g;
-	};
-	
-	/// f - a
-	inline Flux operator-(double a) {
-		Flux g = *this;
-		g -= a;
-		return g;
-	};
+    /// f - g
+    inline Flux operator-(const Flux& f) {
+        assert(f._nx == _nx);
+        assert(f._ny == _ny);
+        Flux g = *this;
+        g -= f;
+        return g;
+    };
+    
+    /// f - a
+    inline Flux operator-(double a) {
+        Flux g = *this;
+        g -= a;
+        return g;
+    };
 
-	/// f *= a
-	inline Flux& operator*=(double a) {
-		_data *= a;
-		return *this;
-	}
+    /// f *= a
+    inline Flux& operator*=(double a) {
+        _data *= a;
+        return *this;
+    }
 
-	/// f /= a
-	inline Flux& operator/=(double a) {
-		_data /= a;
-		return *this;
-	}
+    /// f /= a
+    inline Flux& operator/=(double a) {
+        _data /= a;
+        return *this;
+    }
 
-	/// f * a
-	inline Flux operator*(double a) {
-		Flux g = *this;
-		g *= a;
-		return g;
-	}
+    /// f * a
+    inline Flux operator*(double a) {
+        Flux g = *this;
+        g *= a;
+        return g;
+    }
 
-	/// f / a
-	inline Flux operator/(double a) {
-		Flux g = *this;
-		g /= a;
-		return g;
-	}
+    /// f / a
+    inline Flux operator/(double a) {
+        Flux g = *this;
+        g /= a;
+        return g;
+    }
 
-	/// Return Flux for a uniform flow with the specified magnitude and dir
-	static inline Flux UniformFlow(
-	    const Grid& grid,
-	    double magnitude,
-	    double angle
-	    ) {
-	    double dx = grid.getDx();
-        double u = magnitude * cos( angle ) * dx;
-        double v = magnitude * sin( angle ) * dx;
-        
-        Flux q(grid);
-        Flux::index ind;
-        for (ind = q.begin(X); ind != q.end(X); ++ind) {
-            q(ind) = u;
-        }    
-        for (ind = q.begin(Y); ind != q.end(Y); ++ind) {
-            q(ind) = v;
-        }    
-        return q;
-	}    
+    /// Return Flux for a uniform flow with the specified magnitude and dir
+    static Flux UniformFlow(
+        const Grid& grid,
+        double magnitude,
+        double angle
+    );
 
 private:
-	const Grid& _grid;
-	const int _nx;
-	const int _ny;
+    const Grid& _grid;
+    const int _nx;
+    const int _ny;
     const int _numXFluxes;
     const int _numFluxes;
-	Array<double,1> _data;
+    Array<double,1> _data;
 };  // class Flux
 
 /// -f
 inline Flux operator-(const Flux& f) {
-	Flux g = f;
-	g *= -1;
-	return g;
+    Flux g = f;
+    g *= -1;
+    return g;
 }
 
 /// a + f
 inline Flux operator+(double a, const Flux& f) {
-	Flux g = f;
-	g += a;
-	return g;
+    Flux g = f;
+    g += a;
+    return g;
 };
-	
+    
 /// a - f
 inline Flux operator-(double a, const Flux& f) {
-	Flux g = -f;
-	g += a;
-	return g;
+    Flux g = -f;
+    g += a;
+    return g;
 };
 
 /// a * f
 inline Flux operator*(double a, const Flux& f) {
-	Flux g = f;
-	g *= a;
-	return g;
+    Flux g = f;
+    g *= a;
+    return g;
 }
 
 } // namespace ibpm

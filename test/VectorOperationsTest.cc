@@ -17,147 +17,147 @@ protected:
         _ny(8),
         _grid(_nx, _ny, 2, -1, -3),
         _f(_grid),
-		_g(_grid),
-		_x(_grid),
-		_y(_grid),
-		_p(_grid),
-        _q(_grid)
-    {
+        _g(_grid),
+        _x(_grid),
+        _y(_grid),
+        _p(_grid),
+        _q(_grid) {
+            
         // Initialize Scalars _f, _g, _x, _y
-		for (int i=0; i<_nx+1; ++i) {
-			for (int j=0; j<_ny+1; ++j) {
-				_f(i,j) = f(i,j);
-				_g(i,j) = g(i,j);		
+        for (int i=0; i<_nx+1; ++i) {
+            for (int j=0; j<_ny+1; ++j) {
+                _f(i,j) = f(i,j);
+                _g(i,j) = g(i,j);       
                 _x(i,j) = _grid.getXEdge(i);
                 _y(i,j) = _grid.getYEdge(j);
-			}
-		}
-		
-		// Initialize Flux _q
-		for (int i=0; i<_nx+1; ++i) {
-			for (int j=0; j<_ny; ++j) {
-				_q(X,i,j) = qx(i,j);
-				_p(X,i,j) = px(i,j);				
-			}
-		}
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny+1; ++j) {
-				_q(Y,i,j) = qy(i,j);
-				_p(Y,i,j) = py(i,j);
-			}
-		}
+            }
+        }
+        
+        // Initialize Flux _q
+        for (int i=0; i<_nx+1; ++i) {
+            for (int j=0; j<_ny; ++j) {
+                _q(X,i,j) = qx(i,j);
+                _p(X,i,j) = px(i,j);                
+            }
+        }
+        for (int i=0; i<_nx; ++i) {
+            for (int j=0; j<_ny+1; ++j) {
+                _q(Y,i,j) = qy(i,j);
+                _p(Y,i,j) = py(i,j);
+            }
+        }
     }
     
     // functions to test
     // TODO: Pick better functions, with analytic expressions (in x and y)
     // (Single wavenumber for the scalar fields?)
-	inline double f(int i, int j) {
-		return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos(j) * (_ny + 1);
-	}
+    inline double f(int i, int j) {
+        return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos(j) * (_ny + 1);
+    }
 
-	inline double g(int i, int j) {
-		return -5 * i * i + 3 * i * j + 2 * j * j;
-	}
-		
-	inline double qx(int i, int j) {
-		return 3 * i * _nx + 5 * (j +1 )* i;
-	}
-	
-	inline double qy(int i, int j) {
-		return 4 * i *  j   + _ny + cos(i);
-	}
-	
-	inline double px(int i, int j) {
-		return 2*i + 3*j;
-	}
+    inline double g(int i, int j) {
+        return -5 * i * i + 3 * i * j + 2 * j * j;
+    }
+        
+    inline double qx(int i, int j) {
+        return 3 * i * _nx + 5 * (j +1 )* i;
+    }
+    
+    inline double qy(int i, int j) {
+        return 4 * i *  j   + _ny + cos(i);
+    }
+    
+    inline double px(int i, int j) {
+        return 2*i + 3*j;
+    }
 
-	inline double py(int i, int j) {
-		return i*j - 10;
-	}
-	
+    inline double py(int i, int j) {
+        return i*j - 10;
+    }
+    
     // data
-	int _nx;
-	int _ny;
-	Grid _grid;
-	Scalar _f;
-	Scalar _g;
+    int _nx;
+    int _ny;
+    Grid _grid;
+    Scalar _f;
+    Scalar _g;
     Scalar _x;
     Scalar _y;
-	Flux _p;
-	Flux _q;
+    Flux _p;
+    Flux _q;
 };
 
 // for Scalars
 #define EXPECT_ALL_EQ(a,b)                  \
-	for (int i=0; i<_nx+1; ++i) {           \
-		for (int j=0; j<_ny+1; ++j) {       \
-			EXPECT_DOUBLE_EQ( (a), (b) );   \
-		}                                   \
-	}
+    for (int i=0; i<_nx+1; ++i) {           \
+        for (int j=0; j<_ny+1; ++j) {       \
+            EXPECT_DOUBLE_EQ( (a), (b) );   \
+        }                                   \
+    }
 
 // for Scalars
 #define EXPECT_ALL_INTERIOR_EQ(a,b)         \
-	for (int i=1; i<_nx; ++i) {             \
-		for (int j=1; j<_ny; ++j) {         \
-			EXPECT_DOUBLE_EQ( (a), (b) );   \
-		}                                   \
-	}
+    for (int i=1; i<_nx; ++i) {             \
+        for (int j=1; j<_ny; ++j) {         \
+            EXPECT_DOUBLE_EQ( (a), (b) );   \
+        }                                   \
+    }
 
 // for Fluxes
 #define EXPECT_ALL_X_EQ(a,b)                \
-	for ( int i=0; i<_nx+1; ++i ) {         \
-		for ( int j=0; j<_ny; ++j ) {       \
-			EXPECT_DOUBLE_EQ( (a), (b) );   \
-		}                                   \
-	}
+    for ( int i=0; i<_nx+1; ++i ) {         \
+        for ( int j=0; j<_ny; ++j ) {       \
+            EXPECT_DOUBLE_EQ( (a), (b) );   \
+        }                                   \
+    }
 
 // for Fluxes
 #define EXPECT_ALL_Y_EQ(a,b)                \
-	for ( int i=0; i<_nx; ++i ) {           \
-		for ( int j=0; j<_ny+1; ++j ) {     \
-			EXPECT_DOUBLE_EQ( (a), (b) );   \
-		}                                   \
-	}
+    for ( int i=0; i<_nx; ++i ) {           \
+        for ( int j=0; j<_ny+1; ++j ) {     \
+            EXPECT_DOUBLE_EQ( (a), (b) );   \
+        }                                   \
+    }
 
 TEST_F(VectorOperationsTest, ScalarDotProductSymmetric) {
-	EXPECT_DOUBLE_EQ(InnerProduct(_f,_g), InnerProduct(_f,_g) );        
+    EXPECT_DOUBLE_EQ(InnerProduct(_f,_g), InnerProduct(_f,_g) );        
 }
 
 TEST_F(VectorOperationsTest, ScalarDotProductDomainArea) {
-	Scalar h( _grid );
-	Scalar l( _grid );
-	for (int i=0; i<_nx+1; ++i) {
-		for (int j=0; j<_ny+1; ++j) {
-			h(i,j) = 1;
-			l(i,j) = 1;
-		}
-	}
-	double area = _grid.getArea();
-	EXPECT_DOUBLE_EQ(InnerProduct(h, l), area);
+    Scalar h( _grid );
+    Scalar l( _grid );
+    for (int i=0; i<_nx+1; ++i) {
+        for (int j=0; j<_ny+1; ++j) {
+            h(i,j) = 1;
+            l(i,j) = 1;
+        }
+    }
+    double area = _grid.getArea();
+    EXPECT_DOUBLE_EQ(InnerProduct(h, l), area);
 }
 
 TEST_F(VectorOperationsTest, FluxDotProductSymmetric) {
-	EXPECT_DOUBLE_EQ( InnerProduct(_q,_p), InnerProduct(_p, _q) );
+    EXPECT_DOUBLE_EQ( InnerProduct(_q,_p), InnerProduct(_p, _q) );
 }
 
 TEST_F(VectorOperationsTest, FluxDotProductDomainArea) {
-	Flux h( _grid );
-	Flux l( _grid );
-	for (int i=0; i<_nx+1; ++i) {
-		for (int j=0; j<_ny; ++j) {
-			h(X,i,j) = 1;
-			l(X,i,j) = 0.2;
-		}
-	}
-	for (int i=0; i<_nx; ++i) {
-		for (int j=0; j<_ny+1; ++j) {
-			h(Y,i,j) = 0.8;
-			l(Y,i,j) = 1;
-		}
-	}
-	double area = _grid.getArea();
+    Flux h( _grid );
+    Flux l( _grid );
+    for (int i=0; i<_nx+1; ++i) {
+        for (int j=0; j<_ny; ++j) {
+            h(X,i,j) = 1;
+            l(X,i,j) = 0.2;
+        }
+    }
+    for (int i=0; i<_nx; ++i) {
+        for (int j=0; j<_ny+1; ++j) {
+            h(Y,i,j) = 0.8;
+            l(Y,i,j) = 1;
+        }
+    }
+    double area = _grid.getArea();
     double dx = _grid.getDx();
-	EXPECT_DOUBLE_EQ(InnerProduct(h,l), area  / (dx * dx) );
+    EXPECT_DOUBLE_EQ(InnerProduct(h,l), area  / (dx * dx) );
 }
 
 // =============================
@@ -358,35 +358,35 @@ TEST_F(VectorOperationsTest, CurlInnerProduct) {
 
 
 /*--------------------------------------------------------------------------*/
-//	Tests on Scalar functions (that return Scalar):
-TEST_F(VectorOperationsTest, ScalarCurlOfConstantEqualsZero) {		
-	// Test 1: Curl of a non-zero constant Flux object
-	// (w/ different Flux.x and Flux.y).
-	Flux fluxc(_grid);
-	double cx = 8;
-	double cy = 5;
-	fluxc = cx;
-	for (int i=0; i<_nx; ++i) {
-		for (int j=0; j<_ny+1; ++j) {
-			fluxc(Y,i,j) = cy;
-		}
-	}
-	
-	Scalar sf = Curl(fluxc);		
-	EXPECT_ALL_EQ(sf(i,j), 0); 		
+//  Tests on Scalar functions (that return Scalar):
+TEST_F(VectorOperationsTest, ScalarCurlOfConstantEqualsZero) {      
+    // Test 1: Curl of a non-zero constant Flux object
+    // (w/ different Flux.x and Flux.y).
+    Flux fluxc(_grid);
+    double cx = 8;
+    double cy = 5;
+    fluxc = cx;
+    for (int i=0; i<_nx; ++i) {
+        for (int j=0; j<_ny+1; ++j) {
+            fluxc(Y,i,j) = cy;
+        }
+    }
+    
+    Scalar sf = Curl(fluxc);        
+    EXPECT_ALL_EQ(sf(i,j), 0);      
 }
 
-TEST_F(VectorOperationsTest, ScalarCurlOfFluxGivesZeroBCs) {		
-	Scalar sf = Curl(_q);		
-	for (int i=0; i<_nx+1; ++i) {
-		EXPECT_DOUBLE_EQ( sf(i,0), 0 );
-		EXPECT_DOUBLE_EQ( sf(i,_ny), 0 );
-	}
-	for (int j=0; j<_ny+1; ++j) {       
-		EXPECT_DOUBLE_EQ( sf(0,j), 0 );
-		EXPECT_DOUBLE_EQ( sf(_nx,j), 0 );  
-	}                         
-}	
+TEST_F(VectorOperationsTest, ScalarCurlOfFluxGivesZeroBCs) {        
+    Scalar sf = Curl(_q);       
+    for (int i=0; i<_nx+1; ++i) {
+        EXPECT_DOUBLE_EQ( sf(i,0), 0 );
+        EXPECT_DOUBLE_EQ( sf(i,_ny), 0 );
+    }
+    for (int j=0; j<_ny+1; ++j) {       
+        EXPECT_DOUBLE_EQ( sf(0,j), 0 );
+        EXPECT_DOUBLE_EQ( sf(_nx,j), 0 );  
+    }                         
+}   
 
 // =================
 // = Sin transform =
@@ -394,24 +394,24 @@ TEST_F(VectorOperationsTest, ScalarCurlOfFluxGivesZeroBCs) {
 
 // Sine transform only counts inner grids and gives zero boundary conditions.
 TEST_F(VectorOperationsTest, SineTransformGivesZeroBCs) {
-	Scalar f_fft = SinTransform(_f);
-	for (int i=0; i<_nx+1; ++i) {
-		EXPECT_DOUBLE_EQ( f_fft(i,0), 0 );
-		EXPECT_DOUBLE_EQ( f_fft(i,_ny), 0 );
-	}
-	for (int j=0; j<_ny+1; ++j) {       
-		EXPECT_DOUBLE_EQ( f_fft(0,j), 0 );
-		EXPECT_DOUBLE_EQ( f_fft(_nx,j), 0 );  
-	} 
+    Scalar f_fft = SinTransform(_f);
+    for (int i=0; i<_nx+1; ++i) {
+        EXPECT_DOUBLE_EQ( f_fft(i,0), 0 );
+        EXPECT_DOUBLE_EQ( f_fft(i,_ny), 0 );
+    }
+    for (int j=0; j<_ny+1; ++j) {       
+        EXPECT_DOUBLE_EQ( f_fft(0,j), 0 );
+        EXPECT_DOUBLE_EQ( f_fft(_nx,j), 0 );  
+    } 
 }
 
 // Sine transform of zero gives zero.
-TEST_F(VectorOperationsTest, SineTransformOfZeroEqualsZero) {	
-	Scalar Szero(_grid);
-	Szero = 0; 	
-	
-	Scalar S_fft = SinTransform(Szero);
-	EXPECT_ALL_EQ( S_fft(i,j), 0 );
+TEST_F(VectorOperationsTest, SineTransformOfZeroEqualsZero) {   
+    Scalar Szero(_grid);
+    Szero = 0;  
+    
+    Scalar S_fft = SinTransform(Szero);
+    EXPECT_ALL_EQ( S_fft(i,j), 0 );
 }
 
 // Sine transform gives a Scalar of the same size as its argument
@@ -424,21 +424,20 @@ TEST_F(VectorOperationsTest, SineTransformOutputSize) {
     // compare grids
     const Grid& g1 = a.getGrid();
     const Grid& g2 = b.getGrid();
-    EXPECT_EQ( g1.getNy(), g2.getNy() );
+    EXPECT_EQ( g1.getNx(), g2.getNx() );
     EXPECT_EQ( g1.getNy(), g2.getNy() );
 }
 
 // Do Sine transform twice and obtain the original data, upto the normalization parameter.
 TEST_F(VectorOperationsTest, SineTransformTwiceGivesOriginalScalar) {
-	Scalar f_fft = SinTransform(_f);
-	Scalar f_f_fft = SinTransform(f_fft);
-	double normalization = 2 * _nx * 2 * _ny; //normalization needed (see FFTW3 manual)
+    Scalar f_fft = SinTransform(_f);
+    Scalar f_f_fft = SinTransform(f_fft,true); // normalized
     double tolerance = 2e-14;
-	for (int i = 1; i<_nx; ++i) {
-		for (int j = 1; j<_ny; ++j) {
-			EXPECT_NEAR( f_f_fft(i,j)/normalization, _f(i,j), tolerance ); 
-		}	
-	}		
+    for (int i = 1; i<_nx; ++i) {
+        for (int j = 1; j<_ny; ++j) {
+            EXPECT_NEAR( f_f_fft(i,j), _f(i,j), tolerance ); 
+        }   
+    }       
 }
 
 

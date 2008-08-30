@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
     x.gamma = 0.;
 
     // Setup output routines
-    OutputTecplot tecplot( "pitch%03d.plt", "Pitching plate, step %03d" );
+    OutputTecplot tecplot( "tecplot/pitch%03d.plt", "Pitching plate, step %03d" );
     Logger logger;
     // Output Tecplot file every few timesteps
     logger.addOutput( &tecplot, 25 );

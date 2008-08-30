@@ -60,7 +60,7 @@ public:
 //
 protected:
 
-    const NavierStokesModel* _model;
+    const NavierStokesModel& _model;
     double _timestep;
 
     /*! \brief Return a new ProjectionSolver of the appropriate type

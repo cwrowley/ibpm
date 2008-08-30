@@ -36,7 +36,7 @@ protected:
 
     Scalar linearTerm(const Scalar& g) {
         Scalar a = _model->S( g );
-        a *= *( _model->getLambda() );
+        a *= _model->getLambda();
         a = _model->Sinv( a );
         return a;
     }
@@ -104,11 +104,11 @@ void print(const Scalar& f) {
 }
 
 #define EXPECT_ALL_EQ(a,b)                  \
-	for (int i=0; i<_nx+1; ++i) {           \
-		for (int j=0; j<_ny+1; ++j) {       \
-			EXPECT_NEAR((a), (b), 3e-15);   \
-		}                                   \
-	}
+    for (int i=0; i<_nx+1; ++i) {           \
+        for (int j=0; j<_ny+1; ++j) {       \
+            EXPECT_NEAR((a), (b), 3e-15);   \
+        }                                   \
+    }
 
 TEST_F( NavierStokesModelTest, SOfSinvEqualsIdentity ) {
     Scalar gamma(_grid);

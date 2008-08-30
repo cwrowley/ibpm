@@ -24,13 +24,13 @@ namespace ibpm {
 ProjectionSolver::ProjectionSolver(
     const NavierStokesModel& model,
     double alpha) :
-	_alpha(alpha),
-	_model(&model),
-    _eigenvaluesOfAinv(*( _model->getGrid() )) {
+    _alpha(alpha),
+    _model(model),
+    _eigenvaluesOfAinv( _model.getGrid() ) {
 
     // A = (1 - alpha/2 L)
     // Calculate eigenvalues of Ainv
-    Scalar eigA = *( _model->getLambda() );
+    Scalar eigA = _model.getLambda();
     eigA *= -_alpha/2;
     eigA += 1;
     _eigenvaluesOfAinv = 1 / eigA;

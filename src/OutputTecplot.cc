@@ -8,10 +8,10 @@
 //
 // Date: 22 Aug 2008
 //
-// $Revision:  $
-// $LastChangedDate:  $
-// $LastChangedBy: clancy $
-// $HeadURL: $
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
+// $HeadURL$
 
 #include "OutputTecplot.h"
 #include "State.h"

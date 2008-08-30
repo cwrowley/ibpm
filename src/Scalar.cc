@@ -22,16 +22,6 @@ using namespace std;
 
 namespace ibpm {
 
-Scalar& Scalar::laplacian(const Scalar& f) {
-	// WORK HERE
-	return *this;
-}
-
-Scalar& Scalar::laplacianInverse(const Scalar& f) {
-	// WORK HERE
-	return *this;
-}
-
 // Print the whole field to standard output
 void Scalar::print() const {
     int nx = _grid.getNx();

@@ -1,3 +1,18 @@
+// Logger.cc
+//
+// Description:
+// Implementation of Logger class for calling output routines
+//
+// Author(s):
+// Clancy Rowley
+//
+// Date: 22 Aug 2008
+//
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
+// $HeadURL$
+
 #include <assert.h>
 #include <vector>
 #include "Output.h"

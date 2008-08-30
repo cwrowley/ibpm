@@ -12,12 +12,26 @@ all: lib ibpm
 	
 include make.inc
 
-OBJS = Geometry.o NavierStokesModel.o Grid.o Scalar.o Flux.o \
-	VectorOperations.o Regularizer.o ProjectionSolver.o \
-	ConjugateGradientSolver.o TimeStepper.o Euler.o RungeKutta2.o RigidBody.o \
-	Logger.o OutputRestart.o OutputTecplot.o CholeskySolver.o 
+OBJS = \
+	CholeskySolver.o \
+	ConjugateGradientSolver.o \
+	Euler.o \
+	Flux.o \
+	Geometry.o \
+	Grid.o \
+	Logger.o \
+	NavierStokesModel.o \
+	OutputRestart.o \
+	OutputTecplot.o \
+	ProjectionSolver.o \
+	Regularizer.o \
+	RigidBody.o \
+	RungeKutta2.o \
+	Scalar.o \
+	TimeStepper.o \
+	VectorOperations.o
 
-LDFLAGS = -lfftw3 -lm
+LDLIBS = -lfftw3 -lm
 AR = ar
 ARFLAGS = -r
 MAKEDEPEND = gcc -MM
@@ -35,10 +49,10 @@ lib: $(IBPMLIB)
 ibpm: $(IBPM)
 
 $(IBPMLIB): $(OBJS) 
-	$(AR) $(ARFLAGS) $(IBPMLIB) $(OBJS)
+	$(AR) $(ARFLAGS) $(IBPMLIB) $?
 
 $(IBPM): ibpm.o $(IBPMLIB)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 clean:
 	/bin/rm -rf *.o

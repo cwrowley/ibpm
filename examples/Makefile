@@ -10,7 +10,9 @@
 
 include ../src/make.inc
 
-LDFLAGS = -lfftw3 -lm
+TARGETS = pitching plunging Oseen
+
+LDLIBS = -lfftw3 -lm
 MAKEDEPEND = gcc -MM
 
 LDFLAGS += $(lib_dirs)
@@ -20,14 +22,14 @@ IBPMLIB = ../lib/libibpm.a
 
 .PHONY:  clean depend
 
-plunging: plunging.o $(IBPMLIB)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+all: $(TARGETS)
 
-pitching: pitching.o $(IBPMLIB)
-	$(CXX) -o $@ $^ $(LDFLAGS)
-
+% : %.cc $(IBPMLIB)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	
 clean:
-	/bin/rm -rf *.o
+	-$(RM) -r *.o $(TARGETS)
+	-$(RM) tecplot/*.plt
 
 depend:
 	$(MAKEDEPEND) $(CXXFLAGS) *.cc > .depend

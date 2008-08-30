@@ -14,10 +14,11 @@ namespace ibpm {
 \brief Output routine for writing a restart file
 
 \author Clancy Rowley
-\author $LastChangedBy: $
 \date 21 Aug 2008
-\date $LastChangedDate: $
-\version $Revision: $
+
+\author $LastChangedBy$
+\date $LastChangedDate$
+\version $Revision$
 */
 
 class OutputRestart : public Output {

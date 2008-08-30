@@ -82,36 +82,36 @@ protected:
 
     /// Solve \f$ y = A^{-1} b \f$.
     inline Scalar Ainv(const Scalar& b) {
-        Scalar Sb = _model->S( b );
+        Scalar Sb = _model.S( b );
         Sb *= _eigenvaluesOfAinv;
-        Scalar y = _model->Sinv( Sb );
+        Scalar y = _model.Sinv( Sb );
         return y;
     }
     
     /// Solve \f$ y = A^{-1} b \f$.
     inline Scalar Ainv(const Scalar& b, Scalar& y ) {
-        y = _model->S( b );
+        y = _model.S( b );
         y *= _eigenvaluesOfAinv;
-        y = _model->Sinv( y );
+        y = _model.Sinv( y );
         return y;
     }
 
     /// Compute \a y = B(\a f)
     inline Scalar B(const BoundaryVector& f) {
-        Scalar y = _model->B( f );
+        Scalar y = _model.B( f );
         y *= _alpha;
         return y;
     }
     
     /// Compute \a y = C(\a x)
     inline BoundaryVector C(const Scalar& x) {
-        BoundaryVector y = _model->C( x );
+        BoundaryVector y = _model.C( x );
         return y;
     }
     
     /// Compute \a y = C(\a x)
     inline void C(const Scalar& x, BoundaryVector& y ) {
-        y = _model->C( x );
+        y = _model.C( x );
     }
     
     /// Compute \a y = M(\a f), where \f$ M = C A^{-1} B \f$.
@@ -136,8 +136,8 @@ protected:
     ) = 0;
     
     /// Return a pointer to the associated geometry
-    inline const Geometry* getGeometry() {
-        return _model->getGeometry();
+    inline const Geometry& getGeometry() {
+        return _model.getGeometry();
     }
 
 //
@@ -145,7 +145,7 @@ protected:
 //
 private:
 	double _alpha;
-	const NavierStokesModel* _model;
+	const NavierStokesModel& _model;
     Scalar _eigenvaluesOfAinv;	
 };
 

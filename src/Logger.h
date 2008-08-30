@@ -10,16 +10,17 @@ namespace ibpm {
 class Output;
 
 /*!
-\file Logger.h
-\class Logger
+    \file Logger.h
+    \class Logger
+    
+    \brief Maintain a list of output routines, and call them when specified.
+    
+    \author Clancy Rowley
+    \date 21 Aug 2008
 
-\brief Maintain a list of output routines, and call them when specified.
-
-\author Clancy Rowley
-\author $LastChangedBy: $
-\date 21 Aug 2008
-\date $LastChangedDate: $
-\version $Revision: $
+    \author $LastChangedBy$
+    \date $LastChangedDate$
+    \version $Revision$
 */
 
 class Logger {

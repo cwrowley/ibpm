@@ -25,7 +25,7 @@ namespace ibpm {
 TimeStepper::TimeStepper(
     const NavierStokesModel& model,
     double timestep) :
-    _model(&model),
+    _model(model),
     _timestep(timestep) {
 }
 
@@ -34,12 +34,12 @@ ProjectionSolver* TimeStepper::createSolver(double alpha) {
     //      If so, return a CholeskySolver
     //      If not, return a ConjugateGradientSolver
     
-    if ( _model->getGeometry()->isStationary() ) {
-        return new CholeskySolver( *_model, alpha );
+    if ( _model.getGeometry().isStationary() ) {
+        return new CholeskySolver( _model, alpha );
     }
     else {
         double tol = 1e-7;
-        return new ConjugateGradientSolver( *_model, alpha, tol );    
+        return new ConjugateGradientSolver( _model, alpha, tol );    
     }
 }
 

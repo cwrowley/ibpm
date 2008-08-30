@@ -28,7 +28,7 @@ CholeskySolver::CholeskySolver(
     double alpha
     ) :
     ProjectionSolver( model, alpha ),
-    _numPoints( model.getGeometry()->getNumPoints() ),
+    _numPoints( model.getGeometry().getNumPoints() ),
     _size( 2 * _numPoints ),
     _lower( _size ),
     _diagonal( _size ) {

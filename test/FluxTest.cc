@@ -6,25 +6,25 @@
 using namespace ibpm;
 
 #define EXPECT_ALL_X_EQUAL(a,b)           \
-	for ( int i=0; i<_nx+1; ++i ) {       \
+    for ( int i=0; i<_nx+1; ++i ) {       \
         for ( int j=0; j<_ny; ++j ) {     \
-		    EXPECT_DOUBLE_EQ( (a), (b) ); \
+            EXPECT_DOUBLE_EQ( (a), (b) ); \
         }                                 \
-	}
+    }
 
 #define EXPECT_ALL_X_NEAR(a,b,tol)        \
-	for ( int i=0; i<_nx+1; ++i ) {       \
+    for ( int i=0; i<_nx+1; ++i ) {       \
         for ( int j=0; j<_ny; ++j ) {     \
-		    EXPECT_NEAR( (a), (b), tol ); \
+            EXPECT_NEAR( (a), (b), tol ); \
         }                                 \
-	}
+    }
 
 #define EXPECT_ALL_Y_EQUAL(a,b)           \
-	for ( int i=0; i<_nx; ++i ) {         \
+    for ( int i=0; i<_nx; ++i ) {         \
         for ( int j=0; j<_ny+1; ++j ) {   \
-		    EXPECT_DOUBLE_EQ( (a), (b) ); \
+            EXPECT_DOUBLE_EQ( (a), (b) ); \
         }                                 \
-	}
+    }
 
 class FluxTest : public testing::Test {
 protected:
@@ -35,41 +35,41 @@ protected:
         _f(_grid),
         _g(_grid)
     {
-		for (int i=0; i<_nx+1; ++i) {
-			for (int j=0; j<_ny; ++j) {
-				_f(X,i,j) = fx(i,j);
-				_g(X,i,j) = gx(i,j);
-			}
-		}
-		for (int i=0; i<_nx; ++i) {
-			for (int j=0; j<_ny+1; ++j) {
-				_f(Y,i,j) = fy(i,j);
-				_g(Y,i,j) = gy(i,j);
-			}
-		}
+        for (int i=0; i<_nx+1; ++i) {
+            for (int j=0; j<_ny; ++j) {
+                _f(X,i,j) = fx(i,j);
+                _g(X,i,j) = gx(i,j);
+            }
+        }
+        for (int i=0; i<_nx; ++i) {
+            for (int j=0; j<_ny+1; ++j) {
+                _f(Y,i,j) = fy(i,j);
+                _g(Y,i,j) = gy(i,j);
+            }
+        }
     }
     
-	inline double fx(int i, int j) {
-		return i * _nx + j;
-	}
-	
-	inline double fy(int i, int j) {
-		return j * _ny - i;
-	}
+    inline double fx(int i, int j) {
+        return i * _nx + j;
+    }
+    
+    inline double fy(int i, int j) {
+        return j * _ny - i;
+    }
 
-	inline double gx(int i, int j) {
-		return i + 3*j;
-	}
+    inline double gx(int i, int j) {
+        return i + 3*j;
+    }
 
-	inline double gy(int i, int j) {
-		return i*j - 10;
-	}
-	
-	inline double f(int i, int j) {
-		return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos(j) * (_ny + 1);
-	}
+    inline double gy(int i, int j) {
+        return i*j - 10;
+    }
+    
+    inline double f(int i, int j) {
+        return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos(j) * (_ny + 1);
+    }
 
-	int _nx;
+    int _nx;
     int _ny;
     Grid _grid;
     Flux _f;
@@ -77,122 +77,122 @@ protected:
 };
 
 TEST_F(FluxTest, Assignment) {
-	_f(X,1,3) = 73;
-	EXPECT_DOUBLE_EQ(_f(X,1,3), 73 );
+    _f(X,1,3) = 73;
+    EXPECT_DOUBLE_EQ(_f(X,1,3), 73 );
 }
 
 TEST_F(FluxTest, CopyConstructor) {
-	Flux h = _f;
+    Flux h = _f;
     _f = 0.;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) );
+    EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) );
 }
 
 TEST_F(FluxTest, CopyFromDouble) {
-	double a = 7;
-	_f = a;
-	EXPECT_ALL_X_EQUAL( _f(X,i,j), a );
-	EXPECT_ALL_Y_EQUAL( _f(Y,i,j), a );
+    double a = 7;
+    _f = a;
+    EXPECT_ALL_X_EQUAL( _f(X,i,j), a );
+    EXPECT_ALL_Y_EQUAL( _f(Y,i,j), a );
 }
 
 TEST_F(FluxTest, UnaryMinus) {
-	Flux h = -_f;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), -fx(i,j) );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), -fy(i,j) );
+    Flux h = -_f;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), -fx(i,j) );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), -fy(i,j) );
 }
 
 TEST_F(FluxTest, PlusEqualsFlux) {
-	_g += _f;
-	EXPECT_ALL_X_EQUAL( _g(X,i,j), fx(i,j) + gx(i,j) );
-	EXPECT_ALL_Y_EQUAL( _g(Y,i,j), fy(i,j) + gy(i,j) );
+    _g += _f;
+    EXPECT_ALL_X_EQUAL( _g(X,i,j), fx(i,j) + gx(i,j) );
+    EXPECT_ALL_Y_EQUAL( _g(Y,i,j), fy(i,j) + gy(i,j) );
 }
 
 TEST_F(FluxTest, PlusEqualsDouble) {
-	_g += 7;
-	EXPECT_ALL_X_EQUAL( _g(X,i,j), gx(i,j) + 7 );
-	EXPECT_ALL_Y_EQUAL( _g(Y,i,j), gy(i,j) + 7 );
+    _g += 7;
+    EXPECT_ALL_X_EQUAL( _g(X,i,j), gx(i,j) + 7 );
+    EXPECT_ALL_Y_EQUAL( _g(Y,i,j), gy(i,j) + 7 );
 }
 
 TEST_F(FluxTest, MinusEqualsFlux) {
-	_g -= _f;
-	EXPECT_ALL_X_EQUAL( _g(X,i,j), gx(i,j) - fx(i,j) );
-	EXPECT_ALL_Y_EQUAL( _g(Y,i,j), gy(i,j) - fy(i,j) );
+    _g -= _f;
+    EXPECT_ALL_X_EQUAL( _g(X,i,j), gx(i,j) - fx(i,j) );
+    EXPECT_ALL_Y_EQUAL( _g(Y,i,j), gy(i,j) - fy(i,j) );
 }
 
 TEST_F(FluxTest, MinusEqualsDouble) {
-	_g -= 7;
-	EXPECT_ALL_X_EQUAL( _g(X,i,j), gx(i,j) - 7 );
-	EXPECT_ALL_Y_EQUAL( _g(Y,i,j), gy(i,j) - 7 );
+    _g -= 7;
+    EXPECT_ALL_X_EQUAL( _g(X,i,j), gx(i,j) - 7 );
+    EXPECT_ALL_Y_EQUAL( _g(Y,i,j), gy(i,j) - 7 );
 }
 
 TEST_F(FluxTest, FluxPlusFlux) {
-	Flux h = _f + _g;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) + gx(i,j) );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) + gy(i,j) );
+    Flux h = _f + _g;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) + gx(i,j) );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) + gy(i,j) );
 }
 
 TEST_F(FluxTest, FluxPlusDouble) {
-	Flux h = _f + 7;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) + 7 );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) + 7 );		
+    Flux h = _f + 7;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) + 7 );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) + 7 );        
 }
 
 TEST_F(FluxTest, DoublePlusFlux) {
-	Flux h = 7 + _f;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) + 7 );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) + 7 );		
+    Flux h = 7 + _f;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) + 7 );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) + 7 );        
 }
 
 TEST_F(FluxTest, FluxMinusFlux) {
-	Flux h = _f - _g;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) - gx(i,j) );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) - gy(i,j) );
+    Flux h = _f - _g;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) - gx(i,j) );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) - gy(i,j) );
 }
 
 TEST_F(FluxTest, FluxMinusDouble) {
-	Flux h = _f - 7;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) - 7 );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) - 7 );		
+    Flux h = _f - 7;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) - 7 );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) - 7 );        
 }
 
 TEST_F(FluxTest, DoubleMinusFlux) {
-	Flux h = 7 - _f;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), 7 - fx(i,j) );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), 7 - fy(i,j) );		
+    Flux h = 7 - _f;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), 7 - fx(i,j) );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), 7 - fy(i,j) );        
 }
 
 TEST_F(FluxTest, TimesEqualsDouble) {
-	_f *= 3;
-	EXPECT_ALL_X_EQUAL( _f(X,i,j), 3 * fx(i,j) );
-	EXPECT_ALL_Y_EQUAL( _f(Y,i,j), 3 * fy(i,j) );
+    _f *= 3;
+    EXPECT_ALL_X_EQUAL( _f(X,i,j), 3 * fx(i,j) );
+    EXPECT_ALL_Y_EQUAL( _f(Y,i,j), 3 * fy(i,j) );
 }
 
 TEST_F(FluxTest, DivEqualsDouble) {
-	_f /= 3.;
-	EXPECT_ALL_X_EQUAL( _f(X,i,j), fx(i,j) / 3. );
-	EXPECT_ALL_Y_EQUAL( _f(Y,i,j), fy(i,j) / 3. );
+    _f /= 3.;
+    EXPECT_ALL_X_EQUAL( _f(X,i,j), fx(i,j) / 3. );
+    EXPECT_ALL_Y_EQUAL( _f(Y,i,j), fy(i,j) / 3. );
 }
 
 TEST_F(FluxTest, FluxTimesDouble) {
-	double a = 5;
-	Flux h = _f * a;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) * a );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) * a );		
+    double a = 5;
+    Flux h = _f * a;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) * a );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) * a );        
 }
 
 TEST_F(FluxTest, DoubleTimesFlux) {
-	double a = 5;
-	Flux h = a * _f;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) * a );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) * a );		
+    double a = 5;
+    Flux h = a * _f;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) * a );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) * a );        
 }
 
 TEST_F(FluxTest, FluxDivDouble) {
-	double a = 5;
-	Flux h = _f / a;
-	EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) / a );
-	EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) / a );		
-}	
+    double a = 5;
+    Flux h = _f / a;
+    EXPECT_ALL_X_EQUAL( h(X,i,j), fx(i,j) / a );
+    EXPECT_ALL_Y_EQUAL( h(Y,i,j), fy(i,j) / a );        
+}   
 
 TEST_F(FluxTest, FluxCoordinates) {
     EXPECT_ALL_X_EQUAL( _f.x(X,i), _grid.getXEdge(i) );
