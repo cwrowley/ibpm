@@ -12,10 +12,10 @@
 // Clancy Rowley
 // 22 Aug 2008
 //
-// $Revision: 88 $
-// $Date: 2008-08-22 11:26:17 -0700 (Fri, 22 Aug 2008) $
-// $Author: cwrowley $
-// $HeadURL: svn+ssh://zion.princeton.edu/ibpm/trunk/src/ibpm.cc $
+// $Revision$
+// $Date$
+// $Author$
+// $HeadURL$
 
 #include <iostream>
 #include "Grid.h"
