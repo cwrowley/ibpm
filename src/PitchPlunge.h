@@ -5,6 +5,8 @@
 #include "TangentSE2.h"
 #include <math.h>
 
+namespace ibpm {
+
 /*!
     \file PitchPlunge.h
     \class PitchPlunge
@@ -58,5 +60,6 @@ private:
     double _plungeFreq;
 };
 
+} // namespace ibpm
 
 #endif /* _PITCHPLUNGE_H_ */

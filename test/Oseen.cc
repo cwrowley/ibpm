@@ -27,6 +27,7 @@
 #include <math.h>
 
 using namespace std;
+using namespace ibpm;
 
 void initializeOseenVortex(
     double Reynolds,

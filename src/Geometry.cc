@@ -12,11 +12,11 @@
 // $LastChangedBy$
 // $HeadURL:// $Header$
 
-
-
 #include "Geometry.h"
 #include "RigidBody.h"
 #include "Regularizer.h"
+
+namespace ibpm {
 
 Geometry::Geometry() {
     _numPoints = 0;
@@ -91,3 +91,5 @@ void Geometry::load(const istream& in) {
 void Geometry::setRegularizer(Regularizer& reg) const {
     _regularizer = &reg;
 }
+
+} // namespace ibpm

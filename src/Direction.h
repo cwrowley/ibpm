@@ -1,6 +1,8 @@
 #ifndef _DIRECTION_H_
 #define _DIRECTION_H_
 
+namespace ibpm {
+
 /*!
     \file Direction.h
 
@@ -23,5 +25,7 @@ inline Direction operator++(Direction& dir, int) {
 inline Direction operator++(Direction& dir) {
     return dir = (Direction)(dir + 1);
 }
+
+} // namespace ibpm
 
 #endif /* _DIRECTION_H_ */

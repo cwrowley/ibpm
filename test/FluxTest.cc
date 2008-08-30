@@ -3,6 +3,8 @@
 #include <math.h>
 #include <gtest/gtest.h>
 
+using namespace ibpm;
+
 #define EXPECT_ALL_X_EQUAL(a,b)           \
 	for ( int i=0; i<_nx+1; ++i ) {       \
         for ( int j=0; j<_ny; ++j ) {     \

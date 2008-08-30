@@ -20,6 +20,8 @@
 #include <string>
 using namespace std;
 
+namespace ibpm {
+
 OutputRestart::OutputRestart(string formatString) {
     _formatString = formatString;
 }
@@ -36,3 +38,5 @@ bool OutputRestart::doOutput(const State& x) {
     cout << " NOTE: Not actually implemented!" << endl;
     return true;
 }
+
+} // namespace ibpm

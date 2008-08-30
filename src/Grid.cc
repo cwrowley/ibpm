@@ -16,6 +16,8 @@
 #include "Grid.h"
 #include <assert.h>
 
+namespace ibpm {
+
 /// Return the x-coordinate of the center of cell i  (i in 0..m-1)
 double Grid::getXCenter(int i) const {
 	assert(i >= 0);
@@ -48,4 +50,6 @@ double Grid::getYEdge(int j) const {
 double Grid::getArea() const {
 	return _dx * _dx * _nx * _ny;
 }
+
+} // namespace
 

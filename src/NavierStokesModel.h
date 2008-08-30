@@ -11,6 +11,8 @@
 #include "Regularizer.h"
 #include <math.h>
 
+namespace ibpm {
+
 /*!
 \file NavierStokesModel.h
 \class NavierStokesModel
@@ -175,5 +177,6 @@ class LinearizedNavierStokes : public NavierStokesModel {};
 //! Adjoint Navier-Stokes equations, linearized about an equilibrium point.
 class AdjointNavierStokes : public NavierStokesModel {};
 
+} // namespace ibpm
 
 #endif /* _NAVIERSTOKES_H_ */

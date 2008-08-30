@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include <math.h>
 
+using namespace ibpm;
+
 namespace {
     
 const double pi = 4 * atan(1);

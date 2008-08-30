@@ -5,6 +5,8 @@
 #include <string>
 using std::string;
 
+namespace ibpm {
+
 /*!
 \file OutputTecplot.h
 \class OutputTecplot
@@ -33,6 +35,6 @@ private:
     string _title;
 };
 
-
+} // namespace ibpm
 
 #endif /* _OUTPUTTECPLOT_H_ */

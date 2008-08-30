@@ -10,6 +10,8 @@ using namespace std;
 
 BZ_USING_NAMESPACE(blitz)
 
+namespace ibpm {
+
 class Scalar;
 
 /*!
@@ -340,5 +342,6 @@ inline Flux operator*(double a, const Flux& f) {
 	return g;
 }
 
+} // namespace ibpm
 
 #endif /* _FLUX_H_ */

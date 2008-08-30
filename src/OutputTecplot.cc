@@ -22,6 +22,8 @@
 #include <vector>
 using namespace std;
 
+namespace ibpm {
+
 OutputTecplot::OutputTecplot( string filename, string title ) {
     _filename = filename;
     _title = title;
@@ -153,3 +155,5 @@ bool writeTecplotFileASCII(
     fclose(fp);
     return true;
 }
+
+} // namespace ibpm

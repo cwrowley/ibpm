@@ -7,6 +7,8 @@
 #include "Scalar.h"
 #include "BoundaryVector.h"
 
+namespace ibpm {
+
 /*!
 	\file State.h
 	\class State
@@ -40,5 +42,7 @@ struct State {
 	Scalar gamma;
 	BoundaryVector f;
 };
+
+} // namespace ibpm
 
 #endif /* _STATE_H_ */

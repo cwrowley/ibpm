@@ -21,6 +21,8 @@
 #include "VectorOperations.h"
 #include <fftw3.h>
 
+namespace ibpm {
+
 // Return the curl of Flux q, as a Scalar object
 Scalar Curl(const Flux& q) { 
     const Grid& grid = q.getGrid();
@@ -340,4 +342,6 @@ void VelocityToFlux(const Scalar& u, const Scalar& v, Flux& q) {
 void FluxToVelocity(const Flux& q, Scalar& u, Scalar& v) {
     FluxToXVelocity( q, u );
     FluxToYVelocity( q, v );
+}
+
 }

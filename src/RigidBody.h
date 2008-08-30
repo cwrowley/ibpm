@@ -8,9 +8,7 @@
 
 using namespace std;
 
-// using std::istream;
-// using std::ostream;
-// using std::strin
+namespace ibpm {
 
 class BoundaryVector;
 class Motion;
@@ -130,5 +128,7 @@ struct Point {
     double x;
     double y;
 };
+
+} // namespace ibpm
 
 #endif /* _RIGIDBODY_H_ */

@@ -18,8 +18,9 @@
 #include "NavierStokesModel.h"
 #include "ProjectionSolver.h"
 
-// Constructor: initialize private data for eigenvalues of Ainv
+namespace ibpm {
 
+// Constructor: initialize private data for eigenvalues of Ainv
 ProjectionSolver::ProjectionSolver(
     const NavierStokesModel& model,
     double alpha) :
@@ -65,3 +66,5 @@ void ProjectionSolver::solve(
     Scalar Ainv_B_f = Ainv( Bf );
     gamma = gammaStar - Ainv_B_f;
 }
+
+} // namespace ibpm

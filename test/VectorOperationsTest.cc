@@ -6,6 +6,8 @@
 #include "SingleWavenumber.h"
 #include <gtest/gtest.h>
 
+using namespace ibpm;
+
 namespace {
 
 class VectorOperationsTest : public testing::Test {

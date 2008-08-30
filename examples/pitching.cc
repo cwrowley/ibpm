@@ -10,14 +10,10 @@
 // $HeadURL$
 
 #include <iostream>
-#include "NavierStokesModel.h"
-#include "RungeKutta2.h"
-#include "Logger.h"
-#include "OutputTecplot.h"
-#include "RigidBody.h"
-#include "PitchPlunge.h"
+#include "ibpm.h"
 
 using namespace std;
+using namespace ibpm;
 
 int main(int argc, char* argv[]) {
     cout << "Pitching flat plate example\n";

@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 using namespace std;
+using namespace ibpm;
 
 double tol = 1e-14;
 double lowtol = 1e-5;

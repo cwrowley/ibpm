@@ -5,6 +5,8 @@
 #include "BoundaryVector.h"
 #include "NavierStokesModel.h"
 
+namespace ibpm {
+
 /*!
 \file ProjectionSolver.h
 \class ProjectionSolver
@@ -146,5 +148,7 @@ private:
 	const NavierStokesModel* _model;
     Scalar _eigenvaluesOfAinv;	
 };
+
+} // namespace ibpm
 
 #endif /* _PROJECTIONSOLVER_H_ */

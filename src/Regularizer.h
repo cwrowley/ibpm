@@ -5,6 +5,8 @@
 #include "Flux.h"
 #include "BoundaryVector.h"
 
+namespace ibpm {
+
 class Grid;
 class Geometry;
 
@@ -73,5 +75,7 @@ private:
     
     vector<Association> _neighbors;
 };
+
+} // namespace ibpm
 
 #endif /* _REGULARIZER_H_ */

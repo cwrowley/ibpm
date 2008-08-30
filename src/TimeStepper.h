@@ -1,6 +1,8 @@
 #ifndef _TIMESTEPPER_H_
 #define _TIMESTEPPER_H_
 
+namespace ibpm {
+
 class NavierStokesModel;
 class ProjectionSolver;
 class State;
@@ -70,5 +72,6 @@ protected:
 
 };
 
+}
 
 #endif /* _TIMESTEPPER_H_ */

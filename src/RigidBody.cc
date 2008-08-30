@@ -18,7 +18,7 @@
 // $Revision$
 // $LastChangedDate$
 // $LastChangedBy$
-// $HeadURL:// $Header$
+// $HeadURL$
 
 #include "Grid.h"
 #include "Direction.h"
@@ -26,6 +26,8 @@
 #include "RigidBody.h"
 #include "TangentSE2.h"
 #include "Motion.h"
+
+namespace ibpm {
 
 RigidBody::RigidBody() {
     _xCenter = 0;
@@ -161,3 +163,5 @@ void RigidBody::moveBody(double time) const {
         _currentVelocities.push_back(vel);
     }
 }
+
+} // namespace ibpm

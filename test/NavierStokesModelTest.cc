@@ -3,7 +3,9 @@
 #include "NavierStokesModel.h"
 #include <gtest/gtest.h>
 #include <iostream>
+
 using namespace std;
+using namespace ibpm;
 
 namespace {
 

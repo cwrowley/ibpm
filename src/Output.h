@@ -1,6 +1,8 @@
 #ifndef _OUTPUT_H_
 #define _OUTPUT_H_
 
+namespace ibpm {
+
 class State;
 
 /*!
@@ -35,5 +37,7 @@ public:
     virtual bool doOutput(const State& x) = 0;
     
 };
+
+} // namespace ibpm
 
 #endif /* _OUTPUT_H_ */

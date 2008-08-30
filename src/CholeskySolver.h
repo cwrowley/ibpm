@@ -6,6 +6,8 @@
 
 BZ_USING_NAMESPACE(blitz)
 
+namespace ibpm {
+
 /*!
     \file CholeskySolver.h
     \class CholeskySolver
@@ -64,5 +66,6 @@ private:
     void computeFactorization( const Array<double,2>& M );
 };
 
+} // namespace ibpm
 
 #endif /* _CHOLESKYSOLVER_H_ */

@@ -7,7 +7,7 @@
 
 BZ_USING_NAMESPACE(blitz)
 
-//class Flux;
+namespace ibpm {
 
 /*!
 	\file Scalar.h
@@ -282,5 +282,7 @@ inline Scalar operator/(double a, Scalar& f) {
 	g /= f;
 	return g;
 }
+
+} // namespace ibpm
 
 #endif /* _SCALAR_H_ */

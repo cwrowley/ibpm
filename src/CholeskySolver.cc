@@ -17,7 +17,10 @@
 #include "NavierStokesModel.h"
 #include "assert.h"
 #include <iostream>
+
 using namespace std;
+
+namespace ibpm {
 
 // Allocate memory for the Cholesky factorization, but do not compute it
 CholeskySolver::CholeskySolver(
@@ -124,3 +127,5 @@ void CholeskySolver::Minv(
         x(i) = sum / _diagonal(i);
     }
 }
+
+} // namespace ibpm

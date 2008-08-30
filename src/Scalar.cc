@@ -11,7 +11,7 @@
 // $Revision$
 // $LastChangedDate$
 // $LastChangedBy$
-// $HeadURL:// $Header$
+// $HeadURL$
 
 #include "Scalar.h"
 #include "Flux.h"
@@ -19,6 +19,8 @@
 #include <blitz/array.h>
 #include <iostream>
 using namespace std;
+
+namespace ibpm {
 
 Scalar& Scalar::laplacian(const Scalar& f) {
 	// WORK HERE
@@ -42,3 +44,5 @@ void Scalar::print() const {
     }
     
 }
+
+} // namespace

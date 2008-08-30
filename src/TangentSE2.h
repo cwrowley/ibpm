@@ -3,6 +3,8 @@
 
 #include <math.h>
 
+namespace ibpm {
+
 /*!
     \file TangentSE2.h
     \class TangentSE2
@@ -116,5 +118,6 @@ private:
     double _thetadot;
 };
 
+}
 
 #endif /* _TANGENTSE2_H_ */

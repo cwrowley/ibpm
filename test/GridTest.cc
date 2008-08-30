@@ -1,6 +1,8 @@
 #include "Grid.h"
 #include <gtest/gtest.h>
 
+using namespace ibpm;
+
 namespace {
 
 double tol = 1e-14;

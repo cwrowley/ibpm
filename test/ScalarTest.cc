@@ -2,6 +2,8 @@
 #include "Scalar.h"
 #include <gtest/gtest.h>
 
+using namespace ibpm;
+
 namespace {
 
 class ScalarTest : public testing::Test {

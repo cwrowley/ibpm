@@ -1,6 +1,8 @@
 #ifndef _MOTION_H_
 #define _MOTION_H_
 
+namespace ibpm {
+
 class TangentSE2;
 
 /*!
@@ -29,5 +31,7 @@ public:
     /// (an element of TSE(2) at the specified time
     virtual TangentSE2 getTransformation(double time) const = 0;
 };
+
+} // namespace
 
 #endif /* _MOTION_H_ */

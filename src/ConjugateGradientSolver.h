@@ -1,10 +1,13 @@
 #ifndef _CONJUGATEGRADIENTSOLVER_H_
 #define _CONJUGATEGRADIENTSOLVER_H_
 
+#include <math.h>
+
+namespace ibpm {
+
 class ProjectionSolver;
 class NavierStokesModel;
 class BoundaryVector;
-#include <math.h>
 
 /*!
     \file ConjugateGradientSolver.h
@@ -51,6 +54,8 @@ protected:
 private:
     double _toleranceSquared;
 };
+
+} // namespace ibpm
 
 #endif /* _CONJUGATEGRADIENTSOLVER_H_ */
 

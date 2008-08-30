@@ -12,19 +12,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "Grid.h"
-#include "RigidBody.h"
-#include "Geometry.h"
-#include "NavierStokesModel.h"
-#include "Euler.h"
-#include "RungeKutta2.h"
-#include "State.h"
-#include "Logger.h"
-#include "OutputTecplot.h"
-#include "PitchPlunge.h"
-#include "VectorOperations.h"
+#include "ibpm.h"
 
 using namespace std;
+using namespace ibpm;
 
 int main(int argc, char* argv[]) {
     cout << "Plunging flat plate example\n";

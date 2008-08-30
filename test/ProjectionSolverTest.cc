@@ -10,6 +10,8 @@
 #include "SingleWavenumber.h"
 #include <gtest/gtest.h>
 
+using namespace ibpm;
+
 namespace {
 
 const double tolerance = 1e-10;

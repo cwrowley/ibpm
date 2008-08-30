@@ -14,6 +14,7 @@
 
 #include "NavierStokesModel.h"
 
+namespace ibpm {
 
 NavierStokesModel::NavierStokesModel(
     const Grid& grid,
@@ -62,3 +63,5 @@ NavierStokesModel::NavierStokesModel(
 }
 
 NavierStokesModel::~NavierStokesModel() {}
+
+} // namespace ibpm

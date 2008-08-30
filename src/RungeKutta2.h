@@ -6,6 +6,8 @@
 #include "Geometry.h"
 #include "Grid.h"
 
+namespace ibpm {
+
 /*!
     \file RungeKutta2.h
     \class RungeKutta2
@@ -43,6 +45,7 @@ private:
     State _x1;
 };
 
+} // namespace ibpm
 
 #endif /* _RUNGEKUTTA2_H_ */
 

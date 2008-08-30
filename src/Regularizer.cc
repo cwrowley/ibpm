@@ -18,9 +18,9 @@
 #include "Geometry.h"
 #include "Flux.h"
 #include <vector>
-//#include <math>
+#include <math.h>
 
-namespace {
+namespace ibpm {
 
 Regularizer::Regularizer(const Grid& grid, const Geometry& geometry) :
     _grid(grid),

@@ -1,4 +1,8 @@
 // SingleWavenumber.h - routine for initializing single-wavenumber fields
+#include "Grid.h"
+#include "Scalar.h"
+
+using namespace ibpm;
 
 // Set the output Scalar f equal to sin(kx * x) * sin(ky * y)
 // with the specified wavenumbers in x and y

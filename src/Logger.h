@@ -5,6 +5,8 @@
 #include <vector>
 using namespace std;
 
+namespace ibpm {
+
 class Output;
 
 /*!
@@ -54,5 +56,7 @@ private:
 };
 
 #undef LOOP_OVER_ALL_OUTPUTS
+
+} // namespace ibpm
 
 #endif /* _LOGGER_H_ */

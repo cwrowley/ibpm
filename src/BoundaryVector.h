@@ -6,6 +6,8 @@
 
 BZ_USING_NAMESPACE(blitz)
 
+namespace ibpm {
+    
 /*!
 	\file BoundaryVector.h
 	\class BoundaryVector
@@ -241,5 +243,7 @@ inline double InnerProduct(BoundaryVector& x, BoundaryVector& y) {
     // Implementation using Blitz arrays
     return sum(x._data * y._data);
 }
+
+} // namespace ibpm
 
 #endif /* _BOUNDARYVECTOR_H_ */

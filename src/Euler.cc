@@ -21,6 +21,8 @@
 #include "TimeStepper.h"
 #include "Euler.h"
 
+namespace ibpm {
+
 Euler::Euler(const NavierStokesModel& model, double timestep) :
     TimeStepper(model, timestep),
     _linearTermEigenvalues( *(_model->getLambda()) ) {
@@ -61,3 +63,5 @@ void Euler::advance(State& x) {
     x.time += _timestep;
     ++x.timestep;
 }
+
+} // namespace ibpm

@@ -17,7 +17,7 @@
 #include "ProjectionSolver.h"
 #include "ConjugateGradientSolver.h"
 
-namespace {
+namespace ibpm {
 
 const int MAX_ITERATIONS = 3000;
 
@@ -63,4 +63,4 @@ void ConjugateGradientSolver::Minv(
     }
 }
 
-} // namespace
+} // namespace ibpm

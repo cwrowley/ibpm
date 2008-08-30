@@ -5,6 +5,8 @@
 #include <string>
 using std::string;
 
+namespace ibpm {
+
 /*!
 \file OutputRestart.h
 \class OutputRestart
@@ -31,5 +33,6 @@ private:
     string _formatString;
 };
 
+} // namespace ibpm
 
 #endif /* _OUTPUTRESTART_H_ */

@@ -3,6 +3,8 @@
 
 #include "TimeStepper.h"
 
+namespace ibpm {
+
 /*!
     \file Euler.h
     \class Euler
@@ -38,6 +40,7 @@ private:
     Scalar _linearTermEigenvalues;
 };
 
+} // namespace ibpm
 
 #endif /* _EULER_H_ */
 

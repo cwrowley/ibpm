@@ -23,6 +23,8 @@
 #include "State.h"
 #include "RungeKutta2.h"
 
+namespace ibpm {
+
 RungeKutta2::RungeKutta2(const NavierStokesModel& model, double timestep) :
     TimeStepper(model, timestep),
     _linearTermEigenvalues( *model.getLambda() ),
@@ -89,3 +91,5 @@ void RungeKutta2::advance(State& x) {
     x.time += _timestep;
     ++x.timestep;
 }
+
+} // namespace ibpm

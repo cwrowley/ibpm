@@ -3,6 +3,8 @@
 #include "TangentSE2.h"
 #include <gtest/gtest.h>
 
+using namespace ibpm;
+
 TEST( Motion, FixedPosition ) {
     double x = 1;
     double y = 2;

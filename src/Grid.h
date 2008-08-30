@@ -1,6 +1,8 @@
 #ifndef _GRID_H_
 #define _GRID_H_
 
+namespace ibpm {
+
 /*!
 	\file Grid.h
 	\class Grid
@@ -65,5 +67,7 @@ private:
 	double _xOffset;
 	double _yOffset;
 };
+
+} // namespace
 
 #endif /* _GRID_H_ */

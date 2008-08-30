@@ -1,6 +1,8 @@
 #ifndef _VECTOROPERATIONS_H_
 #define _VECTOROPERATIONS_H_
 
+namespace ibpm {
+
 class Scalar;
 class Flux;
 class BoundaryVector;
@@ -93,5 +95,6 @@ void VelocityToFlux(const Scalar& u, const Scalar& v, Flux& q);
 /// \brief Convert fluxes through edges to u- and v-velocities at vertices
 void FluxToVelocity(const Flux& q, Scalar& u, Scalar& v);
 
+} // namespace ibpm
 
 #endif /* _VECTOROPERATIONS_H_ */

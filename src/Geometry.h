@@ -6,6 +6,8 @@
 #include <vector>
 using namespace std;
 
+namespace ibpm {
+
 class RigidBody;
 class Regularizer;
 
@@ -57,5 +59,7 @@ private:
     bool _isStationary;
     mutable Regularizer* _regularizer;
 };
+
+} // namespace
 
 #endif /* _GEOMETRY_H_ */

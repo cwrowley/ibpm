@@ -1,6 +1,8 @@
 #include "BoundaryVector.h"
 #include <gtest/gtest.h>
 
+using namespace ibpm;
+
 #define EXPECT_ALL_EQUAL(a,b) \
 	for ( int i=0; i<_n; ++i ) { \
 		EXPECT_DOUBLE_EQ( (a), (b) ); \

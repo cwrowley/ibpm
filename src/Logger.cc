@@ -6,6 +6,8 @@
 
 using namespace std;
 
+namespace ibpm {
+
 #define LOOP_OVER_ALL_OUTPUTS( a )                                          \
     vector<Entry>::iterator entry;                                          \
     bool successful = true;                                                 \
@@ -54,3 +56,5 @@ bool Logger::cleanup() {
 }
 
 #undef LOOP_OVER_ALL_OUTPUTS
+
+} // namespace

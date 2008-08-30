@@ -4,6 +4,8 @@
 #include "Motion.h"
 #include "TangentSE2.h"
 
+namespace ibpm {
+
 /*!
     \file FixedPosition.h
     \class FixedPosition
@@ -47,5 +49,6 @@ private:
     double _theta;
 };
 
+} // namespace ibpm
 
 #endif /* _FIXEDPOSITION_H_ */

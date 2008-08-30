@@ -11,7 +11,7 @@
 // $Revision$
 // $LastChangedDate$
 // $LastChangedBy$
-// $HeadURL:// $Header$
+// $HeadURL$
 
 #include "NavierStokesModel.h"
 #include "Geometry.h"
@@ -19,6 +19,8 @@
 #include "ConjugateGradientSolver.h"
 #include "CholeskySolver.h"
 #include "TimeStepper.h"
+
+namespace ibpm {
 
 TimeStepper::TimeStepper(
     const NavierStokesModel& model,
@@ -40,3 +42,5 @@ ProjectionSolver* TimeStepper::createSolver(double alpha) {
         return new ConjugateGradientSolver( *_model, alpha, tol );    
     }
 }
+
+} // namespace ibpm
