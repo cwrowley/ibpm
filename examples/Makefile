@@ -3,10 +3,10 @@
 # Clancy Rowley
 # Princeton University
 #
-# $Date: 2008-08-29 06:01:14 -0700 (Fri, 29 Aug 2008) $
-# $Revision: 103 $
-# $Author: sbrunton $
-# $HeadURL: svn+ssh://zion.princeton.edu/ibpm/trunk/src/Makefile $
+# $Date$
+# $Revision$
+# $Author$
+# $HeadURL$
 
 include ../src/make.inc
 
@@ -21,6 +21,9 @@ IBPMLIB = ../lib/libibpm.a
 .PHONY:  clean depend
 
 plunging: plunging.o $(IBPMLIB)
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+pitching: pitching.o $(IBPMLIB)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 clean:
