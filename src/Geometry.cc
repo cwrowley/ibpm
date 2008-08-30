@@ -16,9 +16,11 @@
 
 #include "Geometry.h"
 #include "RigidBody.h"
+#include "Regularizer.h"
 
 Geometry::Geometry() {
     _numPoints = 0;
+    _isStationary = true;
 }
 
 Geometry::~Geometry() {}
@@ -45,26 +47,47 @@ BoundaryVector Geometry::getPoints() const {
 
 BoundaryVector Geometry::getVelocities() const {
     BoundaryVector velocities(_numPoints);
-    velocities = 0;
+    vector<RigidBody>::const_iterator body;
+
+    int ind = 0;
+    for (body = _bodies.begin(); body != _bodies.end(); ++body) {
+        BoundaryVector bodyVel = body->getVelocities();
+        for (int bodyInd=0; bodyInd < bodyVel.getNumPoints(); ++bodyInd) {
+            velocities(X,ind) = bodyVel(X,bodyInd);
+            velocities(Y,ind) = bodyVel(Y,bodyInd);
+            ++ind;
+        }
+    }
     return velocities;
 }
 
 bool Geometry::isStationary() const { 
-    // TODO: call the isStationary methods of the associated RigidBodies
-    // or save an instance variable with the value of this flag
-    return true;
+    return _isStationary;
 }
 
 void Geometry::moveBodies(double time) const {
-    // TODO: Update the positions of the associated RigidBodies and
+    // Update the positions and velocities of the associated RigidBodies
+    vector<RigidBody>::const_iterator body;
+    for (body = _bodies.begin(); body != _bodies.end(); ++body) {
+        body->moveBody(time);
+    }
+
     // recompute Regularizer operations
+    if (_regularizer != NULL) {
+        _regularizer->update();
+    }
 }
 
 void Geometry::addBody(const RigidBody& body) {
     _bodies.push_back(body);
     _numPoints += body.getNumPoints();
+    _isStationary = _isStationary && body.isStationary();
 }
 
 void Geometry::load(const istream& in) {
-    
+    // TODO: implement this
+}
+
+void Geometry::setRegularizer(Regularizer& reg) const {
+    _regularizer = &reg;
 }

@@ -1,5 +1,5 @@
-#include "Motion.h"
 #include "FixedPosition.h"
+#include "PitchPlunge.h"
 #include "TangentSE2.h"
 #include <gtest/gtest.h>
 
@@ -12,7 +12,7 @@ TEST( Motion, FixedPosition ) {
     motion = new FixedPosition( x, y, theta );
 
     // Check stationary flag is true
-    EXPECT_EQ( motion->isStationary(), true );
+    EXPECT_EQ( true, motion->isStationary() );
 
     // Check position is correct
     TangentSE2 g = motion->getTransformation(0.);
@@ -28,5 +28,38 @@ TEST( Motion, FixedPosition ) {
     EXPECT_DOUBLE_EQ( adot, 0 );
     EXPECT_DOUBLE_EQ( bdot, 0 );
     EXPECT_DOUBLE_EQ( omegadot, 0 );
+ 
+    delete motion;
+}
+
+TEST( Motion, PitchPlunge ) {
+    double pitchAmp = 2;
+    double plungeAmp = 3;
+    double pitchFreq = 4;
+    double plungeFreq = 5;
+    const double twopi = 8. * atan(1.);
     
+    Motion* motion;
+    motion = new PitchPlunge( pitchAmp, pitchFreq, plungeAmp, plungeFreq );
+    
+    // Check stationary flag is false
+    EXPECT_EQ( false, motion->isStationary() );
+    
+    // Check position is correct
+    TangentSE2 g = motion->getTransformation(0.);
+    double x, y, theta;
+    g.getPosition( x, y, theta );
+    EXPECT_DOUBLE_EQ( 0, x );
+    EXPECT_DOUBLE_EQ( 0, y );
+    EXPECT_DOUBLE_EQ( 0, theta );
+
+    // Check velocity is correct
+    double xdot, ydot, thetadot;
+    // WORK HERE
+    g.getVelocity( xdot, ydot, thetadot );
+    EXPECT_DOUBLE_EQ( 0, xdot );
+    EXPECT_DOUBLE_EQ( plungeAmp * twopi * plungeFreq, ydot );
+    EXPECT_DOUBLE_EQ( pitchAmp * twopi * pitchFreq, thetadot );
+    // TODO: add phase shift to pitch/plunge
+    // TODO: check different points in time
 }

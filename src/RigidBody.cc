@@ -3,6 +3,13 @@
 // Description:
 // Implementation of the RigidBody class
 //
+// The points on the body are stored with respect to a reference configuration
+// in _refPoints
+// 
+// The current locations of the points on the body, defined by the associated 
+// Motion, are contained in _currentPoints, and are updated whenever 
+// moveBodies() is called.
+//
 // Author(s):
 // Clancy Rowley
 //
@@ -17,21 +24,27 @@
 #include "Direction.h"
 #include "BoundaryVector.h"
 #include "RigidBody.h"
-
+#include "TangentSE2.h"
+#include "Motion.h"
 
 RigidBody::RigidBody() {
     _xCenter = 0;
     _yCenter = 0;
+    _isStationary = true;
+    _motion = NULL;
 }
 
 RigidBody::~RigidBody() {}
 
 void RigidBody::addPoint(double x, double y) {
     Point p(x,y);
-    _points.push_back(p);
+    // Add the point to both lists: reference locations and current locations
+    _refPoints.push_back(p);
+    _currentPoints.push_back(p);
+    Point zero(0,0);
+    _currentVelocities.push_back(zero);
 }
 
-/// For now numPoints is determined by circumference/gridspacing
 void RigidBody::addCircle(
     double xc,
     double yc,
@@ -66,14 +79,15 @@ void RigidBody::addLine(
 } 
 
 int RigidBody::getNumPoints() const {
-    return _points.size();
+    return _refPoints.size();
 };
 
 void RigidBody::saveRaw(ostream& out) {
     int n = getNumPoints();
     out << n;
     for(int i=0; i<n; i++) {
-       out << "\n" << setw(10) << _points[i].x << setw(10) << _points[i].y; 	
+       out << "\n" << setw(10) << _refPoints[i].x
+           << setw(10) << _refPoints[i].y; 	
     }
 }
 
@@ -92,15 +106,58 @@ string RigidBody::getName() {
     return _name;
 }
     
+BoundaryVector RigidBody::toBoundaryVector(const vector<Point> list) {
+    int n = list.size();
+    BoundaryVector BVList(n);
+
+    for (int i=0; i<n; ++i) {
+        BVList(X,i) = list[i].x;
+        BVList(Y,i) = list[i].y;
+    }
+    return BVList;
+}
 
 /// Return the list of coordinates for each point on the body
 BoundaryVector RigidBody::getPoints() const {
-    int n = getNumPoints();
-    BoundaryVector pointList(n);
+    return toBoundaryVector( _currentPoints );
+}
 
-    for (int i=0; i<n; ++i) {
-        pointList(X,i) = _points[i].x;
-        pointList(Y,i) = _points[i].y;
+/// Return the list of velocities at each point on the body
+BoundaryVector RigidBody::getVelocities() const {
+    return toBoundaryVector( _currentVelocities );
+}
+
+bool RigidBody::isStationary() const {
+    return _isStationary;
+}
+
+void RigidBody::setMotion(const Motion& motion) {
+    _motion = &motion;
+    _isStationary = motion.isStationary();
+}
+
+// Update the position of the body (_currentPoints) based on the motion
+void RigidBody::moveBody(double time) const {
+    if ( _motion == NULL ) return;
+    TangentSE2 g = _motion->getTransformation(time);
+    _currentPoints.clear();
+    _currentVelocities.clear();
+
+    // for each reference point
+    vector<Point>::const_iterator p;
+    for (p = _refPoints.begin(); p != _refPoints.end(); ++p) {
+        // add the new position to the list of current positions
+        double xnew;
+        double ynew;
+        g.mapPosition(p->x, p->y, xnew, ynew);
+        Point q(xnew,ynew);
+        _currentPoints.push_back(q);
+
+        // add the new velocity to the list of current velocities
+        double u;
+        double v;
+        g.mapVelocity(p->x, p->y, u, v);
+        Point vel(u,v);
+        _currentVelocities.push_back(vel);
     }
-    return pointList;
 }

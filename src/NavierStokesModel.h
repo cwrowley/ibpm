@@ -30,38 +30,38 @@ $HeadURL$
 
 class NavierStokesModel {
 public:
-	/*! \brief Constructor, given a specified grid, geometry, and Reynolds number
-	*/
-	NavierStokesModel(
-		const Grid& grid,
-		const Geometry& geometry,
-		double Reynolds,
-		const Flux& q_potential
+    /*! \brief Constructor, given a specified grid, geometry, and Reynolds number
+    */
+    NavierStokesModel(
+        const Grid& grid,
+        const Geometry& geometry,
+        double Reynolds,
+        const Flux& q_potential
     );
     
     virtual ~NavierStokesModel();
 
-	/// Return a pointer to the associated Geometry
-	inline const Geometry* getGeometry() const { return &_geometry; }
+    /// Return a pointer to the associated Geometry
+    inline const Geometry* getGeometry() const { return &_geometry; }
 
-	/// Return a pointer to the associated Grid
-	inline const Grid* getGrid() const { return &_grid; }
+    /// Return a pointer to the associated Grid
+    inline const Grid* getGrid() const { return &_grid; }
 
-	/// Return a pointer to the eigenvalues of the linear term L
-	inline const Scalar* getLambda() const { return &_linearTermEigenvalues; }
-	
-	/// Transform to eigenvectors of L (discrete sin transform)
-	inline Scalar S(const Scalar& g) const {
+    /// Return a pointer to the eigenvalues of the linear term L
+    inline const Scalar* getLambda() const { return &_linearTermEigenvalues; }
+    
+    /// Transform to eigenvectors of L (discrete sin transform)
+    inline Scalar S(const Scalar& g) const {
         Scalar ghat = SinTransform( g );
         return ghat;
-	}
+    }
 
-	/*! \brief Inverse transform of S.
-	Note that for the discrete sin transform, the S^{-1} should equal S, but
-	in some implementations (e.g. FFTW), these may differ by a normalization
-	constant.
-	*/
-	Scalar Sinv(const Scalar& ghat) const {
+    /*! \brief Inverse transform of S.
+    Note that for the discrete sin transform, the S^{-1} should equal S, but
+    in some implementations (e.g. FFTW), these may differ by a normalization
+    constant.
+    */
+    Scalar Sinv(const Scalar& ghat) const {
         Scalar g = SinTransform( ghat );
         // multiply by normalization factor
         // TODO: keep track of this normalization factor within a class
@@ -71,41 +71,41 @@ public:
         double normalization = 1.0 / ( nx * ny * 4 );
         g *= normalization;
         return g;
-	}
-	
-	/// Convenience form
-	inline Scalar B(const BoundaryVector& f) const {
+    }
+    
+    /// Convenience form
+    inline Scalar B(const BoundaryVector& f) const {
         Scalar gamma( _grid );
         B( f, gamma );
         return gamma;
-	}
+    }
 
-	/// Compute gamma = B(f) as in (14)
-	inline void B(const BoundaryVector& f, Scalar& gamma ) const {
+    /// Compute gamma = B(f) as in (14)
+    inline void B(const BoundaryVector& f, Scalar& gamma ) const {
         Flux q = _regularizer.toGrid( f );
         gamma = Curl( q );
-	}
-	
-	/// Compute f = C(gamma) as in (14)
-	inline BoundaryVector C(const Scalar& gamma) const {
+    }
+    
+    /// Compute f = C(gamma) as in (14)
+    inline BoundaryVector C(const Scalar& gamma) const {
         BoundaryVector f( _geometry.getNumPoints() );
         C( gamma, f );
         return f;
-	}
-	
-	/// Compute f = C(gamma) as in (14)
-	inline void C(const Scalar& gamma, BoundaryVector& f) const {
+    }
+    
+    /// Compute f = C(gamma) as in (14)
+    inline void C(const Scalar& gamma, BoundaryVector& f) const {
         Flux q(_grid);
         computeFluxWithoutBaseFlow( gamma, q );
         f = _regularizer.toBoundary( q );
-	}
-	
-	/*! \brief Compute nonlinear terms y = N(x)
-	Pure virtual function: must be overridden by subclasses.
-	*/
-	virtual Scalar nonlinear(const State& x) const = 0;
-	
-	/// Compute flux q from circulation gamma
+    }
+    
+    /*! \brief Compute nonlinear terms y = N(x)
+    Pure virtual function: must be overridden by subclasses.
+    */
+    virtual Scalar nonlinear(const State& x) const = 0;
+    
+    /// Compute flux q from circulation gamma
     inline void computeFluxWithoutBaseFlow(const Scalar& gamma, Flux& q ) const {
         Scalar streamfunction = gammaToStreamfunction( gamma );
         q = Curl( streamfunction );
@@ -135,12 +135,12 @@ protected:
         psi = Sinv( psi );
         return psi;
     }
-	
+    
 private:
-	const Grid& _grid;
-	const Geometry& _geometry;
+    const Grid& _grid;
+    const Geometry& _geometry;
     Regularizer _regularizer;
-	Scalar _linearTermEigenvalues;
+    Scalar _linearTermEigenvalues;
     Scalar _eigGammaToStreamfunction;
     Flux _baseFlow;
     double _ReynoldsNumber;
@@ -149,23 +149,23 @@ private:
 //! Full nonlinear Navier-Stokes equations.
 class NonlinearNavierStokes : public NavierStokesModel {
 public:
-	NonlinearNavierStokes(
-		const Grid& grid,
-		const Geometry& geometry,
-		double Reynolds,
-		const Flux& q_potential
-	    ) :
+    NonlinearNavierStokes(
+        const Grid& grid,
+        const Geometry& geometry,
+        double Reynolds,
+        const Flux& q_potential
+        ) :
         NavierStokesModel( grid, geometry, Reynolds, q_potential ) {}
 
 
-	/*! \brief Compute nonlinear terms y = N(x)
-	for full nonlinear Navier-Stokes equations
-	*/
-	inline Scalar nonlinear(const State& x) const {
+    /*! \brief Compute nonlinear terms y = N(x)
+    for full nonlinear Navier-Stokes equations
+    */
+    inline Scalar nonlinear(const State& x) const {
         Flux v = CrossProduct( x.q, x.gamma );
         Scalar g = Curl( v );
         return g;
-	};
+    };
     
 };
 

@@ -20,12 +20,14 @@ class TangentSE2;
 
 class Motion {
 public:
+    virtual ~Motion() {};
+    
     /// True if the body is moving (default is False)
-    virtual bool isStationary() { return false; }
+    virtual bool isStationary() const { return false; }
 
     /// Return a Euclidean transformation and its velocity
     /// (an element of TSE(2) at the specified time
-    virtual TangentSE2 getTransformation(double time) = 0;
+    virtual TangentSE2 getTransformation(double time) const = 0;
 };
 
 #endif /* _MOTION_H_ */

@@ -7,6 +7,7 @@
 using namespace std;
 
 class RigidBody;
+class Regularizer;
 
 /*!
 \file Geometry.h
@@ -48,9 +49,13 @@ public:
     
     void load(const istream& in);
     
+    void setRegularizer(Regularizer& reg) const;
+    
 private:
     vector<RigidBody> _bodies;
     int _numPoints;
+    bool _isStationary;
+    mutable Regularizer* _regularizer;
 };
 
 #endif /* _GEOMETRY_H_ */

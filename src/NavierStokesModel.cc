@@ -16,10 +16,10 @@
 
 
 NavierStokesModel::NavierStokesModel(
-	const Grid& grid,
-	const Geometry& geometry,
-	double Reynolds,
-	const Flux& q_potential
+    const Grid& grid,
+    const Geometry& geometry,
+    double Reynolds,
+    const Flux& q_potential
     ) :
     _grid(grid),
     _geometry(geometry),

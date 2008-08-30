@@ -45,27 +45,24 @@ function, with finite support, as in (14) of Taira & Colonius (J Comput Phys,
 
 class Regularizer {
 public:
-	/// Constructor
-    Regularizer(const Grid& grid, const Geometry& geometry) :
-        _grid(grid),
-        _geometry(geometry)
-        {}
-	
-	/// Destructor
+    /// Constructor
+    Regularizer(const Grid& grid, const Geometry& geometry);
+    
+    /// Destructor
     ~Regularizer() {}
-	
-	/// Update operators, for instance when the position of the bodies changes
-	void update();
-	
-	/// Smear boundary data to grid
-	Flux toGrid(const BoundaryVector& u) const;
+    
+    /// Update operators, for instance when the position of the bodies changes
+    void update();
+    
+    /// Smear boundary data to grid
+    Flux toGrid(const BoundaryVector& u) const;
 
-	/// Interpolate grid data to boundary
-	BoundaryVector toBoundary(const Flux& u) const;
+    /// Interpolate grid data to boundary
+    BoundaryVector toBoundary(const Flux& u) const;
 
 private:
-	const Grid& _grid;
-	const Geometry& _geometry;
+    const Grid& _grid;
+    const Geometry& _geometry;
 
     // Associations between BoundaryVector points and nearby Flux values
     struct Association {

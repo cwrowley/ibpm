@@ -34,10 +34,10 @@ public:
         _theta(theta) {    
     }
     
-    bool isStationary() { return true; }
+    bool isStationary() const { return true; }
     
     /// Returns a fixed transformation for all time: (x,y,theta,0,0,0)
-    TangentSE2 getTransformation(double time) {
+    TangentSE2 getTransformation(double time) const {
         return TangentSE2( _x, _y, _theta, 0, 0, 0 );
     }
 

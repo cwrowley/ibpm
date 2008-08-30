@@ -84,7 +84,6 @@ public:
         double& a_new,
         double& b_new
         ) {
-        // TODO: work here
         double cost = cos(_theta);
         double sint = sin(_theta);    
         a_new = _x + a * cost - b * sint;
@@ -99,7 +98,6 @@ public:
         double& u_new,
         double& v_new
         ) {
-        // TODO: work here
         double cost = cos(_theta);
         double sint = sin(_theta);
         u_new = - a * sint * _thetadot - b * cost * _thetadot + _xdot;

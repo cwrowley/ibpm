@@ -28,13 +28,15 @@ TimeStepper::TimeStepper(
 }
 
 ProjectionSolver* TimeStepper::createSolver(double alpha) {
-    // TODO: Check whether all bodies are stationary
+    // Check whether all bodies are stationary
     //      If so, return a CholeskySolver
     //      If not, return a ConjugateGradientSolver
     
-    // double tol = 1e-7;
-    // return new ConjugateGradientSolver( *_model, alpha, tol );
-
-    // For now, just return a CholeskySolver
-    return new CholeskySolver( *_model, alpha );
+    if ( _model->getGeometry()->isStationary() ) {
+        return new CholeskySolver( *_model, alpha );
+    }
+    else {
+        double tol = 1e-7;
+        return new ConjugateGradientSolver( *_model, alpha, tol );    
+    }
 }

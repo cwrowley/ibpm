@@ -77,8 +77,11 @@ public:
     /// Return the list of coordinates for each point on the body
     BoundaryVector getPoints() const;
     
+    /// Return the list of velocities at each point on the body
+    BoundaryVector getVelocities() const;
+    
     /// Return true if the body is not moving in time
-    bool isStationary();
+    bool isStationary() const;
 
     /// Set the evolution of the current body (which may be stationary or not)
     void setMotion(const Motion& motion);
@@ -95,6 +98,9 @@ public:
         y = _yCenter;
     }
     
+    /// Update the position of the body, based on the Motion
+    void moveBody(double time) const;
+    
     /// Set the name of the body
     void setName(string name);
     
@@ -102,10 +108,17 @@ public:
     string getName();
 
 private:
+    static BoundaryVector toBoundaryVector(const vector<Point> list);
+    
+    // data
     string _name;
     double _xCenter;  ///< x-coordinate of center
     double _yCenter;  ///< y-coordinate of center
-    vector<Point> _points;
+    bool _isStationary;
+    vector<Point> _refPoints;
+    mutable vector<Point> _currentPoints;
+    mutable vector<Point> _currentVelocities;
+    const Motion *_motion;
 };
 
 // Define a small class for keeping track of points in 2d

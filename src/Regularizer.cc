@@ -22,6 +22,13 @@
 
 namespace {
 
+Regularizer::Regularizer(const Grid& grid, const Geometry& geometry) :
+    _grid(grid),
+    _geometry(geometry)
+    {
+    _geometry.setRegularizer(*this);
+}
+
 // number of cells over which delta function has support
 const double deltaSupportRadius = 1.5;
 
