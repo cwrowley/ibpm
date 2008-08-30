@@ -18,13 +18,8 @@
 // $HeadURL$
 
 #include <iostream>
-#include "Grid.h"
-#include "Geometry.h"
-#include "NavierStokesModel.h"
-#include "Euler.h"
-#include "State.h"
-#include "OutputTecplot.h"
 #include <math.h>
+#include "ibpm.h"
 
 using namespace std;
 using namespace ibpm;
@@ -161,7 +156,6 @@ void computeExactSolution(
         uTheta *= 1 - exp( -r*r * Reynolds / (4 * time) );
         double theta = atan2( y, x );
         double u = -uTheta * sin(theta);
-        double v =  uTheta * cos(theta);
         exact.q(ind) = u * dx;
     }
     // Y-direction flux
@@ -172,7 +166,6 @@ void computeExactSolution(
         double uTheta = circulation / (2 * PI * r);
         uTheta *= 1 - exp( -r*r * Reynolds / (4 * time) );
         double theta = atan2( y, x );
-        double u = -uTheta * sin(theta);
         double v =  uTheta * cos(theta);
         exact.q(ind) = v * dx;
     }

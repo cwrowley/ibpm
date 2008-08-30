@@ -57,7 +57,14 @@ void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
     }
 }
 
-// 
+// Compute the Cholesky factorization of matrixM
+//    M = L L*
+// where L is lower triangular.
+// Preconditions:
+//      M is symmetric
+// Postconditions:
+//      _lower contains the strictly lower triangular part of L (no diagonal)
+//      _diag  contains the diagonal elements of L
 void CholeskySolver::computeFactorization( const Array<double,2>& matrixM ) {
     
     _lower = matrixM;

@@ -31,8 +31,7 @@ ProjectionSolver::ProjectionSolver(
     // A = (1 - alpha/2 L)
     // Calculate eigenvalues of Ainv
     Scalar eigA = _model.getLambda();
-    eigA *= -_alpha/2;
-    eigA += 1;
+    eigA = (-_alpha / 2) * eigA + 1;
     _eigenvaluesOfAinv = 1 / eigA;
 }
 

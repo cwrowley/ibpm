@@ -24,9 +24,15 @@ IBPMLIB = ../lib/libibpm.a
 
 all: $(TARGETS)
 
-% : %.cc $(IBPMLIB)
+% : %.o $(IBPMLIB)
+	cd ../src && $(MAKE) lib
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-	
+
+%.o : %.cc
+	$(CXX) $(CXXFLAGS) -c $^
+
+% : %.cc
+
 clean:
 	-$(RM) -r *.o $(TARGETS)
 	-$(RM) tecplot/*.plt
