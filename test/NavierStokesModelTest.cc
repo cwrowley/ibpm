@@ -31,7 +31,8 @@ protected:
         double magnitude = 1.;
         double angle = 0.;
         Flux q0 = Flux::UniformFlow( _grid, magnitude, angle );
-        _model = new NonlinearNavierStokes( _grid, _geom, _Reynolds, q0 );        
+        _model = new NonlinearNavierStokes( _grid, _geom, _Reynolds, q0 );
+        _model->init();
     }
 
     Scalar linearTerm(const Scalar& g) {
@@ -139,6 +140,25 @@ TEST_F( NavierStokesModelTest, LinearTerm ) {
             Scalar L_gamma = linearTerm( gamma );
             Scalar LaplacianGamma = Laplacian( gamma );
             EXPECT_ALL_EQ( LaplacianGamma(i,j), L_gamma(i,j) );            
+        }
+    }
+}
+
+// If q = computeFluxWithoutBaseFlow(gamma)
+// then curl(q) should equal omega == gamma / dx^2
+TEST_F( NavierStokesModelTest, GammaToFlux ) {
+    Scalar gamma(_grid);
+    Flux q(_grid);
+    Scalar curlQ(_grid);
+    double dx2 = _grid.getDx() * _grid.getDx();
+    
+    // For a range of wavenumbers
+    for (int xWavenumber = 0; xWavenumber < _nx; ++xWavenumber ) {
+        for (int yWavenumber = 0; yWavenumber < _ny; ++yWavenumber) {
+            InitializeSingleWavenumber( xWavenumber, yWavenumber, gamma );
+            _model->computeFluxWithoutBaseFlow( gamma, q );
+            Curl( q, curlQ );
+            EXPECT_ALL_EQ( gamma(i,j), curlQ(i,j) * dx2 );            
         }
     }
 }

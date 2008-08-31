@@ -33,8 +33,8 @@ int main(int argc, char* argv[]) {
      double drag = 0.;
     
     // Setup grid
-    int nx = 400;
-    int ny = 400;
+    int nx = 200;
+    int ny = 200;
     double length = 4.0;
     double xOffset = -2;
     double yOffset = -2;
@@ -61,13 +61,14 @@ int main(int argc, char* argv[]) {
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
     cout << "Setting up Navier Stokes model..." << flush;
     NonlinearNavierStokes model( grid, geom, Reynolds, q_potential );
-    // model.init();
+    model.init();
     cout << "done" << endl;
 
     // Setup timestepper
     double dt = 0.01;
-    //Euler solver(model, dt);
+    // Euler solver(model, dt);
     RungeKutta2 solver(model, dt);
+    solver.init();
     // Load initial condition
     string icFile = "initial.bin";
     State x(grid, geom);

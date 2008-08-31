@@ -1,6 +1,9 @@
 #ifndef _TIMESTEPPER_H_
 #define _TIMESTEPPER_H_
 
+#include <string>
+using std::string;
+
 namespace ibpm {
 
 class NavierStokesModel;
@@ -44,9 +47,30 @@ public:
     \param[in] model    The associated NavierStokesModel instance
     \param[in] timestep Timestep to use for the advance() routine
     */
-    TimeStepper(const NavierStokesModel& model, double timestep);
+    TimeStepper(NavierStokesModel& model, double timestep);
 
     virtual ~TimeStepper() {}
+
+    /*! \brief Perform initialization, if necessary
+    
+    Calls init() on the associated NavierStokesModel, in addition to
+    initializations needed within TimeStepper
+    */
+    virtual void init();
+    
+    /*! \brief Load the state of the solver from a file (see saveState)
+
+    Return true if successful
+    */
+    virtual void loadState(string filename);
+    
+    /*! \brief Save the state of the solver to the specified file
+
+    For instance, this might be a Cholesky factorization saved to avoid
+    recomputing, or information at a previous timestep for AdamsBashforth.
+    Return true if successful
+    */
+    virtual void saveState(string filename);
 
     /*! \brief Advance the state forward in time.
     
@@ -60,7 +84,7 @@ public:
 //
 protected:
 
-    const NavierStokesModel& _model;
+    NavierStokesModel& _model;
     double _timestep;
 
     /*! \brief Return a new ProjectionSolver of the appropriate type

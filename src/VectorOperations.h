@@ -29,10 +29,12 @@ class BoundaryVector;
 
 The curl is defined only at the interior nodes, and this routine returns zero at the boundary nodes.
 */
-Scalar Curl(const Flux& q);                          
+Scalar Curl(const Flux& q);
+void Curl(const Flux& q, Scalar& gamma );
     
 /// \brief Return the curl of Scalar f, as a Flux object. 
 Flux Curl(const Scalar& f);
+void Curl(const Scalar& f, Flux& q);
     
 /// \brief Return the inner product of Scalar f and Scalar g.
 double InnerProduct( const Scalar& f, const Scalar& g );

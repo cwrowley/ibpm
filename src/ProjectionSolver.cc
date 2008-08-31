@@ -37,6 +37,10 @@ ProjectionSolver::ProjectionSolver(
 
 ProjectionSolver::~ProjectionSolver() {}
 
+// Initialization for this base class done in constructor
+// Subclasses use this for their own initialization, if needed
+void ProjectionSolver::init() {}
+
 // Solve for gamma and f for a system of the form
 //   A gamma + B f = a
 //   C gamma = b

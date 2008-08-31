@@ -55,13 +55,13 @@ int main(int argc, char* argv[]) {
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
     cout << "Setting up Navier Stokes model..." << flush;
     NonlinearNavierStokes model( grid, geom, Reynolds, q_potential );
-    // model.init();
     cout << "done" << endl;
 
     // Setup timestepper
     double dt = 0.005;
-    Euler solver(model, dt);
-    // RungeKutta2 solver(model, dt);
+    // Euler solver(model, dt);
+    RungeKutta2 solver(model, dt);
+    solver.init();
 
     // Build the state variable, zero initial conditions
     State x(grid, geom);

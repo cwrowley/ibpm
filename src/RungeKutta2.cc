@@ -25,7 +25,7 @@
 
 namespace ibpm {
 
-RungeKutta2::RungeKutta2(const NavierStokesModel& model, double timestep) :
+RungeKutta2::RungeKutta2(NavierStokesModel& model, double timestep) :
     TimeStepper(model, timestep),
     _linearTermEigenvalues( model.getLambda() ),
     _x1( model.getGrid(), model.getGeometry() )
@@ -33,8 +33,19 @@ RungeKutta2::RungeKutta2(const NavierStokesModel& model, double timestep) :
     // compute eigenvalues of linear term on RHS
     _linearTermEigenvalues *= timestep/2.;
     _linearTermEigenvalues += 1;
-  
-    _solver = createSolver(timestep);
+    _solver = 0; // initialize solver in init()
+}
+
+RungeKutta2::~RungeKutta2() {
+    delete _solver;
+}
+
+void RungeKutta2::init() {
+    _model.init();
+    if (_solver == 0) {
+        _solver = createSolver(_timestep);
+        _solver->init();
+    }
 }
 
 void RungeKutta2::advance(State& x) {

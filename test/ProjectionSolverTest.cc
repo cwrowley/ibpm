@@ -53,8 +53,11 @@ protected:
 
         _modelWithNoBodies = new NonlinearNavierStokes(
             _grid, _emptyGeometry, Reynolds, q0 );
+        _modelWithNoBodies->init();
+        
         _modelWithBodies = new NonlinearNavierStokes(
             _grid, _nonemptyGeometry, Reynolds, q0 );
+        _modelWithBodies->init();
     }
 
     ~ProjectionSolverTest() {

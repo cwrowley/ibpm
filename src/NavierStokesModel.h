@@ -43,6 +43,9 @@ public:
     
     virtual ~NavierStokesModel();
 
+    /// Perform initial calculations needed to use model
+    void init();
+
     /// Return a pointer to the associated Geometry
     inline const Geometry& getGeometry() const { return _geometry; }
 
@@ -71,6 +74,7 @@ public:
     
     /// Convenience form
     inline Scalar B(const BoundaryVector& f) const {
+        assert( _hasBeenInitialized );
         Scalar gamma( _grid );
         B( f, gamma );
         return gamma;
@@ -78,12 +82,14 @@ public:
 
     /// Compute gamma = B(f) as in (14)
     inline void B(const BoundaryVector& f, Scalar& gamma ) const {
+        assert( _hasBeenInitialized );
         Flux q = _regularizer.toGrid( f );
         gamma = Curl( q );
     }
     
     /// Compute f = C(gamma) as in (14)
     inline BoundaryVector C(const Scalar& gamma) const {
+        assert( _hasBeenInitialized );
         BoundaryVector f( _geometry.getNumPoints() );
         C( gamma, f );
         return f;
@@ -91,6 +97,7 @@ public:
     
     /// Compute f = C(gamma) as in (14)
     inline void C(const Scalar& gamma, BoundaryVector& f) const {
+        assert( _hasBeenInitialized );
         Flux q(_grid);
         computeFluxWithoutBaseFlow( gamma, q );
         f = _regularizer.toBoundary( q );
@@ -103,17 +110,20 @@ public:
     
     /// Compute flux q from circulation gamma
     inline void computeFluxWithoutBaseFlow(const Scalar& gamma, Flux& q ) const {
+        assert( _hasBeenInitialized );
         Scalar streamfunction = gammaToStreamfunction( gamma );
         q = Curl( streamfunction );
     }
 
     /// Compute flux q from circulation gamma, including base flow q0
     inline void computeFlux(const Scalar& gamma, Flux& q ) const {
+        assert( _hasBeenInitialized );
         computeFluxWithoutBaseFlow( gamma, q );
         q += _baseFlow;
     }
 
     inline BoundaryVector getBaseFlowBoundaryVelocities() const {
+        assert( _hasBeenInitialized );
         BoundaryVector velocity = _regularizer.toBoundary( _baseFlow );
         return velocity;
     }
@@ -126,6 +136,7 @@ protected:
     TODO: Assumptions about boundary conditions??
     */
     inline Scalar gammaToStreamfunction(const Scalar& gamma) const {
+        assert( _hasBeenInitialized );
         Scalar psi = S( gamma );
         psi *= _eigGammaToStreamfunction;
         psi = Sinv( psi );
@@ -140,6 +151,7 @@ private:
     Scalar _eigGammaToStreamfunction;
     Flux _baseFlow;
     double _ReynoldsNumber;
+    bool _hasBeenInitialized;
 };
 
 //! Full nonlinear Navier-Stokes equations.

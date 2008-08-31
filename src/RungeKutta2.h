@@ -35,7 +35,12 @@ class RungeKutta2 : public TimeStepper {
 public:
 
     /// Instantiate an RK2 solver
-    RungeKutta2( const NavierStokesModel& model, double timestep );
+    RungeKutta2( NavierStokesModel& model, double timestep );
+
+    /// Destructor
+    ~RungeKutta2();
+
+    void init();
 
     /// Advance the state forward one step, using RK2
     void advance(State& x);

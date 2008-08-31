@@ -60,6 +60,7 @@ int main(int argc, char* argv[]) {
     double dt = 0.005;
     // Euler solver(model, dt);
     RungeKutta2 solver(model, dt);
+    solver.init();
 
     // Build the state variable, zero initial conditions
     State x(grid, geom);

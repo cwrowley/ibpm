@@ -23,14 +23,25 @@
 
 namespace ibpm {
 
-Euler::Euler(const NavierStokesModel& model, double timestep) :
+Euler::Euler(NavierStokesModel& model, double timestep) :
     TimeStepper(model, timestep),
     _linearTermEigenvalues( _model.getLambda() ) {
     // compute eigenvalues of linear term on RHS
     _linearTermEigenvalues *= timestep/2.;
     _linearTermEigenvalues += 1;
-    
-    _solver = createSolver(timestep);
+    _solver = 0; // initialize solver in init()
+}
+
+Euler::~Euler() {
+    delete _solver;
+}
+
+void Euler::init() {
+    _model.init();
+    if (_solver == 0) {
+        _solver = createSolver(_timestep);
+        _solver->init();
+    }
 }
 
 void Euler::advance(State& x) {

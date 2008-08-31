@@ -60,14 +60,20 @@ public:
     /// Destructor
     virtual ~ProjectionSolver();
 
+    /// Perform initialization, if needed
+    /// NOTE:  Does not call init() on the NavierStokesModel model
+    virtual void init();
+
     /*! \brief Solve for \a gamma and \a f using a fractional step method.
     Solves equations (1-2) using the algorithm (3-5).
+    
+    Assumes the NavierStokesModel has been initialized with init()
+    
     \param[in] a	Right-hand side of equation (1)
     \param[in] b	Right-hand side of constraint equation (2)
     \param[out] gamma	Circulation after solution
     \param[out] f	Boundary force after solution
     */
-
     void solve(
         const Scalar& a,
         const BoundaryVector& b,

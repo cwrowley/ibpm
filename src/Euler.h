@@ -30,8 +30,13 @@ class Euler : public TimeStepper {
 public:
 
     /// Instantiate an Euler solver
-    Euler( const NavierStokesModel& model, double timestep );
+    Euler( NavierStokesModel& model, double timestep );
 
+    /// Destructor
+    ~Euler();
+
+    void init();
+    
     /// Advance the state forward one step, using explicit Euler
     void advance(State& x);
 

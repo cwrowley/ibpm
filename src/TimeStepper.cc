@@ -20,10 +20,13 @@
 #include "CholeskySolver.h"
 #include "TimeStepper.h"
 
+#include <string>
+using namespace std;
+
 namespace ibpm {
 
 TimeStepper::TimeStepper(
-    const NavierStokesModel& model,
+    NavierStokesModel& model,
     double timestep) :
     _model(model),
     _timestep(timestep) {
@@ -35,12 +38,22 @@ ProjectionSolver* TimeStepper::createSolver(double alpha) {
     //      If not, return a ConjugateGradientSolver
     
     if ( _model.getGeometry().isStationary() ) {
+        cout << "Using Cholesky solver" << endl;
         return new CholeskySolver( _model, alpha );
     }
     else {
         double tol = 1e-7;
+        cout << "Using ConjugateGradient solver, tolerance = " << tol << endl;
         return new ConjugateGradientSolver( _model, alpha, tol );    
     }
 }
+
+void TimeStepper::init() {
+    _model.init();
+}
+
+void TimeStepper::loadState(string filename) {}
+
+void TimeStepper::saveState(string filename) {}
 
 } // namespace ibpm
