@@ -72,6 +72,7 @@ int main(int argc, char* argv[]) {
 	// Setup timestepper
 	double dt = 0.05;
 	Euler solver( model, dt );
+    solver.init();
 
 	// Setup initial condition
 	State x( grid, geom );

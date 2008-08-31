@@ -137,12 +137,29 @@ TEST_F(CGSolverTest, WithConstraints) {
 
 TEST_F(CholeskySolverTest, NoConstraints) {
     CholeskySolver solver( *_modelWithNoBodies, _timestep );
+    solver.init();
     verify( *_modelWithNoBodies, solver );
 }
 
 TEST_F(CholeskySolverTest, WithConstraints) {
     CholeskySolver solver( *_modelWithBodies, _timestep );
+    solver.init();
     verify( *_modelWithBodies, solver );
 }
+
+TEST_F(CholeskySolverTest, SaveFile) {
+    CholeskySolver solver( *_modelWithBodies, _timestep );
+    solver.init();
+    bool success = solver.saveCholesky("test.cholesky");
+    EXPECT_EQ( true, success );
+
+    CholeskySolver newSolver( *_modelWithBodies, _timestep );
+    success = newSolver.loadCholesky("test.cholesky");
+    EXPECT_EQ( true, success );
+
+    verify( *_modelWithBodies, newSolver );
+}
+
+
 
 } // namespace

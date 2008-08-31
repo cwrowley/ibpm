@@ -16,7 +16,9 @@
 #include "CholeskySolver.h"
 #include "NavierStokesModel.h"
 #include "assert.h"
-#include <iostream>
+#include <string>
+#include <fstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -31,20 +33,29 @@ CholeskySolver::CholeskySolver(
     _numPoints( model.getGeometry().getNumPoints() ),
     _size( 2 * _numPoints ),
     _lower( _size ),
-    _diagonal( _size ) {
-    computeCholesky();
-}
+    _diagonal( _size ),
+    _hasBeenInitialized( false )
+{}
 
 CholeskySolver::~CholeskySolver() {
     // Deallocate memory for the Cholesky factorization
     // (no need when Blitz++ arrays are initialized as above)
 }
 
+void CholeskySolver::init() {
+    // Build matrix M explicitly, one column at a time
+    Array<double,2> matrixM( _size );
+    computeMatrixM( matrixM );
+
+    // Compute Cholesky factorization
+    computeFactorization( matrixM );
+}
+
 // Compute the matrix M to be factored
 void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
     BoundaryVector e( _numPoints ); // basis vector
     BoundaryVector x( _numPoints ); // x = M(e)
-        
+
     for ( int j=0; j<_size; ++j ) {
         // Compute j-th column of M
         e = 0;
@@ -83,30 +94,62 @@ void CholeskySolver::computeFactorization( const Array<double,2>& matrixM ) {
             }
         }
     }
-}
-
-void CholeskySolver::computeCholesky() {
-    // Build matrix M explicitly, one column at a time
-    Array<double,2> matrixM( _size );
-    computeMatrixM( matrixM );
-
-    // Compute Cholesky factorization
-    computeFactorization( matrixM );
+    _hasBeenInitialized = true;
 }
 
 // Load a Cholesky decomposition from the specified file.
 // Return true if successful
 bool CholeskySolver::loadCholesky(const string& filename) {
-    // Not implemented
-    return false;
+    ifstream infile( filename.c_str() );
+    if ( ! infile.good() ) return false;
+    int n;
+    infile >> n;
+    if (n != _size) return false;
+    for ( int i=0; i<_size; ++i ) {
+        infile >> _diagonal(i);
+    }
+
+    // check the marker, to make sure we did not get off track
+    char c;
+    infile >> c;
+    if (c != '#') return false;
+
+    // read the lower triangular portion
+    for ( int i=0; i<_size; ++i) {
+        for (int j=0; j<i; ++j) {
+            infile >> _lower(i,j);
+        }
+    }
+    _hasBeenInitialized = true;
+    return true;
 }
 
 // Save a Cholesky decomposition to the specified file, overwriting if
 // necessary.
 // Return true if successful
+// Note: saves only strictly lower triangular portion of _lower, since
+// that is all that is needed for back substitution
 bool CholeskySolver::saveCholesky(const string& filename) {
-    // Not implemented
-    return false;
+    assert( _hasBeenInitialized );
+    ofstream outfile( filename.c_str() );
+    if ( ! outfile.good() ) return false;
+    outfile << _size << endl;
+    // write the diagonal part
+    for ( int i=0; i<_size; ++i ) {
+        outfile << setprecision(17) << _diagonal(i) << endl;
+    }
+
+    // insert marker, as a crude verification that we did not skip a line
+    // when reading back in
+    outfile << "#" << endl;
+
+    // write the lower triangular part
+    for ( int i=0; i<_size; ++i) {
+        for (int j=0; j<i; ++j) {
+            outfile << setprecision(17) << _lower(i,j) << endl;
+        }
+    }
+    return true;
 }
 
 // Solve A x = b using the Cholesky factorization A = LL*
@@ -115,6 +158,7 @@ void CholeskySolver::Minv(
     BoundaryVector& x
     ) {
 
+    assert( _hasBeenInitialized );
     // Solve L y = b for y
     // (Here, y and x use the same memory, for efficiency)
     for ( int i=0; i<_size; ++i ) {

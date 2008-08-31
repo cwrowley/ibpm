@@ -38,7 +38,7 @@ public:
     ~CholeskySolver();
 
     /// \brief Compute the Cholesky decomposition of M
-    void computeCholesky();
+    void init();
 
     /// \brief Load a Cholesky decomposition from the specified file.
     /// Returns true if successful
@@ -64,6 +64,7 @@ private:
     Array<double,1> _diagonal;
     void computeMatrixM( Array<double,2>& M );
     void computeFactorization( const Array<double,2>& M );
+    bool _hasBeenInitialized;
 };
 
 } // namespace ibpm
