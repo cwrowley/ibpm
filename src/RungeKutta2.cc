@@ -44,8 +44,27 @@ void RungeKutta2::init() {
     _model.init();
     if (_solver == 0) {
         _solver = createSolver(_timestep);
-        _solver->init();
     }
+    _solver->init();
+}
+
+bool RungeKutta2::load(const string& basename) {
+    _model.init();
+    if (_solver == 0) {
+        _solver = createSolver(_timestep);
+    }
+    bool success = _solver->load( basename );
+    return success;
+}
+
+// Save the ProjectionSolver's state, if necessary
+// (e.g. the Cholesky factorization)
+bool RungeKutta2::save(const string& basename) {
+    bool success = false;
+    if (_solver != 0) {
+        success = _solver->save( basename );
+    }
+    return success;
 }
 
 void RungeKutta2::advance(State& x) {

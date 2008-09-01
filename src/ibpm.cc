@@ -68,7 +68,10 @@ int main(int argc, char* argv[]) {
     double dt = 0.01;
     // Euler solver(model, dt);
     RungeKutta2 solver(model, dt);
-    solver.init();
+    if ( ! solver.load( "ibpm_test" ) ) {
+        solver.init();
+        solver.save( "ibpm_test" );
+    }
     // Load initial condition
     string icFile = "initial.bin";
     State x(grid, geom);

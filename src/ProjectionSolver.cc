@@ -17,6 +17,7 @@
 #include "BoundaryVector.h"
 #include "NavierStokesModel.h"
 #include "ProjectionSolver.h"
+#include <string>
 
 namespace ibpm {
 
@@ -40,6 +41,13 @@ ProjectionSolver::~ProjectionSolver() {}
 // Initialization for this base class done in constructor
 // Subclasses use this for their own initialization, if needed
 void ProjectionSolver::init() {}
+
+// Subclasses can override these to save and load their own state
+// (e.g. a Cholesky factorization)
+// By default, not implemented: return false
+bool ProjectionSolver::save(const std::string& filename) { return false; }
+bool ProjectionSolver::load(const std::string& filename) { return false; }
+
 
 // Solve for gamma and f for a system of the form
 //   A gamma + B f = a

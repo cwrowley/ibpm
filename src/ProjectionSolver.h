@@ -4,6 +4,8 @@
 #include "Scalar.h"
 #include "BoundaryVector.h"
 #include "NavierStokesModel.h"
+#include <string>
+using std::string;
 
 namespace ibpm {
 
@@ -64,6 +66,15 @@ public:
     /// NOTE:  Does not call init() on the NavierStokesModel model
     virtual void init();
 
+    /// \brief Save information to a file, if there is any to write.
+    /// Return true if successful
+    virtual bool save(const string& basename);
+    
+    /// \brief Load information from a file
+    /// Can be used in place of init() (if successful)
+    /// Return true if successful
+    virtual bool load(const string& basename);
+    
     /*! \brief Solve for \a gamma and \a f using a fractional step method.
     Solves equations (1-2) using the algorithm (3-5).
     

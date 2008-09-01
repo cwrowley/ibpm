@@ -40,8 +40,27 @@ void Euler::init() {
     _model.init();
     if (_solver == 0) {
         _solver = createSolver(_timestep);
-        _solver->init();
     }
+    _solver->init();
+}
+
+bool Euler::load(const string& basename) {
+    _model.init();
+    if (_solver == 0) {
+        _solver = createSolver(_timestep);
+    }
+    bool success = _solver->load( basename );
+    return success;
+}
+
+// Save the ProjectionSolver's state, if necessary
+// (e.g. the Cholesky factorization)
+bool Euler::save(const string& basename) {
+    bool success = false;
+    if (_solver != 0) {
+        success = _solver->save( basename );
+    }
+    return success;
 }
 
 void Euler::advance(State& x) {

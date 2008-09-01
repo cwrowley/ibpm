@@ -43,12 +43,16 @@ CholeskySolver::~CholeskySolver() {
 }
 
 void CholeskySolver::init() {
+    // Return if CholeskySolver has already been initialized
+    if ( _hasBeenInitialized ) return;
+
     // Build matrix M explicitly, one column at a time
     Array<double,2> matrixM( _size );
     computeMatrixM( matrixM );
 
     // Compute Cholesky factorization
     computeFactorization( matrixM );
+    _hasBeenInitialized = true;
 }
 
 // Compute the matrix M to be factored
@@ -56,6 +60,7 @@ void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
     BoundaryVector e( _numPoints ); // basis vector
     BoundaryVector x( _numPoints ); // x = M(e)
 
+    cout << "Computing the matrix for Cholesky factorization..." << flush;
     for ( int j=0; j<_size; ++j ) {
         // Compute j-th column of M
         e = 0;
@@ -66,6 +71,7 @@ void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
             matrixM(i,j) = x(i);
         }
     }
+    cout << "done" << endl;
 }
 
 // Compute the Cholesky factorization of matrixM
@@ -78,6 +84,7 @@ void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
 //      _diag  contains the diagonal elements of L
 void CholeskySolver::computeFactorization( const Array<double,2>& matrixM ) {
     
+    cout << "Computing Cholesky factorization..." << flush;
     _lower = matrixM;
     for ( int i=0; i<_size; ++i ) {
         for ( int j=0; j<_size; ++j ) {
@@ -94,17 +101,26 @@ void CholeskySolver::computeFactorization( const Array<double,2>& matrixM ) {
             }
         }
     }
-    _hasBeenInitialized = true;
+    cout << "done" << endl;
 }
 
-// Load a Cholesky decomposition from the specified file.
+// Load a Cholesky decomposition from a file with name <basename>.cholesky
 // Return true if successful
-bool CholeskySolver::loadCholesky(const string& filename) {
+bool CholeskySolver::load(const string& basename) {
+    string filename = basename + ".cholesky";
+    cout << "Loading Cholesky factorization from file " << filename
+        << "..." << flush;
     ifstream infile( filename.c_str() );
-    if ( ! infile.good() ) return false;
+    if ( ! infile.good() ) {
+        cout << "(failed: could not open file)" << endl;
+        return false;
+    }
     int n;
     infile >> n;
-    if (n != _size) return false;
+    if (n != _size) {
+        cout << "(failed: wrong file size)" << endl;
+        return false;
+    }
     for ( int i=0; i<_size; ++i ) {
         infile >> _diagonal(i);
     }
@@ -112,8 +128,11 @@ bool CholeskySolver::loadCholesky(const string& filename) {
     // check the marker, to make sure we did not get off track
     char c;
     infile >> c;
-    if (c != '#') return false;
-
+    if (c != '#') {
+        cout << "(failed: corrupt file)" << endl;
+        return false;
+    }
+    
     // read the lower triangular portion
     for ( int i=0; i<_size; ++i) {
         for (int j=0; j<i; ++j) {
@@ -121,18 +140,25 @@ bool CholeskySolver::loadCholesky(const string& filename) {
         }
     }
     _hasBeenInitialized = true;
+    cout << "done" << endl;
     return true;
 }
 
-// Save a Cholesky decomposition to the specified file, overwriting if
-// necessary.
+// Save a Cholesky decomposition a file with name <basename>.cholesky,
+// overwriting if necessary.
 // Return true if successful
 // Note: saves only strictly lower triangular portion of _lower, since
 // that is all that is needed for back substitution
-bool CholeskySolver::saveCholesky(const string& filename) {
+bool CholeskySolver::save(const string& basename) {
     assert( _hasBeenInitialized );
+    string filename = basename + ".cholesky";
+    cout << "Saving Cholesky factorization to file " << filename
+        << "..." << flush;
     ofstream outfile( filename.c_str() );
-    if ( ! outfile.good() ) return false;
+    if ( ! outfile.good() ) {
+        cout << "(failed: could not open file)" << endl;
+        return false;
+    }
     outfile << _size << endl;
     // write the diagonal part
     for ( int i=0; i<_size; ++i ) {
@@ -149,6 +175,7 @@ bool CholeskySolver::saveCholesky(const string& filename) {
             outfile << setprecision(17) << _lower(i,j) << endl;
         }
     }
+    cout << "done" << endl;
     return true;
 }
 

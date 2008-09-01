@@ -41,6 +41,8 @@ public:
     ~RungeKutta2();
 
     void init();
+    bool load(const std::string& basename);
+    bool save(const std::string& basename);
 
     /// Advance the state forward one step, using RK2
     void advance(State& x);

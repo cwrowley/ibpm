@@ -38,12 +38,12 @@ ProjectionSolver* TimeStepper::createSolver(double alpha) {
     //      If not, return a ConjugateGradientSolver
     
     if ( _model.getGeometry().isStationary() ) {
-        cout << "Using Cholesky solver" << endl;
+        cout << "Using Cholesky solver for projection step" << endl;
         return new CholeskySolver( _model, alpha );
     }
     else {
         double tol = 1e-7;
-        cout << "Using ConjugateGradient solver, tolerance = " << tol << endl;
+        cout << "Using ConjugateGradient solver for projection step, tolerance = " << tol << endl;
         return new ConjugateGradientSolver( _model, alpha, tol );    
     }
 }
@@ -52,8 +52,10 @@ void TimeStepper::init() {
     _model.init();
 }
 
-void TimeStepper::loadState(string filename) {}
+// Implemented in subclasses: return false by default
+bool TimeStepper::load(const string& filename) { return false; }
 
-void TimeStepper::saveState(string filename) {}
+// Implemented in subclasses: return false by default
+bool TimeStepper::save(const string& filename) { return false; }
 
 } // namespace ibpm

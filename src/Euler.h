@@ -2,6 +2,7 @@
 #define _EULER_H_
 
 #include "TimeStepper.h"
+#include <string>
 
 namespace ibpm {
 
@@ -36,6 +37,8 @@ public:
     ~Euler();
 
     void init();
+    bool load(const std::string& basename);
+    bool save(const std::string& basename);
     
     /// Advance the state forward one step, using explicit Euler
     void advance(State& x);

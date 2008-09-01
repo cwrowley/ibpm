@@ -62,15 +62,16 @@ public:
 
     Return true if successful
     */
-    virtual void loadState(string filename);
+    virtual bool load(const string& filename);
     
     /*! \brief Save the state of the solver to the specified file
 
     For instance, this might be a Cholesky factorization saved to avoid
     recomputing, or information at a previous timestep for AdamsBashforth.
+    Can be used in place of init() (if successful)
     Return true if successful
     */
-    virtual void saveState(string filename);
+    virtual bool save(const string& filename);
 
     /*! \brief Advance the state forward in time.
     

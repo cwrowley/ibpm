@@ -3,6 +3,7 @@
 
 #include "ProjectionSolver.h"
 #include <blitz/array.h>
+#include <string>
 
 BZ_USING_NAMESPACE(blitz)
 
@@ -42,12 +43,12 @@ public:
 
     /// \brief Load a Cholesky decomposition from the specified file.
     /// Returns true if successful
-    bool loadCholesky(const string& filename);
+    bool load(const std::string& filename);
     
     /// \brief Save a Cholesky decomposition to the specified file, 
     /// overwriting if necessary.
     /// Returns true if successful
-    bool saveCholesky(const string& filename);
+    bool save(const std::string& filename);
     
 protected:
     /// \brief Solve Mf = b for f, using the Cholesky factorization of M. 

@@ -150,11 +150,11 @@ TEST_F(CholeskySolverTest, WithConstraints) {
 TEST_F(CholeskySolverTest, SaveFile) {
     CholeskySolver solver( *_modelWithBodies, _timestep );
     solver.init();
-    bool success = solver.saveCholesky("test.cholesky");
+    bool success = solver.save("test.cholesky");
     EXPECT_EQ( true, success );
 
     CholeskySolver newSolver( *_modelWithBodies, _timestep );
-    success = newSolver.loadCholesky("test.cholesky");
+    success = newSolver.load("test.cholesky");
     EXPECT_EQ( true, success );
 
     verify( *_modelWithBodies, newSolver );
