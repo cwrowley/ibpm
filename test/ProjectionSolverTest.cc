@@ -16,8 +16,6 @@ using namespace ibpm;
 namespace {
 
 const double tolerance = 1e-10;
-    
-Scalar ComputeLinearTerm(NavierStokesModel& model, const Scalar& gamma);
 
 #define EXPECT_ALL_EQ(a,b)                      \
     for (int i=0; i<_nx+1; ++i) {               \

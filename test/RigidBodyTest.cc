@@ -134,13 +134,12 @@ TEST_F( RigidBodyTest, AddCircle ) {
 }
 
 TEST_F( RigidBodyTest, IORaw1 ) {
-    int numPoints = 3;
     double x1 = 1.;
     double y1 = 2.;
     double x2 = 1./3;
     double y2 = 1./4;
     double x3 = 4. * atan(1.);
-    double y3 = sqrt(2);
+    double y3 = sqrt(2.);
     filebuf fb;
     fb.open ("./output/saveRaw.dat",ios::out);
     ostream out(&fb);
