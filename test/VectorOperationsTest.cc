@@ -52,7 +52,7 @@ protected:
     // TODO: Pick better functions, with analytic expressions (in x and y)
     // (Single wavenumber for the scalar fields?)
     inline double f(int i, int j) {
-        return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos(j) * (_ny + 1);
+        return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos((double)j) * (_ny + 1);
     }
 
     inline double g(int i, int j) {
@@ -64,7 +64,7 @@ protected:
     }
     
     inline double qy(int i, int j) {
-        return 4 * i *  j   + _ny + cos(i);
+        return 4 * i *  j   + _ny + cos((double)i);
     }
     
     inline double px(int i, int j) {

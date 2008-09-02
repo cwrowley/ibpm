@@ -11,7 +11,7 @@ inline void InitializeSingleWavenumber(
     int yWavenumber,
     Scalar& f
     ) {
-    const double pi = 4 * atan(1);
+    const double pi = 4 * atan(1.);
     const Grid& grid = f.getGrid();
     const int nx = grid.getNx();
     const int ny = grid.getNy();

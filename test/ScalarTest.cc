@@ -33,14 +33,6 @@ protected:
         return 3*i + j;
     }
     
-    double fx(int i, int j) {
-        return 3 * i * i * _nx + 5 * (j +1 )* (1 + i + 0.7 * j) * cos((double)j);
-    }
-    
-    double fy(int i, int j) {
-        return  i * (i + j ) *3  + (_ny + cos((double)i)) * (j + 1 ) *2;
-    }
-
     // data
     int _nx;
     int _ny;
