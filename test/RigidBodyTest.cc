@@ -83,7 +83,6 @@ TEST_F( RigidBodyTest, AddLine ) {
 
 TEST_F( RigidBodyTest, AddCircle ) {
     double dx, dy;
-    double d1, d2;
     double xc = 2.; // coordinates of center of circle
     double yc = 3.; 
     double radius = 1.5;

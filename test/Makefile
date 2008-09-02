@@ -5,11 +5,12 @@ TEST_FILES=GridTest.o GeometryTest.o BoundaryVectorTest.o FluxTest.o \
 	ProjectionSolverTest.o RigidBodyTest.o TangentSE2Test.o \
 	MotionTest.o NavierStokesModelTest.o StateTest.o
 
-CXX = g++
-CXXFLAGS = -g
-MAKEDEPEND = gcc -MM
-INCPATH = -I../src
+include ../src/make.inc
+
+CXXFLAGS += $(include_dirs) -I../src
+LDFLAGS += $(lib_dirs)
 IBPMLIB = ../lib/libibpm.a
+MAKEDEPEND = gcc -MM
 
 .PHONY: $(IBPMLIB) clean distclean depend
 
@@ -20,10 +21,10 @@ $(IBPMLIB):
 	cd ../src && $(MAKE) lib
 
 % : %.o $(IBPMLIB)
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
+	$(CXX) $(LDFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
 
 runner: $(TEST_FILES) $(IBPMLIB)
-	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
+	$(CXX) $(LDFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
 
 %.o : %.cc
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) $<
