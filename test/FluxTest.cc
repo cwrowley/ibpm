@@ -65,10 +65,6 @@ protected:
         return i*j - 10;
     }
     
-    inline double f(int i, int j) {
-        return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos(j) * (_ny + 1);
-    }
-
     int _nx;
     int _ny;
     Grid _grid;
