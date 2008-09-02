@@ -150,16 +150,26 @@ TEST_F(CholeskySolverTest, WithConstraints) {
 TEST_F(CholeskySolverTest, SaveFile) {
     CholeskySolver solver( *_modelWithBodies, _timestep );
     solver.init();
-    bool success = solver.save("test.cholesky");
+    // Save a file
+    bool success = solver.save("testSolver");
     EXPECT_EQ( true, success );
 
+    // Load the file
     CholeskySolver newSolver( *_modelWithBodies, _timestep );
-    success = newSolver.load("test.cholesky");
+    success = newSolver.load("testSolver");
     EXPECT_EQ( true, success );
 
     verify( *_modelWithBodies, newSolver );
+    
+    // Attempt to load the file with a solver with the wrong number of points
+    CholeskySolver differentBody( *_modelWithNoBodies, _timestep );
+    success = differentBody.load("testSolver");
+    EXPECT_EQ( false, success );
+    
+    // Attempt to load the file with a solver with the wrong timestep
+    CholeskySolver differentTimestep( *_modelWithBodies, _timestep * 2. );
+    success = differentTimestep.load("testSolver");
+    EXPECT_EQ( false, success );
 }
-
-
 
 } // namespace

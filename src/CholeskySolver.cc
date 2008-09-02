@@ -32,6 +32,7 @@ CholeskySolver::CholeskySolver(
     ProjectionSolver( model, alpha ),
     _numPoints( model.getGeometry().getNumPoints() ),
     _size( 2 * _numPoints ),
+    _alpha( alpha ),
     _lower( _size ),
     _diagonal( _size ),
     _hasBeenInitialized( false )
@@ -60,7 +61,7 @@ void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
     BoundaryVector e( _numPoints ); // basis vector
     BoundaryVector x( _numPoints ); // x = M(e)
 
-    cout << "Computing the matrix for Cholesky factorization..." << flush;
+    cerr << "Computing the matrix for Cholesky factorization..." << flush;
     for ( int j=0; j<_size; ++j ) {
         // Compute j-th column of M
         e = 0;
@@ -71,7 +72,7 @@ void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
             matrixM(i,j) = x(i);
         }
     }
-    cout << "done" << endl;
+    cerr << "done" << endl;
 }
 
 // Compute the Cholesky factorization of matrixM
@@ -84,7 +85,7 @@ void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
 //      _diag  contains the diagonal elements of L
 void CholeskySolver::computeFactorization( const Array<double,2>& matrixM ) {
     
-    cout << "Computing Cholesky factorization..." << flush;
+    cerr << "Computing Cholesky factorization..." << flush;
     _lower = matrixM;
     for ( int i=0; i<_size; ++i ) {
         for ( int j=0; j<_size; ++j ) {
@@ -101,26 +102,38 @@ void CholeskySolver::computeFactorization( const Array<double,2>& matrixM ) {
             }
         }
     }
-    cout << "done" << endl;
+    cerr << "done" << endl;
 }
 
 // Load a Cholesky decomposition from a file with name <basename>.cholesky
 // Return true if successful
 bool CholeskySolver::load(const string& basename) {
     string filename = basename + ".cholesky";
-    cout << "Loading Cholesky factorization from file " << filename
+    cerr << "Loading Cholesky factorization from file " << filename
         << "..." << flush;
     ifstream infile( filename.c_str() );
     if ( ! infile.good() ) {
-        cout << "(failed: could not open file)" << endl;
+        cerr << "(failed: could not open file)" << endl;
         return false;
     }
+
+    // read dimension of matrix in file
     int n;
     infile >> n;
     if (n != _size) {
-        cout << "(failed: wrong file size)" << endl;
+        cerr << "(failed: wrong file size)" << endl;
         return false;
     }
+
+    // read value of alpha in file
+    double alpha_in;
+    infile >> alpha_in;
+    if (alpha_in != _alpha) {
+        cerr << "(failed: wrong timestep)" << endl;
+        return false;
+    }
+    
+    // read in diagonal part
     for ( int i=0; i<_size; ++i ) {
         infile >> _diagonal(i);
     }
@@ -129,7 +142,7 @@ bool CholeskySolver::load(const string& basename) {
     char c;
     infile >> c;
     if (c != '#') {
-        cout << "(failed: corrupt file)" << endl;
+        cerr << "(failed: corrupt file)" << endl;
         return false;
     }
     
@@ -140,7 +153,7 @@ bool CholeskySolver::load(const string& basename) {
         }
     }
     _hasBeenInitialized = true;
-    cout << "done" << endl;
+    cerr << "done" << endl;
     return true;
 }
 
@@ -152,14 +165,15 @@ bool CholeskySolver::load(const string& basename) {
 bool CholeskySolver::save(const string& basename) {
     assert( _hasBeenInitialized );
     string filename = basename + ".cholesky";
-    cout << "Saving Cholesky factorization to file " << filename
+    cerr << "Saving Cholesky factorization to file " << filename
         << "..." << flush;
     ofstream outfile( filename.c_str() );
     if ( ! outfile.good() ) {
-        cout << "(failed: could not open file)" << endl;
+        cerr << "(failed: could not open file)" << endl;
         return false;
     }
     outfile << _size << endl;
+    outfile << setprecision(17) << _alpha << endl;
     // write the diagonal part
     for ( int i=0; i<_size; ++i ) {
         outfile << setprecision(17) << _diagonal(i) << endl;
@@ -175,7 +189,7 @@ bool CholeskySolver::save(const string& basename) {
             outfile << setprecision(17) << _lower(i,j) << endl;
         }
     }
-    cout << "done" << endl;
+    cerr << "done" << endl;
     return true;
 }
 

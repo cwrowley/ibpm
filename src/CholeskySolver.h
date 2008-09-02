@@ -61,6 +61,8 @@ protected:
 private:
     int _numPoints;  // number of points in the geometry
     int _size;       // size of the vectors: numPoints * 2
+    const double _alpha;    // keep a local copy of _alpha, as a check when 
+                            // reading in Cholesky factorizations from files
     Array<double,2> _lower;
     Array<double,1> _diagonal;
     void computeMatrixM( Array<double,2>& M );
