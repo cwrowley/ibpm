@@ -30,6 +30,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <ctype.h>
 
 using namespace std;
 
@@ -160,8 +161,14 @@ static bool check_bad_input(
 
 // 
 static void eat_whitespace( string& s ) {
-    while ( s[0] == ' ') {
+    while ( isblank( s[0] ) ) {
         s.erase(0,1);
+    }
+}
+
+static void make_lowercase( string& s ) {
+    for (unsigned int i=0; i<s.length(); ++i) {
+        s[i] = tolower(s[i]);
     }
 }
 
@@ -196,6 +203,7 @@ bool RigidBody::load(istream& in) {
 #endif
         istringstream one_line( buf );
         one_line >> cmd;
+        make_lowercase( cmd );
         if ( cmd[0] == '#' ) {
 #ifdef DEBUG
             cerr << "[comment]" << endl;
