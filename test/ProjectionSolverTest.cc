@@ -8,6 +8,7 @@
 #include "ConjugateGradientSolver.h"
 #include "CholeskySolver.h"
 #include "SingleWavenumber.h"
+#include <unistd.h>
 #include <gtest/gtest.h>
 
 using namespace ibpm;
@@ -170,6 +171,8 @@ TEST_F(CholeskySolverTest, SaveFile) {
     CholeskySolver differentTimestep( *_modelWithBodies, _timestep * 2. );
     success = differentTimestep.load("testSolver");
     EXPECT_EQ( false, success );
+    
+    unlink("testSolver.cholesky");
 }
 
 } // namespace

@@ -31,16 +31,17 @@ State::State(const Grid& grid, const Geometry& geom) :
 
 State::~State() {}
 
-#define CHECK(a,b,c)                                            \
-    if ( !( (a) == (b) ) ) {                                    \
-        cerr << "Error: " << c << " doesn't match." << endl     \
-            << "  expected: " << (b) << endl                    \
-            << "     read: " << (a) << endl;                    \
-        return false;                                           \
+#define PARM_CHECK(a,b,c)                                           \
+    if ( !( (a) == (b) ) ) {                                        \
+        cerr << endl << "Error: " << c << " doesn't match." << endl \
+            << "  expected: " << (b) << endl                        \
+            << "      read: " << (a) << endl;                       \
+        return false;                                               \
     }
 
 bool State::load(const std::string& filename) {
 
+    cerr << "Reading restart file " << filename << "..." << flush;
     FILE* fp = fopen( filename.c_str(), "rb" );
     if ( fp == NULL ) return false;
 
@@ -63,13 +64,13 @@ bool State::load(const std::string& filename) {
         
     // check that Grid and Geometry in file match those expected
     const Grid& grid = q.getGrid();
-    CHECK( nx, grid.getNx(), "nx" );
-    CHECK( ny, grid.getNy(), "ny" );
-    CHECK( dx, grid.getDx(), "dx" );
-    CHECK( x0, grid.getXEdge(0), "x0" );
-    CHECK( y0, grid.getYEdge(0), "x0" );
+    PARM_CHECK( nx, grid.getNx(), "nx" );
+    PARM_CHECK( ny, grid.getNy(), "ny" );
+    PARM_CHECK( dx, grid.getDx(), "dx" );
+    PARM_CHECK( x0, grid.getXEdge(0), "x0" );
+    PARM_CHECK( y0, grid.getYEdge(0), "x0" );
 
-    CHECK( numPoints, f.getNumPoints(), "numPoints" );
+    PARM_CHECK( numPoints, f.getNumPoints(), "numPoints" );
 
     // read Flux q
     Flux::index qind;
@@ -96,8 +97,11 @@ bool State::load(const std::string& filename) {
 
     // close file
     fclose( fp );
+    cerr << "done" << endl;
     return true;
 }
+
+#undef PARM_CHECK
 
 bool State::save(std::string filename) const {
     cerr << "Writing restart file " << filename << "..." << flush;
