@@ -10,7 +10,7 @@
 
 include ../src/make.inc
 
-TARGETS = pitching plunging Oseen
+TARGETS = pitching plunging Oseen RigidBodyLoad
 
 LDLIBS = -lfftw3 -lm
 MAKEDEPEND = gcc -MM

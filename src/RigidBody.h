@@ -41,8 +41,17 @@ public:
     void addPoint(double x, double y);    
     
     /// Add a circle with center (xc, yc) and the given radius
-    /// with the specified number of points.
+    /// with the specified (approximate) distance between points.
     void addCircle(
+        double xc,
+        double yc,
+        double radius,
+        double dx
+    );
+
+    /// Add a circle with center (xc, yc) and the given radius
+    /// with the specified number of points.
+    void addCircle_n(
         double xc,
         double yc,
         double radius,
@@ -50,8 +59,18 @@ public:
     );
 
     /// Add a line connecting (x1,y1) and (x2,y2)
-    /// with the specified number of points
+    /// with the specified (approximate) distance between points
     void addLine(
+        double x1,
+        double y1,
+        double x2,
+        double y2,
+        double dx
+    );
+    
+    /// Add a line connecting (x1,y1) and (x2,y2)
+    /// with the specified number of points
+    void addLine_n(
         double x1,
         double y1,
         double x2,
@@ -60,11 +79,26 @@ public:
     );
     
     /// Load a list of commands from the specified input stream
-    void load(istream& in);
+    /// Input format is as follows:
+    ///     name Name of this object
+    ///     center x y  # location of the center of the object
+    ///     point x y   # add a point at this location
+    ///     point x y
+    ///     point x y
+    ///     line x1 y1 x2 y2 dx
+    ///     line_n x1 y1 x2 y2 npts
+    ///     circle xc yc radius dx
+    ///     circle_n xc yc radius npts
+    ///     raw naca0012.dat
+    ///     end
+    /// Whitespace at the beginning of the line is ignored
+    /// Returns false if invalid input was encountered
+    bool load(istream& in);
     
     /// Load a list of points, in ASCII format, with one point per line.
     /// Assumes the center is (0,0)
-    void loadRaw(istream& in);
+    /// Returns false if invalid input was encountered
+    bool loadRaw(string fname);
     
     /// Save a list of points to the specified output stream
     void saveRaw(ostream& out);

@@ -47,7 +47,7 @@ protected:
         _emptyGeometry.addBody(body);
 
         int nPoints = 4;
-        body.addLine( -0.75, 0, 0.75, 0, nPoints );
+        body.addLine_n( -0.75, 0, 0.75, 0, nPoints );
         _nonemptyGeometry.addBody(body);
 
         Flux q0 = Flux::UniformFlow( _grid, 1.0, 0. );

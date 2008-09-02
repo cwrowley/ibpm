@@ -100,8 +100,8 @@ TEST_F(GeometryTest, TwoBodies) {
 TEST_F(GeometryTest, PlungingBody) {
     // Define a flat plate with 10 points
     int nPoints = 10;
-    RigidBody body;    
-    body.addLine( 0, 0, 1, 0, nPoints );
+    RigidBody body;
+    body.addLine_n( 0, 0, 1, 0, nPoints );
     EXPECT_EQ( true, body.isStationary() );
 
     // Add it to a geometry

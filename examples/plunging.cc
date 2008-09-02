@@ -35,8 +35,7 @@ int main(int argc, char* argv[]) {
     
     // Make a flat plate, length 1, with center at 1/4 chord
     RigidBody plate;
-    int numPoints = 1. / grid.getDx();
-    plate.addLine( 0, 0, 1, 0, numPoints );
+    plate.addLine( 0, 0, 1, 0, grid.getDx() );
     plate.setCenter( 0.25, 0 );
     
     // Set the motion to plunging: amplitude = 0.25, period 0.1 time unit

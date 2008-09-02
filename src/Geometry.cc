@@ -21,6 +21,7 @@ namespace ibpm {
 Geometry::Geometry() {
     _numPoints = 0;
     _isStationary = true;
+    _regularizer = NULL;
 }
 
 Geometry::~Geometry() {}

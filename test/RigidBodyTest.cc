@@ -60,7 +60,7 @@ TEST_F( RigidBodyTest, SetCenter ) {
 
 TEST_F( RigidBodyTest, AddLine ) {
     // Add a line with 101 points from (1,1) to (3,4)
-    body.addLine(1., 1., 3., 4., 101);
+    body.addLine_n(1., 1., 3., 4., 101);
     BoundaryVector b = body.getPoints();
 
     // Check that numPoints is correct
@@ -90,7 +90,7 @@ TEST_F( RigidBodyTest, AddCircle ) {
     int numPoints = 8;
 
     // Add a circle
-    body.addCircle( xc, yc, radius, numPoints );
+    body.addCircle_n( xc, yc, radius, numPoints );
     BoundaryVector b = body.getPoints();
 
     // Check that numPoints is correct

@@ -60,6 +60,13 @@ public:
         cout << _data << endl;
     }
     
+    inline friend ostream& operator << (ostream& s, const BoundaryVector& f) {
+        for (int i=0; i < f._numPoints; ++i) {
+            s << "  (" << f(X,i) << ", " << f(Y,i) << ")" << endl;
+        }
+        return s;
+    }
+
     /// f(dir,i) refers to the value in direction dir (X or Y) at point i
     inline double& operator()(int dir, int i) {
         assert(dir>=X  && dir<=Y);
