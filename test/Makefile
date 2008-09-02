@@ -15,7 +15,7 @@ MAKEDEPEND = gcc -MM
 .PHONY: $(IBPMLIB) clean distclean depend
 
 run_tests: runner
-	./runner
+	./runner 2> runner.err
 
 $(IBPMLIB):
 	cd ../src && $(MAKE) lib

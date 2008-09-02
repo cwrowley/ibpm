@@ -26,7 +26,7 @@ protected:
 
     // functions to test
     double f(int i, int j) {
-        return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos(j) * (_ny + 1);
+        return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos((double)j) * (_ny + 1);
     }
 
     double g(int i, int j) {
@@ -34,11 +34,11 @@ protected:
     }
     
     double fx(int i, int j) {
-        return 3 * i * i * _nx + 5 * (j +1 )* (1 + i + 0.7 * j) * cos(j);
+        return 3 * i * i * _nx + 5 * (j +1 )* (1 + i + 0.7 * j) * cos((double)j);
     }
     
     double fy(int i, int j) {
-        return  i * (i + j ) *3  + (_ny + cos(i)) * (j + 1 ) *2;
+        return  i * (i + j ) *3  + (_ny + cos((double)i)) * (j + 1 ) *2;
     }
 
     // data
