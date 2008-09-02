@@ -6,6 +6,7 @@
 #include "Flux.h"
 #include "Scalar.h"
 #include "BoundaryVector.h"
+#include <string>
 
 namespace ibpm {
 
@@ -22,19 +23,21 @@ namespace ibpm {
     \version $Revision$
 */
 
-struct State {
-    State(const Grid& grid, const Geometry& geom) :
-        q(grid),
-        gamma(grid),
-        f( geom.getNumPoints() ),
-        timestep(0),
-        time(0.)
-    {}
+class State {
+public:
+    State(const Grid& grid, const Geometry& geom);
 
-    ~State() {}
+    ~State();
     
-    void loadRestartFile(string filename) {}
-    
+    /// \brief Save the state to a file (e.g. as a restart file)
+    /// Return true if successful
+    bool save(std::string filename) const;
+
+    /// \brief Load the state from a file (e.g. as a restart file)
+    /// Return true if successful
+    bool load(const std::string& filename);
+
+    // public data
     Flux q;
     Scalar gamma;
     BoundaryVector f;

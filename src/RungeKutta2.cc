@@ -12,7 +12,7 @@
 // $Revision: 105 $
 // $LastChangedDate: 2008-08-27 23:14:34 -0400 (Thu, 28 Aug 2008) $
 // $LastChangedBy: sbrunton $
-// $HeadURL: Header$
+// $HeadURL: Header $
 
 #include "BoundaryVector.h"
 #include "Geometry.h"

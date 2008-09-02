@@ -124,7 +124,7 @@ bool writeTecplotFileASCII(
     int ny = grid.getNy();
 
     // Write the header for the Tecplot file
-    cout << "Writing Tecplot file " << filename << endl;
+    cerr << "Writing Tecplot file " << filename << endl;
     FILE *fp = fopen( filename, "w" );
     if (fp == NULL) return false;
     fprintf( fp, "TITLE = \"%s\"\n", title );

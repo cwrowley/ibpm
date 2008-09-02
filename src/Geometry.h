@@ -2,6 +2,7 @@
 #define _GEOMETRY_H_
 
 #include "BoundaryVector.h"
+#include "RigidBody.h"
 #include <iostream>
 #include <vector>
 using namespace std;

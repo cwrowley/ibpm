@@ -28,6 +28,7 @@ OBJS = \
 	RigidBody.o \
 	RungeKutta2.o \
 	Scalar.o \
+	State.o \
 	TimeStepper.o \
 	VectorOperations.o
 

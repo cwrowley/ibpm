@@ -75,14 +75,16 @@ int main(int argc, char* argv[]) {
     // Load initial condition
     string icFile = "initial.bin";
     State x(grid, geom);
-    x.loadRestartFile(icFile);  
+    x.load(icFile);  
     x.gamma = 0.;
 
     // Setup output routines
     OutputTecplot tecplot( "ibpm%03d.plt", "Test run, step %03d" );
+    OutputRestart restart( "restart%03d.bin" );
     Logger logger;
     // Output Tecplot file every timestep
-    logger.addOutput( &tecplot, 251 );
+    logger.addOutput( &tecplot, 25 );
+    logger.addOutput( &restart, 20 );
     logger.init();
     logger.doOutput( x );
     

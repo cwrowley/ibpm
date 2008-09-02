@@ -22,7 +22,6 @@ protected:
       _u2(_grid)
     {
         // Create a geometry with one point
-        // NOTE: For now, Geometry stub returns a single point at the origin
         RigidBody body;
         body.addPoint(0,0);
         _geom.addBody(body);

@@ -27,16 +27,10 @@ OutputRestart::OutputRestart(string formatString) {
 }
 
 bool OutputRestart::doOutput(const State& x) {
-    char buf[256];
-    sprintf( buf, _formatString.c_str(), x.timestep );
-
-    // TODO: Work here
-    // Open the file
-    // Write contents to file
-    // Close the file
-    cout << "Writing restart file " << buf << endl;
-    cout << " NOTE: Not actually implemented!" << endl;
-    return true;
+    char filename[256];
+    sprintf( filename, _formatString.c_str(), x.timestep );
+    bool status = x.save( filename );
+    return status;
 }
 
 } // namespace ibpm

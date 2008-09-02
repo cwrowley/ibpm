@@ -24,7 +24,8 @@ namespace ibpm {
 class OutputRestart : public Output {
 public:
     /// \brief Constructor
-    /// \param[in] formatString Filename in the standard printf format (e.g. "file%06d.bin")
+    /// \param[in] formatString Filename in the standard printf format
+    /// (e.g. "file%06d.bin"), where timestep will be substituted for %d
     OutputRestart(string formatString);
 
     /// \brief Write the restart file
