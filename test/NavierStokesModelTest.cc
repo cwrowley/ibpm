@@ -74,7 +74,7 @@ void InitializeSingleWavenumber(
     int yWavenumber,
     Scalar& f
     ) {
-    const double pi = 4 * atan(1);
+    const double pi = 4 * atan(1.);
     const Grid& grid = f.getGrid();
     const int nx = grid.getNx();
     const int ny = grid.getNy();
@@ -90,17 +90,6 @@ void InitializeSingleWavenumber(
             double y = j * deltaX;
             f(i,j) = sin(kx * x) * sin(ky * y);
         }
-    }
-}
-
-void print(const Scalar& f) {
-    int nx = f.getGrid().getNx();
-    int ny = f.getGrid().getNy();
-    for(int i = 0; i <= nx; ++i) {
-        for (int j=0; j <= ny; ++j) {
-            cout << f(i,j) << " ";
-        }
-        cout << endl;
     }
 }
 

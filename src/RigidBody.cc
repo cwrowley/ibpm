@@ -161,7 +161,7 @@ static bool check_bad_input(
 
 // 
 static void eat_whitespace( string& s ) {
-    while ( isblank( s[0] ) ) {
+    while ( isspace( s[0] ) ) {
         s.erase(0,1);
     }
 }

@@ -177,11 +177,11 @@ public:
     
 };
 
-//! Navier-Stokes equations linearized about an equilibrium point.
-class LinearizedNavierStokes : public NavierStokesModel {};
-
-//! Adjoint Navier-Stokes equations, linearized about an equilibrium point.
-class AdjointNavierStokes : public NavierStokesModel {};
+// //! Navier-Stokes equations linearized about an equilibrium point.
+// class LinearizedNavierStokes : public NavierStokesModel {};
+// 
+// //! Adjoint Navier-Stokes equations, linearized about an equilibrium point.
+// class AdjointNavierStokes : public NavierStokesModel {};
 
 } // namespace ibpm
 
