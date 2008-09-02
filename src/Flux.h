@@ -132,10 +132,10 @@ public:
     }
 
     /// Returns an index that refers to the first element
-    inline index begin() { return 0; }
+    inline index begin() const { return 0; }
 
     /// Returns an index that is one past the last element
-    inline index end() { return _numFluxes; }
+    inline index end() const { return _numFluxes; }
 
     /// Returns an index for the first element in direction dir (X or Y)
     inline index begin(int dir) {

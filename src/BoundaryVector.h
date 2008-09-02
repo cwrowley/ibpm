@@ -47,7 +47,7 @@ public:
     // TODO: Implement this, and write tests
 
     /// Return the number of boundary points
-    inline int getNumPoints() { return _numPoints; }
+    inline int getNumPoints() const { return _numPoints; }
     
     /*! \brief Return the number of elements in the array.
     
