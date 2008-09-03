@@ -33,6 +33,7 @@ public:
     
 private:
     string _filename;
+    char _fname[256];
 };
 
 } // namespace ibpm

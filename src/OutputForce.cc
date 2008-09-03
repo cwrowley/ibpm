@@ -26,13 +26,14 @@ namespace ibpm {
 
 OutputForce::OutputForce(string filename) {
     _filename = filename;
+    sprintf( _fname, _filename.c_str() ); 
+    FILE *fout = fopen( _fname, "w" );
+    fclose( fout );
 }
 
 bool OutputForce::doOutput(const State& x) {
     double drag = 0.;
     double lift = 0.;
-    char filename[256];
-    sprintf( filename, _filename.c_str() );
  
     computeNetForce( x.f, drag, lift);
 
@@ -40,7 +41,7 @@ bool OutputForce::doOutput(const State& x) {
     drag *= 2./grid.getDx();
     lift *= 2./grid.getDx();
 
-    FILE *fp = fopen( filename, "a" );
+    FILE *fp = fopen( _fname, "a" );
     if (fp == NULL) return false;
     fprintf( fp, "%0.5d %.5e %.5e %.5e\n",x.timestep, x.time, drag, lift);   
     fclose(fp);   
