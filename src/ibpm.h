@@ -31,6 +31,7 @@
 // timesteppers
 #include "Euler.h"
 #include "RungeKutta2.h"
+#include "RungeKutta3.h"  
 #include "AdamsBashforth.h"
 
 // motion

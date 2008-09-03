@@ -29,6 +29,7 @@ OBJS = \
 	Regularizer.o \
 	RigidBody.o \
 	RungeKutta2.o \
+        RungeKutta3.o \
 	Scalar.o \
 	State.o \
 	TimeStepper.o \

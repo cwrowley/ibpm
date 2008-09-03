@@ -68,7 +68,8 @@ int main(int argc, char* argv[]) {
     double dt = 0.01;
     // Euler solver(model, dt);
     // RungeKutta2 solver(model, dt);
-    AdamsBashforth solver(model, dt);
+    RungeKutta3 solver(model, dt);
+    // AdamsBashforth solver(model, dt);
     if ( ! solver.load( "ibpm_test" ) ) {
         solver.init();
         solver.save( "ibpm_test" );
