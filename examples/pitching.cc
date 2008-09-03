@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
     geom.moveBodies(0);
 
     // Setup equations to solve
-    double Reynolds=10;
+    double Reynolds=100;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
@@ -66,10 +66,12 @@ int main(int argc, char* argv[]) {
     x.gamma = 0.;
 
     // Setup output routines
+    OutputForce force( "tecplot/force.dat" );
     OutputTecplot tecplot( "tecplot/pitch%03d.plt", "Pitching plate, step %03d" );
     Logger logger;
     // Output Tecplot file every few timesteps
     logger.addOutput( &tecplot, 25 );
+    logger.addOutput( &force, 1 ); 
     logger.init();
     logger.doOutput( x );
     
@@ -83,8 +85,8 @@ int main(int argc, char* argv[]) {
             << "  theta = " << theta << endl;
         solver.advance( x );
         computeNetForce(x.f, drag, lift);
-        cout << " x force : " << setw(16) << drag/dt << " , y force : "
-            << setw(16) << lift/dt << "\n";
+        cout << " x force : " << setw(16) << drag*2*nx/length << " , y force : "
+            << setw(16) << lift*2*ny/length << "\n";
         logger.doOutput( x );
     }
     logger.cleanup();

@@ -25,8 +25,8 @@ int main(int argc, char* argv[]) {
     double drag = 0.;
     
     // Setup grid
-    int nx = 100;
-    int ny = 100;
+    int nx = 200;
+    int ny = 200;
     double length = 4.0;
     double xOffset = -1;
     double yOffset = -2;
@@ -38,9 +38,9 @@ int main(int argc, char* argv[]) {
     plate.addLine( 0, 0, 1, 0, grid.getDx() );
     plate.setCenter( 0.25, 0 );
     
-    // Set the motion to plunging: amplitude = 0.25, period 0.1 time unit
-    double amplitude = 0.25;
-    double freq = 0.1;
+    // Set the motion to plunging: amplitude = 0.1, period 0.25 time unit
+    double amplitude = 0.1;
+    double freq = 0.25;
     PitchPlunge motion( 0, 0, amplitude, freq );
     plate.setMotion( motion );
     Geometry geom;
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     geom.moveBodies(0);
 
     // Setup equations to solve
-    double Reynolds=10;
+    double Reynolds=100;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
@@ -58,8 +58,8 @@ int main(int argc, char* argv[]) {
 
     // Setup timestepper
     double dt = 0.005;
-    // Euler solver(model, dt);
-    RungeKutta2 solver(model, dt);
+    Euler solver(model, dt);
+    //RungeKutta2 solver(model, dt);
     solver.init();
 
     // Build the state variable, zero initial conditions
@@ -68,9 +68,11 @@ int main(int argc, char* argv[]) {
 
     // Setup output routines
     OutputTecplot tecplot( "tecplot/plunge%03d.plt", "Plunging plate, step %03d" );
+    OutputForce force( "tecplot/force.dat" );
     Logger logger;
     // Output Tecplot file every few timesteps
-    logger.addOutput( &tecplot, 25 );
+    logger.addOutput( &tecplot, 10 );
+    logger.addOutput( &force, 1 ); 
     logger.init();
     logger.doOutput( x );
     
@@ -84,8 +86,8 @@ int main(int argc, char* argv[]) {
             << "  y = " << y << endl;
         solver.advance( x );
         computeNetForce(x.f, drag, lift);
-        cout << " x force : " << setw(16) << drag/dt << " , y force : "
-            << setw(16) << lift/dt << "\n";
+        cout << " x force : " << setw(16) << drag*2*nx/length << " , y force : "
+            << setw(16) << lift*2*ny/length << "\n";
         logger.doOutput( x );
     }
     logger.cleanup();
