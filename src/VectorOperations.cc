@@ -174,7 +174,7 @@ double YSum( const Flux& q) {
 }   
 
 // Routine for computing X & Y forces
-void computeNetForce( BoundaryVector& f, double& xforce, double& yforce) {
+void computeNetForce( const BoundaryVector& f, double& xforce, double& yforce) {
    xforce = 0;
    yforce = 0;
    for( int i=0; i<f.getNumPoints(); i++ ) {

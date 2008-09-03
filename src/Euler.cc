@@ -65,6 +65,7 @@ bool Euler::save(const string& basename) {
 
 void Euler::advance(State& x) {
     // If the body is moving, update the positions of the bodies
+    const Grid& grid = _model.getGrid(); 
     const Geometry& geom = _model.getGeometry();
     if ( ! geom.isStationary() ) {
         geom.moveBodies(x.time);
@@ -80,6 +81,7 @@ void Euler::advance(State& x) {
     
     // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
     BoundaryVector b = geom.getVelocities();
+    b *= grid.getDx();
     BoundaryVector b0 = _model.getBaseFlowBoundaryVelocities();
     b -= b0;
     

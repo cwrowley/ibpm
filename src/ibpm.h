@@ -41,5 +41,6 @@
 #include "Logger.h"
 #include "OutputTecplot.h"
 #include "OutputRestart.h"
+#include "OutputForce.h"
 
 #endif /* _IBPM_H_ */

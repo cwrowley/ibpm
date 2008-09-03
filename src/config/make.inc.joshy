@@ -6,9 +6,9 @@ CXXFLAGS = -fast -Minline=levels:10 -DNDEBUG
 CXXFLAGS = -g
 
 lib_dirs = \
-	-L/home/cwrowley/lib \
+	-L/home/cwrowley/pgi/lib \
 	-L/nfs/sequoia/sahuja/joshy/fftw3/lib
 
 include_dirs = \
-	-I/home/cwrowley/include \
+	-I/home/cwrowley/pgi/include \
 	-I/nfs/sequoia/sahuja/joshy/fftw3/include

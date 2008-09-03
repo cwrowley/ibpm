@@ -81,10 +81,12 @@ int main(int argc, char* argv[]) {
     // Setup output routines
     OutputTecplot tecplot( "ibpm%03d.plt", "Test run, step %03d" );
     OutputRestart restart( "restart%03d.bin" );
+    OutputForce force( "force.dat" ); 
     Logger logger;
     // Output Tecplot file every timestep
     logger.addOutput( &tecplot, 25 );
     logger.addOutput( &restart, 20 );
+    logger.addOutput( &force, 1);
     logger.init();
     logger.doOutput( x );
     
@@ -93,7 +95,7 @@ int main(int argc, char* argv[]) {
     for(int i=1; i <= numSteps; ++i) {
         cout << "step " << i << endl;
         solver.advance( x );
-        computeNetForce(x.f, drag, lift);
+        computeNetForce( x.f, drag, lift);
         cout << "x force : " << setw(16) << drag*2*nx/length << " , y force : "
             << setw(16) << lift*2*ny/length << "\n";
         logger.doOutput( x );

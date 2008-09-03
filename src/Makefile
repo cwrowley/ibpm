@@ -23,6 +23,7 @@ OBJS = \
 	NavierStokesModel.o \
 	OutputRestart.o \
 	OutputTecplot.o \
+        OutputForce.o \
 	ProjectionSolver.o \
 	Regularizer.o \
 	RigidBody.o \

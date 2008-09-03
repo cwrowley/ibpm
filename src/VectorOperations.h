@@ -49,7 +49,7 @@ double XSum( const Flux& q );
 double YSum( const Flux& q ); 
 
 /// \brief Routine for computing X & Y forces
-void computeNetForce( BoundaryVector& f, double& xforce, double& yforce);
+void computeNetForce( const BoundaryVector& f, double& xforce, double& yforce);
 
 /*! Return the sine transform of a Scalar object using DST-I.
 (fftw library is used (real fft kind:RODFT00); only interior nodes are considered.)
