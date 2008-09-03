@@ -85,8 +85,8 @@ int main(int argc, char* argv[]) {
             << "  theta = " << theta << endl;
         solver.advance( x );
         computeNetForce(x.f, drag, lift);
-        cout << " x force : " << setw(16) << drag*2*nx/length << " , y force : "
-            << setw(16) << lift*2*ny/length << "\n";
+        cout << " x force : " << setw(16) << drag*2 << " , y force : "
+            << setw(16) << lift*2 << "\n";
         logger.doOutput( x );
     }
     logger.cleanup();

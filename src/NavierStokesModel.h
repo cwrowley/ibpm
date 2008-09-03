@@ -83,7 +83,7 @@ public:
     /// Compute gamma = B(f) as in (14)
     inline void B(const BoundaryVector& f, Scalar& gamma ) const {
         assert( _hasBeenInitialized );
-        Flux q = _regularizer.toGrid( f );
+        Flux q = _regularizer.toFlux( f );
         gamma = Curl( q );
     }
     

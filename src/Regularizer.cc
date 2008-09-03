@@ -90,7 +90,7 @@ void Regularizer::update() {
     }
 }
 
-Flux Regularizer::toGrid(const BoundaryVector& u1) const {
+Flux Regularizer::toFlux(const BoundaryVector& u1) const {
     // Allocate a new Flux field, initialized to zero
     Flux u2(_grid);
     u2 = 0;
@@ -101,6 +101,9 @@ Flux Regularizer::toGrid(const BoundaryVector& u1) const {
         // add the weight factor times the boundary value to the flux
         u2(a->fluxIndex) += a->weight * u1(a->boundaryIndex);
     }
+
+    // Multiply by grid spacing for correct dimension (Flux)
+    u2 *= _grid.getDx();
 
     // Return the new flux field
     return u2;
@@ -117,6 +120,9 @@ BoundaryVector Regularizer::toBoundary(const Flux& u2) const {
         // Add the weight factor times the flux value to the boundary
         u1(a->boundaryIndex) += a->weight * u2(a->fluxIndex);
     }
+
+    // Divide by grid spacing for correct dimension (Force / unit length)
+    u1 /= _grid.getDx();    
 
     // Return the new BoundaryVector
     return u1;

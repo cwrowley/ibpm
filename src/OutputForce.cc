@@ -38,8 +38,8 @@ bool OutputForce::doOutput(const State& x) {
     computeNetForce( x.f, drag, lift);
 
     const Grid& grid = x.gamma.getGrid();
-    drag *= 2./grid.getDx();
-    lift *= 2./grid.getDx();
+    drag *= 2;
+    lift *= 2;
 
     FILE *fp = fopen( _fname, "a" );
     if (fp == NULL) return false;

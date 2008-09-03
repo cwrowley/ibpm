@@ -70,7 +70,6 @@ bool RungeKutta2::save(const string& basename) {
 void RungeKutta2::advance(State& x) {
     // If the body is moving, update the positions of the bodies
     const Geometry& geom = _model.getGeometry();
-    const Grid& grid = _model.getGrid(); 
     if ( ! geom.isStationary() ) {
         geom.moveBodies(x.time);
     }
@@ -87,7 +86,6 @@ void RungeKutta2::advance(State& x) {
     
     // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
     BoundaryVector b = geom.getVelocities();
-    b *= grid.getDx();
     BoundaryVector b0 = _model.getBaseFlowBoundaryVelocities();
     b -= b0;
     
@@ -109,7 +107,6 @@ void RungeKutta2::advance(State& x) {
     
     // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
     b = geom.getVelocities();
-    b *= grid.getDx();
     b0 = _model.getBaseFlowBoundaryVelocities();
     b -= b0;
     

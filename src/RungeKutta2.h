@@ -3,8 +3,6 @@
 
 #include "TimeStepper.h"
 #include "State.h"
-#include "Geometry.h"
-#include "Grid.h"
 
 namespace ibpm {
 

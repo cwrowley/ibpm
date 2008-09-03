@@ -57,7 +57,7 @@ public:
     void update();
     
     /// Smear boundary data to grid
-    Flux toGrid(const BoundaryVector& u) const;
+    Flux toFlux(const BoundaryVector& u) const;
 
     /// Interpolate grid data to boundary
     BoundaryVector toBoundary(const Flux& u) const;

@@ -68,8 +68,8 @@ int main(int argc, char* argv[]) {
     double dt = 0.01;
     // Euler solver(model, dt);
     // RungeKutta2 solver(model, dt);
-    RungeKutta3 solver(model, dt);
-    // AdamsBashforth solver(model, dt);
+    // RungeKutta3 solver(model, dt);
+    AdamsBashforth solver(model, dt);
     if ( ! solver.load( "ibpm_test" ) ) {
         solver.init();
         solver.save( "ibpm_test" );
@@ -98,8 +98,8 @@ int main(int argc, char* argv[]) {
         cout << "step " << i << endl;
         solver.advance( x );
         computeNetForce( x.f, drag, lift);
-        cout << "x force : " << setw(16) << drag*2*nx/length << " , y force : "
-            << setw(16) << lift*2*ny/length << "\n";
+        cout << "x force : " << setw(16) << drag*2 << " , y force : "
+            << setw(16) << lift*2 << "\n";
         logger.doOutput( x );
     }
     logger.cleanup();

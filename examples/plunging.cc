@@ -58,8 +58,10 @@ int main(int argc, char* argv[]) {
 
     // Setup timestepper
     double dt = 0.005;
-    Euler solver(model, dt);
+    //Euler solver(model, dt);
     //RungeKutta2 solver(model, dt);
+    //RungeKutta3 solver(model, dt);
+    AdamsBashforth solver(model, dt);
     solver.init();
 
     // Build the state variable, zero initial conditions
@@ -86,8 +88,8 @@ int main(int argc, char* argv[]) {
             << "  y = " << y << endl;
         solver.advance( x );
         computeNetForce(x.f, drag, lift);
-        cout << " x force : " << setw(16) << drag*2*nx/length << " , y force : "
-            << setw(16) << lift*2*ny/length << "\n";
+        cout << " x force : " << setw(16) << drag*2 << " , y force : "
+            << setw(16) << lift*2 << "\n";
         logger.doOutput( x );
     }
     logger.cleanup();
