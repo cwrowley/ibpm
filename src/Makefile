@@ -13,7 +13,7 @@ all: lib ibpm
 include make.inc
 
 OBJS = \
-        AdamsBashforth.o \
+	AdamsBashforth.o \
 	CholeskySolver.o \
 	ConjugateGradientSolver.o \
 	Euler.o \
@@ -22,7 +22,7 @@ OBJS = \
 	Grid.o \
 	Logger.o \
 	NavierStokesModel.o \
-        OutputForce.o \
+	OutputForce.o \
 	OutputRestart.o \
 	OutputTecplot.o \
 	ProjectionSolver.o \

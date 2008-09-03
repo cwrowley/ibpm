@@ -49,9 +49,27 @@ public:
     bool isStationary() const;
 
     void moveBodies(double time) const;
-    
-    void load(const istream& in);
-    
+
+    /// \brief Load a geometry from the specified input stream.
+    /// Returns false if invalid input was encountered
+    /// Input format is as follows:
+    ///    name My Geometry
+    ///    body Flat Plate
+    ///        line 0 0 1 0 0.1  # points on a line, spacing approximately 0.1
+    ///        center 0.25 0     # center at quarter chord
+    ///        motion fixed 0 0 0.3 # 0.3 radians angle of attack
+    ///    end
+    ///    body Large Circle
+    ///        circle 2 3 5 0.1 # Points on a circle
+    ///                         # default center is (2,3)
+    ///    end
+    ///    body Airfoil
+    ///        raw naca0012.in  # Read in the raw data file
+    ///    end
+    bool load(istream& in);
+
+    /// \brief Associate a Regularizer object.
+    /// WARNING: Does not make a copy internally
     void setRegularizer(Regularizer& reg) const;
     
 private:

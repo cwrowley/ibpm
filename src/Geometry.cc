@@ -15,6 +15,12 @@
 #include "Geometry.h"
 #include "RigidBody.h"
 #include "Regularizer.h"
+#include <iostream>
+#include <sstream>
+#include <string>
+#include "utils.h"
+
+using namespace std;
 
 namespace ibpm {
 
@@ -85,8 +91,61 @@ void Geometry::addBody(const RigidBody& body) {
     _isStationary = _isStationary && body.isStationary();
 }
 
-void Geometry::load(const istream& in) {
-    // TODO: implement this
+// Input format is as follows:
+//    name My Geometry
+//    body Flat Plate
+//        line 0 0 1 0 0.1  # points on a line, spacing approximately 0.1
+//        center 0.25 0     # center at quarter chord
+//        motion fixed 0 0 0.3 # 0.3 radians angle of attack
+//    end
+//    body Large Circle
+//        circle 2 3 5 0.1 # Points on a circle
+//                         # default center is (2,3)
+//    end
+//    body Airfoil
+//        raw naca0012.in  # Read in the raw data file
+//    end
+bool Geometry::load(istream& in) {
+    string buf;
+    string cmd;
+    bool error_found = false;
+    while ( getline( in, buf ) ) {
+#ifdef DEBUG
+        cerr << "You typed:" << buf << endl;
+#endif
+        istringstream one_line( buf );
+        one_line >> cmd;
+        MakeLowercase( cmd );
+        if ( cmd[0] == '#' ) {
+#ifdef DEBUG
+            cerr << "[comment]" << endl;
+#endif
+        }
+        else if ( cmd == "body" ) {
+            string name;
+            getline( one_line, name );
+            EatWhitespace( name );
+            RigidBody body;
+            body.setName( name );
+            body.load( in );
+            addBody( body );
+#ifdef DEBUG
+            cerr << "Load a new body, named [" << name << "]" << endl;
+#endif
+        }
+        else if ( cmd == "end" ) {
+#ifdef DEBUG
+            cerr << "End" << endl;
+#endif
+            break;
+        }
+        else {
+            cerr << "WARNING: could not parse the following line:" << endl;
+            cerr << buf << endl;
+        }
+    }
+    if ( error_found ) return false;
+    else return true;
 }
 
 void Geometry::setRegularizer(Regularizer& reg) const {

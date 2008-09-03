@@ -26,11 +26,13 @@
 #include "RigidBody.h"
 #include "TangentSE2.h"
 #include "Motion.h"
+#include "FixedPosition.h"
+#include "PitchPlunge.h"
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <ctype.h>
+#include "utils.h"
 
 using namespace std;
 
@@ -43,7 +45,27 @@ RigidBody::RigidBody() {
     _motion = NULL;
 }
 
-RigidBody::~RigidBody() {}
+RigidBody::RigidBody(const RigidBody& body) :
+   _xCenter( body._xCenter ),
+   _yCenter( body._yCenter ),
+   _isStationary( body._isStationary ),
+   _refPoints( body._refPoints ),
+   _currentPoints( body._currentPoints ),
+   _currentVelocities( body._currentVelocities ) {
+   if ( body._motion == NULL ) {
+       _motion = NULL;
+   }
+   else {
+       _motion = body._motion->clone();
+   }
+}
+
+RigidBody::~RigidBody() {
+    if ( _motion != NULL ) {
+        cout << "         deleting _motion" << endl;
+        delete _motion;
+    }
+}
 
 void RigidBody::addPoint(double x, double y) {
     Point p(x,y);
@@ -159,19 +181,6 @@ static bool check_bad_input(
     }
 }
 
-// 
-static void eat_whitespace( string& s ) {
-    while ( isspace( s[0] ) ) {
-        s.erase(0,1);
-    }
-}
-
-static void make_lowercase( string& s ) {
-    for (unsigned int i=0; i<s.length(); ++i) {
-        s[i] = tolower(s[i]);
-    }
-}
-
 #define RB_CHECK_FOR_ERRORS                     \
     if ( check_bad_input( one_line, buf ) ) {   \
         error_found = true;                     \
@@ -190,6 +199,8 @@ static void make_lowercase( string& s ) {
 //     circle xc yc radius dx
 //     circle_n xc yc radius npts
 //     raw naca0012.dat
+//     motion fixed x y theta
+//     motion pitchplunge amp1 freq1 amp2 freq2
 //     end
 // Whitespace at the beginning of the line is ignored
 // Returns false if invalid input was encountered
@@ -203,7 +214,7 @@ bool RigidBody::load(istream& in) {
 #endif
         istringstream one_line( buf );
         one_line >> cmd;
-        make_lowercase( cmd );
+        MakeLowercase( cmd );
         if ( cmd[0] == '#' ) {
 #ifdef DEBUG
             cerr << "[comment]" << endl;
@@ -279,11 +290,37 @@ bool RigidBody::load(istream& in) {
                 << x1 << ", " << y1 << "), n = " << numPoints << endl;
 #endif
         }
+        else if ( cmd == "motion" ) {
+            string motionType;
+            one_line >> motionType;
+            MakeLowercase( motionType );
+            if ( motionType == "fixed" ) {
+                // FixedPosition
+                double x;
+                double y;
+                double theta;
+                one_line >> x >> y >> theta;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new FixedPosition( x, y, theta );
+                setMotion( *m );
+            }
+            else if ( motionType == "pitchplunge" ) {
+                // PitchPlunge
+                double amp1;
+                double freq1;
+                double amp2;
+                double freq2;
+                one_line >> amp1 >> freq1 >> amp2 >> freq2;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new PitchPlunge( amp1, freq1, amp2, freq2 );
+                setMotion( *m );
+            }
+        }
         else if ( cmd == "name" ) {
             string name;
             getline( one_line, name );
             RB_CHECK_FOR_ERRORS;
-            eat_whitespace( name );
+            EatWhitespace( name );
             setName( name );
 #ifdef DEBUG
             cerr << "Specify the name: " << name << endl;
@@ -348,7 +385,12 @@ bool RigidBody::isStationary() const {
 }
 
 void RigidBody::setMotion(const Motion& motion) {
-    _motion = &motion;
+    // Delete the old motion, if present
+    if ( _motion != NULL ) {
+        delete _motion;
+    }
+    // make a local copy of the new motion
+    _motion = motion.clone();
     _isStationary = motion.isStationary();
 }
 

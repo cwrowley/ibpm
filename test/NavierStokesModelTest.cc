@@ -108,11 +108,14 @@ TEST_F( NavierStokesModelTest, SOfSinvEqualsIdentity ) {
     EXPECT_ALL_EQ( SinvSgamma(i,j), gamma(i,j) );
 #ifdef DEBUG
     cout << "gamma:" << endl;
-    print(gamma);
+    // print(gamma);
+    gamma.print();
     cout << "Sgamma:" << endl;
-    print(Sgamma);
+    // print(Sgamma);
+    Sgamma.print();
     cout << "SinvSgamma:" << endl;
-    print(SinvSgamma);
+    // print(SinvSgamma);
+    SinvSgamma.print();
 #endif
 
 }

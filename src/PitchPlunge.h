@@ -53,6 +53,16 @@ public:
         return TangentSE2( 0, y, theta, 0, ydot, thetadot );
     }
 
+    inline Motion* clone() const {
+        double twopi = 8. * atan(1.);
+        return new PitchPlunge(
+            _pitchAmp,
+            _pitchFreq / twopi,
+            _plungeAmp,
+            _plungeFreq / twopi
+        );
+    };
+
 private:
     double _pitchAmp;
     double _pitchFreq;

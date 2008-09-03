@@ -30,6 +30,9 @@ public:
     /// Return a Euclidean transformation and its velocity
     /// (an element of TSE(2) at the specified time
     virtual TangentSE2 getTransformation(double time) const = 0;
+    
+    /// Return a pointer to a new copy: subclasses must overload
+    virtual Motion* clone() const = 0;
 };
 
 } // namespace

@@ -33,6 +33,7 @@ class RigidBody {
 public:
     /// Default constructor, initializes the center to (0,0).
     RigidBody();
+    RigidBody(const RigidBody& body);
 
     /// Destructor
     ~RigidBody();
@@ -90,6 +91,8 @@ public:
     ///     circle xc yc radius dx
     ///     circle_n xc yc radius npts
     ///     raw naca0012.dat
+    ///     motion fixed x y theta
+    ///     motion pitchplunge amp1 freq1 amp2 freq2
     ///     end
     /// Whitespace at the beginning of the line is ignored
     /// Returns false if invalid input was encountered
@@ -150,7 +153,7 @@ private:
     vector<Point> _refPoints;
     mutable vector<Point> _currentPoints;
     mutable vector<Point> _currentVelocities;
-    const Motion *_motion;
+    Motion *_motion;
 };
 
 // Define a small class for keeping track of points in 2d

@@ -42,6 +42,10 @@ public:
     inline TangentSE2 getTransformation(double time) const {
         return TangentSE2( _x, _y, _theta, 0, 0, 0 );
     }
+    
+    inline Motion* clone() const {
+        return new FixedPosition( _x, _y, _theta );
+    };
 
 private:
     double _x;
