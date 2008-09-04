@@ -56,10 +56,22 @@ public:
     /// Update operators, for instance when the position of the bodies changes
     void update();
     
-    /// Smear boundary data to grid
+    /// \brief Smear boundary data to grid.
+    /// In particular, if u1 denotes the vectors along the boundary,
+    /// and u2 denotes the velocity vectors in the 2d domain, computes
+    /// a discrete approximation to
+    ///    u2(x,y) = \int u1(\xi,\eta) \delta(x-\xi) \delta(y-\eta) d\xi d\eta
+    ///      \approx \sum u1(\xi,\eta) \delta(x-\xi) \delta(y-\eta) * dx^2
+    /// The flux returned is the corresponding flux through cell edges,
+    /// or u2 * dx
     Flux toFlux(const BoundaryVector& u) const;
 
-    /// Interpolate grid data to boundary
+    /// \brief Interpolate grid data to boundary.
+    /// In particular, if q denotes fluxes in the 2D domain, compute
+    /// corresponding velocities u2 = q / dx, and define velocities u1 at
+    /// boundary points by interpolation:
+    ///    u1(x,y) = \int u2(\xi,\eta) \delta(x-\xi) \delta(y-\eta) d\xi d\eta
+    ///      \approx \sum u2(\xi,\eta) \delta(x-\xi) \delta(y-\eta) * dx^2
     BoundaryVector toBoundary(const Flux& u) const;
 
 private:

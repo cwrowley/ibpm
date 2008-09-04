@@ -47,6 +47,7 @@ public:
     /// Advance the state forward one step, using RK3
     void advance(State& x);
 private:
+    void createAllSolvers();
     ProjectionSolver* _solver1;
     ProjectionSolver* _solver2;
     ProjectionSolver* _solver3;

@@ -37,7 +37,6 @@ Euler::~Euler() {
 }
 
 void Euler::init() {
-    _model.init();
     if (_solver == 0) {
         _solver = createSolver(_timestep);
     }
@@ -45,7 +44,6 @@ void Euler::init() {
 }
 
 bool Euler::load(const string& basename) {
-    _model.init();
     if (_solver == 0) {
         _solver = createSolver(_timestep);
     }

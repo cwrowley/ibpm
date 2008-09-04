@@ -55,69 +55,54 @@ RungeKutta3::~RungeKutta3() {
     delete _solver3;
 }
 
-void RungeKutta3::init() {
-    _model.init();
-    // Initialize 1st solver: alpha = h/3
+void RungeKutta3::createAllSolvers() {
+    // 1st solver: alpha = h/3
     if (_solver1 == 0) {
         _solver1 = createSolver(_timestep/3.);
     }
-    _solver1->init();
-    // Initialize 2nd solver: alpha = 5*h/12
+
+    // 2nd solver: alpha = 5*h/12
     if (_solver2 == 0) {
         _solver2 = createSolver(_timestep*5./12.);
     }
-    _solver2->init();
-    // Initialize 3rd solver: alpha = h/4
+
+    // 3rd solver: alpha = h/4
     if (_solver3 == 0) {
         _solver3 = createSolver(_timestep/4.);
     }
+}
+
+void RungeKutta3::init() {
+    createAllSolvers();
+    _solver1->init();
+    _solver2->init();
     _solver3->init();
 }
  
 bool RungeKutta3::load(const string& basename) {
-    _model.init();
-    char bname[256];
-    bool success = false;
-    // load first solver
-    sprintf(bname, basename.c_str(), "_01");
-    if (_solver1 == 0) {
-        _solver1 = createSolver(_timestep/3.);
-    }
-    success = _solver1->load( bname );
-    // load second solver
-    sprintf(bname, basename.c_str(), "_02");
-    if (_solver2 == 0) {
-        _solver2 = createSolver(_timestep*5./12.);
-    }
-    success = success && _solver2->load( bname );
-    // load third solveri
-    sprintf(bname, basename.c_str(), "_03");
-    if (_solver3 == 0) {
-        _solver3 = createSolver(_timestep/4.);
-    }
-    success = success && _solver3->load( bname );   
+    createAllSolvers();
+    bool success;
+    success =            _solver1->load( basename + "_01" );
+    success = success && _solver2->load( basename + "_02" );
+    success = success && _solver3->load( basename + "_03" );
     return success;
 }
 
 // Save the ProjectionSolver's state, if necessary
 // (e.g. the Cholesky factorization)
 bool RungeKutta3::save(const string& basename) {
-    char bname[256];
-    bool success = false;
+    bool success;
     // save first solver
-    sprintf(bname, basename.c_str(), "_01");
     if (_solver1 != 0) {
-        success = _solver1->save( bname );
+        success = _solver1->save( basename + "_01" );
     }
     // save second solver
-    sprintf(bname, basename.c_str(), "_02");
     if (_solver2 != 0) {
-        success = success && _solver2->save( bname );
+        success = success && _solver2->save( basename + "_02" );
     }
     // save third solver
-    sprintf(bname, basename.c_str(), "_03");
     if (_solver3 != 0) {
-        success = success && _solver3->save( bname );
+        success = success && _solver3->save( basename + "_03" );
     }
     return success;
 }

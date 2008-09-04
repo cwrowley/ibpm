@@ -43,7 +43,6 @@ AdamsBashforth::~AdamsBashforth() {
 }
 
 void AdamsBashforth::init() {
-    _model.init();
     if (_solver == 0) {
         _solver = createSolver(_timestep);
     }
@@ -51,7 +50,6 @@ void AdamsBashforth::init() {
 }
 
 bool AdamsBashforth::load(const string& basename) {
-    _model.init();
     if (_solver == 0) {
         _solver = createSolver(_timestep);
     }

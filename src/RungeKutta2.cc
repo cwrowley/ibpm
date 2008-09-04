@@ -41,7 +41,6 @@ RungeKutta2::~RungeKutta2() {
 }
 
 void RungeKutta2::init() {
-    _model.init();
     if (_solver == 0) {
         _solver = createSolver(_timestep);
     }
@@ -49,7 +48,6 @@ void RungeKutta2::init() {
 }
 
 bool RungeKutta2::load(const string& basename) {
-    _model.init();
     if (_solver == 0) {
         _solver = createSolver(_timestep);
     }

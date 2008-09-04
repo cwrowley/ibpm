@@ -1,7 +1,9 @@
 #include "Regularizer.h"
 #include "Grid.h"
+#include "Scalar.h"
 #include "RigidBody.h"
 #include "Geometry.h"
+#include "VectorOperations.h"
 #include <gtest/gtest.h>
 #include <iostream>
 
@@ -18,6 +20,7 @@ protected:
       _nx(10),
       _ny(20),
       _grid(_nx, _ny, 2, -1, -2),
+      _dx( _grid.getDx() ),
       _u1(1),
       _u2(_grid)
     {
@@ -30,13 +33,14 @@ protected:
 
         _u1(X,0) = 3;
         _u1(Y,0) = 5;
-        _u2 = _regularizer->toGrid(_u1);        
+        _u2 = _regularizer->toFlux(_u1);        
     }
 
     // data
     int _nx;
     int _ny;
     Grid _grid;
+    double _dx;
     BoundaryVector _u1;
     Flux _u2;
     Geometry _geom;
@@ -69,19 +73,28 @@ protected:
 //     5. phi(r-i)^2 = 1/2 for all r
 //         - (boundary -> grid -> boundary) should give 1/4 * original value
 
-TEST_F(RegularizerTest, FluxIntegratesToOne) {
-    Flux::index ind;
-    double total = 0;
-    for (ind = _u2.begin(X); ind != _u2.end(X); ++ind) {
-        total += _u2(ind);
-    }
-    EXPECT_DOUBLE_EQ(total, _u1(X,0));
+TEST_F(RegularizerTest, FluxSumsToOne) {
+    Scalar one( _grid );
+    Scalar zero( _grid );
+    Flux q( _grid );
+
+    one = 1.;
+    zero = 0.;
     
-    total = 0;
-    for (ind = _u2.begin(Y); ind != _u2.end(Y); ++ind) {
-        total += _u2(ind);
-    }
-    EXPECT_DOUBLE_EQ(total, _u1(Y,0));
+    // Sum X component
+    VelocityToFlux( one, zero, q );
+    double sum = InnerProduct( q, _u2 );
+    // Normalize by dx^2: inner product is
+    // \int (u1 * u2) dx dy \approx \sum (u1 * u2) * dx^2
+    sum /= _dx * _dx;
+    EXPECT_DOUBLE_EQ( _u1(X,0), sum );
+
+    // Sum Y component
+    VelocityToFlux( zero, one, q );
+    sum = InnerProduct( q, _u2);
+    // Normalize by dx^2, as before
+    sum /= _dx * _dx;
+    EXPECT_DOUBLE_EQ( _u1(Y,0), sum );
 }
 
 TEST_F(RegularizerTest, MomentIsZero) {
@@ -155,19 +168,23 @@ TEST_F(RegularizerTest, FluxZeroAwayFromBoundary) {
 }
 
 TEST_F(RegularizerTest, InterpolateConstant) {
-    Flux u(_grid);
+    Scalar u(_grid);
+    Scalar v(_grid);
+    Flux   q(_grid);
     u = 7;
-    BoundaryVector f = _regularizer->toBoundary(u);
+    v = 9;
+    VelocityToFlux( u, v, q );
+    BoundaryVector f = _regularizer->toBoundary( q );
     
     EXPECT_NEAR(f(X,0), 7, tol);
-    EXPECT_NEAR(f(Y,0), 7, tol);
+    EXPECT_NEAR(f(Y,0), 9, tol);
 }
 
 TEST_F(RegularizerTest, SmoothThenInterpolateEqualsQuarter) {
     BoundaryVector f = _regularizer->toBoundary(_u2);
     
-    EXPECT_NEAR(f(X,0), _u1(X,0) * 0.25, tol);
-    EXPECT_NEAR(f(Y,0), _u1(Y,0) * 0.25, tol);
+    EXPECT_NEAR( f(X,0), _u1(X,0) * 0.25, tol );
+    EXPECT_NEAR( f(Y,0), _u1(Y,0) * 0.25, tol );
 }
 
 } // namespace

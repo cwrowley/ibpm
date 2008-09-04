@@ -53,7 +53,10 @@ public:
     inline const Grid& getGrid() const { return _grid; }
 
     /// Return a pointer to the eigenvalues of the linear term L
-    inline const Scalar& getLambda() const { return _linearTermEigenvalues; }
+    inline const Scalar& getLambda() const { 
+        assert( _hasBeenInitialized );
+        return _linearTermEigenvalues;
+    }
     
     /// Transform to eigenvectors of L (discrete sin transform)
     inline Scalar S(const Scalar& g) const {
