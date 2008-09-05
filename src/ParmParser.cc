@@ -24,42 +24,72 @@ ParmParser::ParmParser(int argc, char* argv[]) :
     _argc( argc ),
     _argv( argc ),
     _used( argc ) {
-    _helpDesired = false;
     _args = "";
     for (int i=1; i<argc; ++i) {
         _args += argv[i];
         _args += " ";
         _argv[i] = argv[i];
         _used[i] = false;
-        if ( _argv[i] == "-help" ) {
-            _helpDesired = true;
-            _used[i] = true;
-        }
     }
-    _argOut << argv[0];
-    _usageMessage << "USAGE: " << argv[0] << " [options]" << endl
+    _argv[0] = argv[0];
+    _argOut << _argv[0];
+    // remove path from executable name, if specified on command line
+    string exec = _argv[0];
+    int slashPosition = exec.find_last_of( '/' );
+    if ( slashPosition >= 0 ) {
+        exec = string( exec, slashPosition + 1, exec.length() );
+    }
+    _usageMessage << "USAGE: " << exec << " [options]" << endl
         << "where [options] are as follows (defaults shown in [ ]):" << endl;
-    appendUsageMessage( "help", "", "display this help message and exit", "" );
-}
-
-bool ParmParser::helpDesired() {
-    return _helpDesired;
 }
 
 void ParmParser::appendUsageMessage(
     string parm,
     string type,
     string description,
-    string defaultVal )
-    {
+    string defaultVal
+    ) {
     _usageMessage.setf(ios_base::left);
     _usageMessage << "  " << setw(OPTION_WIDTH) << "-" + parm + " " + type
         << description << " [" << defaultVal << "]" << endl;
 }
 
+void ParmParser::appendUsageMessage(
+    string flag,
+    string description
+    ) {
+    _usageMessage.setf(ios_base::left);
+    _usageMessage << "  " << setw(OPTION_WIDTH) << "-" + flag
+        << description << endl;
+}
+
+bool ParmParser::getFlag( string flag, string description ) {
+    appendUsageMessage( flag, description );
+    flag = "-" + flag;
+    
+    // Make an input stream with the whole argument list
+    istringstream in;
+    in.str(_args);
+    
+    // Loop through all the command line arguments
+    int i=0;
+    string s;
+    while ( in >> s ) {
+        ++i;
+        // If the specified parameter is found
+        if ( s == flag ) {
+            _used[i] = true;
+            _argOut << " " << flag;
+            return true;
+        }
+    }
+    // If not found, return false
+    return false;
+}
+
 // Generic function to search for the given entry parm and return its
 // argument or a default value
-template<class T> T ParmParser::get(
+template<class T> T ParmParser::getParm(
     string parm,
     string description,
     T defaultVal
@@ -110,23 +140,23 @@ template<class T> T ParmParser::get(
 /// defaultVal if not specified or invalid
 int ParmParser::getInt( string parm, string description, int defaultVal ) {
     PP_APPEND_USAGE("<int>");
-    return get( parm, description, defaultVal );
+    return getParm( parm, description, defaultVal );
 }
 
 // Make a template function from getInt?
 double ParmParser::getDouble( string parm, string description, double defaultVal ) {
     PP_APPEND_USAGE("<real>");
-    return get( parm, description, defaultVal );
+    return getParm( parm, description, defaultVal );
 }
 
 string ParmParser::getString( string parm, string description, string defaultVal ) {
     PP_APPEND_USAGE("<string>");
-    return get( parm, description, defaultVal );
+    return getParm( parm, description, defaultVal );
 }
 
 bool ParmParser::getBool( string parm, string description, bool defaultVal ) {
     PP_APPEND_USAGE("[0 or 1]");
-    return get( parm, description, defaultVal );
+    return getParm( parm, description, defaultVal );
 }
 
 #undef PP_APPEND_USAGE

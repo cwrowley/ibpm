@@ -25,8 +25,13 @@ public:
     /// Constructor, taking command line arguments as input
     ParmParser(int argc, char* argv[]);
 
-    /// Search the parameter list for the given entry parm, returning
-    /// defaultVal if not specified or invalid
+    /// Search the parameter list for the given flag, that does not take
+    /// an argument.  Returns true if the flag is present
+    bool getFlag( string flag, string description );
+    
+    /// Search the parameter list for the given entry parm and a single
+    /// argument of the indicated type, returning defaultVal if not specified
+    /// If argument is invalid, print a warning message and return defaultVal
     int getInt( string parm, string description, int defaultVal );
     double getDouble( string parm, string description, double defaultVal );
     string getString( string parm, string description, string defaultVal );
@@ -40,9 +45,6 @@ public:
     /// \brief Print a usage message
     void printUsage( ostream& out );
     
-    /// \brief Return true if the user has requested help (e.g. -help flag)
-    bool helpDesired();
-
     /// \brief Return argument list in a string
     string getParameters();
     
@@ -50,8 +52,18 @@ public:
     void saveParameters( string fname );
 
 private:
-    void appendUsageMessage( string parm, string type, string description, string defVal );
-    template<class T> T get( string parm, string description, T defaultVal);
+    void appendUsageMessage( string flag, string description );
+    void appendUsageMessage(
+        string parm,
+        string type,
+        string description,
+        string defVal
+    );
+    template<class T> T getParm(
+        string parm,
+        string description,
+        T defaultVal
+    );
     
     // data
     int _argc;
@@ -60,7 +72,6 @@ private:
     string _args;
     ostringstream _argOut;
     ostringstream _usageMessage;
-    bool _helpDesired;
 };
 
 #endif /* _PARMPARSER_H_ */

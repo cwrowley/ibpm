@@ -47,7 +47,7 @@ TEST( ParmParserTest, True ) {
 }
 
 TEST( ParmParserTest, CorrectArguments ) {
-    string cmd = "a.out -flag 1 -fname myFile -ny 20 -nx 10 -length 3.14";
+    string cmd = "a.out -b 1 -flag -fname myFile -ny 20 -nx 10 -length 3.14";
     ParmParser* parser = GetParser( cmd );
     int nx = parser->getInt( "nx", "description of nx", 100 );
     EXPECT_EQ( 10, nx );
@@ -61,11 +61,17 @@ TEST( ParmParserTest, CorrectArguments ) {
     string fname = parser->getString( "fname", "description", "name" );
     EXPECT_EQ( "myFile", fname );
     
-    bool flag = parser->getBool( "flag", "description", 0 );
+    bool on = parser->getBool( "b", "description", 0 );
+    EXPECT_EQ( true, on );
+
+    bool flag = parser->getFlag( "flag", "description" );
     EXPECT_EQ( true, flag );
+    
+    bool flag2 = parser->getFlag( "flag2", "description" );
+    EXPECT_EQ( false, flag2 );
 
     EXPECT_EQ( true, parser->inputIsValid() );
-    EXPECT_EQ( "a.out -nx 10 -ny 20 -length 3.14 -fname myFile -flag 1",
+    EXPECT_EQ( "a.out -nx 10 -ny 20 -length 3.14 -fname myFile -b 1 -flag",
         parser->getParameters() );
     
     delete parser;

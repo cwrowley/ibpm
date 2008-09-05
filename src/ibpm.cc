@@ -37,6 +37,7 @@ int main(int argc, char* argv[]) {
 
     // Get parameters
     ParmParser parser( argc, argv );
+    bool helpFlag = parser.getFlag( "h", "print this help message and exit" );
     string name = parser.getString( "name", "run name", "ibpm" );
     int nx = parser.getInt(
         "nx", "number of gridpoints in x-direction", 200 );
@@ -57,9 +58,6 @@ int main(int argc, char* argv[]) {
     string icFile = parser.getString( "ic", "initial condition filename", "");
     string outdir = parser.getString(
         "outdir", "directory for saving output", "." );
-    AddSlashToPath( outdir );
-    // create output directory if not already present
-    mkdir( outdir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
     int iTecplot = parser.getInt(
         "tecplot", "if >0, write a Tecplot file every n timesteps", 100);
     int iRestart = parser.getInt(
@@ -69,12 +67,16 @@ int main(int argc, char* argv[]) {
     int numSteps = parser.getInt(
         "nsteps", "number of timesteps to compute", 250 );
 
-    if ( ! parser.inputIsValid() || parser.helpDesired() ) {
+    if ( ! parser.inputIsValid() || helpFlag ) {
         parser.printUsage( cerr );
         exit(1);
     }
     string cmd = parser.getParameters();
     cout << "Command:" << endl << cmd << endl;
+
+    // create output directory if not already present
+    AddSlashToPath( outdir );
+    mkdir( outdir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
 
     // Name of this run
     cout << "Run name: " << name << endl;
