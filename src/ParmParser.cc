@@ -14,6 +14,7 @@
 // $HeadURL$
 
 #include "ParmParser.h"
+#include <fstream>
 #include <iomanip>
 
 using namespace std;
@@ -161,7 +162,7 @@ bool ParmParser::getBool( string parm, string description, bool defaultVal ) {
 
 #undef PP_APPEND_USAGE
 
-/// \brief Check if any input parameters were invalid, or unused
+
 bool ParmParser::inputIsValid() {
     // Loop through all the parameters, checking if have been used
     bool allused = true;
@@ -185,7 +186,7 @@ bool ParmParser::inputIsValid() {
     }
 }
 
-/// \brief Print a usage message
+
 void ParmParser::printUsage( ostream& out ) {
     out << _usageMessage.str();
 }
@@ -195,8 +196,7 @@ string ParmParser::getParameters() {
 }
 
 // Save argument list to a file
-// For now, write to standard error
 void ParmParser::saveParameters( string fname ) {
-    cerr << "Parameters:" << endl;
-    cerr << _argOut.str() << endl;
+    fstream out( fname.c_str(), ios_base::out );
+    out << _argOut.str() << endl;
 }

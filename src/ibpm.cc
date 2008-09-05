@@ -71,12 +71,15 @@ int main(int argc, char* argv[]) {
         parser.printUsage( cerr );
         exit(1);
     }
-    string cmd = parser.getParameters();
-    cout << "Command:" << endl << cmd << endl;
 
     // create output directory if not already present
     AddSlashToPath( outdir );
     mkdir( outdir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
+
+    // output command line arguments
+    string cmd = parser.getParameters();
+    cout << "Command:" << endl << cmd << endl;
+    parser.saveParameters( outdir + name + ".cmd" );
 
     // Name of this run
     cout << "Run name: " << name << endl;
