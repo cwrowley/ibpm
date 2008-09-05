@@ -26,7 +26,7 @@
 namespace ibpm {
 
 RungeKutta2::RungeKutta2(NavierStokesModel& model, double timestep) :
-    TimeStepper(model, timestep),
+    TimeStepper("2nd-order Runge-Kutta", model, timestep),
     _linearTermEigenvalues( model.getLambda() ),
     _x1( model.getGrid(), model.getGeometry() )
     {

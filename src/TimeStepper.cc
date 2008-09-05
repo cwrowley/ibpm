@@ -26,10 +26,16 @@ using namespace std;
 namespace ibpm {
 
 TimeStepper::TimeStepper(
+    string name,
     NavierStokesModel& model,
     double timestep) :
+    _name(name),
     _model(model),
     _timestep(timestep) {
+}
+
+string TimeStepper::getName() {
+    return _name;
 }
 
 ProjectionSolver* TimeStepper::createSolver(double alpha) {

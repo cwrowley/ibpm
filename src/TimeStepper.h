@@ -44,10 +44,11 @@ public:
     Note that creation of the ProjectionSolver should be deferred to the
     subclasses, but determination of which type of solver to instantiate
     is handled by the base class.
+    \param[in] name     The name of the solver (e.g. Explicit Euler)
     \param[in] model    The associated NavierStokesModel instance
     \param[in] timestep Timestep to use for the advance() routine
     */
-    TimeStepper(NavierStokesModel& model, double timestep);
+    TimeStepper(string name, NavierStokesModel& model, double timestep);
 
     virtual ~TimeStepper() {}
 
@@ -73,6 +74,10 @@ public:
     */
     virtual bool save(const string& filename);
 
+    /*! \brief Return the name of the timestepping scheme, as a string
+    */
+    string getName();
+
     /*! \brief Advance the state forward in time.
     
     Pure virtual method: must be overridden by subclasses
@@ -85,6 +90,7 @@ public:
 //
 protected:
 
+    const string _name;
     NavierStokesModel& _model;
     double _timestep;
 

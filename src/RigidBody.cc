@@ -208,7 +208,7 @@ bool RigidBody::load(istream& in) {
     string buf;
     string cmd;
     bool error_found = false;
-    while ( getline( cin, buf ) ) {
+    while ( getline( in, buf ) ) {
 #ifdef DEBUG
         cerr << "You typed:" << buf << endl;
 #endif

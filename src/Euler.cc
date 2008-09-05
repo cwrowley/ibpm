@@ -24,7 +24,7 @@
 namespace ibpm {
 
 Euler::Euler(NavierStokesModel& model, double timestep) :
-    TimeStepper(model, timestep),
+    TimeStepper("Explicit Euler", model, timestep),
     _linearTermEigenvalues( _model.getLambda() ) {
     // compute eigenvalues of linear term on RHS
     _linearTermEigenvalues *= timestep/2.;

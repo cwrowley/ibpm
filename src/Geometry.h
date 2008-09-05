@@ -31,6 +31,8 @@ class Geometry {
 public:
     /// Constructor
     Geometry();
+    /// Constructor: load the geometry from the specified file
+    Geometry(string filename);
     
     /// Destructor
     ~Geometry();
@@ -67,6 +69,10 @@ public:
     ///        raw naca0012.in  # Read in the raw data file
     ///    end
     bool load(istream& in);
+    
+    /// \brief Load a geometry from the specified input file
+    /// Returns true if successful
+    bool load(string filename);
 
     /// \brief Associate a Regularizer object.
     /// WARNING: Does not make a copy internally

@@ -30,7 +30,7 @@ using namespace std;
 namespace ibpm {
 
 RungeKutta3::RungeKutta3(NavierStokesModel& model, double timestep) :
-    TimeStepper(model, timestep),
+    TimeStepper("3rd-order Runge-Kutta", model, timestep),
     _linearTermEigenvalues1( model.getLambda() ),
     _linearTermEigenvalues2( model.getLambda() ),
     _linearTermEigenvalues3( model.getLambda() ), 

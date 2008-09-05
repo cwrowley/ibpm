@@ -45,4 +45,8 @@
 #include "OutputRestart.h"
 #include "OutputForce.h"
 
+// utilities
+#include "utils.h"
+#include "ParmParser.h"
+
 #endif /* _IBPM_H_ */

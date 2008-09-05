@@ -26,7 +26,7 @@
 namespace ibpm {
 
 AdamsBashforth::AdamsBashforth(NavierStokesModel& model, double timestep) :
-    TimeStepper(model, timestep),
+    TimeStepper("Adams Bashforth", model, timestep),
     _linearTermEigenvalues( model.getLambda() ),
     _xold( model.getGrid(), model.getGeometry() ),
     _xtemp( model.getGrid(), model.getGeometry() )

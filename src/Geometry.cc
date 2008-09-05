@@ -16,6 +16,7 @@
 #include "RigidBody.h"
 #include "Regularizer.h"
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include "utils.h"
@@ -28,6 +29,13 @@ Geometry::Geometry() {
     _numPoints = 0;
     _isStationary = true;
     _regularizer = NULL;
+}
+
+Geometry::Geometry(string filename) {
+    _numPoints = 0;
+    _isStationary = true;
+    _regularizer = NULL;
+    load( filename );
 }
 
 Geometry::~Geometry() {}
@@ -106,6 +114,10 @@ void Geometry::addBody(const RigidBody& body) {
 //        raw naca0012.in  # Read in the raw data file
 //    end
 bool Geometry::load(istream& in) {
+#ifdef DEBUG
+    cout << "In Geometry::load(in), reading from input stream" << endl;
+    cout << "  in.good() = " << in.good() << endl;
+#endif
     string buf;
     string cmd;
     bool error_found = false;
@@ -116,7 +128,7 @@ bool Geometry::load(istream& in) {
         istringstream one_line( buf );
         one_line >> cmd;
         MakeLowercase( cmd );
-        if ( cmd[0] == '#' ) {
+        if ( one_line.eof() || cmd[0] == '#' ) {
 #ifdef DEBUG
             cerr << "[comment]" << endl;
 #endif
@@ -146,6 +158,20 @@ bool Geometry::load(istream& in) {
     }
     if ( error_found ) return false;
     else return true;
+}
+
+bool Geometry::load(string filename) {
+#ifdef DEBUG
+    cout << "in Geometry::load, opening file " << filename << endl;
+#endif
+    ifstream in( filename.c_str() );
+    if ( in.good() ) {
+        return load( in );
+    }
+    else {
+        cerr << "Error: could not open " << filename << " for input." << endl;
+        return false;
+    }
 }
 
 void Geometry::setRegularizer(Regularizer& reg) const {

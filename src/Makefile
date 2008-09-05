@@ -8,6 +8,8 @@
 # $Author$
 # $HeadURL$
 
+IBPM_VERSION = 0.1
+
 all: lib ibpm
 	
 include make.inc
@@ -25,14 +27,16 @@ OBJS = \
 	OutputForce.o \
 	OutputRestart.o \
 	OutputTecplot.o \
+	ParmParser.o \
 	ProjectionSolver.o \
 	Regularizer.o \
 	RigidBody.o \
 	RungeKutta2.o \
-        RungeKutta3.o \
+	RungeKutta3.o \
 	Scalar.o \
 	State.o \
 	TimeStepper.o \
+	utils.o \
 	VectorOperations.o
 
 LDLIBS = -lfftw3 -lm
@@ -40,8 +44,9 @@ AR = ar
 ARFLAGS = -r
 MAKEDEPEND = gcc -MM
 
+VERSIONDEF = -D'IBPM_VERSION=$(IBPM_VERSION)'
 LDFLAGS += $(lib_dirs)
-CXXFLAGS += $(include_dirs)
+CXXFLAGS += $(VERSIONDEF) $(include_dirs)
 
 IBPMLIB = ../lib/libibpm.a 
 IBPM = ../bin/ibpm
