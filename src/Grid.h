@@ -26,14 +26,21 @@ namespace ibpm {
 
 class Grid {
 public:
-    Grid(int nx, int ny, double length, double xOffset, double yOffset) :
-        _nx(nx),
-        _ny(ny),
-        _xOffset(xOffset),
-        _yOffset(yOffset) {
-        _dx = length / nx;
-    }
+    /// Constructor: set all grid parameters
+    Grid( int nx, int ny, double length, double xOffset, double yOffset );
 
+    /// Default constructor: set all parameters to zero
+    Grid();
+
+    /// Set all grid parameters
+    void resize(
+        int nx,
+        int ny,
+        double length,
+        double xOffset,
+        double yOffset
+    );
+    
     /// Return number of cells in x-direction
     inline int getNx() const { return _nx; }
     

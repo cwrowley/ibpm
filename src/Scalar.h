@@ -33,27 +33,20 @@ namespace ibpm {
 class Scalar {
 public:
     /// Allocate memory for the 2D array
-    Scalar(const Grid& grid) :
-        _grid(grid),
-        _nx(grid.getNx()),
-        _ny(grid.getNy()),
-        _data(_nx+1,_ny+1) {};
+    Scalar( const Grid& grid );
+
+    /// Default constructor: do not allocate memory yet
+    Scalar();
     
     /// Allocate new array, copy the data
-    inline Scalar(const Scalar& f) :
-        _grid(f._grid),
-        _nx(f._nx),
-        _ny(f._ny),
-        _data(_nx+1,_ny+1) {
-        // copy data
-        _data = f._data;
-    }
+    Scalar( const Scalar& f );
     
-    /// Deallocate memory in the destructor
-    ~Scalar() {
-        // deallocation automatic for Blitz++ arrays?
-    }
+    /// Destructor
+    ~Scalar();
 
+    /// Reassign the grid parameters and allocate memory based on the new grid
+    void resize( const Grid& grid );
+    
     const Grid& getGrid() const{
         return _grid;
     }
@@ -77,7 +70,6 @@ public:
     
     /// Copy assignment
     inline Scalar& operator=(const Scalar& f) {
-        assert(&f != this);
         assert(f._nx == _nx);
         assert(f._ny == _ny);
         _data = f._data;
@@ -227,9 +219,9 @@ public:
 
 private:
     
-    const Grid& _grid;
-    const int _nx;
-    const int _ny;
+    Grid _grid;
+    int _nx;
+    int _ny;
     Array<double,2> _data;
     
 };

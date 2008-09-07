@@ -2,7 +2,6 @@
 #define _STATE_H_
 
 #include "Grid.h"
-#include "Geometry.h"
 #include "Flux.h"
 #include "Scalar.h"
 #include "BoundaryVector.h"
@@ -25,10 +24,20 @@ namespace ibpm {
 
 class State {
 public:
-    State(const Grid& grid, const Geometry& geom);
+    /// Default constructor: do not allocate memory
+    State();
+    
+    State( const Grid& grid, int numPoints );
+
+    /// \brief Instantiate a state by reading data from the specified file
+    State( string filename );
 
     ~State();
     
+    /// \brief Allocate memory, with the specified Grid and number of
+    /// boundary points
+    void resize( const Grid& grid, int numPoints );
+
     /// \brief Save the state to a file (e.g. as a restart file)
     /// Return true if successful
     bool save(std::string filename) const;

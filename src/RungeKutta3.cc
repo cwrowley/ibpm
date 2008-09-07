@@ -34,8 +34,8 @@ RungeKutta3::RungeKutta3(NavierStokesModel& model, double timestep) :
     _linearTermEigenvalues1( model.getLambda() ),
     _linearTermEigenvalues2( model.getLambda() ),
     _linearTermEigenvalues3( model.getLambda() ), 
-    _x1( model.getGrid(), model.getGeometry() ),
-    _x2( model.getGrid(), model.getGeometry() )
+    _x1( model.getGrid(), model.getGeometry().getNumPoints() ),
+    _x2( model.getGrid(), model.getGeometry().getNumPoints() )
     {
     // compute eigenvalues of linear terms on RHS of each projection solve
     _linearTermEigenvalues3 *= timestep/8.; 

@@ -20,24 +20,31 @@
 using namespace ibpm;
 
 namespace ibpm {
-    
-State::State(const Grid& grid, const Geometry& geom) :
-    q(grid),
-    gamma(grid),
-    f( geom.getNumPoints() ),
-    timestep(0),
-    time(0.)
-{}
+
+State::State() {
+    timestep = 0;
+    time = 0.;
+}
+
+State::State(const Grid& grid, int numPoints ) {
+    timestep = 0;
+    time = 0.;
+    resize( grid, numPoints );
+}
+
+void State::resize( const Grid& grid, int numPoints ) {
+    q.resize( grid );
+    gamma.resize( grid );
+    f.resize( numPoints );
+}
+
+State::State( string filename ) {
+    timestep = 0;
+    time = 0.;
+    load( filename );
+}
 
 State::~State() {}
-
-#define PARM_CHECK(a,b,c)                                           \
-    if ( !( (a) == (b) ) ) {                                        \
-        cerr << endl << "Error: " << c << " doesn't match." << endl \
-            << "  expected: " << (b) << endl                        \
-            << "      read: " << (a) << endl;                       \
-        return false;                                               \
-    }
 
 bool State::load(const std::string& filename) {
 
@@ -61,47 +68,55 @@ bool State::load(const std::string& filename) {
     int numPoints;
     // read Geometry info
     fread( &numPoints, sizeof( int ), 1, fp );
-        
+    
     // check that Grid and Geometry in file match those expected
-    const Grid& grid = q.getGrid();
-    PARM_CHECK( nx, grid.getNx(), "nx" );
-    PARM_CHECK( ny, grid.getNy(), "ny" );
-    PARM_CHECK( dx, grid.getDx(), "dx" );
-    PARM_CHECK( x0, grid.getXEdge(0), "x0" );
-    PARM_CHECK( y0, grid.getYEdge(0), "x0" );
-
-    PARM_CHECK( numPoints, f.getNumPoints(), "numPoints" );
+    bool success = true;
+    const Grid& oldgrid = q.getGrid();
+    if ( nx != oldgrid.getNx() || 
+        ny != oldgrid.getNy() ||
+        dx != oldgrid.getDx() ||
+        x0 != oldgrid.getXEdge(0) ||
+        y0 != oldgrid.getYEdge(0) ||
+        numPoints != f.getNumPoints() ) {
+        
+        // If old grid was previously allocated, print a warning and set
+        // the return value to false
+        if ( oldgrid.getNx() != 0 ) {
+            cerr << "Warning: grids do not match.  Resizing grid." << endl;
+            success = false;
+        }
+        Grid newgrid( nx, ny, dx * nx, x0, y0 );
+        resize( newgrid, numPoints );
+    }
 
     // read Flux q
     Flux::index qind;
     for ( qind = q.begin(); qind != q.end(); ++qind ) {
-        fread( &( q(qind) ), sizeof( double ), 1, fp );
+        success = success && fread( &( q(qind) ), sizeof( double ), 1, fp );
     }
 
     // read Scalar gamma
     for (int i=0; i<=nx; ++i ) {
         for ( int j=0; j<=ny; ++j ) {
-            fread( &( gamma(i,j) ), sizeof( double ), 1, fp );
+            success = success && fread( &( gamma(i,j) ), sizeof( double ), 1, fp );
         }
     }
 
     // read BoundaryVector f
     for ( int i=0; i < numPoints; ++i ) {
-        fread( &( f(X,i) ), sizeof( double ), 1, fp );
-        fread( &( f(Y,i) ), sizeof( double ), 1, fp );        
+        success = success && fread( &( f(X,i) ), sizeof( double ), 1, fp );
+        success = success && fread( &( f(Y,i) ), sizeof( double ), 1, fp );        
     }
 
     // read timestep and time
-    fread( &timestep, sizeof(int), 1, fp );
-    fread( &time, sizeof(double), 1, fp );
+    success = success && fread( &timestep, sizeof(int), 1, fp );
+    success = success && fread( &time, sizeof(double), 1, fp );
 
     // close file
     fclose( fp );
     cerr << "done" << endl;
-    return true;
+    return success;
 }
-
-#undef PARM_CHECK
 
 bool State::save(std::string filename) const {
     cerr << "Writing restart file " << filename << "..." << flush;

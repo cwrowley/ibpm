@@ -25,27 +25,19 @@ namespace ibpm {
 
 class BoundaryVector {
 public:
+    /// Default constructor: do not allocate memory
+    BoundaryVector();
+    
     /// \brief Constructor, allocating memory for a body with
-    /// n points on the boundary.
-    BoundaryVector(int n) :
-        _numPoints(n),
-        _data( _numPoints * XY )
-        {};
+    /// the given number of  points on the boundary.
+    BoundaryVector( int numPoints );
 
     /// Allocate a new BoundaryVector, copy the data
-    inline BoundaryVector(const BoundaryVector& f) :
-        _numPoints(f._numPoints),
-        _data( _numPoints * XY ) {
-        _data = f._data;
-    }
+    BoundaryVector( const BoundaryVector& f );
 
-    /*! \brief Constructor using pre-existing data, as a 1d array.
-
-    Here, n is the number of boundary points, and *data has size 2n.
-    */
-    BoundaryVector(int n, double* data);
-    // TODO: Implement this, and write tests
-
+    /// Reallocate memory for the given number of points
+    void resize( int numPoints );
+    
     /// Return the number of boundary points
     inline int getNumPoints() const { return _numPoints; }
     

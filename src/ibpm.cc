@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     double yOffset = parser.getDouble(
         "yoffset", "y-coordinate of bottom edge of domain", -2. );
     string geomFile = parser.getString(
-        "geom", "filename for reading geometry", "geom.inp" );
+        "geom", "filename for reading geometry", name + ".geom" );
     double Reynolds = parser.getDouble("Re", "Reynolds number", 100.);
     double dt = parser.getDouble( "dt", "timestep", 0.01 );
     string integratorType = parser.getString(
@@ -94,9 +94,14 @@ int main(int argc, char* argv[]) {
     Grid grid( nx, ny, length, xOffset, yOffset );
 
     // Setup geometry
-    Geometry geom( geomFile );
+    Geometry geom;
     cout << "Reading geometry from file " << geomFile << endl;
-    cout << "  " << geom.getNumPoints() << " points on the boundary" << endl;
+    if ( geom.load( geomFile ) ) {
+        cout << "  " << geom.getNumPoints() << " points on the boundary" << endl;
+    }
+    else {
+        exit(-1);
+    }
 
     // Setup equations to solve
     cout << "Reynolds number = " << Reynolds << endl;
@@ -118,7 +123,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Load initial condition
-    State x(grid, geom);
+    State x( grid, geom.getNumPoints() );
     x.gamma = 0.;
     x.f = 0.;
     x.q = 0.;

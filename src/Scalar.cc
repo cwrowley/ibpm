@@ -22,6 +22,28 @@ using namespace std;
 
 namespace ibpm {
 
+Scalar::Scalar( const Grid& grid ){
+    resize( grid );
+}
+
+/// Default constructor: do not allocate memory yet
+Scalar::Scalar() {
+    _nx = 0;
+    _ny = 0;
+}
+    
+/// Allocate new array, copy the data
+Scalar::Scalar( const Scalar& f ) {
+    resize( f._grid );
+    // copy data
+    _data = f._data;
+}
+    
+/// Deallocate memory in the destructor
+Scalar::~Scalar() {
+    // deallocation automatic for Blitz++ arrays
+}
+
 // Print the whole field to standard output
 void Scalar::print() const {
     int nx = _grid.getNx();
@@ -34,5 +56,13 @@ void Scalar::print() const {
     }
     
 }
+
+void Scalar::resize( const Grid& grid ) {
+    _grid = grid;
+    _nx = grid.getNx();
+    _ny = grid.getNy();
+    _data.resize( _nx+1, _ny+1 );
+}
+
 
 } // namespace

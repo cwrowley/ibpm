@@ -16,6 +16,7 @@ include make.inc
 
 OBJS = \
 	AdamsBashforth.o \
+	BoundaryVector.o \
 	CholeskySolver.o \
 	ConjugateGradientSolver.o \
 	Euler.o \

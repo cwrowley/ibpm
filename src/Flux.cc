@@ -20,31 +20,29 @@
 
 namespace ibpm {
 
-Flux::Flux(const Grid& grid) :
-    _grid(grid),
-    _nx(grid.getNx()),
-    _ny(grid.getNy()),
-    _numXFluxes(_nx * _ny + _ny),
-    _numFluxes(2 * _nx * _ny + _nx + _ny),
-    _data(_numFluxes)
-{}
+Flux::Flux() {}
+
+Flux::Flux( const Grid& grid ) {
+    resize( grid );
+}
 
 /// Allocate new array, copy the data
-Flux::Flux(const Flux& q) :
-    _grid(q._grid),
-    _nx(q._nx),
-    _ny(q._ny),
-    _numXFluxes(q._numXFluxes),
-    _numFluxes(q._numFluxes),
-    _data(_numFluxes) {
-
-    // copy data
+Flux::Flux( const Flux& q ) {
+    resize( q._grid );
     _data = q._data;
 }
 
+/// Set all parameters and reallocate arrays based on the Grid dimensions
+void Flux::resize( const Grid& grid ) {
+    _grid = grid;
+    _nx = grid.getNx();
+    _ny = grid.getNy();
+    _numXFluxes = _nx * _ny + _ny;
+    _numFluxes = 2 * _nx * _ny + _nx + _ny;
+    _data.resize( _numFluxes );
+}
+
 Flux::~Flux() {} // deallocation automatic for Blitz++ arrays
-
-
 
 // Print the X and Y components to standard out (for debugging)
 void Flux::print() {

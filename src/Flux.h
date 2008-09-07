@@ -33,14 +33,20 @@ class Scalar;
 
 class Flux {
 public:
-    /// Constructor
+    /// Constructor: allocate arrays based on the Grid dimensions
     Flux(const Grid& grid);
 
+    /// Default constructor: set all dimensions to zero
+    Flux();
+    
     /// Constructor, making a copy of the data
     Flux(const Flux& q);
 
     /// Deallocate memory in the destructor
     ~Flux();
+
+    /// Set all parameters and reallocate arrays based on the Grid dimensions
+    void resize( const Grid& grid );
     
     inline const Grid& getGrid() const {
         return _grid;
@@ -260,11 +266,11 @@ public:
     );
 
 private:
-    const Grid& _grid;
-    const int _nx;
-    const int _ny;
-    const int _numXFluxes;
-    const int _numFluxes;
+    Grid _grid;
+    int _nx;
+    int _ny;
+    int _numXFluxes;
+    int _numFluxes;
     Array<double,1> _data;
 };  // class Flux
 

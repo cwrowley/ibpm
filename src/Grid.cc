@@ -18,6 +18,34 @@
 
 namespace ibpm {
 
+Grid::Grid(int nx, int ny, double length, double xOffset, double yOffset) {
+    resize( nx, ny, length, xOffset, yOffset );
+}
+
+/// Default constructor: set all parameters to zero
+Grid::Grid() {
+    _nx = 0;
+    _ny = 0;
+    _xOffset = 0;
+    _yOffset = 0;
+    _dx = 0;
+};
+
+/// Set all grid parameters
+void Grid::resize(
+    int nx,
+    int ny,
+    double length,
+    double xOffset,
+    double yOffset
+    ) {
+    _nx = nx;
+    _ny = ny;
+    _xOffset = xOffset;
+    _yOffset = yOffset;
+    _dx = length / nx;
+}
+
 // Return the x-coordinate of the center of cell i  (i in 0..m-1)
 double Grid::getXCenter(int i) const {
     assert(i >= 0);

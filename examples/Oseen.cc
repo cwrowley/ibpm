@@ -60,6 +60,7 @@ int main(int argc, char* argv[]) {
 	
 	// Empty geometry -- no body
 	Geometry geom;
+    int numPoints = 0;
 
 	// Setup equations to solve
 	double Reynolds=100;
@@ -75,11 +76,11 @@ int main(int argc, char* argv[]) {
     solver.init();
 
 	// Setup initial condition
-	State x( grid, geom );
+	State x( grid, numPoints );
     initializeOseenVortex( Reynolds, x );
-    State exact( grid, geom );
+    State exact( grid, numPoints );
     initializeOseenVortex( Reynolds, exact );
-    State error( grid, geom );
+    State error( grid, numPoints );
 
     // Setup output routines
     OutputTecplot outputComputed( "oseen_out/ibpm%03d.plt",

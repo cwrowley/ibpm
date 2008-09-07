@@ -28,8 +28,8 @@ namespace ibpm {
 AdamsBashforth::AdamsBashforth(NavierStokesModel& model, double timestep) :
     TimeStepper("Adams Bashforth", model, timestep),
     _linearTermEigenvalues( model.getLambda() ),
-    _xold( model.getGrid(), model.getGeometry() ),
-    _xtemp( model.getGrid(), model.getGeometry() )
+    _xold( model.getGrid(), model.getGeometry().getNumPoints() ),
+    _xtemp( model.getGrid(), model.getGeometry().getNumPoints() )
     {
     // compute eigenvalues of linear term on RHS
     _linearTermEigenvalues *= timestep/2.;

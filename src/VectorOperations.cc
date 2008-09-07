@@ -26,7 +26,8 @@ namespace ibpm {
 // Compute the curl of Flux q, as a Scalar object f
 void Curl(const Flux& q, Scalar& f ) {
     const Grid& grid = q.getGrid();
-    assert( &grid == &(f.getGrid()) );
+    assert( grid.getNx() == f.getGrid().getNx() );
+    assert( grid.getNy() == f.getGrid().getNy() );
     int nx = grid.getNx();
     int ny = grid.getNy();
     double byDeltaSquared = 1. / ( grid.getDx() * grid.getDx() );
@@ -59,7 +60,8 @@ Scalar Curl(const Flux& q) {
 // Return the curl of Scalar f, as a Flux object q.
 void Curl(const Scalar& f, Flux& q) {
     const Grid& grid = f.getGrid();
-    assert( &grid == &(q.getGrid()) );
+    assert( grid.getNx() == q.getGrid().getNx() );
+    assert( grid.getNy() == q.getGrid().getNy() );
     
     int nx = grid.getNx();
     int ny = grid.getNy();

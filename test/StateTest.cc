@@ -39,21 +39,16 @@ protected:
     StateTest() :
         _nx(3),
         _ny(5),
-        _numPoints(1),
-        _grid( _nx, _ny, 2, -1, -2 ) {
+        _numPoints(2),
+        _grid( _nx, _ny, 2, -1, -2 ),
+        _x( _grid, _numPoints ) {
         
-        // Create a geometry with one point
-        RigidBody body;
-        body.addPoint(0,0);
-        _geom.addBody(body);
-        _x = new State( _grid, _geom );
-
         // Initialize a State
-        _x->q = 1.;
-        _x->gamma = 2.;
-        _x->f = 3.;
-        _x->timestep = 4;
-        _x->time = 0.5;
+        _x.q = 1.;
+        _x.gamma = 2.;
+        _x.f = 3.;
+        _x.timestep = 4;
+        _x.time = 0.5;
     }
 
     // data
@@ -61,34 +56,32 @@ protected:
     int _ny;
     int _numPoints;
     Grid _grid;
-    Geometry _geom;
-    State* _x;
+    State _x;
 };
 
 TEST_F( StateTest, Save ) {
-    bool success = _x->save("state_test");
+    bool success = _x.save("state_test");
     EXPECT_EQ( true, success );
     
-    State y(_grid, _geom);
+    State y( _grid, _numPoints );
     y.load( "state_test" );
-    EXPECT_SCALAR_EQ( _x->gamma(i,j), y.gamma(i,j) );
-    EXPECT_FLUX_X_EQ( _x->q(X,i,j),   y.q(X,i,j)   );
-    EXPECT_FLUX_Y_EQ( _x->q(Y,i,j),   y.q(Y,i,j)   );
-    EXPECT_BV_EQ(     _x->f(dir,i),   y.f(dir,i)   );
-    EXPECT_DOUBLE_EQ( _x->time,       y.time       );
-    EXPECT_EQ(        _x->timestep,   y.timestep   );
-    EXPECT_DOUBLE_EQ( _x->q(X,0,0),   y.q(X,0,0)   );
+    EXPECT_SCALAR_EQ( _x.gamma(i,j), y.gamma(i,j) );
+    EXPECT_FLUX_X_EQ( _x.q(X,i,j),   y.q(X,i,j)   );
+    EXPECT_FLUX_Y_EQ( _x.q(Y,i,j),   y.q(Y,i,j)   );
+    EXPECT_BV_EQ(     _x.f(dir,i),   y.f(dir,i)   );
+    EXPECT_DOUBLE_EQ( _x.time,       y.time       );
+    EXPECT_EQ(        _x.timestep,   y.timestep   );
+    EXPECT_DOUBLE_EQ( _x.q(X,0,0),   y.q(X,0,0)   );
     
     unlink("state_test");
 }
 
 TEST_F( StateTest, LoadBadGeometry ) {
-    bool status = _x->save("state_test");
+    bool status = _x.save("state_test");
     ASSERT_EQ( true, status );
 
-    // Create another state with a different Geometry
-    Geometry emptyGeom;
-    State y( _grid, emptyGeom );
+    // Create another state with a different Geometry (no points)
+    State y( _grid, 0 );
     status = y.load( "state_test" );
     EXPECT_EQ( false, status );
 
@@ -96,12 +89,12 @@ TEST_F( StateTest, LoadBadGeometry ) {
 }
 
 TEST_F( StateTest, LoadBadGrid ) {
-    bool status = _x->save("state_test");
+    bool status = _x.save("state_test");
     ASSERT_EQ( true, status );
 
     // Create another state with a different Grid
     Grid newGrid( 4, 5, 2, -1, -2 );
-    State y( newGrid, _geom );
+    State y( newGrid, _numPoints );
     status = y.load( "state_test" );
     EXPECT_EQ( false, status );
     
