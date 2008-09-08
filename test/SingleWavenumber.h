@@ -12,14 +12,13 @@ inline void InitializeSingleWavenumber(
     Scalar& f
     ) {
     const double pi = 4 * atan(1.);
-    const Grid& grid = f.getGrid();
-    const int nx = grid.getNx();
-    const int ny = grid.getNy();
-    const double xLength = grid.getXEdge(nx) - grid.getXEdge(0);
-    const double yLength = grid.getYEdge(ny) - grid.getYEdge(0);
+    const int nx = f.getNx();
+    const int ny = f.getNy();
+    const double xLength = f.getXEdge(nx) - f.getXEdge(0);
+    const double yLength = f.getYEdge(ny) - f.getYEdge(0);
     const double kx = xWavenumber * pi / xLength;
     const double ky = yWavenumber * pi / yLength;
-    const double deltaX = grid.getDx();
+    const double deltaX = f.getDx();
     
     for (int i=0; i <= nx; ++i) {
         double x = i * deltaX;

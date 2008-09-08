@@ -71,17 +71,16 @@ bool State::load(const std::string& filename) {
     
     // check that Grid and Geometry in file match those expected
     bool success = true;
-    const Grid& oldgrid = q.getGrid();
-    if ( nx != oldgrid.getNx() || 
-        ny != oldgrid.getNy() ||
-        dx != oldgrid.getDx() ||
-        x0 != oldgrid.getXEdge(0) ||
-        y0 != oldgrid.getYEdge(0) ||
+    if ( nx != q.getNx() || 
+        ny != q.getNy() ||
+        dx != q.getDx() ||
+        x0 != q.getXEdge(0) ||
+        y0 != q.getYEdge(0) ||
         numPoints != f.getNumPoints() ) {
         
         // If old grid was previously allocated, print a warning and set
         // the return value to false
-        if ( oldgrid.getNx() != 0 ) {
+        if ( q.getNx() > 0 ) {
             cerr << "Warning: grids do not match.  Resizing grid." << endl;
             success = false;
         }

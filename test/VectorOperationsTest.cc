@@ -422,10 +422,8 @@ TEST_F(VectorOperationsTest, SineTransformOutputSize) {
     Scalar b = SinTransform(a);
     
     // compare grids
-    const Grid& g1 = a.getGrid();
-    const Grid& g2 = b.getGrid();
-    EXPECT_EQ( g1.getNx(), g2.getNx() );
-    EXPECT_EQ( g1.getNy(), g2.getNy() );
+    EXPECT_EQ( a.getNx(), b.getNx() );
+    EXPECT_EQ( a.getNy(), b.getNy() );
 }
 
 // Do Sine transform twice and obtain the original data, upto the normalization parameter.

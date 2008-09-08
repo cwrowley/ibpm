@@ -2,6 +2,7 @@
 #define _SCALAR_H_
 
 #include <blitz/array.h>
+#include "Field.h"
 #include "Grid.h"
 #include "Flux.h"
 
@@ -30,7 +31,7 @@ namespace ibpm {
     \version $Revision$
 */
 
-class Scalar {
+class Scalar : public Field {
 public:
     /// Allocate memory for the 2D array
     Scalar( const Grid& grid );
@@ -46,32 +47,14 @@ public:
 
     /// Reassign the grid parameters and allocate memory based on the new grid
     void resize( const Grid& grid );
-    
-    const Grid& getGrid() const{
-        return _grid;
-    }
-    
-    // const Array<double, 2>& getData() const {
-    //  return _data;
-    // }
-    
-    typedef Array<double,2>::iterator iterator;
 
-    inline iterator begin() {
-        return _data.begin();
-    }
-    
-    inline iterator end() {
-        return _data.end();
-    }
-    
     // Print the whole field to standard output
     void print() const;
     
     /// Copy assignment
     inline Scalar& operator=(const Scalar& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert( f.getNx() == getNx() );
+        assert( f.getNy() == getNy() );
         _data = f._data;
         return *this;
     }
@@ -84,22 +67,22 @@ public:
 
     /// f(i,j) refers to the value at index (i,j)
     inline double& operator()(int i, int j) {
-        assert(i>=0  && i<=_nx);
-        assert(j>=0  && j<=_ny);
+        assert(i>=0  && i<= getNx() );
+        assert(j>=0  && j<= getNy() );
         return _data(i,j);
     }
     
     /// f(i,j) refers to the value at index (i,j)
     inline double operator()(int i, int j) const{
-        assert(i>=0  && i<=_nx);
-        assert(j>=0  && j<=_ny);
+        assert(i>=0  && i<= getNx() );
+        assert(j>=0  && j<= getNy() );
         return _data(i,j);
     }
     
     /// f += g
     inline Scalar& operator+=(const Scalar& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert(f.getNx() == getNx() );
+        assert(f.getNy() == getNy() );
         _data += f._data;
         return *this;
     }
@@ -112,8 +95,8 @@ public:
 
     /// f -= g
     inline Scalar& operator-=(const Scalar& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert( f.getNx() == getNx() );
+        assert( f.getNy() == getNy() );
         _data -= f._data;
         return *this;
     }
@@ -126,8 +109,8 @@ public:
 
     /// f + g
     inline Scalar operator+(const Scalar& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert( f.getNx() == getNx() );
+        assert( f.getNy() == getNy() );
         Scalar g = *this;
         g += f;
         return g;
@@ -142,8 +125,8 @@ public:
     
     /// f - g
     inline Scalar operator-(Scalar& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert( f.getNx() == getNx() );
+        assert( f.getNy() == getNy() );
         Scalar g = *this;
         g -= f;
         return g;
@@ -158,8 +141,8 @@ public:
     
     /// f *= g
     inline Scalar& operator*=(const Scalar& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert( f.getNx() == getNx() );
+        assert( f.getNy() == getNy() );
         _data *= f._data;
         return *this;
     }
@@ -172,8 +155,8 @@ public:
 
     /// f * g
     inline Scalar operator*(const Scalar& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert( f.getNx() == getNx() );
+        assert( f.getNy() == getNy() );
         Scalar g = *this;
         g *= f;
         return g;
@@ -188,8 +171,8 @@ public:
     
     /// f /= g
     inline Scalar& operator/=(const Scalar& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert( f.getNx() == getNx() );
+        assert( f.getNy() == getNy() );
         _data /= f._data;
         return *this;
     }
@@ -202,8 +185,8 @@ public:
 
     /// f / g
     inline Scalar operator/(Scalar& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert( f.getNx() == getNx() );
+        assert( f.getNy() == getNy() );
         Scalar g = *this;
         g /= f;
         return g;
@@ -218,12 +201,7 @@ public:
 
 
 private:
-    
-    Grid _grid;
-    int _nx;
-    int _ny;
     Array<double,2> _data;
-    
 };
 
 /// -f

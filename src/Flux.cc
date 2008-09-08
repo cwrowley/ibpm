@@ -22,23 +22,26 @@ namespace ibpm {
 
 Flux::Flux() {}
 
-Flux::Flux( const Grid& grid ) {
+Flux::Flux( const Grid& grid ) :
+    Field( grid ) {
     resize( grid );
 }
 
 /// Allocate new array, copy the data
-Flux::Flux( const Flux& q ) {
-    resize( q._grid );
+Flux::Flux( const Flux& q ) :
+    Field( q.getGrid() )
+    {
+    resize( q.getGrid() );
     _data = q._data;
 }
 
 /// Set all parameters and reallocate arrays based on the Grid dimensions
 void Flux::resize( const Grid& grid ) {
-    _grid = grid;
-    _nx = grid.getNx();
-    _ny = grid.getNy();
-    _numXFluxes = _nx * _ny + _ny;
-    _numFluxes = 2 * _nx * _ny + _nx + _ny;
+    setGrid( grid );
+    int nx = getNx();
+    int ny = getNy();
+    _numXFluxes = nx * ny + ny;
+    _numFluxes = 2 * nx * ny + nx + ny;
     _data.resize( _numFluxes );
 }
 
@@ -47,15 +50,15 @@ Flux::~Flux() {} // deallocation automatic for Blitz++ arrays
 // Print the X and Y components to standard out (for debugging)
 void Flux::print() {
     cout << "X:" << endl;
-    for (int i=0; i<=_nx; ++i) {
-        for (int j=0; j<_ny; ++j) {
+    for (int i=0; i<=getNx(); ++i) {
+        for (int j=0; j<getNy(); ++j) {
             cout << (*this)(X,i,j) << " ";
         }
         cout << endl;
     }
     cout << "Y:" << endl;
-    for (int i=0; i<_nx; ++i) {
-        for (int j=0; j<=_ny; ++j) {
+    for (int i=0; i<getNx(); ++i) {
+        for (int j=0; j<=getNy(); ++j) {
             cout << (*this)(Y,i,j) << " ";
         }
         cout << endl;

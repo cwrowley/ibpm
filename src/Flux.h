@@ -2,6 +2,7 @@
 #define _FLUX_H_
 
 #include "Grid.h"
+#include "Field.h"
 #include "Direction.h"
 #include <blitz/array.h>
 #include <math.h>
@@ -31,7 +32,7 @@ class Scalar;
     \version $Revision$
 */
 
-class Flux {
+class Flux : public Field {
 public:
     /// Constructor: allocate arrays based on the Grid dimensions
     Flux(const Grid& grid);
@@ -48,17 +49,13 @@ public:
     /// Set all parameters and reallocate arrays based on the Grid dimensions
     void resize( const Grid& grid );
     
-    inline const Grid& getGrid() const {
-        return _grid;
-    }
-    
     /// Print the X and Y components to standard out (for debugging)
     void print();
     
     /// Copy assignment
     inline Flux& operator=(const Flux& q) {
-        assert(q._nx == _nx);
-        assert(q._ny == _ny);
+        assert(q.getNx() == getNx());
+        assert(q.getNy() == getNy());
         _data = q._data;
         return *this;
     }
@@ -99,27 +96,27 @@ public:
         assert( (dir >= X) && (dir <= Y) );
         assert(i >= 0);
         if (dir == X) {
-            assert( i < _nx+1 );
-            return _grid.getXEdge(i);
+            assert( i < getNx()+1 );
+            return getXEdge(i);
         }
         else {
-            assert( i < _nx );
-            return _grid.getXCenter(i);
+            assert( i < getNx() );
+            return getXCenter(i);
         }
     }
 
     /// q.x(ind) returns the x-coordinate of the flux specified by ind
     inline double x(index ind) {
         int dir = ind / _numXFluxes;
-        int i = (ind - dir*_numXFluxes) / (_ny+dir);
+        int i = (ind - dir*_numXFluxes) / (getNy()+dir);
         return x(dir,i);
     }
     
     /// q.y(ind) returns the x-coordinate of the flux specified by ind
     inline double y(index ind) {
         int dir = ind / _numXFluxes;
-        int i = (ind - dir*_numXFluxes) / (_ny+dir);
-        int j = ind - dir*_numXFluxes - i * (_ny+dir);
+        int i = (ind - dir*_numXFluxes) / (getNy()+dir);
+        int j = ind - dir*_numXFluxes - i * (getNy()+dir);
         return y(dir,j);
     }
     
@@ -128,12 +125,12 @@ public:
         assert( (dir >= X) && (dir <= Y) );
         assert(j >= 0);
         if (dir == X) {
-            assert( j < _ny );
-            return _grid.getYCenter(j);
+            assert( j < getNy() );
+            return getYCenter(j);
         }
         else {
-            assert( j < _ny+1 );
-            return _grid.getYEdge(j);
+            assert( j < getNy()+1 );
+            return getYEdge(j);
         }
     }
 
@@ -164,18 +161,18 @@ public:
     inline index getIndex(int dir, int i, int j) const {
         assert(dir>=X  && dir<=Y);
         assert(i >= 0 && j >= 0);
-        assert((dir == X) ? i < _nx+1 : i < _nx);
-        assert((dir == Y) ? j < _ny+1 : j < _ny);
+        assert((dir == X) ? i < getNx()+1 : i < getNx());
+        assert((dir == Y) ? j < getNy()+1 : j < getNy());
         // Tricky expression:
         //   j in [0..ny-1] for X fluxes (dir = X)
         //   j in [0..ny] for Y fluxes   (dir = Y)
-        return dir * _numXFluxes + i * (_ny+dir) + j;
+        return dir * _numXFluxes + i * (getNy()+dir) + j;
     }
     
     /// f += g
     inline Flux& operator+=(const Flux& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert(f.getNx() == getNx());
+        assert(f.getNy() == getNy());
         _data += f._data;
         return *this;
     }
@@ -188,8 +185,8 @@ public:
     
     /// f -= g
     inline Flux& operator-=(const Flux& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert(f.getNx() == getNx());
+        assert(f.getNy() == getNy());
         _data -= f._data;
         return *this;
     }
@@ -202,8 +199,8 @@ public:
     
     /// f + g
     inline Flux operator+(const Flux& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert(f.getNx() == getNx());
+        assert(f.getNy() == getNy());
         Flux g = *this;
         g += f;
         return g;
@@ -218,8 +215,8 @@ public:
 
     /// f - g
     inline Flux operator-(const Flux& f) {
-        assert(f._nx == _nx);
-        assert(f._ny == _ny);
+        assert(f.getNx() == getNx());
+        assert(f.getNy() == getNy());
         Flux g = *this;
         g -= f;
         return g;
@@ -266,9 +263,6 @@ public:
     );
 
 private:
-    Grid _grid;
-    int _nx;
-    int _ny;
     int _numXFluxes;
     int _numFluxes;
     Array<double,1> _data;

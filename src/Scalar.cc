@@ -22,19 +22,17 @@ using namespace std;
 
 namespace ibpm {
 
-Scalar::Scalar( const Grid& grid ){
+Scalar::Scalar( const Grid& grid ) :
+    Field( grid ) {
     resize( grid );
 }
 
 /// Default constructor: do not allocate memory yet
-Scalar::Scalar() {
-    _nx = 0;
-    _ny = 0;
-}
+Scalar::Scalar() {}
     
 /// Allocate new array, copy the data
 Scalar::Scalar( const Scalar& f ) {
-    resize( f._grid );
+    resize( f.getGrid() );
     // copy data
     _data = f._data;
 }
@@ -46,8 +44,8 @@ Scalar::~Scalar() {
 
 // Print the whole field to standard output
 void Scalar::print() const {
-    int nx = _grid.getNx();
-    int ny = _grid.getNy();
+    int nx = getNx();
+    int ny = getNy();
     for(int i = 0; i <= nx; ++i) {
         for (int j=0; j <= ny; ++j) {
             cout << _data(i,j) << " ";
@@ -58,10 +56,8 @@ void Scalar::print() const {
 }
 
 void Scalar::resize( const Grid& grid ) {
-    _grid = grid;
-    _nx = grid.getNx();
-    _ny = grid.getNy();
-    _data.resize( _nx+1, _ny+1 );
+    setGrid( grid );
+    _data.resize( getNx() + 1, getNy() + 1 );
 }
 
 

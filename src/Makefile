@@ -20,6 +20,7 @@ OBJS = \
 	CholeskySolver.o \
 	ConjugateGradientSolver.o \
 	Euler.o \
+	Field.o \
 	Flux.o \
 	Geometry.o \
 	Grid.o \

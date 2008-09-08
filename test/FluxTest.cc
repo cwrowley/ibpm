@@ -77,6 +77,36 @@ TEST_F(FluxTest, Assignment) {
     EXPECT_DOUBLE_EQ(_f(X,1,3), 73 );
 }
 
+TEST_F(FluxTest, GridSizes ) {
+    int nx = 4;
+    int ny = 6;
+    double length = 5.;
+    double xOffset = 0;
+    double yOffset = 0;
+    
+    Grid grid( nx, ny, length, xOffset, yOffset );
+    Flux q( grid );
+    
+    EXPECT_EQ( nx, q.getNx() );
+    EXPECT_EQ( ny, q.getNy() );
+    EXPECT_DOUBLE_EQ( grid.getDx(), q.getDx() );
+    EXPECT_ALL_X_EQUAL( grid.getXEdge(i), q.getXEdge(i) );
+    EXPECT_ALL_Y_EQUAL( grid.getYEdge(j), q.getYEdge(j) );
+
+    Flux q2( q );
+    EXPECT_EQ( nx, q2.getNx() );
+    EXPECT_EQ( ny, q2.getNy() );
+    EXPECT_DOUBLE_EQ( grid.getDx(), q2.getDx() );
+    EXPECT_ALL_X_EQUAL( grid.getXEdge(i), q2.getXEdge(i) );
+    EXPECT_ALL_Y_EQUAL( grid.getYEdge(j), q2.getYEdge(j) );
+    
+    Grid grid2( 2, 3, length, xOffset, yOffset );
+    q2.resize( grid2 );
+    EXPECT_EQ( 2, q2.getNx() );
+    EXPECT_EQ( 3, q2.getNy() );
+    EXPECT_DOUBLE_EQ( grid2.getDx(), q2.getDx() );
+}
+
 TEST_F(FluxTest, CopyConstructor) {
     Flux h = _f;
     _f = 0.;

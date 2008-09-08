@@ -48,6 +48,24 @@ protected:
         }                                   \
     }
 
+TEST_F(ScalarTest, GridSizes ) {
+    int nx = 4;
+    int ny = 6;
+    double length = 5.;
+    double xOffset = 0;
+    double yOffset = 0;
+    
+    Grid grid( nx, ny, length, xOffset, yOffset );
+    Scalar u( grid );
+    
+    EXPECT_EQ( nx, u.getNx() );
+    EXPECT_EQ( ny, u.getNy() );
+    EXPECT_DOUBLE_EQ( grid.getDx(), u.getDx() );
+    EXPECT_ALL_EQUAL( grid.getXEdge(i), u.getXEdge(i) );
+    EXPECT_ALL_EQUAL( grid.getYEdge(j), u.getYEdge(j) );
+
+}
+
 TEST_F(ScalarTest, Assignment) {
     int i = _nx/2;
     int j = _ny/2;

@@ -25,12 +25,11 @@ namespace ibpm {
 
 // Compute the curl of Flux q, as a Scalar object f
 void Curl(const Flux& q, Scalar& f ) {
-    const Grid& grid = q.getGrid();
-    assert( grid.getNx() == f.getGrid().getNx() );
-    assert( grid.getNy() == f.getGrid().getNy() );
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    double byDeltaSquared = 1. / ( grid.getDx() * grid.getDx() );
+    int nx = q.getNx();
+    int ny = q.getNy();
+    assert( nx == f.getNx() );
+    assert( ny == f.getNy() );
+    double byDeltaSquared = 1. / ( q.getDx() * q.getDx() );
 
     // Compute curl at interior nodes
     for (int i = 1; i < nx; ++i) {
@@ -59,12 +58,10 @@ Scalar Curl(const Flux& q) {
 
 // Return the curl of Scalar f, as a Flux object q.
 void Curl(const Scalar& f, Flux& q) {
-    const Grid& grid = f.getGrid();
-    assert( grid.getNx() == q.getGrid().getNx() );
-    assert( grid.getNy() == q.getGrid().getNy() );
-    
-    int nx = grid.getNx();
-    int ny = grid.getNy();
+    int nx = f.getNx();
+    int ny = f.getNy();
+    assert( nx == q.getNx() );
+    assert( ny == q.getNy() );
     
     // X direction
     for (int i=0; i<=nx; ++i) {
@@ -89,11 +86,10 @@ Flux Curl(const Scalar& f) {
 
 // Inner product of two Scalars. 
 double InnerProduct (const Scalar& f, const Scalar& g){
-    const Grid& grid = f.getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    assert(nx == g.getGrid().getNx());
-    assert(ny == g.getGrid().getNy());
+    int nx = f.getNx();
+    int ny = f.getNy();
+    assert( nx == g.getNx() );
+    assert( ny == g.getNy() );
     
     double ip = 0;
     for (int i = 1; i < nx; ++i) {
@@ -110,7 +106,7 @@ double InnerProduct (const Scalar& f, const Scalar& g){
     ip += ( f(0,0) * g(0,0) + f(nx,0) * g(nx,0) 
           + f(0, ny) * g(0, ny) + f(nx, ny) * g(nx,ny) )/4;
 
-    double dx = grid.getDx();
+    double dx = f.getDx();
     return ip * dx * dx;
 }
 
@@ -118,11 +114,10 @@ double InnerProduct (const Scalar& f, const Scalar& g){
 // Note that this is not multiplied by dx * dx, since the Fluxes are already
 // multiplied by these (i.e., inner product is really over *velocities*).
 double InnerProduct (const Flux& p, const Flux& q){
-    const Grid& grid = p.getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    assert(nx == q.getGrid().getNx());
-    assert(ny == q.getGrid().getNy());
+    int nx = p.getNx();
+    int ny = p.getNy();
+    assert( nx == q.getNx() );
+    assert( ny == q.getNy() );
 
     double ip = 0;
     // Add x-fluxes
@@ -147,9 +142,8 @@ double InnerProduct (const Flux& p, const Flux& q){
 
 // Sum of X-component of Flux q
 double XSum( const Flux& q ) {
-   const Grid& grid = q.getGrid();
-   int nx = grid.getNx();
-   int ny = grid.getNy();
+   int nx = q.getNx();
+   int ny = q.getNy();
    double qsumx = 0;
    // Sum x-fluxes 
    for (int j=0; j<ny; ++j) {
@@ -162,9 +156,8 @@ double XSum( const Flux& q ) {
 
 // Sum of Y-component of Flux q
 double YSum( const Flux& q) {
-   const Grid& grid = q.getGrid();
-   int nx = grid.getNx();
-   int ny = grid.getNy();
+   int nx = q.getNx();
+   int ny = q.getNy();
    double qsumy = 0;
    // Sum y-fluxes
    for (int i=0; i<nx; ++i) {
@@ -188,9 +181,9 @@ void computeNetForce( const BoundaryVector& f, double& xforce, double& yforce) {
 // sine transform of a Scalar object using fft (type DST-I).
 // (fftw library is used(kind: RODFT00); Only interior nodes are considered.)
 Scalar SinTransform(const Scalar& f, bool normalize) {
-    Scalar f_fft(f.getGrid());
-    int nx = f.getGrid().getNx();
-    int ny = f.getGrid().getNy();
+    Scalar f_fft( f.getGrid() );
+    int nx = f.getNx();
+    int ny = f.getNy();
     
     double *in;
     in = (double*) fftw_malloc(sizeof(double) * (nx-1) * (ny-1));
@@ -242,12 +235,11 @@ Scalar SinTransform(const Scalar& f, bool normalize) {
 // Step 3: Convert the velocities to fluxes through edges
 
 Flux CrossProduct(const Flux& q, const Scalar& f){
-    const Grid& grid = f.getGrid();
-    assert(grid.getNx() == q.getGrid().getNx());
-    assert(grid.getNy() == q.getGrid().getNy());                                                                                                                                                                 
+    assert( q.getNx() == f.getNx());
+    assert( q.getNy() == f.getNy());                                                                                                                                                                 
 
-    Scalar u(grid);
-    Scalar v(grid);
+    Scalar u( f.getGrid() );
+    Scalar v( f.getGrid() );
     
     FluxToXVelocity( q, u );
     u *= f;
@@ -256,7 +248,7 @@ Flux CrossProduct(const Flux& q, const Scalar& f){
     FluxToYVelocity( q, v );
     v *= f;
     
-    Flux cross(grid);
+    Flux cross( q.getGrid() );
     VelocityToFlux( v, u, cross );      // cross = ( f v, -f u )
 
     return cross;
@@ -269,12 +261,12 @@ Flux CrossProduct(const Flux& q, const Scalar& f){
 // Step 2: Compute u1 * v2 - u2 * v1
 
 Scalar CrossProduct(const Flux& q1, const Flux& q2){
-    assert(q1.getGrid().getNx() == q2.getGrid().getNx());
-    assert(q1.getGrid().getNy() == q2.getGrid().getNy());
+    assert( q1.getNx() == q2.getNx() );
+    assert( q1.getNy() == q2.getNy() );
     
     const Grid& grid = q1.getGrid();
-    Scalar u(grid);
-    Scalar v(grid);
+    Scalar u( grid );
+    Scalar v( grid );
     
     FluxToXVelocity( q1, u );
     FluxToYVelocity( q2, v );
@@ -290,10 +282,11 @@ Scalar CrossProduct(const Flux& q1, const Flux& q2){
 };
 
 void FluxToXVelocity(const Flux& q, Scalar& u) {
-    const Grid& grid = u.getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    double oneOver2Delta = 1./ (2 * grid.getDx());
+    int nx = q.getNx();
+    int ny = q.getNy();
+    assert( nx == u.getNx() );
+    assert( ny == u.getNy() );
+    double oneOver2Delta = 1./ (2 * q.getDx());
 
     for (int i=0; i <= nx; ++i ){
         for (int j=1; j < ny; ++j ) {
@@ -305,10 +298,11 @@ void FluxToXVelocity(const Flux& q, Scalar& u) {
 }
 
 void FluxToYVelocity(const Flux& q, Scalar& v) {
-    const Grid& grid = v.getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    double oneOver2Delta = 1./ (2 * grid.getDx());
+    int nx = q.getNx();
+    int ny = q.getNy();
+    assert( nx == v.getNx() );
+    assert( ny == v.getNy() );
+    double oneOver2Delta = 1./ (2 * q.getDx());
 
     for (int j=0; j <= ny; ++j ){
         for (int i=1; i < nx; ++i ) {
@@ -322,10 +316,11 @@ void FluxToYVelocity(const Flux& q, Scalar& v) {
 // Convert u-velocities at vertices to x-fluxes through edges.
 // Does not touch the y-component of the Flux q passed in.
 void XVelocityToFlux(const Scalar& u, Flux& q) {
-    const Grid& grid = u.getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    double deltaOver2 = grid.getDx() / 2.;
+    int nx = u.getNx();
+    int ny = u.getNy();
+    assert( nx == q.getNx() );
+    assert( ny == q.getNy() );
+    double deltaOver2 = u.getDx() / 2.;
     
     for (int i=0; i <= nx; ++i ) {
         for (int j=0; j < ny; ++j ){
@@ -337,10 +332,11 @@ void XVelocityToFlux(const Scalar& u, Flux& q) {
 // Convert v-velocities at vertices to y-fluxes through edges.
 // Does not touch the x-component of the Flux q passed in.
 void YVelocityToFlux(const Scalar& v, Flux& q) {
-    const Grid& grid = v.getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    double deltaOver2 = grid.getDx() / 2.;
+    int nx = v.getNx();
+    int ny = v.getNy();
+    assert( nx == q.getNx() );
+    assert( ny == q.getNy() );
+    double deltaOver2 = v.getDx() / 2.;
     
     for (int i=0; i < nx; ++i ) {
         for (int j=0; j <= ny; ++j ){
