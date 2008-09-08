@@ -22,15 +22,32 @@ NavierStokesModel::NavierStokesModel(
     double Reynolds,
     const Flux& q_potential
     ) :
-    _grid(grid),
-    _geometry(geometry),
+    _grid( grid ),
+    _geometry( geometry ),
     _regularizer( grid, geometry ),
     _linearTermEigenvalues( grid ),
     _eigGammaToStreamfunction( grid ),
-    _baseFlow(q_potential),
-    _ReynoldsNumber(Reynolds),
-    _hasBeenInitialized(false)
+    _baseFlow( q_potential ),
+    _ReynoldsNumber( Reynolds ),
+    _hasBeenInitialized( false )
 {}
+
+NavierStokesModel::NavierStokesModel(
+    const Grid& grid,
+    const Geometry& geometry,
+    double Reynolds
+    ) :
+    _grid( grid ),
+    _geometry( geometry ),
+    _regularizer( grid, geometry ),
+    _linearTermEigenvalues( grid ),
+    _eigGammaToStreamfunction( grid ),
+    _baseFlow( grid ),
+    _ReynoldsNumber( Reynolds ),
+    _hasBeenInitialized( false )
+    {
+    _baseFlow = 0.;
+}
 
 void NavierStokesModel::init() {
     if ( _hasBeenInitialized ) return;  // do only once

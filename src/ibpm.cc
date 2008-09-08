@@ -21,12 +21,17 @@ $HeadURL$
 using namespace std;
 using namespace ibpm;
 
+enum ModelType { LINEAR, NONLINEAR, ADJOINT, INVALID };
+
 // Return a solver of the appropriate type (e.g. Euler, RK2 )
 TimeStepper* GetSolver(
     NavierStokesModel& model,
     double dt,
     string solverType
     );
+
+// Return the type of model specified in the string modelName
+ModelType str2model( string modelName );
 
 /*! \brief Main routine for IBFS code
  *  Set up a timestepper and advance the flow in time.
@@ -53,6 +58,10 @@ int main(int argc, char* argv[]) {
         "geom", "filename for reading geometry", name + ".geom" );
     double Reynolds = parser.getDouble("Re", "Reynolds number", 100.);
     double dt = parser.getDouble( "dt", "timestep", 0.01 );
+    string modelName = parser.getString(
+        "model", "type of model (linear, nonlinear, adjoint)", "nonlinear" );
+    string baseFlow = parser.getString(
+        "baseflow", "base flow for linear/adjoint model", "" );
     string integratorType = parser.getString(
         "scheme", "timestepping scheme (euler,ab2,rk2,rk3)", "rk2" );
     string icFile = parser.getString( "ic", "initial condition filename", "");
@@ -67,8 +76,16 @@ int main(int argc, char* argv[]) {
     int numSteps = parser.getInt(
         "nsteps", "number of timesteps to compute", 250 );
 
-    if ( ! parser.inputIsValid() || helpFlag ) {
+    ModelType modelType = str2model( modelName );
+    
+    if ( ! parser.inputIsValid() || modelType == INVALID || helpFlag ) {
         parser.printUsage( cerr );
+        exit(1);
+    }
+    
+    if ( modelType != NONLINEAR && baseFlow == "" ) {
+        cout << "ERROR: for linear or adjoint models, "
+            "must specify a base flow" << endl;
         exit(1);
     }
 
@@ -109,12 +126,26 @@ int main(int argc, char* argv[]) {
     double alpha = 0;  // angle of background flow
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
     cout << "Setting up Navier Stokes model..." << flush;
-    NonlinearNavierStokes model( grid, geom, Reynolds, q_potential );
-    model.init();
+    NavierStokesModel* model = NULL;
+    if ( modelType == NONLINEAR ) {
+        model = new NonlinearNavierStokes( grid, geom, Reynolds, q_potential);
+    }
+    else {
+        State x0( grid, geom.getNumPoints() );
+        x0.load( baseFlow );
+        if ( modelType == LINEAR ) {
+            model = new LinearizedNavierStokes( grid, geom, Reynolds, x0 );
+        }
+        else if ( modelType == ADJOINT ){
+            model = new AdjointNavierStokes( grid, geom, Reynolds, x0 );
+        }
+    }
+    assert( model != NULL );
+    model->init();
     cout << "done" << endl;
 
     // Setup timestepper
-    TimeStepper* solver = GetSolver( model, dt, integratorType );
+    TimeStepper* solver = GetSolver( *model, dt, integratorType );
     cout << "Using " << solver->getName() << " timestepper" << endl;
     cout << "  dt = " << dt << endl;
     if ( ! solver->load( outdir + name ) ) {
@@ -173,7 +204,27 @@ int main(int argc, char* argv[]) {
     }
     logger.cleanup();
     delete solver;
+    delete model;
     return 0;
+}
+
+ModelType str2model( string modelName ) {
+    ModelType type;
+    MakeLowercase( modelName );
+    if ( modelName == "nonlinear" ) {
+        type = NONLINEAR;
+    }
+    else if ( modelName == "linear" ) {
+        type = LINEAR;
+    }
+    else if ( modelName == "adjoint" ) {
+        type = ADJOINT;
+    }
+    else {
+        cerr << "Unrecognized model: " << modelName << endl;
+        type = INVALID;
+    }
+    return type;
 }
 
 TimeStepper* GetSolver(

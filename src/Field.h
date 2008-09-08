@@ -3,6 +3,8 @@
 
 #include "Grid.h"
 
+namespace ibpm {
+
 /*!
     \file Field.h
     \class Field
@@ -18,8 +20,6 @@
     \date $LastChangedDate$
     \version $Revision$
 */
-
-namespace ibpm {
 
 class Field {
 public:

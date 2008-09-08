@@ -32,7 +32,8 @@ $HeadURL$
 
 class NavierStokesModel {
 public:
-    /*! \brief Constructor, given a specified grid, geometry, and Reynolds number
+    /*! \brief Constructor, given a specified grid, geometry, Reynolds number,
+        and potential flow flux
     */
     NavierStokesModel(
         const Grid& grid,
@@ -40,7 +41,14 @@ public:
         double Reynolds,
         const Flux& q_potential
     );
-    
+
+    /// \brief Constructor, assuming potential flow part is zero
+    NavierStokesModel(
+        const Grid& grid,
+        const Geometry& geometry,
+        double Reynolds
+    );
+
     virtual ~NavierStokesModel();
 
     /// Perform initial calculations needed to use model
@@ -180,11 +188,36 @@ public:
     
 };
 
-// //! Navier-Stokes equations linearized about an equilibrium point.
-// class LinearizedNavierStokes : public NavierStokesModel {};
-// 
-// //! Adjoint Navier-Stokes equations, linearized about an equilibrium point.
-// class AdjointNavierStokes : public NavierStokesModel {};
+//! Navier-Stokes equations linearized about an equilibrium point.
+class LinearizedNavierStokes : public NavierStokesModel {
+public:
+    LinearizedNavierStokes(
+        const Grid& grid,
+        const Geometry& geometry,
+        double Reynolds,
+        const State& baseFlow
+        ) :
+        NavierStokesModel( grid, geometry, Reynolds ),
+        _x0( baseFlow ) {}
+
+    /*! \brief Compute nonlinear terms y = N(x)
+    for linearized Navier-Stokes equations
+    */
+    inline Scalar nonlinear(const State& x) const {
+        Flux v = CrossProduct( _x0.q, x.gamma );
+        v += CrossProduct( x.q, _x0.gamma );
+        Scalar g = Curl( v );
+        return g;
+    };
+private:
+    State _x0;
+};
+
+
+//! Adjoint Navier-Stokes equations, linearized about an equilibrium point.
+// For now, just make AdjointNavierStokes identical to LinearizedNavierStokes
+typedef LinearizedNavierStokes AdjointNavierStokes;
+
 
 } // namespace ibpm
 
