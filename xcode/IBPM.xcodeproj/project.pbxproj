@@ -69,6 +69,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F557BD740E7AE50C0006234C /* bin2plt.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bin2plt.cc; path = ../examples/bin2plt.cc; sourceTree = SOURCE_ROOT; };
+		F557BD760E7AE50C0006234C /* bininfo.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bininfo.cc; path = ../examples/bininfo.cc; sourceTree = SOURCE_ROOT; };
+		F557BD770E7AE50C0006234C /* cylinder.geom */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = cylinder.geom; path = ../examples/cylinder.geom; sourceTree = SOURCE_ROOT; };
+		F557BD790E7AE50C0006234C /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../examples/Makefile; sourceTree = SOURCE_ROOT; };
+		F557BD7B0E7AE50C0006234C /* Oseen.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Oseen.cc; path = ../examples/Oseen.cc; sourceTree = SOURCE_ROOT; };
+		F557BD7F0E7AE50C0006234C /* pitching.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pitching.cc; path = ../examples/pitching.cc; sourceTree = SOURCE_ROOT; };
+		F557BD820E7AE50C0006234C /* plunging.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plunging.cc; path = ../examples/plunging.cc; sourceTree = SOURCE_ROOT; };
+		F557BD840E7AE50C0006234C /* RigidBodyLoad.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RigidBodyLoad.cc; path = ../examples/RigidBodyLoad.cc; sourceTree = SOURCE_ROOT; };
 		F5BE614A0E7ACE1300F26FFC /* main */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = main; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5BE61550E7ACE3800F26FFC /* libibpm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libibpm.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5BE61EA0E7ADC4100F26FFC /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -178,11 +186,55 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F557BD720E7AE50C0006234C /* examples */ = {
+			isa = PBXGroup;
+			children = (
+				F557BD740E7AE50C0006234C /* bin2plt.cc */,
+				F557BD760E7AE50C0006234C /* bininfo.cc */,
+				F557BD770E7AE50C0006234C /* cylinder.geom */,
+				F557BD790E7AE50C0006234C /* Makefile */,
+				F557BD7B0E7AE50C0006234C /* Oseen.cc */,
+				F557BD7C0E7AE50C0006234C /* output */,
+				F557BD7F0E7AE50C0006234C /* pitching.cc */,
+				F557BD800E7AE50C0006234C /* plt */,
+				F557BD820E7AE50C0006234C /* plunging.cc */,
+				F557BD840E7AE50C0006234C /* RigidBodyLoad.cc */,
+				F557BD850E7AE50C0006234C /* tecplot */,
+			);
+			name = examples;
+			path = ../examples;
+			sourceTree = SOURCE_ROOT;
+		};
+		F557BD7C0E7AE50C0006234C /* output */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = output;
+			path = ../examples/output;
+			sourceTree = SOURCE_ROOT;
+		};
+		F557BD800E7AE50C0006234C /* plt */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = plt;
+			path = ../examples/plt;
+			sourceTree = SOURCE_ROOT;
+		};
+		F557BD850E7AE50C0006234C /* tecplot */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = tecplot;
+			path = ../examples/tecplot;
+			sourceTree = SOURCE_ROOT;
+		};
 		F5BE61380E7ACDD800F26FFC = {
 			isa = PBXGroup;
 			children = (
-				F5EB08120E7ADE4C0097BF5F /* test */,
+				F557BD720E7AE50C0006234C /* examples */,
 				F5EB07C70E7ADE3D0097BF5F /* src */,
+				F5EB08120E7ADE4C0097BF5F /* test */,
 				F5BE614B0E7ACE1300F26FFC /* Products */,
 			);
 			sourceTree = "<group>";
