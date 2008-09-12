@@ -1,0 +1,634 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F5BE61D60E7ACFAB00F26FFC /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
+		F5BE61F00E7ADC5800F26FFC /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
+		F5EB08250E7ADE7A0097BF5F /* AdamsBashforth.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07C80E7ADE3D0097BF5F /* AdamsBashforth.cc */; };
+		F5EB08260E7ADE7A0097BF5F /* BoundaryVector.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07CA0E7ADE3D0097BF5F /* BoundaryVector.cc */; };
+		F5EB08270E7ADE7A0097BF5F /* CholeskySolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07CC0E7ADE3D0097BF5F /* CholeskySolver.cc */; };
+		F5EB08280E7ADE7A0097BF5F /* ConjugateGradientSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D10E7ADE3D0097BF5F /* ConjugateGradientSolver.cc */; };
+		F5EB08290E7ADE7A0097BF5F /* Euler.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D40E7ADE3D0097BF5F /* Euler.cc */; };
+		F5EB082A0E7ADE7A0097BF5F /* Field.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D60E7ADE3D0097BF5F /* Field.cc */; };
+		F5EB082B0E7ADE7A0097BF5F /* Flux.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D90E7ADE3D0097BF5F /* Flux.cc */; };
+		F5EB082C0E7ADE7A0097BF5F /* Geometry.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07DB0E7ADE3D0097BF5F /* Geometry.cc */; };
+		F5EB082D0E7ADE7A0097BF5F /* Grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07DD0E7ADE3D0097BF5F /* Grid.cc */; };
+		F5EB082E0E7ADE7A0097BF5F /* Logger.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07E10E7ADE3D0097BF5F /* Logger.cc */; };
+		F5EB082F0E7ADE7A0097BF5F /* NavierStokesModel.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07E60E7ADE3D0097BF5F /* NavierStokesModel.cc */; };
+		F5EB08300E7ADE7A0097BF5F /* OutputForce.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07F40E7ADE3D0097BF5F /* OutputForce.cc */; };
+		F5EB08310E7ADE7A0097BF5F /* OutputRestart.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07F60E7ADE3D0097BF5F /* OutputRestart.cc */; };
+		F5EB08320E7ADE7A0097BF5F /* OutputTecplot.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07F80E7ADE3D0097BF5F /* OutputTecplot.cc */; };
+		F5EB08330E7ADE7A0097BF5F /* ParmParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07FA0E7ADE3D0097BF5F /* ParmParser.cc */; };
+		F5EB08340E7ADE7A0097BF5F /* ProjectionSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07FD0E7ADE3D0097BF5F /* ProjectionSolver.cc */; };
+		F5EB08350E7ADE7A0097BF5F /* Regularizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07FF0E7ADE3D0097BF5F /* Regularizer.cc */; };
+		F5EB08360E7ADE7A0097BF5F /* RigidBody.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08010E7ADE3D0097BF5F /* RigidBody.cc */; };
+		F5EB08370E7ADE7A0097BF5F /* RungeKutta2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08030E7ADE3D0097BF5F /* RungeKutta2.cc */; };
+		F5EB08380E7ADE7A0097BF5F /* RungeKutta3.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08050E7ADE3D0097BF5F /* RungeKutta3.cc */; };
+		F5EB08390E7ADE7A0097BF5F /* Scalar.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08070E7ADE3D0097BF5F /* Scalar.cc */; };
+		F5EB083A0E7ADE7A0097BF5F /* State.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08090E7ADE3D0097BF5F /* State.cc */; };
+		F5EB083B0E7ADE7A0097BF5F /* TimeStepper.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB080C0E7ADE3D0097BF5F /* TimeStepper.cc */; };
+		F5EB083C0E7ADE7A0097BF5F /* utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB080E0E7ADE3D0097BF5F /* utils.cc */; };
+		F5EB083D0E7ADE7A0097BF5F /* VectorOperations.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08100E7ADE3D0097BF5F /* VectorOperations.cc */; };
+		F5EB083E0E7ADE8B0097BF5F /* ibpm.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07DF0E7ADE3D0097BF5F /* ibpm.cc */; };
+		F5EB08410E7ADE9E0097BF5F /* BoundaryVectorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08140E7ADE4C0097BF5F /* BoundaryVectorTest.cc */; };
+		F5EB08420E7ADE9E0097BF5F /* FluxTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08150E7ADE4C0097BF5F /* FluxTest.cc */; };
+		F5EB08430E7ADE9E0097BF5F /* GeometryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08160E7ADE4C0097BF5F /* GeometryTest.cc */; };
+		F5EB08440E7ADE9E0097BF5F /* GridTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08170E7ADE4C0097BF5F /* GridTest.cc */; };
+		F5EB08450E7ADE9E0097BF5F /* MotionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08190E7ADE4C0097BF5F /* MotionTest.cc */; };
+		F5EB08460E7ADE9E0097BF5F /* NavierStokesModelTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081A0E7ADE4C0097BF5F /* NavierStokesModelTest.cc */; };
+		F5EB08470E7ADE9E0097BF5F /* ParmParserTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081B0E7ADE4C0097BF5F /* ParmParserTest.cc */; };
+		F5EB08480E7ADE9E0097BF5F /* ProjectionSolverTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081C0E7ADE4C0097BF5F /* ProjectionSolverTest.cc */; };
+		F5EB08490E7ADE9E0097BF5F /* RegularizerTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081D0E7ADE4C0097BF5F /* RegularizerTest.cc */; };
+		F5EB084A0E7ADE9E0097BF5F /* RigidBodyTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081E0E7ADE4C0097BF5F /* RigidBodyTest.cc */; };
+		F5EB084B0E7ADE9E0097BF5F /* ScalarTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081F0E7ADE4C0097BF5F /* ScalarTest.cc */; };
+		F5EB084C0E7ADE9E0097BF5F /* StateTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08210E7ADE4C0097BF5F /* StateTest.cc */; };
+		F5EB084D0E7ADE9E0097BF5F /* TangentSE2Test.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08220E7ADE4C0097BF5F /* TangentSE2Test.cc */; };
+		F5EB084E0E7ADE9E0097BF5F /* VectorOperationsTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F5BE61D20E7ACF3300F26FFC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F5BE613A0E7ACDD800F26FFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F5BE61540E7ACE3800F26FFC;
+			remoteInfo = ibpm;
+		};
+		F5BE61EE0E7ADC5100F26FFC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F5BE613A0E7ACDD800F26FFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F5BE61540E7ACE3800F26FFC;
+			remoteInfo = ibpm;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F5BE614A0E7ACE1300F26FFC /* main */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = main; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5BE61550E7ACE3800F26FFC /* libibpm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libibpm.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5BE61EA0E7ADC4100F26FFC /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5EB07C80E7ADE3D0097BF5F /* AdamsBashforth.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AdamsBashforth.cc; path = ../src/AdamsBashforth.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07C90E7ADE3D0097BF5F /* AdamsBashforth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AdamsBashforth.h; path = ../src/AdamsBashforth.h; sourceTree = SOURCE_ROOT; };
+		F5EB07CA0E7ADE3D0097BF5F /* BoundaryVector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BoundaryVector.cc; path = ../src/BoundaryVector.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07CB0E7ADE3D0097BF5F /* BoundaryVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BoundaryVector.h; path = ../src/BoundaryVector.h; sourceTree = SOURCE_ROOT; };
+		F5EB07CC0E7ADE3D0097BF5F /* CholeskySolver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CholeskySolver.cc; path = ../src/CholeskySolver.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07CD0E7ADE3D0097BF5F /* CholeskySolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CholeskySolver.h; path = ../src/CholeskySolver.h; sourceTree = SOURCE_ROOT; };
+		F5EB07CF0E7ADE3D0097BF5F /* make.inc.gcc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = make.inc.gcc; path = ../src/config/make.inc.gcc; sourceTree = SOURCE_ROOT; };
+		F5EB07D00E7ADE3D0097BF5F /* make.inc.joshy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = make.inc.joshy; path = ../src/config/make.inc.joshy; sourceTree = SOURCE_ROOT; };
+		F5EB07D10E7ADE3D0097BF5F /* ConjugateGradientSolver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ConjugateGradientSolver.cc; path = ../src/ConjugateGradientSolver.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07D20E7ADE3D0097BF5F /* ConjugateGradientSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConjugateGradientSolver.h; path = ../src/ConjugateGradientSolver.h; sourceTree = SOURCE_ROOT; };
+		F5EB07D30E7ADE3D0097BF5F /* Direction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Direction.h; path = ../src/Direction.h; sourceTree = SOURCE_ROOT; };
+		F5EB07D40E7ADE3D0097BF5F /* Euler.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Euler.cc; path = ../src/Euler.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07D50E7ADE3D0097BF5F /* Euler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Euler.h; path = ../src/Euler.h; sourceTree = SOURCE_ROOT; };
+		F5EB07D60E7ADE3D0097BF5F /* Field.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Field.cc; path = ../src/Field.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07D70E7ADE3D0097BF5F /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Field.h; path = ../src/Field.h; sourceTree = SOURCE_ROOT; };
+		F5EB07D80E7ADE3D0097BF5F /* FixedPosition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FixedPosition.h; path = ../src/FixedPosition.h; sourceTree = SOURCE_ROOT; };
+		F5EB07D90E7ADE3D0097BF5F /* Flux.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Flux.cc; path = ../src/Flux.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07DA0E7ADE3D0097BF5F /* Flux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Flux.h; path = ../src/Flux.h; sourceTree = SOURCE_ROOT; };
+		F5EB07DB0E7ADE3D0097BF5F /* Geometry.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Geometry.cc; path = ../src/Geometry.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07DC0E7ADE3D0097BF5F /* Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Geometry.h; path = ../src/Geometry.h; sourceTree = SOURCE_ROOT; };
+		F5EB07DD0E7ADE3D0097BF5F /* Grid.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Grid.cc; path = ../src/Grid.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07DE0E7ADE3D0097BF5F /* Grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Grid.h; path = ../src/Grid.h; sourceTree = SOURCE_ROOT; };
+		F5EB07DF0E7ADE3D0097BF5F /* ibpm.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ibpm.cc; path = ../src/ibpm.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07E00E7ADE3D0097BF5F /* ibpm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ibpm.h; path = ../src/ibpm.h; sourceTree = SOURCE_ROOT; };
+		F5EB07E10E7ADE3D0097BF5F /* Logger.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logger.cc; path = ../src/Logger.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07E20E7ADE3D0097BF5F /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logger.h; path = ../src/Logger.h; sourceTree = SOURCE_ROOT; };
+		F5EB07E40E7ADE3D0097BF5F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../src/Makefile; sourceTree = SOURCE_ROOT; };
+		F5EB07E50E7ADE3D0097BF5F /* Motion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Motion.h; path = ../src/Motion.h; sourceTree = SOURCE_ROOT; };
+		F5EB07E60E7ADE3D0097BF5F /* NavierStokesModel.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NavierStokesModel.cc; path = ../src/NavierStokesModel.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07E70E7ADE3D0097BF5F /* NavierStokesModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavierStokesModel.h; path = ../src/NavierStokesModel.h; sourceTree = SOURCE_ROOT; };
+		F5EB07F30E7ADE3D0097BF5F /* Output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Output.h; path = ../src/Output.h; sourceTree = SOURCE_ROOT; };
+		F5EB07F40E7ADE3D0097BF5F /* OutputForce.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OutputForce.cc; path = ../src/OutputForce.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07F50E7ADE3D0097BF5F /* OutputForce.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OutputForce.h; path = ../src/OutputForce.h; sourceTree = SOURCE_ROOT; };
+		F5EB07F60E7ADE3D0097BF5F /* OutputRestart.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OutputRestart.cc; path = ../src/OutputRestart.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07F70E7ADE3D0097BF5F /* OutputRestart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OutputRestart.h; path = ../src/OutputRestart.h; sourceTree = SOURCE_ROOT; };
+		F5EB07F80E7ADE3D0097BF5F /* OutputTecplot.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OutputTecplot.cc; path = ../src/OutputTecplot.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07F90E7ADE3D0097BF5F /* OutputTecplot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OutputTecplot.h; path = ../src/OutputTecplot.h; sourceTree = SOURCE_ROOT; };
+		F5EB07FA0E7ADE3D0097BF5F /* ParmParser.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParmParser.cc; path = ../src/ParmParser.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07FB0E7ADE3D0097BF5F /* ParmParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParmParser.h; path = ../src/ParmParser.h; sourceTree = SOURCE_ROOT; };
+		F5EB07FC0E7ADE3D0097BF5F /* PitchPlunge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PitchPlunge.h; path = ../src/PitchPlunge.h; sourceTree = SOURCE_ROOT; };
+		F5EB07FD0E7ADE3D0097BF5F /* ProjectionSolver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ProjectionSolver.cc; path = ../src/ProjectionSolver.cc; sourceTree = SOURCE_ROOT; };
+		F5EB07FE0E7ADE3D0097BF5F /* ProjectionSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProjectionSolver.h; path = ../src/ProjectionSolver.h; sourceTree = SOURCE_ROOT; };
+		F5EB07FF0E7ADE3D0097BF5F /* Regularizer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Regularizer.cc; path = ../src/Regularizer.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08000E7ADE3D0097BF5F /* Regularizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Regularizer.h; path = ../src/Regularizer.h; sourceTree = SOURCE_ROOT; };
+		F5EB08010E7ADE3D0097BF5F /* RigidBody.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RigidBody.cc; path = ../src/RigidBody.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08020E7ADE3D0097BF5F /* RigidBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RigidBody.h; path = ../src/RigidBody.h; sourceTree = SOURCE_ROOT; };
+		F5EB08030E7ADE3D0097BF5F /* RungeKutta2.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RungeKutta2.cc; path = ../src/RungeKutta2.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08040E7ADE3D0097BF5F /* RungeKutta2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RungeKutta2.h; path = ../src/RungeKutta2.h; sourceTree = SOURCE_ROOT; };
+		F5EB08050E7ADE3D0097BF5F /* RungeKutta3.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RungeKutta3.cc; path = ../src/RungeKutta3.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08060E7ADE3D0097BF5F /* RungeKutta3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RungeKutta3.h; path = ../src/RungeKutta3.h; sourceTree = SOURCE_ROOT; };
+		F5EB08070E7ADE3D0097BF5F /* Scalar.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Scalar.cc; path = ../src/Scalar.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08080E7ADE3D0097BF5F /* Scalar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Scalar.h; path = ../src/Scalar.h; sourceTree = SOURCE_ROOT; };
+		F5EB08090E7ADE3D0097BF5F /* State.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = State.cc; path = ../src/State.cc; sourceTree = SOURCE_ROOT; };
+		F5EB080A0E7ADE3D0097BF5F /* State.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = State.h; path = ../src/State.h; sourceTree = SOURCE_ROOT; };
+		F5EB080B0E7ADE3D0097BF5F /* TangentSE2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TangentSE2.h; path = ../src/TangentSE2.h; sourceTree = SOURCE_ROOT; };
+		F5EB080C0E7ADE3D0097BF5F /* TimeStepper.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TimeStepper.cc; path = ../src/TimeStepper.cc; sourceTree = SOURCE_ROOT; };
+		F5EB080D0E7ADE3D0097BF5F /* TimeStepper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TimeStepper.h; path = ../src/TimeStepper.h; sourceTree = SOURCE_ROOT; };
+		F5EB080E0E7ADE3D0097BF5F /* utils.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utils.cc; path = ../src/utils.cc; sourceTree = SOURCE_ROOT; };
+		F5EB080F0E7ADE3D0097BF5F /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utils.h; path = ../src/utils.h; sourceTree = SOURCE_ROOT; };
+		F5EB08100E7ADE3D0097BF5F /* VectorOperations.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VectorOperations.cc; path = ../src/VectorOperations.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08110E7ADE3D0097BF5F /* VectorOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VectorOperations.h; path = ../src/VectorOperations.h; sourceTree = SOURCE_ROOT; };
+		F5EB08140E7ADE4C0097BF5F /* BoundaryVectorTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BoundaryVectorTest.cc; path = ../test/BoundaryVectorTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08150E7ADE4C0097BF5F /* FluxTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FluxTest.cc; path = ../test/FluxTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08160E7ADE4C0097BF5F /* GeometryTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeometryTest.cc; path = ../test/GeometryTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08170E7ADE4C0097BF5F /* GridTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridTest.cc; path = ../test/GridTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08180E7ADE4C0097BF5F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../test/Makefile; sourceTree = SOURCE_ROOT; };
+		F5EB08190E7ADE4C0097BF5F /* MotionTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MotionTest.cc; path = ../test/MotionTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB081A0E7ADE4C0097BF5F /* NavierStokesModelTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NavierStokesModelTest.cc; path = ../test/NavierStokesModelTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB081B0E7ADE4C0097BF5F /* ParmParserTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParmParserTest.cc; path = ../test/ParmParserTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB081C0E7ADE4C0097BF5F /* ProjectionSolverTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ProjectionSolverTest.cc; path = ../test/ProjectionSolverTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB081D0E7ADE4C0097BF5F /* RegularizerTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegularizerTest.cc; path = ../test/RegularizerTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB081E0E7ADE4C0097BF5F /* RigidBodyTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RigidBodyTest.cc; path = ../test/RigidBodyTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB081F0E7ADE4C0097BF5F /* ScalarTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScalarTest.cc; path = ../test/ScalarTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08200E7ADE4C0097BF5F /* SingleWavenumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SingleWavenumber.h; path = ../test/SingleWavenumber.h; sourceTree = SOURCE_ROOT; };
+		F5EB08210E7ADE4C0097BF5F /* StateTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StateTest.cc; path = ../test/StateTest.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08220E7ADE4C0097BF5F /* TangentSE2Test.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TangentSE2Test.cc; path = ../test/TangentSE2Test.cc; sourceTree = SOURCE_ROOT; };
+		F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VectorOperationsTest.cc; path = ../test/VectorOperationsTest.cc; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F5BE61480E7ACE1300F26FFC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5BE61D60E7ACFAB00F26FFC /* libibpm.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5BE61530E7ACE3800F26FFC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5BE61E80E7ADC4100F26FFC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5BE61F00E7ADC5800F26FFC /* libibpm.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F5BE61380E7ACDD800F26FFC = {
+			isa = PBXGroup;
+			children = (
+				F5EB08120E7ADE4C0097BF5F /* test */,
+				F5EB07C70E7ADE3D0097BF5F /* src */,
+				F5BE614B0E7ACE1300F26FFC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F5BE614B0E7ACE1300F26FFC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F5BE614A0E7ACE1300F26FFC /* main */,
+				F5BE61550E7ACE3800F26FFC /* libibpm.a */,
+				F5BE61EA0E7ADC4100F26FFC /* test */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F5EB07C70E7ADE3D0097BF5F /* src */ = {
+			isa = PBXGroup;
+			children = (
+				F5EB07C80E7ADE3D0097BF5F /* AdamsBashforth.cc */,
+				F5EB07C90E7ADE3D0097BF5F /* AdamsBashforth.h */,
+				F5EB07CA0E7ADE3D0097BF5F /* BoundaryVector.cc */,
+				F5EB07CB0E7ADE3D0097BF5F /* BoundaryVector.h */,
+				F5EB07CC0E7ADE3D0097BF5F /* CholeskySolver.cc */,
+				F5EB07CD0E7ADE3D0097BF5F /* CholeskySolver.h */,
+				F5EB07CE0E7ADE3D0097BF5F /* config */,
+				F5EB07D10E7ADE3D0097BF5F /* ConjugateGradientSolver.cc */,
+				F5EB07D20E7ADE3D0097BF5F /* ConjugateGradientSolver.h */,
+				F5EB07D30E7ADE3D0097BF5F /* Direction.h */,
+				F5EB07D40E7ADE3D0097BF5F /* Euler.cc */,
+				F5EB07D50E7ADE3D0097BF5F /* Euler.h */,
+				F5EB07D60E7ADE3D0097BF5F /* Field.cc */,
+				F5EB07D70E7ADE3D0097BF5F /* Field.h */,
+				F5EB07D80E7ADE3D0097BF5F /* FixedPosition.h */,
+				F5EB07D90E7ADE3D0097BF5F /* Flux.cc */,
+				F5EB07DA0E7ADE3D0097BF5F /* Flux.h */,
+				F5EB07DB0E7ADE3D0097BF5F /* Geometry.cc */,
+				F5EB07DC0E7ADE3D0097BF5F /* Geometry.h */,
+				F5EB07DD0E7ADE3D0097BF5F /* Grid.cc */,
+				F5EB07DE0E7ADE3D0097BF5F /* Grid.h */,
+				F5EB07DF0E7ADE3D0097BF5F /* ibpm.cc */,
+				F5EB07E00E7ADE3D0097BF5F /* ibpm.h */,
+				F5EB07E10E7ADE3D0097BF5F /* Logger.cc */,
+				F5EB07E20E7ADE3D0097BF5F /* Logger.h */,
+				F5EB07E40E7ADE3D0097BF5F /* Makefile */,
+				F5EB07E50E7ADE3D0097BF5F /* Motion.h */,
+				F5EB07E60E7ADE3D0097BF5F /* NavierStokesModel.cc */,
+				F5EB07E70E7ADE3D0097BF5F /* NavierStokesModel.h */,
+				F5EB07F30E7ADE3D0097BF5F /* Output.h */,
+				F5EB07F40E7ADE3D0097BF5F /* OutputForce.cc */,
+				F5EB07F50E7ADE3D0097BF5F /* OutputForce.h */,
+				F5EB07F60E7ADE3D0097BF5F /* OutputRestart.cc */,
+				F5EB07F70E7ADE3D0097BF5F /* OutputRestart.h */,
+				F5EB07F80E7ADE3D0097BF5F /* OutputTecplot.cc */,
+				F5EB07F90E7ADE3D0097BF5F /* OutputTecplot.h */,
+				F5EB07FA0E7ADE3D0097BF5F /* ParmParser.cc */,
+				F5EB07FB0E7ADE3D0097BF5F /* ParmParser.h */,
+				F5EB07FC0E7ADE3D0097BF5F /* PitchPlunge.h */,
+				F5EB07FD0E7ADE3D0097BF5F /* ProjectionSolver.cc */,
+				F5EB07FE0E7ADE3D0097BF5F /* ProjectionSolver.h */,
+				F5EB07FF0E7ADE3D0097BF5F /* Regularizer.cc */,
+				F5EB08000E7ADE3D0097BF5F /* Regularizer.h */,
+				F5EB08010E7ADE3D0097BF5F /* RigidBody.cc */,
+				F5EB08020E7ADE3D0097BF5F /* RigidBody.h */,
+				F5EB08030E7ADE3D0097BF5F /* RungeKutta2.cc */,
+				F5EB08040E7ADE3D0097BF5F /* RungeKutta2.h */,
+				F5EB08050E7ADE3D0097BF5F /* RungeKutta3.cc */,
+				F5EB08060E7ADE3D0097BF5F /* RungeKutta3.h */,
+				F5EB08070E7ADE3D0097BF5F /* Scalar.cc */,
+				F5EB08080E7ADE3D0097BF5F /* Scalar.h */,
+				F5EB08090E7ADE3D0097BF5F /* State.cc */,
+				F5EB080A0E7ADE3D0097BF5F /* State.h */,
+				F5EB080B0E7ADE3D0097BF5F /* TangentSE2.h */,
+				F5EB080C0E7ADE3D0097BF5F /* TimeStepper.cc */,
+				F5EB080D0E7ADE3D0097BF5F /* TimeStepper.h */,
+				F5EB080E0E7ADE3D0097BF5F /* utils.cc */,
+				F5EB080F0E7ADE3D0097BF5F /* utils.h */,
+				F5EB08100E7ADE3D0097BF5F /* VectorOperations.cc */,
+				F5EB08110E7ADE3D0097BF5F /* VectorOperations.h */,
+			);
+			name = src;
+			path = ../src;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5EB07CE0E7ADE3D0097BF5F /* config */ = {
+			isa = PBXGroup;
+			children = (
+				F5EB07CF0E7ADE3D0097BF5F /* make.inc.gcc */,
+				F5EB07D00E7ADE3D0097BF5F /* make.inc.joshy */,
+			);
+			name = config;
+			path = ../src/config;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5EB08120E7ADE4C0097BF5F /* test */ = {
+			isa = PBXGroup;
+			children = (
+				F5EB08140E7ADE4C0097BF5F /* BoundaryVectorTest.cc */,
+				F5EB08150E7ADE4C0097BF5F /* FluxTest.cc */,
+				F5EB08160E7ADE4C0097BF5F /* GeometryTest.cc */,
+				F5EB08170E7ADE4C0097BF5F /* GridTest.cc */,
+				F5EB08180E7ADE4C0097BF5F /* Makefile */,
+				F5EB08190E7ADE4C0097BF5F /* MotionTest.cc */,
+				F5EB081A0E7ADE4C0097BF5F /* NavierStokesModelTest.cc */,
+				F5EB081B0E7ADE4C0097BF5F /* ParmParserTest.cc */,
+				F5EB081C0E7ADE4C0097BF5F /* ProjectionSolverTest.cc */,
+				F5EB081D0E7ADE4C0097BF5F /* RegularizerTest.cc */,
+				F5EB081E0E7ADE4C0097BF5F /* RigidBodyTest.cc */,
+				F5EB081F0E7ADE4C0097BF5F /* ScalarTest.cc */,
+				F5EB08200E7ADE4C0097BF5F /* SingleWavenumber.h */,
+				F5EB08210E7ADE4C0097BF5F /* StateTest.cc */,
+				F5EB08220E7ADE4C0097BF5F /* TangentSE2Test.cc */,
+				F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */,
+			);
+			name = test;
+			path = ../test;
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		F5BE61510E7ACE3800F26FFC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		F5BE61490E7ACE1300F26FFC /* ibpm_main */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5BE614F0E7ACE1300F26FFC /* Build configuration list for PBXNativeTarget "ibpm_main" */;
+			buildPhases = (
+				F5BE61470E7ACE1300F26FFC /* Sources */,
+				F5BE61480E7ACE1300F26FFC /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F5BE61D30E7ACF3300F26FFC /* PBXTargetDependency */,
+			);
+			name = ibpm_main;
+			productName = main;
+			productReference = F5BE614A0E7ACE1300F26FFC /* main */;
+			productType = "com.apple.product-type.tool";
+		};
+		F5BE61540E7ACE3800F26FFC /* ibpm */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5BE61580E7ACE5600F26FFC /* Build configuration list for PBXNativeTarget "ibpm" */;
+			buildPhases = (
+				F5BE61510E7ACE3800F26FFC /* Headers */,
+				F5BE61520E7ACE3800F26FFC /* Sources */,
+				F5BE61530E7ACE3800F26FFC /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ibpm;
+			productName = ibpm;
+			productReference = F5BE61550E7ACE3800F26FFC /* libibpm.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		F5BE61E90E7ADC4100F26FFC /* test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5BE62000E7ADC8200F26FFC /* Build configuration list for PBXNativeTarget "test" */;
+			buildPhases = (
+				F5BE61E70E7ADC4100F26FFC /* Sources */,
+				F5BE61E80E7ADC4100F26FFC /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F5BE61EF0E7ADC5100F26FFC /* PBXTargetDependency */,
+			);
+			name = test;
+			productName = test;
+			productReference = F5BE61EA0E7ADC4100F26FFC /* test */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F5BE613A0E7ACDD800F26FFC /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = F5BE613D0E7ACDD800F26FFC /* Build configuration list for PBXProject "IBPM" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 0;
+			mainGroup = F5BE61380E7ACDD800F26FFC;
+			productRefGroup = F5BE614B0E7ACE1300F26FFC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F5BE61490E7ACE1300F26FFC /* ibpm_main */,
+				F5BE61540E7ACE3800F26FFC /* ibpm */,
+				F5BE61E90E7ADC4100F26FFC /* test */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F5BE61470E7ACE1300F26FFC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5EB083E0E7ADE8B0097BF5F /* ibpm.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5BE61520E7ACE3800F26FFC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5EB08250E7ADE7A0097BF5F /* AdamsBashforth.cc in Sources */,
+				F5EB08260E7ADE7A0097BF5F /* BoundaryVector.cc in Sources */,
+				F5EB08270E7ADE7A0097BF5F /* CholeskySolver.cc in Sources */,
+				F5EB08280E7ADE7A0097BF5F /* ConjugateGradientSolver.cc in Sources */,
+				F5EB08290E7ADE7A0097BF5F /* Euler.cc in Sources */,
+				F5EB082A0E7ADE7A0097BF5F /* Field.cc in Sources */,
+				F5EB082B0E7ADE7A0097BF5F /* Flux.cc in Sources */,
+				F5EB082C0E7ADE7A0097BF5F /* Geometry.cc in Sources */,
+				F5EB082D0E7ADE7A0097BF5F /* Grid.cc in Sources */,
+				F5EB082E0E7ADE7A0097BF5F /* Logger.cc in Sources */,
+				F5EB082F0E7ADE7A0097BF5F /* NavierStokesModel.cc in Sources */,
+				F5EB08300E7ADE7A0097BF5F /* OutputForce.cc in Sources */,
+				F5EB08310E7ADE7A0097BF5F /* OutputRestart.cc in Sources */,
+				F5EB08320E7ADE7A0097BF5F /* OutputTecplot.cc in Sources */,
+				F5EB08330E7ADE7A0097BF5F /* ParmParser.cc in Sources */,
+				F5EB08340E7ADE7A0097BF5F /* ProjectionSolver.cc in Sources */,
+				F5EB08350E7ADE7A0097BF5F /* Regularizer.cc in Sources */,
+				F5EB08360E7ADE7A0097BF5F /* RigidBody.cc in Sources */,
+				F5EB08370E7ADE7A0097BF5F /* RungeKutta2.cc in Sources */,
+				F5EB08380E7ADE7A0097BF5F /* RungeKutta3.cc in Sources */,
+				F5EB08390E7ADE7A0097BF5F /* Scalar.cc in Sources */,
+				F5EB083A0E7ADE7A0097BF5F /* State.cc in Sources */,
+				F5EB083B0E7ADE7A0097BF5F /* TimeStepper.cc in Sources */,
+				F5EB083C0E7ADE7A0097BF5F /* utils.cc in Sources */,
+				F5EB083D0E7ADE7A0097BF5F /* VectorOperations.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5BE61E70E7ADC4100F26FFC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5EB08410E7ADE9E0097BF5F /* BoundaryVectorTest.cc in Sources */,
+				F5EB08420E7ADE9E0097BF5F /* FluxTest.cc in Sources */,
+				F5EB08430E7ADE9E0097BF5F /* GeometryTest.cc in Sources */,
+				F5EB08440E7ADE9E0097BF5F /* GridTest.cc in Sources */,
+				F5EB08450E7ADE9E0097BF5F /* MotionTest.cc in Sources */,
+				F5EB08460E7ADE9E0097BF5F /* NavierStokesModelTest.cc in Sources */,
+				F5EB08470E7ADE9E0097BF5F /* ParmParserTest.cc in Sources */,
+				F5EB08480E7ADE9E0097BF5F /* ProjectionSolverTest.cc in Sources */,
+				F5EB08490E7ADE9E0097BF5F /* RegularizerTest.cc in Sources */,
+				F5EB084A0E7ADE9E0097BF5F /* RigidBodyTest.cc in Sources */,
+				F5EB084B0E7ADE9E0097BF5F /* ScalarTest.cc in Sources */,
+				F5EB084C0E7ADE9E0097BF5F /* StateTest.cc in Sources */,
+				F5EB084D0E7ADE9E0097BF5F /* TangentSE2Test.cc in Sources */,
+				F5EB084E0E7ADE9E0097BF5F /* VectorOperationsTest.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F5BE61D30E7ACF3300F26FFC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F5BE61540E7ACE3800F26FFC /* ibpm */;
+			targetProxy = F5BE61D20E7ACF3300F26FFC /* PBXContainerItemProxy */;
+		};
+		F5BE61EF0E7ADC5100F26FFC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F5BE61540E7ACE3800F26FFC /* ibpm */;
+			targetProxy = F5BE61EE0E7ADC5100F26FFC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		F5BE613B0E7ACDD800F26FFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		F5BE613C0E7ACDD800F26FFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+		F5BE614D0E7ACE1300F26FFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_CFLAGS = "-DIBPM_VERSION=0.1";
+				OTHER_LDFLAGS = "-lfftw3";
+				PREBINDING = NO;
+				PRODUCT_NAME = main;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		F5BE614E0E7ACE1300F26FFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_CFLAGS = "-DIBPM_VERSION=0.1";
+				OTHER_LDFLAGS = "-lfftw3";
+				PREBINDING = NO;
+				PRODUCT_NAME = main;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		F5BE61560E7ACE3800F26FFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/build/Debug\"";
+				PREBINDING = NO;
+				PRODUCT_NAME = ibpm;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		F5BE61570E7ACE3800F26FFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = ibpm;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		F5BE61EC0E7ADC4100F26FFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-lgtest",
+					"-lgtest_main",
+					"-lfftw3",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = test;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		F5BE61ED0E7ADC4100F26FFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-lgtest",
+					"-lgtest_main",
+					"-lfftw3",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = test;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F5BE613D0E7ACDD800F26FFC /* Build configuration list for PBXProject "IBPM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5BE613B0E7ACDD800F26FFC /* Debug */,
+				F5BE613C0E7ACDD800F26FFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F5BE614F0E7ACE1300F26FFC /* Build configuration list for PBXNativeTarget "ibpm_main" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5BE614D0E7ACE1300F26FFC /* Debug */,
+				F5BE614E0E7ACE1300F26FFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F5BE61580E7ACE5600F26FFC /* Build configuration list for PBXNativeTarget "ibpm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5BE61560E7ACE3800F26FFC /* Debug */,
+				F5BE61570E7ACE3800F26FFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F5BE62000E7ADC8200F26FFC /* Build configuration list for PBXNativeTarget "test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5BE61EC0E7ADC4100F26FFC /* Debug */,
+				F5BE61ED0E7ADC4100F26FFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F5BE613A0E7ACDD800F26FFC /* Project object */;
+}
