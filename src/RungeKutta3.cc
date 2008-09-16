@@ -35,7 +35,13 @@ RungeKutta3::RungeKutta3(NavierStokesModel& model, double timestep) :
     _linearTermEigenvalues2( model.getLambda() ),
     _linearTermEigenvalues3( model.getLambda() ), 
     _x1( model.getGrid(), model.getGeometry().getNumPoints() ),
-    _x2( model.getGrid(), model.getGeometry().getNumPoints() )
+    _x2( model.getGrid(), model.getGeometry().getNumPoints() ),
+    _Q1( model.getGrid() ),
+    _Q2( model.getGrid() ),
+    _Q3( model.getGrid() ),
+    _a( model.getGrid() ),
+    _b( model.getGeometry().getNumPoints() ),
+    _b0( model.getGeometry().getNumPoints() )
     {
     // compute eigenvalues of linear terms on RHS of each projection solve
     _linearTermEigenvalues3 *= timestep/8.; 
@@ -114,75 +120,76 @@ void RungeKutta3::advance(State& x) {
         geom.moveBodies(x.time);
     }
 
-    // First Projection Solve 
+    //*****
+    // First Projection Solve (intermediate state _x1) 
 
-    // Evaluate Right-Hand-Side (a) for first equation of ProjectionSolver
-    Scalar Q1 = _model.nonlinear( x );
-    Q1 *= _timestep;
+    // RHS for 1st eqn of ProjectionSolver
+    _Q1 = _model.nonlinear( x );
+    _Q1 *= _timestep;
 
-    Scalar a = _model.S( x.gamma );
-    a *= _linearTermEigenvalues1;
-    a = _model.Sinv( a );
+    _a = _model.S( x.gamma );
+    _a *= _linearTermEigenvalues1;
+    _a = _model.Sinv( _a );
 
-    a += Q1 / 3.;
+    _a += _Q1 / 3.;
 
-    // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
-    BoundaryVector b = geom.getVelocities();
-    BoundaryVector b0 = _model.getBaseFlowBoundaryVelocities();
-    b -= b0;
+    // RHS for 2nd eqn of ProjectionSolver
+    _b = geom.getVelocities();
+    _b0 = _model.getBaseFlowBoundaryVelocities();
+    _b -= _b0;
     
     // Call the ProjectionSolver to determine the circulation and forces
-    _solver1->solve( a, b, _x1.gamma, _x1.f );
+    _solver1->solve( _a, _b, _x1.gamma, _x1.f );
     
     // Compute the corresponding flux
     _model.computeFlux( _x1.gamma, _x1.q );
 
-    // Second Projection Solve
+    //*****
+    // Second Projection Solve (intermediate state _x2)
 
-    // Evaluate Right-Hand-Side (a) for first equation of ProjectionSolver  
-    Scalar Q2 = _model.nonlinear( _x1 );
-    Q2 *= _timestep;
-    Q2 += -Q1 * 5. / 9.;
+    // RHS for 1st eqn of ProjectionSolver
+    _Q2 = _model.nonlinear( _x1 );
+    _Q2 *= _timestep;
+    _Q2 += -_Q1 * 5. / 9.;
 
-    //a = _model.S( _x1.gamma );
-    a = _model.S( _x1.gamma );
-    a *= _linearTermEigenvalues2;  
-    a = _model.Sinv( a );
+    _a = _model.S( _x1.gamma );
+    _a *= _linearTermEigenvalues2;  
+    _a = _model.Sinv( _a );
 
-    a += Q2 * 15. / 16.;
+    _a += _Q2 * 15. / 16.;
     
-    // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
-    b = geom.getVelocities();
-    b0 = _model.getBaseFlowBoundaryVelocities();
-    b -= b0;
+    // RHS for 2nd eqn of ProjectionSolver
+    _b = geom.getVelocities();
+    _b0 = _model.getBaseFlowBoundaryVelocities();
+    _b -= _b0;
     
     // Call the ProjectionSolver to determine the circulation and forces
-    _solver2->solve( a, b, _x2.gamma, _x2.f );
+    _solver2->solve( _a, _b, _x2.gamma, _x2.f );
     
     // Compute the corresponding flux
     _model.computeFlux( _x2.gamma, _x2.q );
 
-    // Third Projection Solve
+    //*****
+    // Third Projection Solve (final state)
 
-    // Evaluate Right-Hand-Side (a) for first equation of ProjectionSolver  
-    Scalar Q3 = _model.nonlinear( _x2 );
-    Q3 *= _timestep;
-    Q3 += -Q2 * 153. / 128.;
+    // RHS for 1st eqn of ProjectionSolver  
+    _Q3 = _model.nonlinear( _x2 );
+    _Q3 *= _timestep;
+    _Q3 += -_Q2 * 153. / 128.;
 
-    //a = _model.S( _x2.gamma );
-    a = _model.S( _x2.gamma );
-    a *= _linearTermEigenvalues3;  
-    a = _model.Sinv( a );
+    _a = _model.S( _x2.gamma );
+    _a *= _linearTermEigenvalues3;  
+    _a = _model.Sinv( _a );
 
-    a += Q3 * 8. / 15.;
+    _a += _Q3 * 8. / 15.;
     
-    // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
-    b = geom.getVelocities();
-    b0 = _model.getBaseFlowBoundaryVelocities();
-    b -= b0;
+    // RHS for 2nd eqn of ProjectionSolver
+    _b = geom.getVelocities();
+    _b0 = _model.getBaseFlowBoundaryVelocities();
+    _b -= _b0;
     
     // Call the ProjectionSolver to determine the circulation and forces
-    _solver2->solve( a, b, x.gamma, x.f );
+    _solver2->solve( _a, _b, x.gamma, x.f );
     
     // Compute the corresponding flux
     _model.computeFlux( x.gamma, x.q );

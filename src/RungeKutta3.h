@@ -14,14 +14,17 @@ namespace ibpm {
 
     \brief Timestepper using RK3 for nonlinear terms
     
-    Uses Crank-Nicolson for linear terms.  Uses the scheme given by Peyret, p. 148[3], for alpha=1, beta=1/2:  
+    Uses Crank-Nicolson for linear terms.  Uses the scheme given by Peyret, p. 149[3]:
     \f{align}
-    (1 - \frac{h}{2}L)\gamma_1 + hBf_1 &=
-        (1+\frac{h}{2}L)\gamma^n + h N(q^n)\\
-    C\gamma_1 &= b_{n+1} \\
-    (1 - \frac{h}{2}L)\gamma^{n+1} + hBf^{n+1} &=
-        (1+\frac{h}{2}L)\gamma^n + \frac{h}{2}(N(q^n)+N(q_1))\\
-    C\gamma^{n+1} &= b_{n+1}
+    Q_1&=hN(x^n)\\
+    (1-\frac{h}{6}L)x_1+\frac{h}{3}Bf_1&=(1+\frac{h}{6}L)x^n+\frac{h}{3}Q_1\\
+    Cx_1&=b_{n+1/3}\\
+    Q_2&=-\frac{5}{9}Q_1+hN(x_1)\\
+    (1-\frac{5h}{24}L)x_2+\frac{5h}{12}Bf_2&=(1+\frac{5h}{24}L)x_1+\frac{15}{16}Q_2\\
+    Cx_2&=b_{n+3/4}\\
+    Q_3&=-\frac{153}{128}Q_2+hN(x_2)\\
+    (1-\frac{h}{8}L)x^{n+1}+\frac{h}{4}Bf^{n+1}&=(1+\frac{h}{8}L)x_2+\frac{8}{15}Q_3\\
+    Cx^{n+1}&=b_{n+1} 
     \f}  
 
     \author Steve Brunton
@@ -56,6 +59,12 @@ private:
     Scalar _linearTermEigenvalues3;
     State _x1;
     State _x2;
+    Scalar _Q1;
+    Scalar _Q2;
+    Scalar _Q3;   
+    Scalar _a;
+    BoundaryVector _b;
+    BoundaryVector _b0;
 };
 
 } // namespace ibpm
