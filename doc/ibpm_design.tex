@@ -89,41 +89,41 @@ The Navier Stokes equations are solved in two dimensions, using a streamfunction
 
 Let $q$ denote the (vector-valued) velocity flux, $\psi$ the streamfunction, and $\gamma$ the circulation about a cell.  The no-slip boundary condition at the surface of an object are imposed by delta-function forces at the boundary locations, and $f$ is a vector of these force values.  The equations to be solved are given as (22) in~\cite{ColTai-07}:
 \begin{align}
-	\frac{d\gamma}{dt} + C^TE^T\tilde f &= -\beta C^TC\gamma + C^T\mathcal{N}(q) + bc_\gamma
-	\label{eq:navier_stokes}\\
-EC(S\Lambda^{-1}S)\gamma + bc_s &= u_B.
-\label{eq:no_slip}
+	\frac{d\gamma}{dt} + C^TE^T\tilde f &= \nu L\gamma + C^T(q\times\gamma),
+		\qquad \gamma\big|_\partial = bc_\gamma
+		\label{eq:navier_stokes}\\
+	L\psi &= -\frac{1}{\delta^2}\gamma,\qquad \psi\big|_\partial = bc_\psi
+		\label{eq:poisson}\\
+	EC\psi &= u_B.
+		\label{eq:no_slip}
 \end{align}
-The first equation is the momentum equation, and the second equation is a constraint representing the no-slip condition, so that velocities at the boundary points match prescribed velocities~$u_B$. The discrete operators in the above equation are described in the table below, and $\beta=1/(Re\delta^2)$, where $\delta$ is the grid spacing and $Re$ is the Reynolds number.
+The first equation is the momentum equation, the second is a Poisson equation for the streamfunction, and the third equation is a constraint representing the no-slip condition, so that velocities at the boundary points match prescribed velocities~$u_B$. The discrete operators in the above equation are described in the table below, where $\delta$ is the grid spacing and $\nu=1/Re$ is one over the Reynolds number.
 \begin{center}
 \begin{tabular}{ccp{3.7in}}
 Operator & Maps & Definition\\
 $C$ 	& $\psi\mapsto q$ & curl of a scalar\\
 $C^T$ 	& $q\mapsto \gamma$ & curl of a vector in 2d\\
 $S$ 	& $\gamma\mapsto\hat\gamma$ & discrete sin transform\\
-$-C^TC$	& $\gamma\mapsto\gamma$ & Laplacian, analogous to $\triangle u = \nabla(\nabla\cdot u) - \nabla\times\nabla\times u$\\
+$L=-C^TC$	& $\gamma\mapsto\gamma$ & Laplacian, analogous to $\triangle u = \nabla(\nabla\cdot u) - \nabla\times\nabla\times u$\\
 $\Lambda$	& $\hat\gamma\mapsto\hat\gamma$ & eigenvalues of Laplacian\\
 $E$ 	& $q\mapsto u_B$ & restriction of fluxes everywhere to velocities at boundary\\
 $E^T$	& $f\mapsto q$ & regularization of forces at boundary points to fluxes everywhere\\
 $D$		& $q\mapsto \varphi$ & divergence of a vector field
 \end{tabular}
 \end{center}
-where $u_B$ is a vector of velocities at boundary points.  An important aspect of the method is that the curl operator~$C$ is chosen such that its range is in the nullspace of a discrete divergence operator~$D$, such that $DC=0$, and the continuity equation is satisfied for any streamfunction~$\psi$.  The discrete Laplacian $-C^TC$ is diagonalized by the discrete sin transform~$S$, and its eigenvalues are known analytically.  Since $\triangle\psi =\gamma$, we have
+Here, $u_B$ is a vector of velocities at boundary points.  An important aspect of the method is that the curl operator~$C$ is chosen such that its range is in the nullspace of a discrete divergence operator~$D$, such that $DC=0$, and the continuity equation is satisfied for any streamfunction~$\psi$.  The discrete Laplacian $L$ is diagonalized by the discrete sin transform~$S$, and its eigenvalues are known analytically, so the Poisson equation~(\ref{eq:poisson}) can be solved efficiently.
+To retrieve the fluxes $q$ from the streamfunction~$\psi$, we need to add in a (prescribed) potential flow solution~$q_\text{pot}$, so we have
 \begin{equation}
-	\psi = S\Lambda^{-1}S\gamma + bc.
-\label{eq:compute_psi}
-\end{equation}
-To retrieve the fluxes $q$ from the streamfunction~$\psi$, we need to add in a (prescribed) potential flow solution~$q_\text{pot}$ as well as a boundary term $bc_q$, so we have
-\begin{equation}
-	q = C\psi + q_\text{pot} + bc_q.
+	q = C\psi + q_\text{pot}.
 \label{eq:compute_q}
 \end{equation}
+We consider farfield boundary conditions, for which $bc_\gamma$ in~(\ref{eq:navier_stokes}) and~$bc_\psi$ in~(\ref{eq:poisson}) are both zero.
 
 \paragraph{Time discretization}
 Equation~(\ref{eq:navier_stokes}--\ref{eq:no_slip}) are stepped forward in time using a projection method, as follows.  For instance, discretizing the linear terms of (\ref{eq:navier_stokes}) using Crank-Nicolson (trapezoidal rule), and the nonlinear terms using explicit Euler, one obtains
 \begin{align}
-	\left(1+\frac{\beta\Delta t}{2}C^TC\right)\gamma^{n+1} + \Delta t C^TE^Tf &= \left(1 - \frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \Delta t C^T \mathcal{N}(q^n) + \Delta t bc_\gamma \label{eq:timestepper}\\
-	EC(S\Lambda^{-1}S)\gamma^{n+1} &= u_B - bc_s.
+	\left(1-\frac{\nu\Delta t}{2}L\right)\gamma^{n+1} + \Delta t C^TE^Tf &= \left(1 + \frac{\nu\Delta t}{2}L\right)\gamma^n + \Delta t C^T (q^n\times\gamma^n)  \label{eq:timestepper}\\
+	-\frac{1}{\delta^2}ECL^{-1}\gamma^{n+1} &= u_B^{n+1}
 \end{align}
 These equations are of the form
 \begin{equation}
@@ -141,33 +141,50 @@ These equations are of the form
 \end{equation}
 where
 \begin{align}
-	\mathcal{A} &= 1 + \frac{\beta\Delta t}{2}C^TC\\
+	\mathcal{A} &= 1 - \frac{\nu\Delta t}{2}L\\
 	\mathcal{B} &= \Delta t C^TE^T\\
-	\mathcal{C} &= ECS\Lambda^{-1}S\\
-	a &= \left(1-\frac{\beta\Delta t}{2}C^TC\right)\gamma^n + \Delta t C^T\mathcal{N}(q^n) + bc_\gamma\\
-	b &= u_B - bc_s.
+	\mathcal{C} &= -\frac{1}{\delta^2}ECL^{-1}\\
+	a &= \left(1+\frac{\nu\Delta t}{2}L\right)\gamma^n + \Delta t C^T(q^n\times\gamma^n)\\
+	b &= u_B.
 \end{align}
+
 
 
 \paragraph{Projection method}
 We solve the constrained equation~(\ref{eq:constrained}) using the following algorithm:
 \begin{equation}
 \begin{aligned}
-	\mathcal{A}\gamma^* = a\\
-	\mathcal{CA}^{-1}\mathcal{B}f = \mathcal{C}\gamma^* - b\\
-	\gamma^{n+1} = \gamma^* - \mathcal{A}^{-1}\mathcal{B}f
+	\mathcal{A}\gamma^* &= a,\qquad \gamma^*\big|_\partial\\
+	\mathcal{CA}^{-1}\mathcal{B}f &= \mathcal{C}\gamma^* - b\\
+	\gamma^{n+1} &= \gamma^* - \mathcal{A}^{-1}\mathcal{B}f
 \end{aligned}
 \label{eq:projection_alg}
 \end{equation}
-Since the matrix $\mathcal{A}$ is easily invertible using a sin transform, one may solve the first equation easily.  The second equation is rather small ($\text{\#forces} \times \text{\#forces}$), and furthermore the matrix $\mathcal{M}=\mathcal{C}\mathcal{A}^{-1}\mathcal{B}$ is symmetric, since $A$ and $C^TC$ have the same eigenvectors.  When the boundary conditions are fixed (stationary bodies), then the matrix~$\mathcal{M}$ is constant in time, and so may be LU decomposed (e.g. using a Cholesky decomposition) once beforehand, and solved rapidly at each timestep.  When the boundary conditions vary in time, then $E$ changes at each step, and a direct solve is not as efficient as an iterative solve, such as a conjugate-gradient method (also for symmetric matrices).
+Since the matrix $\mathcal{A}$ is easily invertible using a sin transform, one may solve the first equation easily (applying boundary conditions on~$\gamma^*$).  The second equation is rather small ($\text{\#forces} \times \text{\#forces}$), and furthermore the matrix $\mathcal{M}=\mathcal{C}\mathcal{A}^{-1}\mathcal{B}$ is symmetric, since $\mathcal{A}$ and $L$ have the same eigenvectors.  When the boundary conditions are fixed (stationary bodies), then the matrix~$\mathcal{M}$ is constant in time, and so may be LU decomposed (e.g. using a Cholesky decomposition) once beforehand, and solved rapidly at each timestep.  When the boundary conditions vary in time, then $E$ changes at each step, and a direct solve is not as efficient as an iterative solve, such as a conjugate-gradient method (also for symmetric matrices).
 
 In the design below, we decouple the algorithm for the timestepper~(\ref{eq:timestepper}) from the algorithm (\ref{eq:projection_alg}) for solving equation~(\ref{eq:constrained}).
 
-\subsection{To do}
-\begin{itemize}
-	\item Who is responsible for storing the potential flow solution $q_\text{pot}$?
-	\item Who is responsible for adding the boundary velocity, determining the RHS of the projection equations?
-\end{itemize}
+\subsection{Multi-domain method}
+For large domains, it is not practical to use uniform grid spacing, so the method in~\cite{ColTai-07} uses a multi-domain approach in which several nested uniform grids are used.  The Poisson equations may still be solved efficiently in this case, also using a number of sin transforms, as outlined here.  We present a slightly modified version of this scheme that is slightly more accurate (the only real difference is in the definition of the operator $P^{k+1,k}$ that moves variables from a fine grid to a coarse grid).
+
+One defines a scalar field $u$ on a nested set of grids $u^1,\ldots,u^{N_g}$, where $u^1$ is the finest grid and $u^{N_g}$ is the coarsest.  One then defines a sequence of {\em coarsening} operators $P^k$ that move points from the full grid to an individual coarse grid~$u^k$, by suitably averaging finer gridpoints.  These coarsening operators may be defined recursively, by starting with the finest grid and averaging values to each coarser grid sequentially.
+
+In order to solve the system
+\begin{equation}
+	Lu = f,\qquad u\big|_\partial = bc_u,
+\end{equation}
+one first computes a sequence of coarsified forcing terms $f^1,\ldots,f^{N_g}$, for instance with $f^{k} = P^{k}f$. Then one considers the Laplacian $L_1$ on the finest (uniform) grid, and solves a sequence of Poisson problems
+\begin{equation}
+\begin{aligned}
+	L_1 u^{N_g} &= 2^{N_g-1} f^{N_g},& u^{N_g}\big|_\partial &= bc_u\\
+	L_1 u^{N_g-1} &= 2^{N_g-2} f^{N_g-1},& u^{N_g-1}\big|_\partial &= bc(u^{N_g})\\
+	&\;\vdots\\
+	L_1 u^1 &= f^1,& u^1\big|_\partial &= bc(u^2)
+\end{aligned}
+\end{equation}
+where the operators $bc(u^{k+1})$ return the values on grid $u^{k+1}$ that are on the boundary of the next finer grid~$k$.  The scaling terms $2^k$ on the right-hand side compensate for the different grid spacings on the different domains.  Since the single-grid Laplacian $L_1$ is easily inverted using a sin transform, the overall solution is efficient.
+
+One can show that with suitably defined coarsening operators, the process above {\em exactly} solves the original Poisson problem $Lu=f$, with the standard Laplacian operator on the full grid (second-order accurate in each sub-grid, first-order accurate at the boundaries).
 
 \section{Classes}
 In this section, we give a high-level description of the classes involved.  A diagram showing the main classes and their collaborations is shown in Figure~\ref{fig:class_diagram}.  Below, we discuss each of these and their interfaces in more detail.
@@ -190,7 +207,7 @@ C\gamma &= b
 \end{aligned}
 \label{eq:model}
 \end{equation}
-where the operators in these equations are defined in the associated instance of \code|NavierStokesModel|.  Note that the nonlinear term depends only on the fluxes~$q$, but the fluxes can be computed from the circulation~$\gamma$ by~(\ref{eq:compute_psi}--\ref{eq:compute_q}).
+where the operators in these equations are defined in the associated instance of \code|NavierStokesModel|.  Note that the nonlinear term depends only on the fluxes~$q$, but the fluxes can be computed from the circulation~$\gamma$ by~(\ref{eq:poisson},\ref{eq:compute_q}).
 
 A \class{TimeStepper} instance (e.g. \class{AdamsBashforth}) has a method \fn{advance} that takes a \class{State}, and computes the value at the next timestep, overwriting the values passed in.  The instance has a pointer to a model (of type \class{NavierStokesModel}), which contains information about the \class{Grid} and \class{Geometry}, as well as the equations to be solved (e.g., \class{LinearNavierStokes}, \class{AdjointNavierStokes}), and instantiates its own \code|ProjectionSolver| as appropriate, for solving the projection step of the equations.  For instance, for a stationary body, the \class{CholeskySolver} should be used, and for moving bodies, for which the projection step in (\ref{eq:projection_alg}) varies at each timestep, an iterative solver such as the \class{ConjugateGradientSolver} is needed.
 
