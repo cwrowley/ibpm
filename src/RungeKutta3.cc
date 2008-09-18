@@ -43,12 +43,22 @@ RungeKutta3::RungeKutta3(NavierStokesModel& model, double timestep) :
     _b( model.getGeometry().getNumPoints() ),
     _b0( model.getGeometry().getNumPoints() )
     {
+    // Set values of constants given in Peyret, p.149[3]  
+    _A1 = 0.; 
+    _A2 = -5./9.;
+    _A3 = -153./128.;
+    _B1 = 1./3.;
+    _B2 = 15./16.;
+    _B3 = 8./15.;
+    _Bp1 = 1./6.;
+    _Bp2 = 5./24.;
+    _Bp3 = 1./8.;
     // compute eigenvalues of linear terms on RHS of each projection solve
-    _linearTermEigenvalues3 *= timestep/8.; 
+    _linearTermEigenvalues3 *= timestep * _Bp3;
     _linearTermEigenvalues3 += 1; 
-    _linearTermEigenvalues2 *= timestep*5./24.;
+    _linearTermEigenvalues2 *= timestep * _Bp2;
     _linearTermEigenvalues2 += 1;
-    _linearTermEigenvalues1 *= timestep/6.;
+    _linearTermEigenvalues1 *= timestep * _Bp1;
     _linearTermEigenvalues1 += 1;
     _solver1 = 0; // initialize solvers in init()
     _solver2 = 0;
@@ -64,17 +74,17 @@ RungeKutta3::~RungeKutta3() {
 void RungeKutta3::createAllSolvers() {
     // 1st solver: alpha = h/3
     if (_solver1 == 0) {
-        _solver1 = createSolver(_timestep/3.);
+        _solver1 = createSolver(_timestep * 2. * _Bp1);
     }
 
     // 2nd solver: alpha = 5*h/12
     if (_solver2 == 0) {
-        _solver2 = createSolver(_timestep*5./12.);
+        _solver2 = createSolver(_timestep * 2. * _Bp2);
     }
 
     // 3rd solver: alpha = h/4
     if (_solver3 == 0) {
-        _solver3 = createSolver(_timestep/4.);
+        _solver3 = createSolver(_timestep * 2. * _Bp3);
     }
 }
 
@@ -131,7 +141,7 @@ void RungeKutta3::advance(State& x) {
     _a *= _linearTermEigenvalues1;
     _a = _model.Sinv( _a );
 
-    _a += _Q1 / 3.;
+    _a += _Q1 * _B1;
 
     // RHS for 2nd eqn of ProjectionSolver
     _b = geom.getVelocities();
@@ -150,13 +160,13 @@ void RungeKutta3::advance(State& x) {
     // RHS for 1st eqn of ProjectionSolver
     _Q2 = _model.nonlinear( _x1 );
     _Q2 *= _timestep;
-    _Q2 += -_Q1 * 5. / 9.;
+    _Q2 += _Q1 * _A2;
 
     _a = _model.S( _x1.gamma );
     _a *= _linearTermEigenvalues2;  
     _a = _model.Sinv( _a );
 
-    _a += _Q2 * 15. / 16.;
+    _a += _Q2 * _B2;
     
     // RHS for 2nd eqn of ProjectionSolver
     _b = geom.getVelocities();
@@ -175,13 +185,13 @@ void RungeKutta3::advance(State& x) {
     // RHS for 1st eqn of ProjectionSolver  
     _Q3 = _model.nonlinear( _x2 );
     _Q3 *= _timestep;
-    _Q3 += -_Q2 * 153. / 128.;
+    _Q3 += _Q2 * _A3;
 
     _a = _model.S( _x2.gamma );
     _a *= _linearTermEigenvalues3;  
     _a = _model.Sinv( _a );
 
-    _a += _Q3 * 8. / 15.;
+    _a += _Q3 * _B3;
     
     // RHS for 2nd eqn of ProjectionSolver
     _b = geom.getVelocities();

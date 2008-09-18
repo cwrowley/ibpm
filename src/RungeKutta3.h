@@ -65,6 +65,9 @@ private:
     Scalar _a;
     BoundaryVector _b;
     BoundaryVector _b0;
+    double _A1, _A2, _A3; 
+    double _B1, _B2, _B3;
+    double _Bp1, _Bp2, _Bp3;
 };
 
 } // namespace ibpm
