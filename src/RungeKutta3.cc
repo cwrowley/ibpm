@@ -189,7 +189,7 @@ void RungeKutta3::advance(State& x) {
     _b -= _b0;
     
     // Call the ProjectionSolver to determine the circulation and forces
-    _solver2->solve( _a, _b, x.gamma, x.f );
+    _solver3->solve( _a, _b, x.gamma, x.f );
     
     // Compute the corresponding flux
     _model.computeFlux( x.gamma, x.q );
