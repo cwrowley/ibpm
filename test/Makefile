@@ -1,9 +1,21 @@
 all: run_tests
 
-TEST_FILES=GridTest.o GeometryTest.o BoundaryVectorTest.o FluxTest.o \
-	ScalarTest.o RegularizerTest.o VectorOperationsTest.o \
-	ProjectionSolverTest.o RigidBodyTest.o TangentSE2Test.o \
-	MotionTest.o NavierStokesModelTest.o StateTest.o ParmParserTest.o
+TEST_FILES= \
+	BoundaryVectorTest.o \
+	EllipticSolverTest.o \
+	FluxTest.o \
+	GeometryTest.o \
+	GridTest.o \
+	MotionTest.o \
+	NavierStokesModelTest.o \
+	ParmParserTest.o \
+	ProjectionSolverTest.o \
+	RegularizerTest.o \
+	RigidBodyTest.o \
+	ScalarTest.o \
+	StateTest.o \
+	TangentSE2Test.o \
+	VectorOperationsTest.o \
 
 include ../src/make.inc
 

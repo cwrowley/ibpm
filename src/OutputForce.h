@@ -18,9 +18,9 @@ namespace ibpm {
 \author Clancy Rowley
 \date 21 Aug 2008
 
-\author $LastChangedBy: cwrowley $
-\date $LastChangedDate: 2008-09-01 21:43:39 -0400 (Mon, 01 Sep 2008) $
-\version $Revision: 117 $
+\author $LastChangedBy$
+\date $LastChangedDate$
+\version $Revision$
 */
 
 class OutputForce : public Output {

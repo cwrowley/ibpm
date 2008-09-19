@@ -19,6 +19,7 @@ OBJS = \
 	BoundaryVector.o \
 	CholeskySolver.o \
 	ConjugateGradientSolver.o \
+	EllipticSolver.o \
 	Euler.o \
 	Field.o \
 	Flux.o \
@@ -34,12 +35,12 @@ OBJS = \
 	Regularizer.o \
 	RigidBody.o \
 	RungeKutta2.o \
-	RungeKutta3.o \
 	Scalar.o \
 	State.o \
 	TimeStepper.o \
 	utils.o \
 	VectorOperations.o
+#	RungeKutta3.o \
 
 LDLIBS = -lfftw3 -lm
 AR = ar

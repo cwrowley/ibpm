@@ -3,7 +3,8 @@
 
 #include "Scalar.h"
 #include "BoundaryVector.h"
-#include "NavierStokesModel.h"
+#include "Model.h"
+#include "EllipticSolver.h"
 #include <string>
 using std::string;
 
@@ -17,7 +18,7 @@ namespace ibpm {
 
 Solve a system of the form
 \f{align}
-   (1 - \frac{\alpha}{2}L )x + \alpha B f &= a\\
+   (1 - \frac{\alpha\beta}{2}L )x + \beta B f &= a\\
    C x &= b
 \f}
 for \a f and \a x, using the following algorithm (a fractional step method):
@@ -30,13 +31,14 @@ for \a f and \a x, using the following algorithm (a fractional step method):
 
 where
 \f{align}
-   A &= 1-\frac{\alpha}{2}L\\
-   B_1 &= \alpha B
+   A &= 1-\frac{\alpha\beta}{2}L\\
+   B_1 &= \beta B
 \f}
 
 Note that this form of the equations arises for all of the timesteppers
-considered (so far).  The parameter \f$ \alpha \f$ is fixed, and the
-operators L, B, and C are determined by an associated NavierStokesModel.
+considered (so far).  The parameter \f$ \beta \f$ is fixed, L is the discrete
+Laplacian, and the operators B, and C and the parameter \f$ \alpha \f$ are
+determined by an associated Model.
 
 This is an abstract base class, and may not be instantiated directly.
 
@@ -57,13 +59,13 @@ class ProjectionSolver {
 public:
 
     /// Constructor
-    ProjectionSolver(const NavierStokesModel& model, double alpha);
+    ProjectionSolver(const Grid& grid, const Model& model, double beta);
 
     /// Destructor
     virtual ~ProjectionSolver();
 
     /// Perform initialization, if needed
-    /// NOTE:  Does not call init() on the NavierStokesModel model
+    /// NOTE:  Does not call init() on the Model model
     virtual void init();
 
     /// \brief Save information to a file, if there is any to write.
@@ -78,7 +80,7 @@ public:
     /*! \brief Solve for \a gamma and \a f using a fractional step method.
     Solves equations (1-2) using the algorithm (3-5).
     
-    Assumes the NavierStokesModel has been initialized with init()
+    Assumes the Model has been initialized with init()
     
     \param[in] a	Right-hand side of equation (1)
     \param[in] b	Right-hand side of constraint equation (2)
@@ -98,72 +100,29 @@ public:
 protected:
 
     /// Solve \f$ y = A^{-1} b \f$.
-    inline Scalar Ainv(const Scalar& b) {
-        Scalar Sb = _model.S( b );
-        Sb *= _eigenvaluesOfAinv;
-        Scalar y = _model.Sinv( Sb );
-        return y;
-    }
-    
-    /// Solve \f$ y = A^{-1} b \f$.
-    inline Scalar Ainv(const Scalar& b, Scalar& y ) {
-        y = _model.S( b );
-        y *= _eigenvaluesOfAinv;
-        y = _model.Sinv( y );
-        return y;
-    }
+    void Ainv( const Scalar& b, Scalar& y );
 
     /// Compute \a y = B(\a f)
-    inline Scalar B(const BoundaryVector& f) {
-        Scalar y = _model.B( f );
-        y *= _alpha;
-        return y;
-    }
+    void B( const BoundaryVector& f, Scalar& y );
     
     /// Compute \a y = C(\a x)
-    inline BoundaryVector C(const Scalar& x) {
-        BoundaryVector y = _model.C( x );
-        return y;
-    }
-    
-    /// Compute \a y = C(\a x)
-    inline void C(const Scalar& x, BoundaryVector& y ) {
-        y = _model.C( x );
-    }
+    void C( const Scalar& x, BoundaryVector& y );
     
     /// Compute \a y = M(\a f), where \f$ M = C A^{-1} B \f$.
-    inline BoundaryVector M(const BoundaryVector& f) {
-        Scalar Bf = B(f);
-        Scalar Ainv_B_f = Ainv(Bf);
-        BoundaryVector y = C(Ainv_B_f);
-        return y;
-    }
+    void M( const BoundaryVector& f, BoundaryVector& y );
+    BoundaryVector M( const BoundaryVector& f );
     
-    /// Compute \a y = M(\a f), where \f$ M = C A^{-1} B \f$.
-    inline void M(const BoundaryVector& f, BoundaryVector& y ) {
-        Scalar Bf = B( f );
-        Ainv( Bf, Bf );
-        C( Bf, y );
-    }    
-
     /// Compute \f$ x = M^{-1} b \f$.
-    virtual void Minv(
-        const BoundaryVector& b,
-        BoundaryVector& x
-    ) = 0;
+    virtual void Minv( const BoundaryVector& b, BoundaryVector& x ) = 0;
     
-    /// Return a pointer to the associated geometry
-    inline const Geometry& getGeometry() {
-        return _model.getGeometry();
-    }
-
 //
 // Private data
 //
 private:
-	double _alpha;
-	const NavierStokesModel& _model;
-    Scalar _eigenvaluesOfAinv;	
+	double _beta;
+    const Grid _grid;
+	const Model& _model;
+    HelmholtzSolver _helmholtz;
 };
 
 } // namespace ibpm

@@ -28,13 +28,11 @@ namespace ibpm {
 Geometry::Geometry() {
     _numPoints = 0;
     _isStationary = true;
-    _regularizer = NULL;
 }
 
 Geometry::Geometry(string filename) {
     _numPoints = 0;
     _isStationary = true;
-    _regularizer = NULL;
     load( filename );
 }
 
@@ -85,11 +83,6 @@ void Geometry::moveBodies(double time) const {
     vector<RigidBody>::const_iterator body;
     for (body = _bodies.begin(); body != _bodies.end(); ++body) {
         body->moveBody(time);
-    }
-
-    // recompute Regularizer operations
-    if (_regularizer != NULL) {
-        _regularizer->update();
     }
 }
 
@@ -172,10 +165,6 @@ bool Geometry::load(string filename) {
         cerr << "Error: could not open " << filename << " for input." << endl;
         return false;
     }
-}
-
-void Geometry::setRegularizer(Regularizer& reg) const {
-    _regularizer = &reg;
 }
 
 } // namespace ibpm

@@ -29,9 +29,9 @@ int main(int argc, char *argv[]) {
         cout << "Timestep " << x.timestep << endl;
         cout << "time = " << x.time << endl;
         // Write out the Grid information
-        cout << "nx = " << x.gamma.getNx() << endl
-             << "ny = " << x.gamma.getNy() << endl
-             << "dx = " << x.gamma.getDx() << endl
+        cout << "nx = " << x.gamma.Nx() << endl
+             << "ny = " << x.gamma.Ny() << endl
+             << "dx = " << x.gamma.Dx() << endl
              << "x0 = " << x.gamma.getXEdge(0) << endl
              << "y0 = " << x.gamma.getYEdge(0) << endl
              << "numPoints = " << x.f.getNumPoints() << endl;

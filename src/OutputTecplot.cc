@@ -71,9 +71,9 @@ bool OutputTecplot::doOutput(const State& state) {
     
     // Get grid dimensions
     const Grid& grid = state.gamma.getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    double dx = grid.getDx();
+    int nx = grid.Nx();
+    int ny = grid.Ny();
+    double dx = grid.Dx();
 
     // Calculate the variables for output
     // Calculate the grid
@@ -120,8 +120,8 @@ bool writeTecplotFileASCII(
     assert( numVars > 0 );
     // Get grid information
     const Grid& grid = list.getVariable(0)->getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
+    int nx = grid.Nx();
+    int ny = grid.Ny();
 
     // Write the header for the Tecplot file
     cerr << "Writing Tecplot file " << filename << endl;

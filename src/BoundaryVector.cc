@@ -31,7 +31,9 @@ BoundaryVector::BoundaryVector(const BoundaryVector& f) {
 
 void BoundaryVector::resize( int numPoints ) {
     _numPoints = numPoints;
-    _data.resize( _numPoints * XY );
+    // blitz: _data.resize( _numPoints * XY );
+    _data.Deallocate();
+    _data.Allocate( _numPoints * XY );
 }
 
 } // namespace ibpm

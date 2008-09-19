@@ -71,20 +71,20 @@ bool State::load(const std::string& filename) {
     
     // check that Grid and Geometry in file match those expected
     bool success = true;
-    if ( nx != q.getNx() || 
-        ny != q.getNy() ||
-        dx != q.getDx() ||
+    if ( nx != q.Nx() || 
+        ny != q.Ny() ||
+        dx != q.Dx() ||
         x0 != q.getXEdge(0) ||
         y0 != q.getYEdge(0) ||
         numPoints != f.getNumPoints() ) {
         
         // If old grid was previously allocated, print a warning and set
         // the return value to false
-        if ( q.getNx() > 0 ) {
+        if ( q.Nx() > 0 ) {
             cerr << "Warning: grids do not match.  Resizing grid." << endl;
             success = false;
         }
-        Grid newgrid( nx, ny, dx * nx, x0, y0 );
+        Grid newgrid( nx, ny, 1, dx * nx, x0, y0 );
         resize( newgrid, numPoints );
     }
 
@@ -125,9 +125,9 @@ bool State::save(std::string filename) const {
 
     // write Grid info
     const Grid& grid = q.getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    double dx = grid.getDx();
+    int nx = grid.Nx();
+    int ny = grid.Ny();
+    double dx = grid.Dx();
     double x0 = grid.getXEdge(0);
     double y0 = grid.getYEdge(0);
     

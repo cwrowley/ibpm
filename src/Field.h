@@ -27,9 +27,9 @@ public:
     Field( const Grid& grid );
     virtual ~Field();
     
-    inline int getNx() const { return _grid.getNx(); }
-    inline int getNy() const { return _grid.getNy(); }
-    inline double getDx() const { return _grid.getDx(); }
+    inline int Nx() const { return _grid.Nx(); }
+    inline int Ny() const { return _grid.Ny(); }
+    inline double Dx() const { return _grid.Dx(); }
     inline const Grid& getGrid() const { return _grid; }
     inline void setGrid( const Grid& grid ) { _grid = grid; }
 

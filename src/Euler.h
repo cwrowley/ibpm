@@ -31,7 +31,7 @@ class Euler : public TimeStepper {
 public:
 
     /// Instantiate an Euler solver
-    Euler( NavierStokesModel& model, double timestep );
+    Euler( Grid& grid, Model& model, double timestep );
 
     /// Destructor
     ~Euler();
@@ -45,7 +45,6 @@ public:
 
 private:
     ProjectionSolver* _solver;
-    Scalar _linearTermEigenvalues;
 };
 
 } // namespace ibpm

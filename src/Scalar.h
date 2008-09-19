@@ -1,12 +1,10 @@
 #ifndef _SCALAR_H_
 #define _SCALAR_H_
 
-#include <blitz/array.h>
+#include "Array.h"
 #include "Field.h"
 #include "Grid.h"
 #include "Flux.h"
-
-BZ_USING_NAMESPACE(blitz)
 
 namespace ibpm {
 
@@ -53,8 +51,8 @@ public:
     
     /// Copy assignment
     inline Scalar& operator=(const Scalar& f) {
-        assert( f.getNx() == getNx() );
-        assert( f.getNy() == getNy() );
+        assert( f.Nx() == Nx() );
+        assert( f.Ny() == Ny() );
         _data = f._data;
         return *this;
     }
@@ -67,50 +65,54 @@ public:
 
     /// f(i,j) refers to the value at index (i,j)
     inline double& operator()(int i, int j) {
-        assert(i>=0  && i<= getNx() );
-        assert(j>=0  && j<= getNy() );
+        assert(i>=0  && i<= Nx() );
+        assert(j>=0  && j<= Ny() );
         return _data(i,j);
     }
     
     /// f(i,j) refers to the value at index (i,j)
     inline double operator()(int i, int j) const{
-        assert(i>=0  && i<= getNx() );
-        assert(j>=0  && j<= getNy() );
+        assert(i>=0  && i<= Nx() );
+        assert(j>=0  && j<= Ny() );
         return _data(i,j);
     }
     
     /// f += g
     inline Scalar& operator+=(const Scalar& f) {
-        assert(f.getNx() == getNx() );
-        assert(f.getNy() == getNy() );
+        assert(f.Nx() == Nx() );
+        assert(f.Ny() == Ny() );
         _data += f._data;
         return *this;
     }
 
     /// f += a
     inline Scalar& operator+=(double a) {
-        _data += a;
+        for ( unsigned int i=0; i<_data.Size(); ++i ) {
+            _data(i) += a;
+        }
         return *this;
     }
 
     /// f -= g
     inline Scalar& operator-=(const Scalar& f) {
-        assert( f.getNx() == getNx() );
-        assert( f.getNy() == getNy() );
+        assert( f.Nx() == Nx() );
+        assert( f.Ny() == Ny() );
         _data -= f._data;
         return *this;
     }
 
     /// f -= a
     inline Scalar& operator-=(double a) {
-        _data -= a;
+        for ( unsigned int i=0; i<_data.Size(); ++i ) {
+            _data(i) -= a;
+        }
         return *this;
     }
 
     /// f + g
     inline Scalar operator+(const Scalar& f) {
-        assert( f.getNx() == getNx() );
-        assert( f.getNy() == getNy() );
+        assert( f.Nx() == Nx() );
+        assert( f.Ny() == Ny() );
         Scalar g = *this;
         g += f;
         return g;
@@ -125,8 +127,8 @@ public:
     
     /// f - g
     inline Scalar operator-(Scalar& f) {
-        assert( f.getNx() == getNx() );
-        assert( f.getNy() == getNy() );
+        assert( f.Nx() == Nx() );
+        assert( f.Ny() == Ny() );
         Scalar g = *this;
         g -= f;
         return g;
@@ -141,9 +143,11 @@ public:
     
     /// f *= g
     inline Scalar& operator*=(const Scalar& f) {
-        assert( f.getNx() == getNx() );
-        assert( f.getNy() == getNy() );
-        _data *= f._data;
+        assert( f.Nx() == Nx() );
+        assert( f.Ny() == Ny() );
+        for ( unsigned int i=0; i<_data.Size(); ++i) {
+            _data(i) *= f._data(i);
+        }
         return *this;
     }
 
@@ -155,8 +159,8 @@ public:
 
     /// f * g
     inline Scalar operator*(const Scalar& f) {
-        assert( f.getNx() == getNx() );
-        assert( f.getNy() == getNy() );
+        assert( f.Nx() == Nx() );
+        assert( f.Ny() == Ny() );
         Scalar g = *this;
         g *= f;
         return g;
@@ -171,8 +175,8 @@ public:
     
     /// f /= g
     inline Scalar& operator/=(const Scalar& f) {
-        assert( f.getNx() == getNx() );
-        assert( f.getNy() == getNy() );
+        assert( f.Nx() == Nx() );
+        assert( f.Ny() == Ny() );
         _data /= f._data;
         return *this;
     }
@@ -185,8 +189,8 @@ public:
 
     /// f / g
     inline Scalar operator/(Scalar& f) {
-        assert( f.getNx() == getNx() );
-        assert( f.getNy() == getNy() );
+        assert( f.Nx() == Nx() );
+        assert( f.Ny() == Ny() );
         Scalar g = *this;
         g /= f;
         return g;
@@ -201,7 +205,7 @@ public:
 
 
 private:
-    Array<double,2> _data;
+    Array::Array2<double> _data;
 };
 
 /// -f

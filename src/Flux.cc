@@ -38,11 +38,12 @@ Flux::Flux( const Flux& q ) :
 /// Set all parameters and reallocate arrays based on the Grid dimensions
 void Flux::resize( const Grid& grid ) {
     setGrid( grid );
-    int nx = getNx();
-    int ny = getNy();
+    int nx = Nx();
+    int ny = Ny();
     _numXFluxes = nx * ny + ny;
     _numFluxes = 2 * nx * ny + nx + ny;
-    _data.resize( _numFluxes );
+    _data.Deallocate();
+    _data.Allocate( _numFluxes );
 }
 
 Flux::~Flux() {} // deallocation automatic for Blitz++ arrays
@@ -50,15 +51,15 @@ Flux::~Flux() {} // deallocation automatic for Blitz++ arrays
 // Print the X and Y components to standard out (for debugging)
 void Flux::print() {
     cout << "X:" << endl;
-    for (int i=0; i<=getNx(); ++i) {
-        for (int j=0; j<getNy(); ++j) {
+    for (int i=0; i<=Nx(); ++i) {
+        for (int j=0; j<Ny(); ++j) {
             cout << (*this)(X,i,j) << " ";
         }
         cout << endl;
     }
     cout << "Y:" << endl;
-    for (int i=0; i<getNx(); ++i) {
-        for (int j=0; j<=getNy(); ++j) {
+    for (int i=0; i<Nx(); ++i) {
+        for (int j=0; j<=Ny(); ++j) {
             cout << (*this)(Y,i,j) << " ";
         }
         cout << endl;
@@ -71,7 +72,7 @@ Flux Flux::UniformFlow(
     double magnitude,
     double angle
     ) {
-    double dx = grid.getDx();
+    double dx = grid.Dx();
     double u = magnitude * cos( angle ) * dx;
     double v = magnitude * sin( angle ) * dx;
     

@@ -28,17 +28,17 @@ namespace ibpm {
     \f}  
 
     \author Steve Brunton
-    \author $LastChangedBy: sbrunton $
+    \author $LastChangedBy$
     \date  28 Aug 2008
-    \date $LastChangedDate: 2008-08-13 11:11:32 -0400 (Thu, 28 Aug 2008) $
-    \version $Revision: 105 $
+    \date $LastChangedDate$
+    \version $Revision$
 */
 
 class RungeKutta3 : public TimeStepper {
 public:
 
     /// Instantiate an RK3 solver
-    RungeKutta3( NavierStokesModel& model, double timestep );
+    RungeKutta3( Model& model, double timestep );
 
     /// Destructor
     ~RungeKutta3();

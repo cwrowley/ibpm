@@ -39,8 +39,9 @@ protected:
     StateTest() :
         _nx(3),
         _ny(5),
+        _ngrid(1),
         _numPoints(2),
-        _grid( _nx, _ny, 2, -1, -2 ),
+        _grid( _nx, _ny, _ngrid, 2, -1, -2 ),
         _x( _grid, _numPoints ) {
         
         // Initialize a State
@@ -54,6 +55,7 @@ protected:
     // data
     int _nx;
     int _ny;
+    int _ngrid;
     int _numPoints;
     Grid _grid;
     State _x;
@@ -93,7 +95,7 @@ TEST_F( StateTest, LoadBadGrid ) {
     ASSERT_EQ( true, status );
 
     // Create another state with a different Grid
-    Grid newGrid( 4, 5, 2, -1, -2 );
+    Grid newGrid( 4, 5, 1, 2, -1, -2 );
     State y( newGrid, _numPoints );
     status = y.load( "state_test" );
     EXPECT_EQ( false, status );

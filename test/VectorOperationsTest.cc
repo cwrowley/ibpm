@@ -15,7 +15,8 @@ protected:
     VectorOperationsTest() : 
         _nx(4),
         _ny(8),
-        _grid(_nx, _ny, 2, -1, -3),
+        _ngrid(1),
+        _grid(_nx, _ny, _ngrid, 2, -1, -3),
         _f(_grid),
         _g(_grid),
         _x(_grid),
@@ -78,6 +79,7 @@ protected:
     // data
     int _nx;
     int _ny;
+    int _ngrid;
     Grid _grid;
     Scalar _f;
     Scalar _g;
@@ -156,7 +158,7 @@ TEST_F(VectorOperationsTest, FluxDotProductDomainArea) {
         }
     }
     double area = _grid.getArea();
-    double dx = _grid.getDx();
+    double dx = _grid.Dx();
     EXPECT_DOUBLE_EQ(InnerProduct(h,l), area  / (dx * dx) );
 }
 
@@ -334,7 +336,7 @@ TEST_F(VectorOperationsTest, CurlOfLinearScalar) {
     f = a * _x + b * _y + c;
     Flux CurlF = Curl( f );
 
-    double dx = _grid.getDx();
+    double dx = _grid.Dx();
     EXPECT_ALL_X_EQ( CurlF(X,i,j), b * dx );
     EXPECT_ALL_Y_EQ( CurlF(Y,i,j), -a * dx );
 }
@@ -422,8 +424,8 @@ TEST_F(VectorOperationsTest, SineTransformOutputSize) {
     Scalar b = SinTransform(a);
     
     // compare grids
-    EXPECT_EQ( a.getNx(), b.getNx() );
-    EXPECT_EQ( a.getNy(), b.getNy() );
+    EXPECT_EQ( a.Nx(), b.Nx() );
+    EXPECT_EQ( a.Ny(), b.Ny() );
 }
 
 // Do Sine transform twice and obtain the original data, upto the normalization parameter.

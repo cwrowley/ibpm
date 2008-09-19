@@ -6,7 +6,7 @@ using std::string;
 
 namespace ibpm {
 
-class NavierStokesModel;
+class Model;
 class ProjectionSolver;
 class State;
 
@@ -18,12 +18,13 @@ class State;
     
     The governing equations are in the form
     \f{align}
-       \frac{d\gamma}{dt} + Bf &= L\gamma + N(q)\\
+       \frac{d\gamma}{dt} + Bf &= \alpha L\gamma + N(q)\\
        C\gamma &= b
     \f}
     where \f$ \gamma \f$ is a Scalar and \f$ f \f$ and \f$ b \f$ are
-    BoundaryVectors.  The operators B, C, L, and N are determined by an
-    associated NavierStokesModel.
+    BoundaryVectors.  \f$ L \f$ is the discrete Laplacian.  The operators
+    B, C, and N, as well as the constant \f$ \alpha \f$ and the constraint
+    values \f$ b \f$, are determined by an associated Model.
     
     \author Clancy Rowley
     \author $LastChangedBy$
@@ -45,16 +46,16 @@ public:
     subclasses, but determination of which type of solver to instantiate
     is handled by the base class.
     \param[in] name     The name of the solver (e.g. Explicit Euler)
-    \param[in] model    The associated NavierStokesModel instance
+    \param[in] model    The associated Model instance
     \param[in] timestep Timestep to use for the advance() routine
     */
-    TimeStepper(string name, NavierStokesModel& model, double timestep);
+    TimeStepper(string name, Grid& grid, Model& model, double timestep);
 
     virtual ~TimeStepper() {}
 
     /*! \brief Perform initialization, if necessary
     
-    Calls init() on the associated NavierStokesModel, in addition to
+    Calls init() on the associated Model, in addition to
     initializations needed within TimeStepper
     */
     virtual void init();
@@ -91,15 +92,16 @@ public:
 protected:
 
     const string _name;
-    NavierStokesModel& _model;
+    Grid& _grid;
+    Model& _model;
     double _timestep;
 
     /*! \brief Return a new ProjectionSolver of the appropriate type
     
-    \param[in] alpha    Parameter passed to the appropriate ProjectionSolver
+    \param[in] beta     Parameter passed to the appropriate ProjectionSolver
                         (usually the timestep)
     */
-    ProjectionSolver* createSolver(double alpha);
+    ProjectionSolver* createSolver(double beta);
 
 };
 

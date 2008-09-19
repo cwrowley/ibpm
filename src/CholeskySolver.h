@@ -2,10 +2,11 @@
 #define _CHOLESKYSOLVER_H_
 
 #include "ProjectionSolver.h"
-#include <blitz/array.h>
+#include "Array.h"
 #include <string>
 
-BZ_USING_NAMESPACE(blitz)
+using Array::array1;
+using Array::array2;
 
 namespace ibpm {
 
@@ -15,7 +16,12 @@ namespace ibpm {
 
     \brief Subclass of ProjectionSolver, in which the system M f = b is solved 
     directly, using Cholesky factorization.
-
+ 
+    Here M is the matrix 
+        \beta C A^{-1} B 
+    where
+        A = (1 + \alpha\beta / 2) * Laplacian
+ 
     This class assumes the matrix M is symmetric.  For now, it computes the 
     Cholesky factorization when it is instantiated, but this should be changed 
     to do this explicitly, or load a previously computed factorization from a 
@@ -32,8 +38,9 @@ class CholeskySolver : public ProjectionSolver {
 public:
     
     CholeskySolver(
-        const NavierStokesModel& model,
-        double alpha
+        const Grid& grid,
+        const Model& model,
+        double beta
     );
     
     ~CholeskySolver();
@@ -61,12 +68,13 @@ protected:
 private:
     int _numPoints;  // number of points in the geometry
     int _size;       // size of the vectors: numPoints * 2
-    const double _alpha;    // keep a local copy of _alpha, as a check when 
-                            // reading in Cholesky factorizations from files
-    Array<double,2> _lower;
-    Array<double,1> _diagonal;
-    void computeMatrixM( Array<double,2>& M );
-    void computeFactorization( const Array<double,2>& M );
+    const double _alphaBeta;    // keep a local copy of alpha * beta, as a
+                                // check when reading in Cholesky factorizations
+                                // from files
+    array2<double> _lower;
+    array1<double> _diagonal;
+    void computeMatrixM( array2<double>& M );
+    void computeFactorization( const array2<double>& M );
     bool _hasBeenInitialized;
 };
 

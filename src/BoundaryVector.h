@@ -1,10 +1,12 @@
 #ifndef _BOUNDARYVECTOR_H_
 #define _BOUNDARYVECTOR_H_
 
-#include <blitz/array.h>
+#include "Array.h"
 #include "Direction.h"
+#include <iostream>
 
-BZ_USING_NAMESPACE(blitz)
+using std::cout;
+using std::endl;
 
 namespace ibpm {
     
@@ -191,7 +193,7 @@ public:
     
 private:
     int _numPoints;
-    Array<double,1> _data;
+    Array::Array1<double> _data;
 };  // class BoundaryVector
 
 /// -f
@@ -210,17 +212,17 @@ inline BoundaryVector operator*(double a, const BoundaryVector& f) {
 
 /// Return the inner product of BoundaryVectors x and y.
 inline double InnerProduct(BoundaryVector& x, BoundaryVector& y) {
-    // // Implementation using only public interface
-    // BoundaryVector::index ind;
-    // double ip = 0;
-    // 
-    // for (ind = x.begin(); ind != x.end(); ++ind) {
-    //     ip += x(ind) * y(ind);
-    // }    
-    // return ip;
+    // Implementation using only public interface
+    BoundaryVector::index ind;
+    double ip = 0;
+
+    for (ind = x.begin(); ind != x.end(); ++ind) {
+        ip += x(ind) * y(ind);
+    }    
+    return ip;
     
     // Implementation using Blitz arrays
-    return sum(x._data * y._data);
+    // return sum(x._data * y._data);
 }
 
 } // namespace ibpm

@@ -9,15 +9,15 @@
 //
 // Date: 28 Aug 2008
 //
-// $Revision: 105 $
-// $LastChangedDate: 2008-08-27 23:14:34 -0400 (Thu, 28 Aug 2008) $
-// $LastChangedBy: sbrunton $
-// $HeadURL: Header $
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
+// $HeadURL$
 
 #include "BoundaryVector.h"
 #include "Geometry.h"
 #include "Grid.h"
-#include "NavierStokesModel.h"
+#include "Model.h"
 #include "ProjectionSolver.h"
 #include "TimeStepper.h"
 #include "State.h"
@@ -29,7 +29,7 @@ using namespace std;
 
 namespace ibpm {
 
-RungeKutta3::RungeKutta3(NavierStokesModel& model, double timestep) :
+RungeKutta3::RungeKutta3(Model& model, double timestep) :
     TimeStepper("3rd-order Runge-Kutta", model, timestep),
     _linearTermEigenvalues1( model.getLambda() ),
     _linearTermEigenvalues2( model.getLambda() ),
@@ -134,7 +134,7 @@ void RungeKutta3::advance(State& x) {
     // First Projection Solve (intermediate state _x1) 
 
     // RHS for 1st eqn of ProjectionSolver
-    _Q1 = _model.nonlinear( x );
+    _Q1 = _model.N( x );
     _Q1 *= _timestep;
 
     _a = _model.S( x.gamma );
@@ -158,7 +158,7 @@ void RungeKutta3::advance(State& x) {
     // Second Projection Solve (intermediate state _x2)
 
     // RHS for 1st eqn of ProjectionSolver
-    _Q2 = _model.nonlinear( _x1 );
+    _Q2 = _model.N( _x1 );
     _Q2 *= _timestep;
     _Q2 += _Q1 * _A2;
 
@@ -183,7 +183,7 @@ void RungeKutta3::advance(State& x) {
     // Third Projection Solve (final state)
 
     // RHS for 1st eqn of ProjectionSolver  
-    _Q3 = _model.nonlinear( _x2 );
+    _Q3 = _model.N( _x2 );
     _Q3 *= _timestep;
     _Q3 += _Q2 * _A3;
 

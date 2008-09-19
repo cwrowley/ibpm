@@ -44,8 +44,8 @@ Scalar::~Scalar() {
 
 // Print the whole field to standard output
 void Scalar::print() const {
-    int nx = getNx();
-    int ny = getNy();
+    int nx = Nx();
+    int ny = Ny();
     for(int i = 0; i <= nx; ++i) {
         for (int j=0; j <= ny; ++j) {
             cout << _data(i,j) << " ";
@@ -57,7 +57,8 @@ void Scalar::print() const {
 
 void Scalar::resize( const Grid& grid ) {
     setGrid( grid );
-    _data.resize( getNx() + 1, getNy() + 1 );
+    _data.Deallocate();
+    _data.Allocate( Nx() + 1, Ny() + 1, 0 );
 }
 
 

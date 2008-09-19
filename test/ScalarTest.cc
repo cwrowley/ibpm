@@ -11,7 +11,8 @@ protected:
     ScalarTest() : 
         _nx(3),
         _ny(5),
-        _grid(_nx, _ny, 2, -1, 3),
+        _ngrid(1),
+        _grid(_nx, _ny, _ngrid, 2, -1, 3),
         _f(_grid),
         _g(_grid)
     {
@@ -36,6 +37,7 @@ protected:
     // data
     int _nx;
     int _ny;
+    int _ngrid;
     Grid _grid;
     Scalar _f;
     Scalar _g;
@@ -51,16 +53,17 @@ protected:
 TEST_F(ScalarTest, GridSizes ) {
     int nx = 4;
     int ny = 6;
+    int ngrid = 1;
     double length = 5.;
     double xOffset = 0;
     double yOffset = 0;
     
-    Grid grid( nx, ny, length, xOffset, yOffset );
+    Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
     Scalar u( grid );
     
-    EXPECT_EQ( nx, u.getNx() );
-    EXPECT_EQ( ny, u.getNy() );
-    EXPECT_DOUBLE_EQ( grid.getDx(), u.getDx() );
+    EXPECT_EQ( nx, u.Nx() );
+    EXPECT_EQ( ny, u.Ny() );
+    EXPECT_DOUBLE_EQ( grid.Dx(), u.Dx() );
     EXPECT_ALL_EQUAL( grid.getXEdge(i), u.getXEdge(i) );
     EXPECT_ALL_EQUAL( grid.getYEdge(j), u.getYEdge(j) );
 

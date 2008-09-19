@@ -9,32 +9,30 @@
 //
 // Date: 28 Aug 2008
 //
-// $Revision: 105 $
-// $LastChangedDate: 2008-08-27 23:14:34 -0400 (Thu, 28 Aug 2008) $
-// $LastChangedBy: sbrunton $
-// $HeadURL: Header $
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
+// $HeadURL$
 
 #include "BoundaryVector.h"
 #include "Geometry.h"
 #include "Grid.h"
-#include "NavierStokesModel.h"
+#include "Model.h"
 #include "ProjectionSolver.h"
 #include "TimeStepper.h"
 #include "State.h"
+#include "VectorOperations.h"
 #include "AdamsBashforth.h"
 
 namespace ibpm {
 
-AdamsBashforth::AdamsBashforth(NavierStokesModel& model, double timestep) :
-    TimeStepper("Adams Bashforth", model, timestep),
-    _linearTermEigenvalues( model.getLambda() ),
-    _xold( model.getGrid(), model.getGeometry().getNumPoints() ),
-    _xtemp( model.getGrid(), model.getGeometry().getNumPoints() )
+AdamsBashforth::AdamsBashforth(Grid& grid, Model& model, double timestep) :
+    TimeStepper("Adams Bashforth", grid, model, timestep),
+    _xold( grid, model.getNumPoints() ),
+    _xtemp( grid, model.getNumPoints() )
     {
-    // compute eigenvalues of linear term on RHS
-    _linearTermEigenvalues *= timestep/2.;
-    _linearTermEigenvalues += 1;
-    _solver = 0; // initialize solver in init()
+    _solver = createSolver( _timestep);
+    // initialize solver in init()
     _oldSaved = false;
 }
 
@@ -43,16 +41,10 @@ AdamsBashforth::~AdamsBashforth() {
 }
 
 void AdamsBashforth::init() {
-    if (_solver == 0) {
-        _solver = createSolver(_timestep);
-    }
     _solver->init();
 }
 
 bool AdamsBashforth::load(const string& basename) {
-    if (_solver == 0) {
-        _solver = createSolver(_timestep);
-    }
     bool success = _solver->load( basename );
     return success;
 }
@@ -68,10 +60,13 @@ bool AdamsBashforth::save(const string& basename) {
 }
 
 void AdamsBashforth::advance(State& x) {
+    // Update the value of the time
+    x.time += _timestep;
+    ++x.timestep;
+
     // If the body is moving, update the positions of the bodies
-    const Geometry& geom = _model.getGeometry();
-    if ( ! geom.isStationary() ) {
-        geom.moveBodies(x.time);
+    if ( _model.isTimeDependent() ) {
+        _model.updateOperators(x.time);
     }
 
     // Keep unmodified state to save as previous at the end of advance 
@@ -83,31 +78,25 @@ void AdamsBashforth::advance(State& x) {
     }
 
     // Evaluate Right-Hand-Side (a) for first equation of ProjectionSolver
-    Scalar a = _model.S( x.gamma );
-    a *= _linearTermEigenvalues;
-    a = _model.Sinv( a );
+    Scalar a = Laplacian( x.gamma );
+    a *= 0.5 * _timestep * _model.getAlpha();
+    a += x.gamma;
 
-    Scalar nonlinear = _model.nonlinear( x );
+    Scalar nonlinear = _model.N( x );
     nonlinear *= 3.;
-    nonlinear -= _model.nonlinear( _xold );
+    nonlinear -= _model.N( _xold );
     a += .5 * _timestep * nonlinear;
     
     // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
-    BoundaryVector b = geom.getVelocities();
-    BoundaryVector b0 = _model.getBaseFlowBoundaryVelocities();
-    b -= b0;
+    BoundaryVector b = _model.getConstraints();
     
     // Call the ProjectionSolver to determine the circulation and forces
     _solver->solve( a, b, x.gamma, x.f );
     
     // Compute the corresponding flux
-    _model.computeFlux( x.gamma, x.q );
+    _model.refreshState( x );
 
     setPreviousState( _xtemp ); 
-
-    // Update the value of the time
-    x.time += _timestep;
-    ++x.timestep;
 }
 
 } // namespace ibpm

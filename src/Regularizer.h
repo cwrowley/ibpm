@@ -39,10 +39,10 @@ function, with finite support, as in (14) of Taira & Colonius (J Comput Phys,
 2007).
 
 \author Clancy Rowley
-\author $LastChangedBy: $
+\author $LastChangedBy$
 \date  7 Jul 2008
-\date $LastChangedDate: $
-\version $Revision: $
+\date $LastChangedDate$
+\version $Revision$
 */
 
 class Regularizer {

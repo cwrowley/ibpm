@@ -18,14 +18,22 @@
 
 namespace ibpm {
 
-Grid::Grid(int nx, int ny, double length, double xOffset, double yOffset) {
-    resize( nx, ny, length, xOffset, yOffset );
+Grid::Grid(
+    int nx,
+    int ny,
+    int ngrid,
+    double length,
+    double xOffset,
+    double yOffset
+    ) {
+    resize( nx, ny, ngrid, length, xOffset, yOffset );
 }
 
 /// Default constructor: set all parameters to zero
 Grid::Grid() {
     _nx = 0;
     _ny = 0;
+    _ngrid = 0;
     _xOffset = 0;
     _yOffset = 0;
     _dx = 0;
@@ -35,12 +43,14 @@ Grid::Grid() {
 void Grid::resize(
     int nx,
     int ny,
+    int ngrid,
     double length,
     double xOffset,
     double yOffset
     ) {
     _nx = nx;
     _ny = ny;
+    _ngrid = ngrid;
     _xOffset = xOffset;
     _yOffset = yOffset;
     _dx = length / nx;

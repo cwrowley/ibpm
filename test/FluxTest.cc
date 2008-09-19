@@ -31,7 +31,7 @@ protected:
     FluxTest() :
         _nx(3),
         _ny(5),
-        _grid(_nx, _ny, 2, -1, -3),
+        _grid(_nx, _ny, 1, 2, -1, -3),
         _f(_grid),
         _g(_grid)
     {
@@ -80,31 +80,32 @@ TEST_F(FluxTest, Assignment) {
 TEST_F(FluxTest, GridSizes ) {
     int nx = 4;
     int ny = 6;
+    int ngrid = 1;
     double length = 5.;
     double xOffset = 0;
     double yOffset = 0;
     
-    Grid grid( nx, ny, length, xOffset, yOffset );
+    Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
     Flux q( grid );
     
-    EXPECT_EQ( nx, q.getNx() );
-    EXPECT_EQ( ny, q.getNy() );
-    EXPECT_DOUBLE_EQ( grid.getDx(), q.getDx() );
+    EXPECT_EQ( nx, q.Nx() );
+    EXPECT_EQ( ny, q.Ny() );
+    EXPECT_DOUBLE_EQ( grid.Dx(), q.Dx() );
     EXPECT_ALL_X_EQUAL( grid.getXEdge(i), q.getXEdge(i) );
     EXPECT_ALL_Y_EQUAL( grid.getYEdge(j), q.getYEdge(j) );
 
     Flux q2( q );
-    EXPECT_EQ( nx, q2.getNx() );
-    EXPECT_EQ( ny, q2.getNy() );
-    EXPECT_DOUBLE_EQ( grid.getDx(), q2.getDx() );
+    EXPECT_EQ( nx, q2.Nx() );
+    EXPECT_EQ( ny, q2.Ny() );
+    EXPECT_DOUBLE_EQ( grid.Dx(), q2.Dx() );
     EXPECT_ALL_X_EQUAL( grid.getXEdge(i), q2.getXEdge(i) );
     EXPECT_ALL_Y_EQUAL( grid.getYEdge(j), q2.getYEdge(j) );
     
-    Grid grid2( 2, 3, length, xOffset, yOffset );
+    Grid grid2( 2, 3, 1, length, xOffset, yOffset );
     q2.resize( grid2 );
-    EXPECT_EQ( 2, q2.getNx() );
-    EXPECT_EQ( 3, q2.getNy() );
-    EXPECT_DOUBLE_EQ( grid2.getDx(), q2.getDx() );
+    EXPECT_EQ( 2, q2.Nx() );
+    EXPECT_EQ( 3, q2.Ny() );
+    EXPECT_DOUBLE_EQ( grid2.Dx(), q2.Dx() );
 }
 
 TEST_F(FluxTest, CopyConstructor) {
@@ -293,14 +294,14 @@ TEST_F(FluxTest, UniformFlow) {
     double mag = 3.;
     double angle = 0.;
     Flux q = Flux::UniformFlow( _grid, mag, angle );
-    EXPECT_ALL_X_EQUAL( q(X,i,j), mag * _grid.getDx() );
+    EXPECT_ALL_X_EQUAL( q(X,i,j), mag * _grid.Dx() );
     EXPECT_ALL_Y_EQUAL( q(Y,i,j), 0. );
 
     double pi = 4. * atan(1.);
     angle = pi/2.;
     q = Flux::UniformFlow( _grid, mag, angle );
     EXPECT_ALL_X_NEAR( q(X,i,j), 0., 1e-15 );
-    EXPECT_ALL_Y_EQUAL( q(Y,i,j), mag * _grid.getDx() );
+    EXPECT_ALL_Y_EQUAL( q(Y,i,j), mag * _grid.Dx() );
 }
 
 #undef EXPECT_ALL_X_EQUAL

@@ -9,10 +9,10 @@
 //
 // Date: 22 Aug 2008
 //
-// $Revision: 117 $
-// $LastChangedDate: 2008-09-01 21:43:39 -0400 (Mon, 01 Sep 2008) $
-// $LastChangedBy: cwrowley $
-// $HeadURL: svn+ssh://sbrunton@zion.princeton.edu/ibpm/trunk/src/OutputRestart.cc $
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
+// $HeadURL$
 
 #include "OutputForce.h"
 #include "State.h"

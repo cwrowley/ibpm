@@ -13,6 +13,7 @@ $HeadURL$
 */
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include <sys/stat.h>
@@ -25,10 +26,11 @@ enum ModelType { LINEAR, NONLINEAR, ADJOINT, INVALID };
 
 // Return a solver of the appropriate type (e.g. Euler, RK2 )
 TimeStepper* GetSolver(
+    Grid& grid,
     NavierStokesModel& model,
     double dt,
     string solverType
-    );
+);
 
 // Return the type of model specified in the string modelName
 ModelType str2model( string modelName );
@@ -48,12 +50,14 @@ int main(int argc, char* argv[]) {
         "nx", "number of gridpoints in x-direction", 200 );
     int ny = parser.getInt(
         "ny", "number of gridpoints in y-direction", 200 );
+    int ngrid = parser.getInt(
+        "ngrid", "number of grid levels for multi-domain scheme", 1 );
     double length = parser.getDouble(
-        "length", "length of domain in x-dir", 4.0 );
+        "length", "length of finest domain in x-dir", 4.0 );
     double xOffset = parser.getDouble(
-        "xoffset", "x-coordinate of left edge of domain", -2. );
+        "xoffset", "x-coordinate of left edge of finest domain", -2. );
     double yOffset = parser.getDouble(
-        "yoffset", "y-coordinate of bottom edge of domain", -2. );
+        "yoffset", "y-coordinate of bottom edge of finest domain", -2. );
     string geomFile = parser.getString(
         "geom", "filename for reading geometry", name + ".geom" );
     double Reynolds = parser.getDouble("Re", "Reynolds number", 100.);
@@ -105,10 +109,11 @@ int main(int argc, char* argv[]) {
     cout << "Grid parameters:" << endl
         << "  nx      " << nx << endl
         << "  ny      " << ny << endl
+        << "  ngrid   " << ngrid << endl
         << "  length  " << length << endl
         << "  xoffset " << xOffset << endl
         << "  yoffset " << yOffset << endl;
-    Grid grid( nx, ny, length, xOffset, yOffset );
+    Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
 
     // Setup geometry
     Geometry geom;
@@ -145,7 +150,7 @@ int main(int argc, char* argv[]) {
     cout << "done" << endl;
 
     // Setup timestepper
-    TimeStepper* solver = GetSolver( *model, dt, integratorType );
+    TimeStepper* solver = GetSolver( grid, *model, dt, integratorType );
     cout << "Using " << solver->getName() << " timestepper" << endl;
     cout << "  dt = " << dt << endl;
     if ( ! solver->load( outdir + name ) ) {
@@ -228,23 +233,24 @@ ModelType str2model( string modelName ) {
 }
 
 TimeStepper* GetSolver(
+    Grid& grid,
     NavierStokesModel& model,
     double dt,
     string solverType
     ) {
     MakeLowercase( solverType );
     if ( solverType == "euler" ) {
-        return new Euler( model, dt );
+        return new Euler( grid, model, dt );
     }
     else if ( solverType == "ab2" ) {
-        return new AdamsBashforth( model, dt );
+        return new AdamsBashforth( grid, model, dt );
     }
     else if ( solverType == "rk2" ) {
-        return new RungeKutta2( model, dt );
+        return new RungeKutta2( grid, model, dt );
     }
-    else if ( solverType == "rk3" ) {
-        return new RungeKutta3( model, dt );
-    }
+//    else if ( solverType == "rk3" ) {
+//        return new RungeKutta3( grid, model, dt );
+//    }
     else {
         cerr << "ERROR: unrecognized solver: " << solverType << endl;
         exit(1);

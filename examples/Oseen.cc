@@ -127,9 +127,9 @@ void computeExactSolution(
     State& exact
     ) {
     const Grid& grid = exact.gamma.getGrid();
-    int nx = grid.getNx();
-    int ny = grid.getNy();
-    double dx = grid.getDx();
+    int nx = grid.Nx();
+    int ny = grid.Ny();
+    double dx = grid.Dx();
 
     const double circulation = 2 * PI * (1 + 1./(2*alpha) );
     double amp = circulation * Reynolds / (4 * PI * time) * dx * dx;

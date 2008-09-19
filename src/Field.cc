@@ -23,10 +23,11 @@ Field::Field() {
     // Set to -1 to indicate no grid defined
     int nx = -1;
     int ny = -1;
+    int ngrid = 0;
     double length = 0;
     double xOffset = 0;
     double yOffset = 0;
-    _grid.resize( nx, ny, length, xOffset, yOffset );
+    _grid.resize( nx, ny, ngrid, length, xOffset, yOffset );
 }
 
 Field::Field(const Grid& grid) {

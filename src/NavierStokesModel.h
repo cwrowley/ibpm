@@ -9,6 +9,8 @@
 #include "State.h"
 #include "VectorOperations.h"
 #include "Regularizer.h"
+#include "EllipticSolver.h"
+#include "Model.h"
 #include <math.h>
 
 namespace ibpm {
@@ -30,7 +32,7 @@ $LastChangedBy$
 $HeadURL$
 */
 
-class NavierStokesModel {
+class NavierStokesModel : public Model {
 public:
     /*! \brief Constructor, given a specified grid, geometry, Reynolds number,
         and potential flow flux
@@ -54,114 +56,61 @@ public:
     /// Perform initial calculations needed to use model
     void init();
 
-    /// Return a pointer to the associated Geometry
-    inline const Geometry& getGeometry() const { return _geometry; }
+    /// \brief Return true if the geometry has moving bodies
+    bool isTimeDependent() const;
 
-    /// Return a pointer to the associated Grid
-    inline const Grid& getGrid() const { return _grid; }
+    /// \brief Return the number of points in the geometry
+    int getNumPoints() const;
 
-    /// Return a pointer to the eigenvalues of the linear term L
-    inline const Scalar& getLambda() const { 
-        assert( _hasBeenInitialized );
-        return _linearTermEigenvalues;
-    }
+    /// \brief Return the right-hand side b of the constraint equations.
+    /// Here, this is the velocity of the bodies minus the base flow velocity
+    BoundaryVector getConstraints() const;
     
-    /// Transform to eigenvectors of L (discrete sin transform)
-    inline Scalar S(const Scalar& g) const {
-        Scalar ghat = SinTransform( g );
-        return ghat;
-    }
+    /// \brief Update operators, for time-dependent models
+    void updateOperators( double time );
 
-    /*! \brief Inverse transform of S.
-    Note that for the discrete sin transform, the S^{-1} should equal S, but
-    in some implementations (e.g. FFTW), these may differ by a normalization
-    constant.
-    */
-    inline Scalar Sinv(const Scalar& ghat) const {
-        const bool normalize = true;
-        Scalar g = SinTransform( ghat, normalize );
-        return g;
-    }
-    
-    /// Convenience form
-    inline Scalar B(const BoundaryVector& f) const {
-        assert( _hasBeenInitialized );
-        Scalar gamma( _grid );
-        B( f, gamma );
-        return gamma;
-    }
+//    /// Return a pointer to the associated Geometry
+//    inline const Geometry& getGeometry() const { return _geometry; }
+//
+//    /// Return a pointer to the associated Grid
+//    inline const Grid& getGrid() const { return _grid; }
 
     /// Compute gamma = B(f) as in (14)
-    inline void B(const BoundaryVector& f, Scalar& gamma ) const {
-        assert( _hasBeenInitialized );
-        Flux q = _regularizer.toFlux( f );
-        gamma = Curl( q );
-    }
-    
+    void B(const BoundaryVector& f, Scalar& gamma ) const;
+        
     /// Compute f = C(gamma) as in (14)
-    inline BoundaryVector C(const Scalar& gamma) const {
-        assert( _hasBeenInitialized );
-        BoundaryVector f( _geometry.getNumPoints() );
-        C( gamma, f );
-        return f;
-    }
-    
-    /// Compute f = C(gamma) as in (14)
-    inline void C(const Scalar& gamma, BoundaryVector& f) const {
-        assert( _hasBeenInitialized );
-        Flux q(_grid);
-        computeFluxWithoutBaseFlow( gamma, q );
-        f = _regularizer.toBoundary( q );
-    }
-    
+    void C(const Scalar& gamma, BoundaryVector& f) const;
+        
     /*! \brief Compute nonlinear terms y = N(x)
     Pure virtual function: must be overridden by subclasses.
     */
-    virtual Scalar nonlinear(const State& x) const = 0;
+    virtual Scalar N(const State& x) const = 0;
     
-    /// Compute flux q from circulation gamma
-    inline void computeFluxWithoutBaseFlow(const Scalar& gamma, Flux& q ) const {
-        assert( _hasBeenInitialized );
-        Scalar streamfunction = gammaToStreamfunction( gamma );
-        q = Curl( streamfunction );
-    }
-
+    /// \brief Return the constant alpha = 1/ReynoldsNumber
+    double getAlpha() const;
+    
     /// Compute flux q from circulation gamma, including base flow q0
-    inline void computeFlux(const Scalar& gamma, Flux& q ) const {
-        assert( _hasBeenInitialized );
-        computeFluxWithoutBaseFlow( gamma, q );
-        q += _baseFlow;
-    }
+    void computeFlux(const Scalar& gamma, Flux& q ) const;
 
-    inline BoundaryVector getBaseFlowBoundaryVelocities() const {
-        assert( _hasBeenInitialized );
-        BoundaryVector velocity = _regularizer.toBoundary( _baseFlow );
-        return velocity;
-    }
+    /// \brief Compute flux q from the circulation gamma, including base flow
+    void refreshState( State& x ) const;
 
-
-protected:
-    
+private:    
     /*! \brief Given the circulation gamma, return the streamfunction psi.
 
-    TODO: Assumptions about boundary conditions??
+    Assumes psi = 0 on the boundary, and does not add in potential flow solution
     */
-    inline Scalar gammaToStreamfunction(const Scalar& gamma) const {
-        assert( _hasBeenInitialized );
-        Scalar psi = S( gamma );
-        psi *= _eigGammaToStreamfunction;
-        psi = Sinv( psi );
-        return psi;
-    }
-    
-private:
+    Scalar gammaToStreamfunction(const Scalar& gamma) const;
+    BoundaryVector getBaseFlowBoundaryVelocities() const;
+    void computeFluxWithoutBaseFlow(const Scalar& gamma, Flux& q ) const;
+
+    // data
     const Grid& _grid;
     const Geometry& _geometry;
     Regularizer _regularizer;
-    Scalar _linearTermEigenvalues;
-    Scalar _eigGammaToStreamfunction;
     Flux _baseFlow;
     double _ReynoldsNumber;
+    PoissonSolver _poisson;
     bool _hasBeenInitialized;
 };
 
@@ -174,17 +123,21 @@ public:
         double Reynolds,
         const Flux& q_potential
         ) :
-        NavierStokesModel( grid, geometry, Reynolds, q_potential ) {}
+        NavierStokesModel( grid, geometry, Reynolds, q_potential )
+    {}
 
-
+    NonlinearNavierStokes(
+        const Grid& grid,
+        const Geometry& geometry,
+        double Reynolds
+        ) :
+        NavierStokesModel( grid, geometry, Reynolds )
+    {}
+    
     /*! \brief Compute nonlinear terms y = N(x)
     for full nonlinear Navier-Stokes equations
     */
-    inline Scalar nonlinear(const State& x) const {
-        Flux v = CrossProduct( x.q, x.gamma );
-        Scalar g = Curl( v );
-        return g;
-    };
+    Scalar N(const State& x) const;
     
 };
 
@@ -198,17 +151,14 @@ public:
         const State& baseFlow
         ) :
         NavierStokesModel( grid, geometry, Reynolds ),
-        _x0( baseFlow ) {}
+        _x0( baseFlow )
+    {}
 
     /*! \brief Compute nonlinear terms y = N(x)
     for linearized Navier-Stokes equations
     */
-    inline Scalar nonlinear(const State& x) const {
-        Flux v = CrossProduct( _x0.q, x.gamma );
-        v += CrossProduct( x.q, _x0.gamma );
-        Scalar g = Curl( v );
-        return g;
-    };
+    Scalar N(const State& x) const;
+
 private:
     State _x0;
 };

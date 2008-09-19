@@ -23,17 +23,17 @@ namespace ibpm {
     \f}  
 
     \author Steve Brunton
-    \author $LastChangedBy: sbrunton $
+    \author $LastChangedBy$
     \date  28 Aug 2008
-    \date $LastChangedDate: 2008-08-13 11:11:32 -0400 (Thu, 28 Aug 2008) $
-    \version $Revision: 105 $
+    \date $LastChangedDate$
+    \version $Revision$
 */
 
 class RungeKutta2 : public TimeStepper {
 public:
 
     /// Instantiate an RK2 solver
-    RungeKutta2( NavierStokesModel& model, double timestep );
+    RungeKutta2( Grid& grid, Model& model, double timestep );
 
     /// Destructor
     ~RungeKutta2();
@@ -46,7 +46,6 @@ public:
     void advance(State& x);
 private:
     ProjectionSolver* _solver;
-    Scalar _linearTermEigenvalues;
     State _x1;
 };
 

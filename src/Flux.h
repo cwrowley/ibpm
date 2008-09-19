@@ -4,12 +4,10 @@
 #include "Grid.h"
 #include "Field.h"
 #include "Direction.h"
-#include <blitz/array.h>
+#include "Array.h"
 #include <math.h>
 #include <iostream>
 using namespace std;
-
-BZ_USING_NAMESPACE(blitz)
 
 namespace ibpm {
 
@@ -54,8 +52,8 @@ public:
     
     /// Copy assignment
     inline Flux& operator=(const Flux& q) {
-        assert(q.getNx() == getNx());
-        assert(q.getNy() == getNy());
+        assert(q.Nx() == Nx());
+        assert(q.Ny() == Ny());
         _data = q._data;
         return *this;
     }
@@ -96,11 +94,11 @@ public:
         assert( (dir >= X) && (dir <= Y) );
         assert(i >= 0);
         if (dir == X) {
-            assert( i < getNx()+1 );
+            assert( i < Nx()+1 );
             return getXEdge(i);
         }
         else {
-            assert( i < getNx() );
+            assert( i < Nx() );
             return getXCenter(i);
         }
     }
@@ -108,15 +106,15 @@ public:
     /// q.x(ind) returns the x-coordinate of the flux specified by ind
     inline double x(index ind) {
         int dir = ind / _numXFluxes;
-        int i = (ind - dir*_numXFluxes) / (getNy()+dir);
+        int i = (ind - dir*_numXFluxes) / (Ny()+dir);
         return x(dir,i);
     }
     
     /// q.y(ind) returns the x-coordinate of the flux specified by ind
     inline double y(index ind) {
         int dir = ind / _numXFluxes;
-        int i = (ind - dir*_numXFluxes) / (getNy()+dir);
-        int j = ind - dir*_numXFluxes - i * (getNy()+dir);
+        int i = (ind - dir*_numXFluxes) / (Ny()+dir);
+        int j = ind - dir*_numXFluxes - i * (Ny()+dir);
         return y(dir,j);
     }
     
@@ -125,11 +123,11 @@ public:
         assert( (dir >= X) && (dir <= Y) );
         assert(j >= 0);
         if (dir == X) {
-            assert( j < getNy() );
+            assert( j < Ny() );
             return getYCenter(j);
         }
         else {
-            assert( j < getNy()+1 );
+            assert( j < Ny()+1 );
             return getYEdge(j);
         }
     }
@@ -161,18 +159,18 @@ public:
     inline index getIndex(int dir, int i, int j) const {
         assert(dir>=X  && dir<=Y);
         assert(i >= 0 && j >= 0);
-        assert((dir == X) ? i < getNx()+1 : i < getNx());
-        assert((dir == Y) ? j < getNy()+1 : j < getNy());
+        assert((dir == X) ? i < Nx()+1 : i < Nx());
+        assert((dir == Y) ? j < Ny()+1 : j < Ny());
         // Tricky expression:
         //   j in [0..ny-1] for X fluxes (dir = X)
         //   j in [0..ny] for Y fluxes   (dir = Y)
-        return dir * _numXFluxes + i * (getNy()+dir) + j;
+        return dir * _numXFluxes + i * (Ny()+dir) + j;
     }
     
     /// f += g
     inline Flux& operator+=(const Flux& f) {
-        assert(f.getNx() == getNx());
-        assert(f.getNy() == getNy());
+        assert(f.Nx() == Nx());
+        assert(f.Ny() == Ny());
         _data += f._data;
         return *this;
     }
@@ -185,8 +183,8 @@ public:
     
     /// f -= g
     inline Flux& operator-=(const Flux& f) {
-        assert(f.getNx() == getNx());
-        assert(f.getNy() == getNy());
+        assert(f.Nx() == Nx());
+        assert(f.Ny() == Ny());
         _data -= f._data;
         return *this;
     }
@@ -199,8 +197,8 @@ public:
     
     /// f + g
     inline Flux operator+(const Flux& f) {
-        assert(f.getNx() == getNx());
-        assert(f.getNy() == getNy());
+        assert(f.Nx() == Nx());
+        assert(f.Ny() == Ny());
         Flux g = *this;
         g += f;
         return g;
@@ -215,8 +213,8 @@ public:
 
     /// f - g
     inline Flux operator-(const Flux& f) {
-        assert(f.getNx() == getNx());
-        assert(f.getNy() == getNy());
+        assert(f.Nx() == Nx());
+        assert(f.Ny() == Ny());
         Flux g = *this;
         g -= f;
         return g;
@@ -265,7 +263,7 @@ public:
 private:
     int _numXFluxes;
     int _numFluxes;
-    Array<double,1> _data;
+    Array::Array1<double> _data;
 };  // class Flux
 
 /// -f

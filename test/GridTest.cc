@@ -12,15 +12,17 @@ protected:
     GridTest() : 
       _nx(10),
       _ny(20),
+      _ngrid(1),
       _length(2),
       _xOffset(-1),
       _yOffset(-3),
-      _grid(_nx, _ny, _length, _xOffset, _yOffset) {}
+      _grid(_nx, _ny, _ngrid, _length, _xOffset, _yOffset) {}
 
     virtual ~GridTest() {}
 
     int _nx;
     int _ny;
+    int _ngrid;
     double _length;
     double _xOffset;
     double _yOffset;
@@ -28,7 +30,7 @@ protected:
 };
 
 TEST_F(GridTest, TestDx) {
-    EXPECT_DOUBLE_EQ(_grid.getDx(), 0.2);
+    EXPECT_DOUBLE_EQ(_grid.Dx(), 0.2);
 }
 
 TEST_F(GridTest, TestXCenter) {

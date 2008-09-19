@@ -8,9 +8,9 @@
 //
 // Date: 7 Jul 2008
 //
-// $Revision: 28 $
-// $LastChangedDate: 2008-07-04 01:35:13 -0400 (Fri, 04 Jul 2008) $
-// $LastChangedBy: clancy $
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
 // $HeadURL: Header$
 
 #include "Regularizer.h"
@@ -20,14 +20,14 @@
 #include <vector>
 #include <math.h>
 
+using namespace std;
+
 namespace ibpm {
 
 Regularizer::Regularizer(const Grid& grid, const Geometry& geometry) :
     _grid(grid),
     _geometry(geometry)
-    {
-    _geometry.setRegularizer(*this);
-}
+{}
 
 // number of cells over which delta function has support
 const double deltaSupportRadius = 1.5;
@@ -58,7 +58,7 @@ void Regularizer::update() {
     int i;
     Flux::index j;
     double dx, dy;
-    double h = _grid.getDx();  // mesh spacing
+    double h = _grid.Dx();  // mesh spacing
     Association a;
 
     // Clear the list of associated Flux and BoundaryVector points
@@ -74,8 +74,8 @@ void Regularizer::update() {
             // For each cell
             for (j = f.begin(dir); j != f.end(dir); ++j) {
                 // Find x and y distances between boundary point and cell
-                dx = abs(f.x(j) - bodyCoords(X,i)) / h;
-                dy = abs(f.y(j) - bodyCoords(Y,i)) / h;
+                dx = fabs(f.x(j) - bodyCoords(X,i)) / h;
+                dy = fabs(f.y(j) - bodyCoords(Y,i)) / h;
                 // If cell is within the radius of support of delta function
                 if ((dx < deltaSupportRadius) && (dy < deltaSupportRadius)) {
                     // Compute the weight factor
@@ -103,7 +103,7 @@ Flux Regularizer::toFlux(const BoundaryVector& u1) const {
     }
 
     // Multiply by grid spacing for correct dimension (vector -> Flux)
-    u2 *= _grid.getDx();
+    u2 *= _grid.Dx();
 
     // Return the new flux field
     return u2;
@@ -122,7 +122,7 @@ BoundaryVector Regularizer::toBoundary(const Flux& u2) const {
     }
 
     // Divide by grid spacing for correct dimension (Flux -> vector)
-    u1 /= _grid.getDx();    
+    u1 /= _grid.Dx();    
 
     // Return the new BoundaryVector
     return u1;

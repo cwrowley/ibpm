@@ -13,7 +13,7 @@
 // $LastChangedBy$
 // $HeadURL$
 
-#include "NavierStokesModel.h"
+#include "Model.h"
 #include "ProjectionSolver.h"
 #include "ConjugateGradientSolver.h"
 
@@ -22,13 +22,14 @@ namespace ibpm {
 const int MAX_ITERATIONS = 3000;
 
 ConjugateGradientSolver::ConjugateGradientSolver(
-    const NavierStokesModel& model,
-    double alpha,
+    const Grid& grid,
+    const Model& model,
+    double beta,
     double tolerance
     ) :
-    ProjectionSolver(model, alpha),
-    _toleranceSquared(tolerance*tolerance) {    
-}
+    ProjectionSolver( grid, model, beta ),
+    _toleranceSquared(tolerance*tolerance)
+{}
 
 // Implementation of conjugate gradient method
 void ConjugateGradientSolver::Minv(

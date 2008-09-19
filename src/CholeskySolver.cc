@@ -14,7 +14,7 @@
 // $HeadURL$
 
 #include "CholeskySolver.h"
-#include "NavierStokesModel.h"
+#include "Model.h"
 #include "assert.h"
 #include <string>
 #include <fstream>
@@ -26,14 +26,15 @@ namespace ibpm {
 
 // Allocate memory for the Cholesky factorization, but do not compute it
 CholeskySolver::CholeskySolver(
-    const NavierStokesModel& model,
-    double alpha
+    const Grid& grid,
+    const Model& model,
+    double beta
     ) :
-    ProjectionSolver( model, alpha ),
-    _numPoints( model.getGeometry().getNumPoints() ),
+    ProjectionSolver( grid, model, beta ),
+    _numPoints( model.getNumPoints() ),
     _size( 2 * _numPoints ),
-    _alpha( alpha ),
-    _lower( _size ),
+    _alphaBeta( model.getAlpha() * beta ),
+    _lower( _size, _size ),
     _diagonal( _size ),
     _hasBeenInitialized( false )
 {}
@@ -48,7 +49,7 @@ void CholeskySolver::init() {
     if ( _hasBeenInitialized ) return;
 
     // Build matrix M explicitly, one column at a time
-    Array<double,2> matrixM( _size );
+    array2<double> matrixM( _size, _size );
     computeMatrixM( matrixM );
 
     // Compute Cholesky factorization
@@ -57,7 +58,7 @@ void CholeskySolver::init() {
 }
 
 // Compute the matrix M to be factored
-void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
+void CholeskySolver::computeMatrixM( array2<double>& matrixM ) {
     BoundaryVector e( _numPoints ); // basis vector
     BoundaryVector x( _numPoints ); // x = M(e)
 
@@ -83,7 +84,7 @@ void CholeskySolver::computeMatrixM( Array<double,2>& matrixM ) {
 // Postconditions:
 //      _lower contains the strictly lower triangular part of L (no diagonal)
 //      _diag  contains the diagonal elements of L
-void CholeskySolver::computeFactorization( const Array<double,2>& matrixM ) {
+void CholeskySolver::computeFactorization( const array2<double>& matrixM ) {
     
     cerr << "Computing Cholesky factorization..." << flush;
     _lower = matrixM;
@@ -125,11 +126,11 @@ bool CholeskySolver::load(const string& basename) {
         return false;
     }
 
-    // read value of alpha in file
-    double alpha_in;
-    infile >> alpha_in;
-    if (alpha_in != _alpha) {
-        cerr << "(failed: wrong timestep)" << endl;
+    // read value of alphaBeta in file
+    double alphaBeta_in;
+    infile >> alphaBeta_in;
+    if (alphaBeta_in != _alphaBeta) {
+        cerr << "(failed: wrong timestep or Re)" << endl;
         return false;
     }
     
@@ -173,7 +174,7 @@ bool CholeskySolver::save(const string& basename) {
         return false;
     }
     outfile << _size << endl;
-    outfile << setprecision(17) << _alpha << endl;
+    outfile << setprecision(17) << _alphaBeta << endl;
     // write the diagonal part
     for ( int i=0; i<_size; ++i ) {
         outfile << setprecision(17) << _diagonal(i) << endl;

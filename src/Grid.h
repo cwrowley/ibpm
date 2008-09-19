@@ -27,7 +27,14 @@ namespace ibpm {
 class Grid {
 public:
     /// Constructor: set all grid parameters
-    Grid( int nx, int ny, double length, double xOffset, double yOffset );
+    Grid(
+         int nx,
+         int ny,
+         int ngrid,
+         double length,
+         double xOffset,
+         double yOffset
+    );
 
     /// Default constructor: set all parameters to zero
     Grid();
@@ -36,20 +43,26 @@ public:
     void resize(
         int nx,
         int ny,
+        int ngrid,
         double length,
         double xOffset,
         double yOffset
     );
     
     /// Return number of cells in x-direction
-    inline int getNx() const { return _nx; }
+    inline int Nx() const { return _nx; }
     
     /// Return number of cells in y-direction
-    inline int getNy() const { return _ny; }
+    inline int Ny() const { return _ny; }
+    
+    /// Return number of grid levels for multi-domain solution
+    inline int Ngrid() const { return _ngrid; }
     
     /// Return grid spacing (same in x- and y-directions)
-    inline double getDx() const { return _dx; }
+    inline double Dx() const { return _dx; }
 
+    // TODO: add parameter for grid level in these routines for getting coordinates
+    
     /// Return the x-coordinate of the center of cell i  (i in 0..m-1)
     double getXCenter(int i) const;
     
@@ -69,6 +82,7 @@ public:
 private:
     int _nx;
     int _ny;
+    int _ngrid;
     double _dx;
     double _xOffset;
     double _yOffset;

@@ -73,16 +73,11 @@ public:
     /// \brief Load a geometry from the specified input file
     /// Returns true if successful
     bool load(string filename);
-
-    /// \brief Associate a Regularizer object.
-    /// WARNING: Does not make a copy internally
-    void setRegularizer(Regularizer& reg) const;
     
 private:
     vector<RigidBody> _bodies;
     int _numPoints;
     bool _isStationary;
-    mutable Regularizer* _regularizer;
 };
 
 } // namespace

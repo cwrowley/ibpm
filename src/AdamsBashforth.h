@@ -20,17 +20,17 @@ namespace ibpm {
     \f}  
 
     \author Steve Brunton
-    \author $LastChangedBy: sbrunton $
+    \author $LastChangedBy$
     \date  28 Aug 2008
-    \date $LastChangedDate: 2008-08-13 11:11:32 -0400 (Thu, 28 Aug 2008) $
-    \version $Revision: 105 $
+    \date $LastChangedDate$
+    \version $Revision$
 */
 
 class AdamsBashforth : public TimeStepper {
 public:
 
     /// Instantiate an AB solver
-    AdamsBashforth( NavierStokesModel& model, double timestep );
+    AdamsBashforth( Grid& grid, Model& model, double timestep );
 
     /// Destructor
     ~AdamsBashforth();
@@ -53,7 +53,6 @@ public:
     void advance(State& x);
 private:
     ProjectionSolver* _solver;
-    Scalar _linearTermEigenvalues;
     State _xold;
     State _xtemp;  
     bool _oldSaved;
