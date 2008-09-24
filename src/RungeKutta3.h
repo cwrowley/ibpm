@@ -17,13 +17,16 @@ namespace ibpm {
     Uses Crank-Nicolson for linear terms.  Uses the scheme given by Peyret, p. 149[3]:
     \f{align}
     Q_1&=hN(x^n)\\
-    (1-\frac{h}{6}L)x_1+\frac{h}{3}Bf_1&=(1+\frac{h}{6}L)x^n+\frac{h}{3}Q_1\\
+    (1-\frac{h}{6}L)x_1+\frac{h}{3}Bf_1
+        &=(1+\frac{h}{6}L)x^n+\frac{h}{3}Q_1\\
     Cx_1&=b_{n+1/3}\\
     Q_2&=-\frac{5}{9}Q_1+hN(x_1)\\
-    (1-\frac{5h}{24}L)x_2+\frac{5h}{12}Bf_2&=(1+\frac{5h}{24}L)x_1+\frac{15}{16}Q_2\\
+    (1-\frac{5h}{24}L)x_2+\frac{5h}{12}Bf_2
+        &=(1+\frac{5h}{24}L)x_1+\frac{15}{16}Q_2\\
     Cx_2&=b_{n+3/4}\\
     Q_3&=-\frac{153}{128}Q_2+hN(x_2)\\
-    (1-\frac{h}{8}L)x^{n+1}+\frac{h}{4}Bf^{n+1}&=(1+\frac{h}{8}L)x_2+\frac{8}{15}Q_3\\
+    (1-\frac{h}{8}L)x^{n+1}+\frac{h}{4}Bf^{n+1}
+        &=(1+\frac{h}{8}L)x_2+\frac{8}{15}Q_3\\
     Cx^{n+1}&=b_{n+1} 
     \f}  
 
@@ -38,7 +41,7 @@ class RungeKutta3 : public TimeStepper {
 public:
 
     /// Instantiate an RK3 solver
-    RungeKutta3( Model& model, double timestep );
+    RungeKutta3( Grid& grid, Model& model, double timestep );
 
     /// Destructor
     ~RungeKutta3();
@@ -54,9 +57,6 @@ private:
     ProjectionSolver* _solver1;
     ProjectionSolver* _solver2;
     ProjectionSolver* _solver3;
-    Scalar _linearTermEigenvalues1;
-    Scalar _linearTermEigenvalues2;
-    Scalar _linearTermEigenvalues3;
     State _x1;
     State _x2;
     Scalar _Q1;
@@ -64,7 +64,6 @@ private:
     Scalar _Q3;   
     Scalar _a;
     BoundaryVector _b;
-    BoundaryVector _b0;
     double _A1, _A2, _A3; 
     double _B1, _B2, _B3;
     double _Bp1, _Bp2, _Bp3;

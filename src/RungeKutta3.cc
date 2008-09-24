@@ -21,6 +21,7 @@
 #include "ProjectionSolver.h"
 #include "TimeStepper.h"
 #include "State.h"
+#include "VectorOperations.h"
 #include "RungeKutta3.h"
 #include <stdio.h>
 #include <string>
@@ -29,19 +30,15 @@ using namespace std;
 
 namespace ibpm {
 
-RungeKutta3::RungeKutta3(Model& model, double timestep) :
-    TimeStepper("3rd-order Runge-Kutta", model, timestep),
-    _linearTermEigenvalues1( model.getLambda() ),
-    _linearTermEigenvalues2( model.getLambda() ),
-    _linearTermEigenvalues3( model.getLambda() ), 
-    _x1( model.getGrid(), model.getGeometry().getNumPoints() ),
-    _x2( model.getGrid(), model.getGeometry().getNumPoints() ),
-    _Q1( model.getGrid() ),
-    _Q2( model.getGrid() ),
-    _Q3( model.getGrid() ),
-    _a( model.getGrid() ),
-    _b( model.getGeometry().getNumPoints() ),
-    _b0( model.getGeometry().getNumPoints() )
+RungeKutta3::RungeKutta3( Grid& grid, Model& model, double timestep ) :
+    TimeStepper("3rd-order Runge-Kutta", grid, model, timestep),
+    _x1( grid, model.getNumPoints() ),
+    _x2( grid, model.getNumPoints() ),
+    _Q1( grid ),
+    _Q2( grid ),
+    _Q3( grid ),
+    _a( grid ),
+    _b( model.getNumPoints() )
     {
     // Set values of constants given in Peyret, p.149[3]  
     _A1 = 0.; 
@@ -53,13 +50,6 @@ RungeKutta3::RungeKutta3(Model& model, double timestep) :
     _Bp1 = 1./6.;
     _Bp2 = 5./24.;
     _Bp3 = 1./8.;
-    // compute eigenvalues of linear terms on RHS of each projection solve
-    _linearTermEigenvalues3 *= timestep * _Bp3;
-    _linearTermEigenvalues3 += 1; 
-    _linearTermEigenvalues2 *= timestep * _Bp2;
-    _linearTermEigenvalues2 += 1;
-    _linearTermEigenvalues1 *= timestep * _Bp1;
-    _linearTermEigenvalues1 += 1;
     _solver1 = 0; // initialize solvers in init()
     _solver2 = 0;
     _solver3 = 0;
@@ -124,10 +114,13 @@ bool RungeKutta3::save(const string& basename) {
 }
 
 void RungeKutta3::advance(State& x) {
+    // Update the value of the time
+    x.time += _timestep;
+    ++x.timestep;
+
     // If the body is moving, update the positions of the bodies
-    const Geometry& geom = _model.getGeometry();
-    if ( ! geom.isStationary() ) {
-        geom.moveBodies(x.time);
+    if ( _model.isTimeDependent() ) {
+        _model.updateOperators( x.time );
     }
 
     //*****
@@ -136,23 +129,21 @@ void RungeKutta3::advance(State& x) {
     // RHS for 1st eqn of ProjectionSolver
     _Q1 = _model.N( x );
     _Q1 *= _timestep;
-
-    _a = _model.S( x.gamma );
-    _a *= _linearTermEigenvalues1;
-    _a = _model.Sinv( _a );
+ 
+    _a = Laplacian( x.gamma );
+    _a *= _timestep * _Bp1 * _model.getAlpha();
+    _a += x.gamma; 
 
     _a += _Q1 * _B1;
 
     // RHS for 2nd eqn of ProjectionSolver
-    _b = geom.getVelocities();
-    _b0 = _model.getBaseFlowBoundaryVelocities();
-    _b -= _b0;
+    _b = _model.getConstraints();
     
     // Call the ProjectionSolver to determine the circulation and forces
     _solver1->solve( _a, _b, _x1.gamma, _x1.f );
     
-    // Compute the corresponding flux
-    _model.computeFlux( _x1.gamma, _x1.q );
+    // Update the rest of the state (i.e. flux)
+    _model.refreshState( _x1 );
 
     //*****
     // Second Projection Solve (intermediate state _x2)
@@ -162,22 +153,20 @@ void RungeKutta3::advance(State& x) {
     _Q2 *= _timestep;
     _Q2 += _Q1 * _A2;
 
-    _a = _model.S( _x1.gamma );
-    _a *= _linearTermEigenvalues2;  
-    _a = _model.Sinv( _a );
+    _a = Laplacian( _x1.gamma );
+    _a *= _timestep * _Bp2 * _model.getAlpha();
+    _a += _x1.gamma;
 
     _a += _Q2 * _B2;
     
     // RHS for 2nd eqn of ProjectionSolver
-    _b = geom.getVelocities();
-    _b0 = _model.getBaseFlowBoundaryVelocities();
-    _b -= _b0;
+    _b = _model.getConstraints();
     
     // Call the ProjectionSolver to determine the circulation and forces
     _solver2->solve( _a, _b, _x2.gamma, _x2.f );
     
-    // Compute the corresponding flux
-    _model.computeFlux( _x2.gamma, _x2.q );
+    // Update the rest of the state (i.e. flux)
+    _model.refreshState( _x2 );
 
     //*****
     // Third Projection Solve (final state)
@@ -187,26 +176,20 @@ void RungeKutta3::advance(State& x) {
     _Q3 *= _timestep;
     _Q3 += _Q2 * _A3;
 
-    _a = _model.S( _x2.gamma );
-    _a *= _linearTermEigenvalues3;  
-    _a = _model.Sinv( _a );
+    _a = Laplacian( _x2.gamma );
+    _a *= _timestep * _Bp3 * _model.getAlpha();
+    _a += _x2.gamma;
 
     _a += _Q3 * _B3;
     
     // RHS for 2nd eqn of ProjectionSolver
-    _b = geom.getVelocities();
-    _b0 = _model.getBaseFlowBoundaryVelocities();
-    _b -= _b0;
+    _b = _model.getConstraints();
     
     // Call the ProjectionSolver to determine the circulation and forces
     _solver3->solve( _a, _b, x.gamma, x.f );
     
-    // Compute the corresponding flux
-    _model.computeFlux( x.gamma, x.q );
-
-    // Update the value of the time
-    x.time += _timestep;
-    ++x.timestep;
+    // Update the rest of the state (i.e. flux)
+    _model.refreshState( x );
 }
 
 } // namespace ibpm

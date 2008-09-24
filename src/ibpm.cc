@@ -248,9 +248,9 @@ TimeStepper* GetSolver(
     else if ( solverType == "rk2" ) {
         return new RungeKutta2( grid, model, dt );
     }
-//    else if ( solverType == "rk3" ) {
-//        return new RungeKutta3( grid, model, dt );
-//    }
+    else if ( solverType == "rk3" ) {
+        return new RungeKutta3( grid, model, dt );
+    }
     else {
         cerr << "ERROR: unrecognized solver: " << solverType << endl;
         exit(1);
