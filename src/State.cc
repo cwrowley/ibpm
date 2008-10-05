@@ -34,7 +34,7 @@ State::State(const Grid& grid, int numPoints ) {
 
 void State::resize( const Grid& grid, int numPoints ) {
     q.resize( grid );
-    gamma.resize( grid );
+    omega.resize( grid );
     f.resize( numPoints );
 }
 
@@ -45,6 +45,24 @@ State::State( string filename ) {
 }
 
 State::~State() {}
+    
+// Routine for computing X & Y forces
+// Note that f is actually a body force (force per unit mass), so the net
+// force is the integral over the domain.  By a property of the discrete
+// delta function, this equals a sum of the BoundaryVector values times dx^2
+void State::computeNetForce( double& xforce, double& yforce) const {
+    xforce = 0;
+    yforce = 0;
+    for( int i=0; i<f.getNumPoints(); i++ ) {
+        xforce += f(X,i);
+        yforce += f(Y,i);
+    }
+    double dx2 = omega.Dx() * omega.Dx();
+    xforce *= dx2;
+    yforce *= dx2;
+}
+    
+    
 
 bool State::load(const std::string& filename) {
 
@@ -55,12 +73,14 @@ bool State::load(const std::string& filename) {
     // read Grid info
     int nx;
     int ny;
+    int ngrid;
     double dx;
     double x0;
     double y0;
     
     fread( &nx, sizeof( int ), 1, fp );
     fread( &ny, sizeof( int ), 1, fp );
+    fread( &ngrid, sizeof( int ), 1, fp );
     fread( &dx, sizeof( double ), 1, fp );
     fread( &x0, sizeof( double ), 1, fp );
     fread( &y0, sizeof( double ), 1, fp );
@@ -73,9 +93,10 @@ bool State::load(const std::string& filename) {
     bool success = true;
     if ( nx != q.Nx() || 
         ny != q.Ny() ||
+        ngrid != q.Ngrid() ||
         dx != q.Dx() ||
-        x0 != q.getXEdge(0) ||
-        y0 != q.getYEdge(0) ||
+        x0 != q.getXEdge(0,0) ||
+        y0 != q.getYEdge(0,0) ||
         numPoints != f.getNumPoints() ) {
         
         // If old grid was previously allocated, print a warning and set
@@ -90,14 +111,18 @@ bool State::load(const std::string& filename) {
 
     // read Flux q
     Flux::index qind;
-    for ( qind = q.begin(); qind != q.end(); ++qind ) {
-        success = success && fread( &( q(qind) ), sizeof( double ), 1, fp );
+    for ( int lev=0; lev < q.Ngrid(); ++lev ) {
+        for ( qind = q.begin(); qind != q.end(); ++qind ) {
+            success = success && fread( &( q(lev,qind) ), sizeof( double ), 1, fp );
+        }
     }
-
-    // read Scalar gamma
-    for (int i=0; i<=nx; ++i ) {
-        for ( int j=0; j<=ny; ++j ) {
-            success = success && fread( &( gamma(i,j) ), sizeof( double ), 1, fp );
+    
+    // read Scalar omega
+    for ( int lev=0; lev < q.Ngrid(); ++lev ) {
+        for (int i=1; i<nx; ++i ) {
+            for ( int j=1; j<ny; ++j ) {
+                success = success && fread( &( omega(lev,i,j) ), sizeof( double ), 1, fp );
+            }
         }
     }
 
@@ -127,12 +152,14 @@ bool State::save(std::string filename) const {
     const Grid& grid = q.getGrid();
     int nx = grid.Nx();
     int ny = grid.Ny();
+    int ngrid = grid.Ngrid();
     double dx = grid.Dx();
-    double x0 = grid.getXEdge(0);
-    double y0 = grid.getYEdge(0);
+    double x0 = grid.getXEdge(0,0);
+    double y0 = grid.getYEdge(0,0);
     
     fwrite( &nx, sizeof( int ), 1, fp );
     fwrite( &ny, sizeof( int ), 1, fp );
+    fwrite( &ngrid, sizeof( int ), 1, fp );
     fwrite( &dx, sizeof( double ), 1, fp );
     fwrite( &x0, sizeof( double ), 1, fp );
     fwrite( &y0, sizeof( double ), 1, fp );
@@ -143,16 +170,20 @@ bool State::save(std::string filename) const {
         
     // write Flux q
     Flux::index qind;
-    for ( qind = q.begin(); qind != q.end(); ++qind ) {
-        double qq = q(qind);
-        fwrite( &qq, sizeof( double ), 1, fp );
+    for ( int lev=0; lev < q.Ngrid(); ++lev ) {
+        for ( qind = q.begin(); qind != q.end(); ++qind ) {
+            double qq = q(lev,qind);
+            fwrite( &qq, sizeof( double ), 1, fp );
+        }
     }
 
-    // write Scalar gamma
-    for (int i=0; i<=nx; ++i ) {
-        for ( int j=0; j<=ny; ++j ) {
-            double g = gamma(i,j);
-            fwrite( &g, sizeof( double ), 1, fp );
+    // write Scalar omega
+    for ( int lev=0; lev < q.Ngrid(); ++lev ) {
+        for (int i=1; i<nx; ++i ) {
+            for ( int j=1; j<ny; ++j ) {
+                double g = omega(lev,i,j);
+                fwrite( &g, sizeof( double ), 1, fp );
+            }
         }
     }
 

@@ -2,9 +2,9 @@
 #define _SCALAR_H_
 
 #include "Array.h"
+#include "BC.h"
 #include "Field.h"
 #include "Grid.h"
-#include "Flux.h"
 
 namespace ibpm {
 
@@ -12,16 +12,15 @@ namespace ibpm {
     \file Scalar.h
     \class Scalar
 
-    \brief Store a 2D array of scalar values, located at cell nodes.
+    \brief Store a 2D array of scalar values, located at interior cell nodes.
     
     For a grid with nx cells in the x-direction and ny cells in the y-direction,
-    there are (nx+1)*(ny+1) nodes.  
+    there are (nx-1)*(ny+1) nodes.  
     
     There are (nx-1)*(ny-1) inner nodes, and 2*(nx+ny) boundary nodes.
+    Only the interior nodes are stored in a Scalar, and the boundary nodes are
+    always zero.
     
-    Also provides scalar-valued math operations, such as discrete sin transform, 
-    and Laplacian and its inverse, of scalar fields.
-
     \author Clancy Rowley
     \author $LastChangedBy$
     \date  4 Jul 2008
@@ -46,14 +45,23 @@ public:
     /// Reassign the grid parameters and allocate memory based on the new grid
     void resize( const Grid& grid );
 
-    // Print the whole field to standard output
+    /// Print the whole field to standard output
     void print() const;
+    
+    /// "Coarsify" the Scalar quantity
+    ///  - Fine grid is left unchanged
+    ///  - Coarse values that correspond to points on the fine grid are replaced by
+    ///    averaged value of fine gridpoints
+    void coarsify();
     
     /// Copy assignment
     inline Scalar& operator=(const Scalar& f) {
+        assert( f.Ngrid() == Ngrid() );
         assert( f.Nx() == Nx() );
         assert( f.Ny() == Ny() );
-        _data = f._data;
+        for (unsigned int i=0; i<_data.Size(); ++i) {
+            _data(i) = f._data(i);
+        }
         return *this;
     }
 
@@ -64,24 +72,46 @@ public:
     }
 
     /// f(i,j) refers to the value at index (i,j)
-    inline double& operator()(int i, int j) {
-        assert(i>=0  && i<= Nx() );
-        assert(j>=0  && j<= Ny() );
-        return _data(i,j);
+    inline double& operator()(int lev, int i, int j) {
+        assert( lev >= 0 && lev < Ngrid() );
+        assert( i>=1  && i< Nx() );
+        assert( j>=1  && j< Ny() );
+        return _data(lev,i,j);
     }
     
     /// f(i,j) refers to the value at index (i,j)
-    inline double operator()(int i, int j) const{
-        assert(i>=0  && i<= Nx() );
-        assert(j>=0  && j<= Ny() );
-        return _data(i,j);
+    inline double operator()(int lev, int i, int j) const{
+        assert( lev >= 0 && lev < Ngrid() );
+        assert( i>=1  && i< Nx() );
+        assert( j>=1  && j< Ny() );
+        return _data(lev,i,j);
     }
+
+    /// f[lev] returns a 2d array of grid level lev
+    inline Array::Array2<double> operator[](int lev) {
+        return _data[lev];
+    }
+        
+    /// f[lev] returns a 2d array of grid level lev
+    inline const Array::Array2<double> operator[](int lev) const {
+        return _data[lev];
+    }
+    
+    /// \brief Compute the boundary values at level lev from the next coarser
+    /// grid.
+    /// \param[in] lev is the grid level for which the bounday values are
+    ///             desired; must be in the range 0..Ngrid-2
+    /// \param[out] bc contains the boundary values computed
+    void getBC( int lev, BC& bc ) const;
     
     /// f += g
     inline Scalar& operator+=(const Scalar& f) {
+        assert( f.Ngrid() == Ngrid() );
         assert(f.Nx() == Nx() );
         assert(f.Ny() == Ny() );
-        _data += f._data;
+        for ( unsigned int i=0; i<_data.Size(); ++i ) {
+            _data(i) += f._data(i);
+        }
         return *this;
     }
 
@@ -95,9 +125,12 @@ public:
 
     /// f -= g
     inline Scalar& operator-=(const Scalar& f) {
-        assert( f.Nx() == Nx() );
-        assert( f.Ny() == Ny() );
-        _data -= f._data;
+        assert( f.Ngrid() == Ngrid() );
+        assert(f.Nx() == Nx() );
+        assert(f.Ny() == Ny() );
+        for ( unsigned int i=0; i<_data.Size(); ++i ) {
+            _data(i) -= f._data(i);
+        }
         return *this;
     }
 
@@ -111,6 +144,7 @@ public:
 
     /// f + g
     inline Scalar operator+(const Scalar& f) {
+        assert( f.Ngrid() == Ngrid() );
         assert( f.Nx() == Nx() );
         assert( f.Ny() == Ny() );
         Scalar g = *this;
@@ -126,7 +160,8 @@ public:
     }
     
     /// f - g
-    inline Scalar operator-(Scalar& f) {
+    inline Scalar operator-(const Scalar& f) {
+        assert( f.Ngrid() == Ngrid() );
         assert( f.Nx() == Nx() );
         assert( f.Ny() == Ny() );
         Scalar g = *this;
@@ -143,6 +178,7 @@ public:
     
     /// f *= g
     inline Scalar& operator*=(const Scalar& f) {
+        assert( f.Ngrid() == Ngrid() );
         assert( f.Nx() == Nx() );
         assert( f.Ny() == Ny() );
         for ( unsigned int i=0; i<_data.Size(); ++i) {
@@ -159,6 +195,7 @@ public:
 
     /// f * g
     inline Scalar operator*(const Scalar& f) {
+        assert( f.Ngrid() == Ngrid() );
         assert( f.Nx() == Nx() );
         assert( f.Ny() == Ny() );
         Scalar g = *this;
@@ -175,6 +212,7 @@ public:
     
     /// f /= g
     inline Scalar& operator/=(const Scalar& f) {
+        assert( f.Ngrid() == Ngrid() );
         assert( f.Nx() == Nx() );
         assert( f.Ny() == Ny() );
         _data /= f._data;
@@ -188,7 +226,8 @@ public:
     }
 
     /// f / g
-    inline Scalar operator/(Scalar& f) {
+    inline Scalar operator/(const Scalar& f) {
+        assert( f.Ngrid() == Ngrid() );
         assert( f.Nx() == Nx() );
         assert( f.Ny() == Ny() );
         Scalar g = *this;
@@ -205,39 +244,39 @@ public:
 
 
 private:
-    Array::Array2<double> _data;
+    Array::Array3<double> _data;
 };
 
 /// -f
-inline Scalar operator-(Scalar& f) {
+inline Scalar operator-(const Scalar& f) {
     Scalar g = f;
     g *= -1;
     return g;
 }
 
 /// a + f
-inline Scalar operator+(double a, Scalar& f) {
+inline Scalar operator+(double a, const Scalar& f) {
     Scalar g = f;
     g += a;
     return g;
 }
     
 /// a - f
-inline Scalar operator-(double a, Scalar& f) {
+inline Scalar operator-(double a, const Scalar& f) {
     Scalar g = -f;
     g += a;
     return g;
 }
     
 /// a * f
-inline Scalar operator*(double a, Scalar& f) {
+inline Scalar operator*(double a, const Scalar& f) {
     Scalar g = f;
     g *= a;
     return g;
 }
 
 /// a / f
-inline Scalar operator/(double a, Scalar& f) {
+inline Scalar operator/(double a, const Scalar& f) {
     Scalar g(f.getGrid());
     g = a;
     g /= f;

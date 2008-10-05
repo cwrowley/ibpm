@@ -18,8 +18,8 @@ namespace {
 const double tolerance = 1e-10;
 
 #define EXPECT_ALL_EQ(a,b)                      \
-    for (int i=0; i<_nx+1; ++i) {               \
-        for (int j=0; j<_ny+1; ++j) {           \
+    for (int i=1; i<_nx; ++i) {                 \
+        for (int j=1; j<_ny; ++j) {             \
             EXPECT_NEAR( (a), (b), tolerance ); \
         }                                       \
     }
@@ -65,22 +65,22 @@ protected:
     }
 
     // Compute the linear term on the LHS of the projection equations:
-    //   (1 - h/2 L) gamma
+    //   (1 - h/2 L) omega
     // where L is given by the associated NavierStokesModel
-    Scalar ComputeLinearTerm(NavierStokesModel& model, const Scalar& gamma) {
-        Scalar result = Laplacian( gamma );
+    Scalar ComputeLinearTerm(Model& model, const Scalar& omega) {
+        Scalar result = Laplacian( omega );
         result *= model.getAlpha();
         result *= -_timestep / 2.;
-        result += gamma;
+        result += omega;
         return result;
     }
     
     // Verify that the projection equations are satisfied by the solution of
     // the given solver, for the given model:
-    //  (1 - h/2 L) gamma + h B f = a
+    //  (1 - h/2 L) omega + h B f = a
     //                      C f = b
     void verify(
-        NavierStokesModel& model,
+        Model& model,
         ProjectionSolver& solver
         ) {
         const int nPoints = model.getNumPoints();
@@ -90,23 +90,23 @@ protected:
         BoundaryVector b(nPoints);
         b = 3.;
         // Variables to solve for
-        Scalar gamma(_grid);
-        gamma = 0;
+        Scalar omega(_grid);
+        omega = 0;
         BoundaryVector f(nPoints);
         f = 0;
 
-        solver.solve( a, b, gamma, f );
+        solver.solve( a, b, omega, f );
 
         // Verify equations are satisfied to specified tolerance
-        Scalar lhs = ComputeLinearTerm( model, gamma );
+        Scalar lhs = ComputeLinearTerm( model, omega );
         Scalar forcingTerm( _grid );
         model.B( f, forcingTerm );
         lhs += _timestep * forcingTerm;
-        EXPECT_ALL_EQ( a(i,j), lhs(i,j) );
+        EXPECT_ALL_EQ( a(0,i,j), lhs(0,i,j) );
 
         // Verify constraint is satisfied
         BoundaryVector constraint( nPoints );
-        model.C( gamma, constraint );
+        model.C( omega, constraint );
         EXPECT_ALL_BV_EQ( b(X,i), constraint(X,i), nPoints );
         EXPECT_ALL_BV_EQ( b(Y,i), constraint(Y,i), nPoints );
     }
@@ -119,8 +119,8 @@ protected:
     Grid _grid;
     Geometry _emptyGeometry;
     Geometry _nonemptyGeometry;
-    NavierStokesModel* _modelWithNoBodies;
-    NavierStokesModel* _modelWithBodies;
+    Model* _modelWithNoBodies;
+    Model* _modelWithBodies;
 };
 
 typedef ProjectionSolverTest CGSolverTest;

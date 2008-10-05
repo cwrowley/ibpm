@@ -14,6 +14,7 @@
 // $HeadURL$
 
 #include "Grid.h"
+#include <math.h>
 #include <assert.h>
 
 namespace ibpm {
@@ -48,6 +49,7 @@ void Grid::resize(
     double xOffset,
     double yOffset
     ) {
+    assert( ngrid == 1 || ( nx % 4 == 0 && ny % 4 == 0 ) );
     _nx = nx;
     _ny = ny;
     _ngrid = ngrid;
@@ -56,37 +58,43 @@ void Grid::resize(
     _dx = length / nx;
 }
 
+// Return the x-coordinate of the left-most gridpoint of level lev
+double Grid::getXOffset(int lev) const {
+    return _xOffset -  0.5 * ( exp2(lev) - 1 ) * (_nx * _dx);
+}
+    
+// Return the y-coordinate of the bottom gridpoint of level lev
+double Grid::getYOffset(int lev) const {
+    return _yOffset -  0.5 * ( exp2(lev) - 1 ) * (_ny * _dx);
+}
+    
+    
 // Return the x-coordinate of the center of cell i  (i in 0..m-1)
-double Grid::getXCenter(int i) const {
-    assert(i >= 0);
-    assert(i < _nx);
-    return _xOffset + (i+0.5) * _dx;
+double Grid::getXCenter(int lev, int i) const {
+    assert( lev >= 0 && lev <  _ngrid );
+    assert(   i >= 0 &&   i <= _nx );
+    return getXOffset(lev) + (i+0.5) * _dx * exp2(lev);
 }
 
 // Return the y-coordinate of the center of cell j  (j in 0..n-1)
-double Grid::getYCenter(int j) const {
-    assert(j >= 0);
-    assert(j < _ny);
-    return _yOffset + (j+0.5) * _dx;
+double Grid::getYCenter(int lev, int j) const {
+    assert( lev >= 0 && lev <  _ngrid );
+    assert(   j >= 0 &&   j <= _ny );
+    return getYOffset(lev) + (j+0.5) * _dx * exp2(lev);
 }
 
 // Return the x-coordinate of the left edge of cell i  (i in 0..m)
-double Grid::getXEdge(int i) const {
-    assert(i >= 0);
-    assert(i <= _nx);
-    return _xOffset + i * _dx;
+double Grid::getXEdge(int lev, int i) const {
+    assert( lev >= 0 && lev <  _ngrid );
+    assert(   i >= 0 &&   i <= _nx );
+    return getXOffset(lev) + i * _dx * exp2(lev);
 }
 
 // Return the y-coordinate of the bottom edge of cell j  (j in 0..n)
-double Grid::getYEdge(int j) const {
-    assert(j >= 0);
-    assert(j <= _ny);
-    return _yOffset + j * _dx;
-}
-
-// Return the area of the domain
-double Grid::getArea() const {
-    return _dx * _dx * _nx * _ny;
+double Grid::getYEdge(int lev, int j) const {
+    assert( lev >= 0 && lev <  _ngrid );
+    assert(   j >= 0 &&   j <= _ny );
+    return getYOffset(lev) + j * _dx * exp2(lev);
 }
 
 } // namespace

@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
 
     // Load initial condition
     State x( grid, geom.getNumPoints() );
-    x.gamma = 0.;
+    x.omega = 0.;
     x.f = 0.;
     x.q = 0.;
     if ( icFile != "" ) {
@@ -202,7 +202,7 @@ int main(int argc, char* argv[]) {
         solver->advance( x );
         double lift;
         double drag;
-        computeNetForce( x.f, drag, lift );
+        x.computeNetForce( drag, lift );
         cout << "x force : " << setw(16) << drag*2 << " , y force : "
             << setw(16) << lift*2 << "\n";
         logger.doOutput( x );

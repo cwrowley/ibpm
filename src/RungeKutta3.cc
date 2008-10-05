@@ -130,9 +130,9 @@ void RungeKutta3::advance(State& x) {
     _Q1 = _model.N( x );
     _Q1 *= _timestep;
  
-    _a = Laplacian( x.gamma );
+    _a = Laplacian( x.omega );
     _a *= _timestep * _Bp1 * _model.getAlpha();
-    _a += x.gamma; 
+    _a += x.omega; 
 
     _a += _Q1 * _B1;
 
@@ -140,7 +140,7 @@ void RungeKutta3::advance(State& x) {
     _b = _model.getConstraints();
     
     // Call the ProjectionSolver to determine the circulation and forces
-    _solver1->solve( _a, _b, _x1.gamma, _x1.f );
+    _solver1->solve( _a, _b, _x1.omega, _x1.f );
     
     // Update the rest of the state (i.e. flux)
     _model.refreshState( _x1 );
@@ -153,9 +153,9 @@ void RungeKutta3::advance(State& x) {
     _Q2 *= _timestep;
     _Q2 += _Q1 * _A2;
 
-    _a = Laplacian( _x1.gamma );
+    _a = Laplacian( _x1.omega );
     _a *= _timestep * _Bp2 * _model.getAlpha();
-    _a += _x1.gamma;
+    _a += _x1.omega;
 
     _a += _Q2 * _B2;
     
@@ -163,7 +163,7 @@ void RungeKutta3::advance(State& x) {
     _b = _model.getConstraints();
     
     // Call the ProjectionSolver to determine the circulation and forces
-    _solver2->solve( _a, _b, _x2.gamma, _x2.f );
+    _solver2->solve( _a, _b, _x2.omega, _x2.f );
     
     // Update the rest of the state (i.e. flux)
     _model.refreshState( _x2 );
@@ -176,9 +176,9 @@ void RungeKutta3::advance(State& x) {
     _Q3 *= _timestep;
     _Q3 += _Q2 * _A3;
 
-    _a = Laplacian( _x2.gamma );
+    _a = Laplacian( _x2.omega );
     _a *= _timestep * _Bp3 * _model.getAlpha();
-    _a += _x2.gamma;
+    _a += _x2.omega;
 
     _a += _Q3 * _B3;
     
@@ -186,7 +186,7 @@ void RungeKutta3::advance(State& x) {
     _b = _model.getConstraints();
     
     // Call the ProjectionSolver to determine the circulation and forces
-    _solver3->solve( _a, _b, x.gamma, x.f );
+    _solver3->solve( _a, _b, x.omega, x.f );
     
     // Update the rest of the state (i.e. flux)
     _model.refreshState( x );

@@ -46,9 +46,12 @@ public:
     /// Return true if successful
     bool load(const std::string& filename);
 
+    /// \brief Routine for computing X & Y forces
+    void computeNetForce( double& xforce, double& yforce ) const;
+        
     // public data
     Flux q;
-    Scalar gamma;
+    Scalar omega;
     BoundaryVector f;
     int timestep;
     double time;

@@ -17,10 +17,10 @@ namespace ibpm {
     
     Subclasses define operators for models of the form
     \f{align}
-       \frac{d\gamma}{dt} + Bf &= \alpha L\gamma + N(q)\\
-       C\gamma &= b
+       \frac{d\omega}{dt} + Bf &= \alpha L\omega + N(q)\\
+       C\omega &= b
     \f}
-    where \f$ \gamma \f$ is a Scalar and \f$ f \f$ and \f$ b \f$ are
+    where \f$ \omega \f$ is a Scalar and \f$ f \f$ and \f$ b \f$ are
     BoundaryVectors, and \f$ q \f$ is a State.
     \f$ L \f$ is the discrete Laplacian, and Model subclasses are 
     responsible for determining operators B, C, and N, as well as the
@@ -51,14 +51,14 @@ namespace ibpm {
         /// \brief update operators for time-dependent models
         virtual void updateOperators( double time ) = 0;
 
-        virtual void B( const BoundaryVector& f, Scalar& gamma ) const = 0;
-        virtual void C( const Scalar& gamma, BoundaryVector& f ) const = 0;
+        virtual void B( const BoundaryVector& f, Scalar& omega ) const = 0;
+        virtual void C( const Scalar& omega, BoundaryVector& f ) const = 0;
         virtual Scalar N( const State& x ) const = 0;
         virtual double getAlpha() const = 0;
         
         // \brief Compute any quantities in the state vector that depend on
         // other state variables and the model (e.g. for Navier-Stokes,
-        // compute the flux from the circulation)
+        // compute the flux from the vorticity)
         virtual void refreshState( State& x ) const {}
     };
 

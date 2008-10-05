@@ -103,13 +103,13 @@ TEST_F(RegularizerTest, MomentIsZero) {
     Flux::index ind;
     double moment=0;
     for (ind = _u2.begin(X); ind != _u2.end(X); ++ind) {
-        moment += _u2.x(ind) * _u2(ind);
+        moment += _u2.x(0,ind) * _u2(0,ind);
     }
     EXPECT_NEAR(moment, 0, tol);
     
     moment = 0;
     for (ind = _u2.begin(X); ind != _u2.end(X); ++ind) {
-        moment += _u2.x(ind) * _u2(ind);
+        moment += _u2.x(0,ind) * _u2(0,ind);
     }
     EXPECT_NEAR(moment, 0, tol);
 }
@@ -118,7 +118,7 @@ TEST_F(RegularizerTest, CountNumberNonzeroPoints) {
     Flux::index ind;
     int count=0;
     for (ind = _u2.begin(X); ind != _u2.end(X); ++ind) {
-        if (fabs(_u2(ind)) > tol) {
+        if (fabs(_u2(0,ind)) > tol) {
 #ifdef DEBUG
             cout << "(" << _u2.x(ind) << "," << _u2.y(ind) << ") : " <<
                 _u2(ind) << endl;
@@ -133,7 +133,7 @@ TEST_F(RegularizerTest, CountNumberNonzeroPoints) {
 
     count=0;
     for (ind = _u2.begin(Y); ind != _u2.end(Y); ++ind) {
-        if (fabs(_u2(ind)) > tol) {
+        if (fabs(_u2(0,ind)) > tol) {
 #ifdef DEBUG
             cout << "(" << _u2.x(ind) << "," << _u2.y(ind) << ") : " << 
                 _u2(ind) << endl;
@@ -154,17 +154,17 @@ TEST_F(RegularizerTest, FluxZeroAwayFromBoundary) {
     
     for (ind = _u2.begin(); ind != _u2.end(); ++ind) {
         // if point is outside of region of support of the origin
-        if (fabs(_u2.x(ind)) > supportDistance || 
-            fabs(_u2.y(ind)) > supportDistance) {
-            EXPECT_DOUBLE_EQ(_u2(ind), 0);
+        if (fabs(_u2.x(0,ind)) > supportDistance || 
+            fabs(_u2.y(0,ind)) > supportDistance) {
+            EXPECT_DOUBLE_EQ(_u2(0,ind), 0);
         }
-        if (fabs(_u2.x(ind)) + tol < supportDistance && 
-            fabs(_u2.y(ind)) + tol < supportDistance) {
+        if (fabs(_u2.x(0,ind)) + tol < supportDistance && 
+            fabs(_u2.y(0,ind)) + tol < supportDistance) {
 #ifdef DEBUG
             cout << "(" << _u2.x(ind) << "," << _u2.y(ind) << ") : " <<
                _u2(ind) << endl;
 #endif
-            EXPECT_GT(fabs(_u2(ind)), 0);
+            EXPECT_GT(fabs(_u2(0,ind)), 0);
         }
     }
 }

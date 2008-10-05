@@ -78,9 +78,9 @@ void AdamsBashforth::advance(State& x) {
     }
 
     // Evaluate Right-Hand-Side (a) for first equation of ProjectionSolver
-    Scalar a = Laplacian( x.gamma );
+    Scalar a = Laplacian( x.omega );
     a *= 0.5 * _timestep * _model.getAlpha();
-    a += x.gamma;
+    a += x.omega;
 
     Scalar nonlinear = _model.N( x );
     nonlinear *= 3.;
@@ -90,8 +90,8 @@ void AdamsBashforth::advance(State& x) {
     // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
     BoundaryVector b = _model.getConstraints();
     
-    // Call the ProjectionSolver to determine the circulation and forces
-    _solver->solve( a, b, x.gamma, x.f );
+    // Call the ProjectionSolver to determine the vorticity and forces
+    _solver->solve( a, b, x.omega, x.f );
     
     // Compute the corresponding flux
     _model.refreshState( x );

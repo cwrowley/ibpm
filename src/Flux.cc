@@ -29,10 +29,12 @@ Flux::Flux( const Grid& grid ) :
 
 /// Allocate new array, copy the data
 Flux::Flux( const Flux& q ) :
-    Field( q.getGrid() )
-    {
+    Field( q ) {
     resize( q.getGrid() );
-    _data = q._data;
+    // copy the data
+    for (unsigned int i=0; i<_data.Size(); ++i) {
+        _data(i) = q._data(i);
+    }
 }
 
 /// Set all parameters and reallocate arrays based on the Grid dimensions
@@ -43,7 +45,7 @@ void Flux::resize( const Grid& grid ) {
     _numXFluxes = nx * ny + ny;
     _numFluxes = 2 * nx * ny + nx + ny;
     _data.Deallocate();
-    _data.Allocate( _numFluxes );
+    _data.Allocate( Ngrid(), _numFluxes );
 }
 
 Flux::~Flux() {} // deallocation automatic for Blitz++ arrays
@@ -51,16 +53,22 @@ Flux::~Flux() {} // deallocation automatic for Blitz++ arrays
 // Print the X and Y components to standard out (for debugging)
 void Flux::print() {
     cout << "X:" << endl;
-    for (int i=0; i<=Nx(); ++i) {
-        for (int j=0; j<Ny(); ++j) {
-            cout << (*this)(X,i,j) << " ";
+    for (int lev=0; lev<Ngrid(); ++lev) {
+        for (int j=Ny()-1; j>=0; --j) {
+            for (int i=0; i<=Nx(); ++i) {
+                cout << (*this)(lev,X,i,j) << " ";
+            }
+            cout << endl;
         }
         cout << endl;
     }
     cout << "Y:" << endl;
-    for (int i=0; i<Nx(); ++i) {
-        for (int j=0; j<=Ny(); ++j) {
-            cout << (*this)(Y,i,j) << " ";
+    for (int lev=0; lev<Ngrid(); ++lev) {
+        for (int j=Ny(); j>=0; --j) {
+        for (int i=0; i<Nx(); ++i) {
+                cout << (*this)(lev,Y,i,j) << " ";
+            }
+            cout << endl;
         }
         cout << endl;
     }
@@ -78,11 +86,14 @@ Flux Flux::UniformFlow(
     
     Flux q(grid);
     Flux::index ind;
-    for (ind = q.begin(X); ind != q.end(X); ++ind) {
-        q(ind) = u;
-    }
-    for (ind = q.begin(Y); ind != q.end(Y); ++ind) {
-        q(ind) = v;
+    for (int lev=0; lev<grid.Ngrid(); ++lev) {
+        int gridFactor = exp2(lev);
+        for (ind = q.begin(X); ind != q.end(X); ++ind) {
+            q(lev,ind) = u * gridFactor;
+        }
+        for (ind = q.begin(Y); ind != q.end(Y); ++ind) {
+            q(lev,ind) = v * gridFactor;
+        }
     }
     return q;
 }

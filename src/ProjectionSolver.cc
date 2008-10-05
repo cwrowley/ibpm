@@ -46,36 +46,36 @@ bool ProjectionSolver::save(const std::string& filename) { return false; }
 bool ProjectionSolver::load(const std::string& filename) { return false; }
 
 
-// Solve for gamma and f for a system of the form
-//   A gamma + B f = a
-//   C gamma = b
+// Solve for omega and f for a system of the form
+//   A omega + B f = a
+//   C omega = b
 // using a fractional step method:
-//   A gamma^* = a
-//   C A^{-1}B f = C gamma^* - b
-//   gamma = gamma^* - A^{-1} B f
+//   A omega^* = a
+//   C A^{-1}B f = C omega^* - b
+//   omega = omega^* - A^{-1} B f
 
 void ProjectionSolver::solve(
     const Scalar& a,
     const BoundaryVector& b,
-    Scalar& gamma,
+    Scalar& omega,
     BoundaryVector& f
     ) {
     
-    // A gamma^* = a
-    Scalar gammaStar( a.getGrid() );
-    Ainv( a, gammaStar );
+    // A omega^* = a
+    Scalar omegaStar( a.getGrid() );
+    Ainv( a, omegaStar );
     
-    // C A^{-1}B f = C gamma^* - b
+    // C A^{-1}B f = C omega^* - b
     BoundaryVector rhs( f.getNumPoints() );
-    C( gammaStar, rhs );
-    rhs -= b;               // rhs = C gamma^* - b
+    C( omegaStar, rhs );
+    rhs -= b;               // rhs = C omega^* - b
     Minv( rhs, f );         // f = Minv( rhs )
 
-    // gamma = gamma^* - A^{-1} B f
+    // omega = omega^* - A^{-1} B f
     Scalar c( a.getGrid() );
     B( f, c );              // c = Bf
     Ainv( c, c );           // c = Ainv(Bf)
-    gamma = gammaStar - c;
+    omega = omegaStar - c;
 }
 
 void ProjectionSolver::Ainv(const Scalar& x, Scalar& y) {

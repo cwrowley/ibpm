@@ -14,9 +14,9 @@ namespace ibpm {
     
     Uses Crank-Nicolson for linear terms.  Uses the scheme given by Peyret, p. 148[3], for alpha=1, beta=1/2:  
     \f{align}
-    (1 - \frac{h}{2}L)\gamma^{n+1} + hBf &=
-        (1+\frac{h}{2}L)\gamma^n + \frac{h}{2}(3N(q^n)-N(q^{n-1}))\\
-    C\gamma^{n+1} &= b_{n+1} 
+    (1 - \frac{h}{2}L)\omega^{n+1} + hBf &=
+        (1+\frac{h}{2}L)\omega^n + \frac{h}{2}(3N(q^n)-N(q^{n-1}))\\
+    C\omega^{n+1} &= b_{n+1} 
     \f}  
 
     \author Steve Brunton

@@ -46,7 +46,7 @@ bool OutputForce::doOutput(const State& x) {
     double drag = 0.;
     double lift = 0.;
  
-    computeNetForce( x.f, drag, lift );
+    x.computeNetForce( drag, lift );
 
     // Convert forces to lift and drag coefficients:
     // If L_d is dimensional lift, then in the nondimensionalization of the

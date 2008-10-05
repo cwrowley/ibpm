@@ -14,9 +14,6 @@
 // $HeadURL$
 
 #include "Scalar.h"
-#include "Flux.h"
-#include "Grid.h"
-#include <blitz/array.h>
 #include <iostream>
 using namespace std;
 
@@ -31,24 +28,49 @@ Scalar::Scalar( const Grid& grid ) :
 Scalar::Scalar() {}
     
 /// Allocate new array, copy the data
-Scalar::Scalar( const Scalar& f ) {
+Scalar::Scalar( const Scalar& f ) :
+    Field( f ) {
     resize( f.getGrid() );
     // copy data
-    _data = f._data;
+    for (unsigned int i=0; i<_data.Size(); ++i) {
+        _data(i) = f._data(i);
+    }
 }
     
 /// Deallocate memory in the destructor
 Scalar::~Scalar() {
-    // deallocation automatic for Blitz++ arrays
+    // deallocation automatic for Arrays
+}
+    
+void Scalar::coarsify() {
+    // Fine grid unchanged: start with next finest grid
+    for (int lev=1; lev<Ngrid(); ++lev) {
+        // Loop over interior gridpoints, that correspond to finer grid
+        for (int i=NxExt()+1; i<Nx()-NxExt(); ++i) {
+            for (int j=NyExt()+1; j<Ny()-NyExt(); ++j) {
+                // get corresponding point on fine grid
+                int ii,jj;
+                getGrid().c2f(i,j,ii,jj);
+                _data(lev,i,j) = 0.25 * _data(lev-1,ii,jj) +
+                    0.125 * ( _data(lev-1,ii+1,jj) + _data(lev-1,ii,jj+1) +
+                              _data(lev-1,ii-1,jj) + _data(lev-1,ii,jj-1) ) +
+                    0.0625 * ( _data(lev-1,ii+1,jj+1) + _data(lev-1,ii+1,jj-1) +
+                               _data(lev-1,ii-1,jj+1) + _data(lev-1,ii-1,jj-1) );
+            }
+        }
+    }
 }
 
 // Print the whole field to standard output
 void Scalar::print() const {
     int nx = Nx();
     int ny = Ny();
-    for(int i = 0; i <= nx; ++i) {
-        for (int j=0; j <= ny; ++j) {
-            cout << _data(i,j) << " ";
+    for( int lev=0; lev<Ngrid(); ++lev ) {
+        for (int j=ny-1; j > 0; --j) {
+            for(int i = 1; i < nx; ++i) {
+                cout << _data(lev,i,j) << " ";
+            }
+            cout << endl;
         }
         cout << endl;
     }
@@ -58,8 +80,47 @@ void Scalar::print() const {
 void Scalar::resize( const Grid& grid ) {
     setGrid( grid );
     _data.Deallocate();
-    _data.Allocate( Nx() + 1, Ny() + 1, 0 );
+    // Allocate arrays for interior points:
+    //    lev in 0..lev-1
+    //    i   in 1..nx-1
+    //    j   in 1..ny-1
+    _data.Allocate( Ngrid(), Nx() - 1, Ny() - 1, 0, 1, 1 );
 }
+    
+void Scalar::getBC( int lev, BC& bc ) const {
+    assert( Nx() == bc.Nx() );
+    assert( Ny() == bc.Ny() );
+    assert( lev >= 0 && lev < Ngrid()-1 );
+
+    // top and bottom boundaries
+    for (int i=0; i<=Nx(); ++i) {
+        int ii,jj;  // indices on coarse grid
+        getGrid().f2c(i,0,ii,jj);
+        // copy point that coincides with coarse point
+        bc.bottom(i) = (*this)( lev+1, ii, jj );
+        bc.top(i) = (*this)( lev+1, ii, Ny()-jj );
+        if ( ++i <= Nx() ) {
+            // interpolate point in between coarse points
+            bc.bottom(i) = 0.5 * ( (*this)( lev+1, ii, jj ) + (*this)( lev+1, ii+1, jj) );
+            bc.top(i) = 0.5 * ( (*this)( lev+1, ii, Ny()-jj ) + (*this)( lev+1, ii+1, Ny()-jj) );
+        }
+    }
+
+    // left and right boundaries
+    for (int j=0; j<=Ny(); ++j) {
+        int ii,jj;  // indices on coarse grid
+        getGrid().f2c(0,j,ii,jj);
+        // copy point that coincides with coarse point
+        bc.left(j) = (*this)( lev+1, ii, jj );
+        bc.right(j) = (*this)( lev+1, Nx()-ii, jj );
+        if ( ++j <= Ny() ) {
+            // interpolate point in between coarse points
+            bc.left(j) = 0.5 * ( (*this)( lev+1, ii, jj ) + (*this)( lev+1, ii, jj+1) );
+            bc.right(j) = 0.5 * ( (*this)( lev+1, Nx()-ii, jj ) + (*this)( lev+1, Nx()-ii, jj+1 ) );
+        }
+    }
+}
+
 
 
 } // namespace

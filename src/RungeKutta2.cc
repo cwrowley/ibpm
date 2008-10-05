@@ -70,9 +70,9 @@ void RungeKutta2::advance(State& x) {
     // First Projection Solve 
 
     // Evaluate Right-Hand-Side (a) for first equation of ProjectionSolver
-    Scalar a = Laplacian( x.gamma );
+    Scalar a = Laplacian( x.omega );
     a *= 0.5 * _timestep * _model.getAlpha();
-    a += x.gamma;
+    a += x.omega;
 
     Scalar nonlinear = _model.N( x );
     a += _timestep * nonlinear;
@@ -80,8 +80,8 @@ void RungeKutta2::advance(State& x) {
     // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
     BoundaryVector b = _model.getConstraints();
     
-    // Call the ProjectionSolver to determine the circulation and forces
-    _solver->solve( a, b, _x1.gamma, _x1.f );
+    // Call the ProjectionSolver to determine the vorticity and forces
+    _solver->solve( a, b, _x1.omega, _x1.f );
     
     // Update the rest of the state (i.e. flux)
     _model.refreshState( _x1 );
@@ -89,10 +89,10 @@ void RungeKutta2::advance(State& x) {
     // Second Projection Solve
 
     // Evaluate Right-Hand-Side (a) for first equation of ProjectionSolver
-    // TODO: Redo this to avoid calculating L(gamma) and N(x) twice 
-    a = Laplacian( x.gamma );
+    // TODO: Redo this to avoid calculating L(omega) and N(x) twice 
+    a = Laplacian( x.omega );
     a *= 0.5 * _timestep * _model.getAlpha();
-    a += x.gamma;
+    a += x.omega;
 
     nonlinear = _model.N( x ) + _model.N( _x1 );
     a += 0.5 * _timestep * nonlinear;
@@ -100,8 +100,8 @@ void RungeKutta2::advance(State& x) {
     // Evaluate Right-Hand-Side (b) for second equation of ProjectionSolver
     b = _model.getConstraints();
     
-    // Call the ProjectionSolver to determine the circulation and forces
-    _solver->solve( a, b, x.gamma, x.f );
+    // Call the ProjectionSolver to determine the vorticity and forces
+    _solver->solve( a, b, x.omega, x.f );
     
     // Update the rest of the state (i.e. flux)
     _model.refreshState( x );

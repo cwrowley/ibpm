@@ -18,10 +18,10 @@ class State;
     
     The governing equations are in the form
     \f{align}
-       \frac{d\gamma}{dt} + Bf &= \alpha L\gamma + N(q)\\
-       C\gamma &= b
+       \frac{d\omega}{dt} + Bf &= \alpha L\omega + N(q)\\
+       C\omega &= b
     \f}
-    where \f$ \gamma \f$ is a Scalar and \f$ f \f$ and \f$ b \f$ are
+    where \f$ \omega \f$ is a Scalar and \f$ f \f$ and \f$ b \f$ are
     BoundaryVectors.  \f$ L \f$ is the discrete Laplacian.  The operators
     B, C, and N, as well as the constant \f$ \alpha \f$ and the constraint
     values \f$ b \f$, are determined by an associated Model.

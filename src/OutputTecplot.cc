@@ -70,26 +70,24 @@ bool OutputTecplot::doOutput(const State& state) {
     sprintf( title, _title.c_str(), state.timestep );
     
     // Get grid dimensions
-    const Grid& grid = state.gamma.getGrid();
+    const Grid& grid = state.omega.getGrid();
     int nx = grid.Nx();
     int ny = grid.Ny();
-    double dx = grid.Dx();
+    int ngrid = grid.Ngrid();
 
     // Calculate the variables for output
     // Calculate the grid
     Scalar x(grid);
     Scalar y(grid);
-    for (int i=0; i<=nx; ++i) {
-        for (int j=0; j<=ny; ++j) {
-            x(i,j) = grid.getXEdge(i);
-            y(i,j) = grid.getYEdge(j);
+    for (int lev=0; lev<ngrid; ++lev) {
+        for (int i=1; i<nx; ++i) {
+            for (int j=1; j<ny; ++j) {
+                x(lev,i,j) = grid.getXEdge(lev,i);
+                y(lev,i,j) = grid.getYEdge(lev,j);
+            }
         }
     }
     
-    // Calculate vorticity
-    Scalar vort = state.gamma;
-    vort /= dx * dx;
-
     // Calculate velocities
     Scalar u(grid);
     Scalar v(grid);
@@ -101,7 +99,7 @@ bool OutputTecplot::doOutput(const State& state) {
     list.addVariable( &y, "y" );
     list.addVariable( &u, "u" );
     list.addVariable( &v, "v" );
-    list.addVariable( &vort, "Vorticity" );
+    list.addVariable( &(state.omega), "Vorticity" );
 
     // Write the Tecplot file
     bool status = writeTecplotFileASCII( filename, title, list );
@@ -110,6 +108,7 @@ bool OutputTecplot::doOutput(const State& state) {
 
 // Write a Tecplot file with the specified filename and title,
 // with data given in the VarList passed in
+// For now, write only finest grid (level 0)
 bool writeTecplotFileASCII(
     const char* filename,
     const char* title,
@@ -143,10 +142,11 @@ bool writeTecplotFileASCII(
     fprintf( fp, ")\n" );
     
     // Write the data
+    const int lev=0; // finest grid
     for (int j=1; j<ny; ++j) {
         for (int i=1; i<nx; ++i) {
             for (int ind=0; ind < numVars; ++ind ) {
-                fprintf( fp, "%.5e ", (*list.getVariable(ind))(i,j) );
+                fprintf( fp, "%.5e ", (*list.getVariable(ind))(lev,i,j) );
             }
             fprintf( fp, "\n" );
         }

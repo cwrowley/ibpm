@@ -52,6 +52,7 @@ inline double deltaFunction(double r) {
 
 // Update list of relationships between boundary points and cells, and the
 // corresponding weights
+// Checks only the finest grid level, level=0
 void Regularizer::update() {
     Direction dir;
     Flux f(_grid);
@@ -74,8 +75,8 @@ void Regularizer::update() {
             // For each cell
             for (j = f.begin(dir); j != f.end(dir); ++j) {
                 // Find x and y distances between boundary point and cell
-                dx = fabs(f.x(j) - bodyCoords(X,i)) / h;
-                dy = fabs(f.y(j) - bodyCoords(Y,i)) / h;
+                dx = fabs(f.x(0,j) - bodyCoords(X,i)) / h;
+                dy = fabs(f.y(0,j) - bodyCoords(Y,i)) / h;
                 // If cell is within the radius of support of delta function
                 if ((dx < deltaSupportRadius) && (dy < deltaSupportRadius)) {
                     // Compute the weight factor
@@ -99,7 +100,7 @@ Flux Regularizer::toFlux(const BoundaryVector& u1) const {
     vector<Association>::const_iterator a;
     for (a = _neighbors.begin(); a != _neighbors.end(); ++a) {
         // add the weight factor times the boundary value to the flux
-        u2(a->fluxIndex) += a->weight * u1(a->boundaryIndex);
+        u2(0,a->fluxIndex) += a->weight * u1(a->boundaryIndex);
     }
 
     // Multiply by grid spacing for correct dimension (vector -> Flux)
@@ -118,7 +119,7 @@ BoundaryVector Regularizer::toBoundary(const Flux& u2) const {
     vector<Association>::const_iterator a;
     for (a = _neighbors.begin(); a != _neighbors.end(); ++a) {
         // Add the weight factor times the flux value to the boundary
-        u1(a->boundaryIndex) += a->weight * u2(a->fluxIndex);
+        u1(a->boundaryIndex) += a->weight * u2(0,a->fluxIndex);
     }
 
     // Divide by grid spacing for correct dimension (Flux -> vector)

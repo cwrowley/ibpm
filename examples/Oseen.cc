@@ -18,6 +18,7 @@
 // $HeadURL$
 
 #include <iostream>
+#include <sys/stat.h>
 #include <math.h>
 #include "ibpm.h"
 
@@ -53,10 +54,11 @@ int main(int argc, char* argv[]) {
 	// Setup grid
 	int nx = 100;
 	int ny = 100;
+    int ngrid = 3;
 	double length = 10;
     double xOffset = -5;
     double yOffset = -5;
-	Grid grid( nx, ny, length, xOffset, yOffset );
+	Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
 	
 	// Empty geometry -- no body
 	Geometry geom;
@@ -69,10 +71,11 @@ int main(int argc, char* argv[]) {
     q0 = 0;
 
 	NonlinearNavierStokes model( grid, geom, Reynolds, q0 );
-
+    model.init();
+    
 	// Setup timestepper
 	double dt = 0.05;
-	Euler solver( model, dt );
+	Euler solver( grid, model, dt );
     solver.init();
 
 	// Setup initial condition
@@ -82,6 +85,9 @@ int main(int argc, char* argv[]) {
     initializeOseenVortex( Reynolds, exact );
     State error( grid, numPoints );
 
+    // Create output directory, if does not already exist
+    mkdir( "oseen_out", S_IRWXU | S_IRWXG | S_IRWXO );
+    
     // Setup output routines
     OutputTecplot outputComputed( "oseen_out/ibpm%03d.plt",
         "Oseen vortex, numerical, step %03d" );
@@ -89,7 +95,7 @@ int main(int argc, char* argv[]) {
         "Oseen vortex, exact, step %03d");
     OutputTecplot outputError( "oseen_out/error%03d.plt",
         "Oseen vortex, error, step %03d");
-
+    
     // Output initial condition
     outputComputed.doOutput( x );
     outputExact.doOutput( exact );
@@ -105,7 +111,7 @@ int main(int argc, char* argv[]) {
         computeExactSolution( Reynolds, x.time, x.timestep, exact );
 
         // Compute error
-        error.gamma = x.gamma - exact.gamma;
+        error.omega = x.omega - exact.omega;
         error.q = x.q - exact.q;
         error.time = x.time;
         error.timestep = x.timestep;
@@ -126,24 +132,24 @@ void computeExactSolution(
     int timestep,
     State& exact
     ) {
-    const Grid& grid = exact.gamma.getGrid();
+    const Grid& grid = exact.omega.getGrid();
     int nx = grid.Nx();
     int ny = grid.Ny();
     double dx = grid.Dx();
 
     const double circulation = 2 * PI * (1 + 1./(2*alpha) );
-    double amp = circulation * Reynolds / (4 * PI * time) * dx * dx;
+    double amp = circulation * Reynolds / (4 * PI * time);
 
     exact.time = time;
     exact.timestep = timestep;
 
-    // Circulation
-    for (int i=0; i <= nx; ++i ){
-        double x = grid.getXEdge(i);
-        for (int j=0; j <= ny; ++j ){
-            double y = grid.getYEdge(j);
+    // Vorticity
+    for (int i=1; i < nx; ++i ){
+        double x = grid.getXEdge(0,i);
+        for (int j=1; j < ny; ++j ){
+            double y = grid.getYEdge(0,j);
             double rSquared = x*x + y*y;
-            exact.gamma(i,j) = amp * exp( -rSquared * Reynolds / (4 * time) );
+            exact.omega(0,i,j) = amp * exp( -rSquared * Reynolds / (4 * time) );
         }
     }
 
@@ -151,25 +157,25 @@ void computeExactSolution(
     Flux::index ind;
     // X-direction flux
     for (ind = exact.q.begin(X); ind != exact.q.end(X); ++ind) {
-        double x = exact.q.x(ind);
-        double y = exact.q.y(ind);
+        double x = exact.q.x(0,ind);
+        double y = exact.q.y(0,ind);
         double r = sqrt( x*x + y*y );
         double uTheta = circulation / (2 * PI * r);
         uTheta *= 1 - exp( -r*r * Reynolds / (4 * time) );
         double theta = atan2( y, x );
         double u = -uTheta * sin(theta);
-        exact.q(ind) = u * dx;
+        exact.q(0,ind) = u * dx;
     }
     // Y-direction flux
     for (ind = exact.q.begin(Y); ind != exact.q.end(Y); ++ind) {
-        double x = exact.q.x(ind);
-        double y = exact.q.y(ind);
+        double x = exact.q.x(0,ind);
+        double y = exact.q.y(0,ind);
         double r = sqrt( x*x + y*y );
         double uTheta = circulation / (2 * PI * r);
         uTheta *= 1 - exp( -r*r * Reynolds / (4 * time) );
         double theta = atan2( y, x );
         double v =  uTheta * cos(theta);
-        exact.q(ind) = v * dx;
+        exact.q(0,ind) = v * dx;
     }
 }
 

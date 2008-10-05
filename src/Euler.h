@@ -14,9 +14,9 @@ namespace ibpm {
     
     Uses Crank-Nicolson for linear terms.  In particular, advance() returns the solution of
     \f{align}
-    (1 - \frac{h}{2}L)\gamma^{n+1} + hBf &=
-        (1 + \frac{h}{2}L) \gamma^n + h N(q^n)\\
-    C\gamma^{n+1} &= b_{n+1}
+    (1 - \frac{h}{2}L)\omega^{n+1} + hBf &=
+        (1 + \frac{h}{2}L) \omega^n + h N(q^n)\\
+    C\omega^{n+1} &= b_{n+1}
     \f}
     
 

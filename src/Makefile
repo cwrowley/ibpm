@@ -16,10 +16,12 @@ include make.inc
 
 OBJS = \
 	AdamsBashforth.o \
+	BC.o \
 	BoundaryVector.o \
 	CholeskySolver.o \
 	ConjugateGradientSolver.o \
 	EllipticSolver.o \
+	EllipticSolver2d.o \
 	Euler.o \
 	Field.o \
 	Flux.o \

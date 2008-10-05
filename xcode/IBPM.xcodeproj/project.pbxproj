@@ -7,54 +7,72 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F5685B820E8349D80061F7D5 /* EllipticSolverTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5685B810E8349D80061F7D5 /* EllipticSolverTest.cc */; };
+		F53AEAB20E949E9800A62F40 /* EllipticSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F54A2D0E0E92592200AEF8C6 /* EllipticSolver.cc */; };
+		F54A27E90E9143B900AEF8C6 /* EllipticSolver2d.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5E3DCD50E8215E000D62675 /* EllipticSolver2d.cc */; };
+		F54B895D0E898F7200914D47 /* CheckCurl.cc in Sources */ = {isa = PBXBuildFile; fileRef = F54B895B0E898F6700914D47 /* CheckCurl.cc */; };
+		F553DA730E987EC50031D523 /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
+		F553DA790E987EE40031D523 /* Oseen.cc in Sources */ = {isa = PBXBuildFile; fileRef = F557BD7B0E7AE50C0006234C /* Oseen.cc */; };
+		F56DC36D0E97E920000D85EB /* VectorOperationsTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */; };
+		F583E0DC0E9971AC00F77676 /* TangentSE2Test.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08220E7ADE4C0097BF5F /* TangentSE2Test.cc */; };
+		F583E0DD0E9971AE00F77676 /* StateTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08210E7ADE4C0097BF5F /* StateTest.cc */; };
+		F583E0DE0E9971AF00F77676 /* ScalarTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081F0E7ADE4C0097BF5F /* ScalarTest.cc */; };
+		F583E0DF0E9971B000F77676 /* RigidBodyTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081E0E7ADE4C0097BF5F /* RigidBodyTest.cc */; };
+		F583E0E00E9971B100F77676 /* RegularizerTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081D0E7ADE4C0097BF5F /* RegularizerTest.cc */; };
+		F583E0E10E9971B200F77676 /* ProjectionSolverTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081C0E7ADE4C0097BF5F /* ProjectionSolverTest.cc */; };
+		F583E0E20E9971B400F77676 /* ParmParserTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081B0E7ADE4C0097BF5F /* ParmParserTest.cc */; };
+		F583E0E30E9971B500F77676 /* NavierStokesModelTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081A0E7ADE4C0097BF5F /* NavierStokesModelTest.cc */; };
+		F583E0E40E9971B600F77676 /* MotionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08190E7ADE4C0097BF5F /* MotionTest.cc */; };
+		F583E0E50E9971B800F77676 /* GridTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08170E7ADE4C0097BF5F /* GridTest.cc */; };
+		F583E0E60E9971B900F77676 /* GeometryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08160E7ADE4C0097BF5F /* GeometryTest.cc */; };
+		F583E0E70E9971BA00F77676 /* FluxTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08150E7ADE4C0097BF5F /* FluxTest.cc */; };
+		F583E0E80E9971BC00F77676 /* EllipticSolverTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5C804020E95D153005CCAAA /* EllipticSolverTest.cc */; };
+		F583E0E90E9971BE00F77676 /* EllipticSolver2dTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5685B810E8349D80061F7D5 /* EllipticSolver2dTest.cc */; };
+		F583E0EB0E9971C300F77676 /* BoundaryVectorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08140E7ADE4C0097BF5F /* BoundaryVectorTest.cc */; };
+		F583E0EC0E9971C400F77676 /* BCTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5A497DE0E8FFBCC00F9A49D /* BCTest.cc */; };
+		F5A497DB0E8FF5CE00F9A49D /* BC.h in Headers */ = {isa = PBXBuildFile; fileRef = F5A497DA0E8FF5CE00F9A49D /* BC.h */; };
+		F5A497DD0E8FF84300F9A49D /* BC.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5A497DC0E8FF84300F9A49D /* BC.cc */; };
 		F5A9A1040E82C58200F97921 /* Array.h in Headers */ = {isa = PBXBuildFile; fileRef = F5A9A1030E82C58200F97921 /* Array.h */; };
-		F5AA2F520E840F9500B041AA /* AdamsBashforth.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07C80E7ADE3D0097BF5F /* AdamsBashforth.cc */; };
-		F5AA2F6A0E8421F200B041AA /* RungeKutta2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08030E7ADE3D0097BF5F /* RungeKutta2.cc */; };
 		F5BE61D60E7ACFAB00F26FFC /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
 		F5BE61F00E7ADC5800F26FFC /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
-		F5E3DCD60E8215E000D62675 /* EllipticSolver.h in Headers */ = {isa = PBXBuildFile; fileRef = F5E3DCD40E8215E000D62675 /* EllipticSolver.h */; };
-		F5E3DCD70E8215E000D62675 /* EllipticSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5E3DCD50E8215E000D62675 /* EllipticSolver.cc */; };
+		F5D301E80E95851700BD6153 /* NavierStokesModel.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07E60E7ADE3D0097BF5F /* NavierStokesModel.cc */; };
+		F5D301E90E95852200BD6153 /* ProjectionSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07FD0E7ADE3D0097BF5F /* ProjectionSolver.cc */; };
+		F5D301ED0E95872800BD6153 /* OutputTecplot.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07F80E7ADE3D0097BF5F /* OutputTecplot.cc */; };
+		F5E286670E854B6200AC859E /* Field.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D60E7ADE3D0097BF5F /* Field.cc */; };
+		F5E286710E854E8300AC859E /* Scalar.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08070E7ADE3D0097BF5F /* Scalar.cc */; };
+		F5E286840E85525F00AC859E /* Field.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D60E7ADE3D0097BF5F /* Field.cc */; };
+		F5E2868C0E85570A00AC859E /* Flux.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D90E7ADE3D0097BF5F /* Flux.cc */; };
+		F5E2870A0E8560EB00AC859E /* AdamsBashforth.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07C80E7ADE3D0097BF5F /* AdamsBashforth.cc */; };
+		F5E2870C0E8560F300AC859E /* CholeskySolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07CC0E7ADE3D0097BF5F /* CholeskySolver.cc */; };
+		F5E2870D0E8560F400AC859E /* ConjugateGradientSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D10E7ADE3D0097BF5F /* ConjugateGradientSolver.cc */; };
+		F5E2870F0E8560F600AC859E /* Euler.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D40E7ADE3D0097BF5F /* Euler.cc */; };
+		F5E287100E8560F800AC859E /* Geometry.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07DB0E7ADE3D0097BF5F /* Geometry.cc */; };
+		F5E287120E8560FD00AC859E /* Logger.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07E10E7ADE3D0097BF5F /* Logger.cc */; };
+		F5E287140E8560FF00AC859E /* OutputForce.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07F40E7ADE3D0097BF5F /* OutputForce.cc */; };
+		F5E287160E85610300AC859E /* OutputRestart.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07F60E7ADE3D0097BF5F /* OutputRestart.cc */; };
+		F5E287190E85610800AC859E /* RungeKutta2.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08030E7ADE3D0097BF5F /* RungeKutta2.cc */; };
+		F5E2871B0E85610D00AC859E /* TimeStepper.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB080C0E7ADE3D0097BF5F /* TimeStepper.cc */; };
+		F5E2871D0E85613E00AC859E /* Regularizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07FF0E7ADE3D0097BF5F /* Regularizer.cc */; };
+		F5E287270E85619D00AC859E /* State.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08090E7ADE3D0097BF5F /* State.cc */; };
+		F5E2874C0E85651600AC859E /* VectorOperations.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08100E7ADE3D0097BF5F /* VectorOperations.cc */; };
 		F5EB08260E7ADE7A0097BF5F /* BoundaryVector.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07CA0E7ADE3D0097BF5F /* BoundaryVector.cc */; };
-		F5EB08270E7ADE7A0097BF5F /* CholeskySolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07CC0E7ADE3D0097BF5F /* CholeskySolver.cc */; };
-		F5EB08280E7ADE7A0097BF5F /* ConjugateGradientSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D10E7ADE3D0097BF5F /* ConjugateGradientSolver.cc */; };
-		F5EB08290E7ADE7A0097BF5F /* Euler.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D40E7ADE3D0097BF5F /* Euler.cc */; };
-		F5EB082A0E7ADE7A0097BF5F /* Field.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D60E7ADE3D0097BF5F /* Field.cc */; };
-		F5EB082B0E7ADE7A0097BF5F /* Flux.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07D90E7ADE3D0097BF5F /* Flux.cc */; };
-		F5EB082C0E7ADE7A0097BF5F /* Geometry.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07DB0E7ADE3D0097BF5F /* Geometry.cc */; };
 		F5EB082D0E7ADE7A0097BF5F /* Grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07DD0E7ADE3D0097BF5F /* Grid.cc */; };
-		F5EB082E0E7ADE7A0097BF5F /* Logger.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07E10E7ADE3D0097BF5F /* Logger.cc */; };
-		F5EB082F0E7ADE7A0097BF5F /* NavierStokesModel.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07E60E7ADE3D0097BF5F /* NavierStokesModel.cc */; };
-		F5EB08300E7ADE7A0097BF5F /* OutputForce.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07F40E7ADE3D0097BF5F /* OutputForce.cc */; };
-		F5EB08310E7ADE7A0097BF5F /* OutputRestart.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07F60E7ADE3D0097BF5F /* OutputRestart.cc */; };
-		F5EB08320E7ADE7A0097BF5F /* OutputTecplot.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07F80E7ADE3D0097BF5F /* OutputTecplot.cc */; };
 		F5EB08330E7ADE7A0097BF5F /* ParmParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07FA0E7ADE3D0097BF5F /* ParmParser.cc */; };
-		F5EB08340E7ADE7A0097BF5F /* ProjectionSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07FD0E7ADE3D0097BF5F /* ProjectionSolver.cc */; };
-		F5EB08350E7ADE7A0097BF5F /* Regularizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07FF0E7ADE3D0097BF5F /* Regularizer.cc */; };
 		F5EB08360E7ADE7A0097BF5F /* RigidBody.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08010E7ADE3D0097BF5F /* RigidBody.cc */; };
-		F5EB08390E7ADE7A0097BF5F /* Scalar.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08070E7ADE3D0097BF5F /* Scalar.cc */; };
-		F5EB083A0E7ADE7A0097BF5F /* State.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08090E7ADE3D0097BF5F /* State.cc */; };
-		F5EB083B0E7ADE7A0097BF5F /* TimeStepper.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB080C0E7ADE3D0097BF5F /* TimeStepper.cc */; };
 		F5EB083C0E7ADE7A0097BF5F /* utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB080E0E7ADE3D0097BF5F /* utils.cc */; };
-		F5EB083D0E7ADE7A0097BF5F /* VectorOperations.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08100E7ADE3D0097BF5F /* VectorOperations.cc */; };
 		F5EB083E0E7ADE8B0097BF5F /* ibpm.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07DF0E7ADE3D0097BF5F /* ibpm.cc */; };
-		F5EB08410E7ADE9E0097BF5F /* BoundaryVectorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08140E7ADE4C0097BF5F /* BoundaryVectorTest.cc */; };
-		F5EB08420E7ADE9E0097BF5F /* FluxTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08150E7ADE4C0097BF5F /* FluxTest.cc */; };
-		F5EB08430E7ADE9E0097BF5F /* GeometryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08160E7ADE4C0097BF5F /* GeometryTest.cc */; };
-		F5EB08440E7ADE9E0097BF5F /* GridTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08170E7ADE4C0097BF5F /* GridTest.cc */; };
-		F5EB08450E7ADE9E0097BF5F /* MotionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08190E7ADE4C0097BF5F /* MotionTest.cc */; };
-		F5EB08460E7ADE9E0097BF5F /* NavierStokesModelTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081A0E7ADE4C0097BF5F /* NavierStokesModelTest.cc */; };
-		F5EB08470E7ADE9E0097BF5F /* ParmParserTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081B0E7ADE4C0097BF5F /* ParmParserTest.cc */; };
-		F5EB08480E7ADE9E0097BF5F /* ProjectionSolverTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081C0E7ADE4C0097BF5F /* ProjectionSolverTest.cc */; };
-		F5EB08490E7ADE9E0097BF5F /* RegularizerTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081D0E7ADE4C0097BF5F /* RegularizerTest.cc */; };
-		F5EB084A0E7ADE9E0097BF5F /* RigidBodyTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081E0E7ADE4C0097BF5F /* RigidBodyTest.cc */; };
-		F5EB084B0E7ADE9E0097BF5F /* ScalarTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB081F0E7ADE4C0097BF5F /* ScalarTest.cc */; };
-		F5EB084C0E7ADE9E0097BF5F /* StateTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08210E7ADE4C0097BF5F /* StateTest.cc */; };
-		F5EB084D0E7ADE9E0097BF5F /* TangentSE2Test.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08220E7ADE4C0097BF5F /* TangentSE2Test.cc */; };
-		F5EB084E0E7ADE9E0097BF5F /* VectorOperationsTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */; };
+		F5FA979D0E86767E00C0BB16 /* CheckFluxToX.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5FA97910E86763C00C0BB16 /* CheckFluxToX.cc */; };
+		F5FA979E0E86769000C0BB16 /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
+		F5FA97DA0E867FEA00C0BB16 /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		F553DA6F0E987EC50031D523 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F5BE613A0E7ACDD800F26FFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F5BE61540E7ACE3800F26FFC;
+			remoteInfo = ibpm;
+		};
 		F5BE61D20E7ACF3300F26FFC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F5BE613A0E7ACDD800F26FFC /* Project object */;
@@ -69,9 +87,28 @@
 			remoteGlobalIDString = F5BE61540E7ACE3800F26FFC;
 			remoteInfo = ibpm;
 		};
+		F5FA979B0E86766B00C0BB16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F5BE613A0E7ACDD800F26FFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F5BE61540E7ACE3800F26FFC;
+			remoteInfo = ibpm;
+		};
+		F5FA97D60E867FEA00C0BB16 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F5BE613A0E7ACDD800F26FFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F5BE61540E7ACE3800F26FFC;
+			remoteInfo = ibpm;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F54A2D0C0E92590F00AEF8C6 /* EllipticSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EllipticSolver.h; sourceTree = "<group>"; };
+		F54A2D0E0E92592200AEF8C6 /* EllipticSolver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EllipticSolver.cc; sourceTree = "<group>"; };
+		F54B895B0E898F6700914D47 /* CheckCurl.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckCurl.cc; sourceTree = "<group>"; };
+		F553DA660E987D200031D523 /* cylinder2.geom */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cylinder2.geom; sourceTree = "<group>"; };
+		F553DA770E987EC50031D523 /* main */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = main; sourceTree = BUILT_PRODUCTS_DIR; };
 		F557BD740E7AE50C0006234C /* bin2plt.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bin2plt.cc; path = ../examples/bin2plt.cc; sourceTree = SOURCE_ROOT; };
 		F557BD760E7AE50C0006234C /* bininfo.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bininfo.cc; path = ../examples/bininfo.cc; sourceTree = SOURCE_ROOT; };
 		F557BD770E7AE50C0006234C /* cylinder.geom */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = cylinder.geom; path = ../examples/cylinder.geom; sourceTree = SOURCE_ROOT; };
@@ -80,14 +117,20 @@
 		F557BD7F0E7AE50C0006234C /* pitching.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pitching.cc; path = ../examples/pitching.cc; sourceTree = SOURCE_ROOT; };
 		F557BD820E7AE50C0006234C /* plunging.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plunging.cc; path = ../examples/plunging.cc; sourceTree = SOURCE_ROOT; };
 		F557BD840E7AE50C0006234C /* RigidBodyLoad.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RigidBodyLoad.cc; path = ../examples/RigidBodyLoad.cc; sourceTree = SOURCE_ROOT; };
-		F5685B810E8349D80061F7D5 /* EllipticSolverTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EllipticSolverTest.cc; sourceTree = "<group>"; };
+		F5685B810E8349D80061F7D5 /* EllipticSolver2dTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EllipticSolver2dTest.cc; sourceTree = "<group>"; };
+		F58ED5AE0E86B0E600AE747A /* CheckAdjoint */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CheckAdjoint; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5A497DA0E8FF5CE00F9A49D /* BC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BC.h; sourceTree = "<group>"; };
+		F5A497DC0E8FF84300F9A49D /* BC.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BC.cc; sourceTree = "<group>"; };
+		F5A497DE0E8FFBCC00F9A49D /* BCTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BCTest.cc; sourceTree = "<group>"; };
+		F5A745300E86EA43000692D8 /* CheckFluxToX */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CheckFluxToX; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5A9A1030E82C58200F97921 /* Array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Array.h; sourceTree = "<group>"; };
 		F5A9A18A0E82F19D00F97921 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
 		F5BE614A0E7ACE1300F26FFC /* main */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = main; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5BE61550E7ACE3800F26FFC /* libibpm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libibpm.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5BE61EA0E7ADC4100F26FFC /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
-		F5E3DCD40E8215E000D62675 /* EllipticSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EllipticSolver.h; sourceTree = "<group>"; };
-		F5E3DCD50E8215E000D62675 /* EllipticSolver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EllipticSolver.cc; sourceTree = "<group>"; };
+		F5C804020E95D153005CCAAA /* EllipticSolverTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EllipticSolverTest.cc; sourceTree = "<group>"; };
+		F5E3DCD40E8215E000D62675 /* EllipticSolver2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EllipticSolver2d.h; sourceTree = "<group>"; };
+		F5E3DCD50E8215E000D62675 /* EllipticSolver2d.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EllipticSolver2d.cc; sourceTree = "<group>"; };
 		F5EB07C80E7ADE3D0097BF5F /* AdamsBashforth.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AdamsBashforth.cc; path = ../src/AdamsBashforth.cc; sourceTree = SOURCE_ROOT; };
 		F5EB07C90E7ADE3D0097BF5F /* AdamsBashforth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AdamsBashforth.h; path = ../src/AdamsBashforth.h; sourceTree = SOURCE_ROOT; };
 		F5EB07CA0E7ADE3D0097BF5F /* BoundaryVector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BoundaryVector.cc; path = ../src/BoundaryVector.cc; sourceTree = SOURCE_ROOT; };
@@ -165,9 +208,19 @@
 		F5EB08210E7ADE4C0097BF5F /* StateTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StateTest.cc; path = ../test/StateTest.cc; sourceTree = SOURCE_ROOT; };
 		F5EB08220E7ADE4C0097BF5F /* TangentSE2Test.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TangentSE2Test.cc; path = ../test/TangentSE2Test.cc; sourceTree = SOURCE_ROOT; };
 		F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VectorOperationsTest.cc; path = ../test/VectorOperationsTest.cc; sourceTree = SOURCE_ROOT; };
+		F5FA97910E86763C00C0BB16 /* CheckFluxToX.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckFluxToX.cc; sourceTree = "<group>"; };
+		F5FA97CB0E867C7C00C0BB16 /* CheckAdjoint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckAdjoint.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		F553DA720E987EC50031D523 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F553DA730E987EC50031D523 /* libibpm.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F5BE61480E7ACE1300F26FFC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -191,12 +244,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F5FA97950E86765500C0BB16 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5FA979E0E86769000C0BB16 /* libibpm.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5FA97D90E867FEA00C0BB16 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5FA97DA0E867FEA00C0BB16 /* libibpm.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		F557BD720E7AE50C0006234C /* examples */ = {
 			isa = PBXGroup;
 			children = (
+				F553DA660E987D200031D523 /* cylinder2.geom */,
 				F557BD740E7AE50C0006234C /* bin2plt.cc */,
 				F557BD760E7AE50C0006234C /* bininfo.cc */,
 				F557BD770E7AE50C0006234C /* cylinder.geom */,
@@ -253,6 +323,9 @@
 				F5BE614A0E7ACE1300F26FFC /* main */,
 				F5BE61550E7ACE3800F26FFC /* libibpm.a */,
 				F5BE61EA0E7ADC4100F26FFC /* test */,
+				F58ED5AE0E86B0E600AE747A /* CheckAdjoint */,
+				F5A745300E86EA43000692D8 /* CheckFluxToX */,
+				F553DA770E987EC50031D523 /* main */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -263,6 +336,8 @@
 				F5EB07C80E7ADE3D0097BF5F /* AdamsBashforth.cc */,
 				F5EB07C90E7ADE3D0097BF5F /* AdamsBashforth.h */,
 				F5A9A1030E82C58200F97921 /* Array.h */,
+				F5A497DC0E8FF84300F9A49D /* BC.cc */,
+				F5A497DA0E8FF5CE00F9A49D /* BC.h */,
 				F5EB07CA0E7ADE3D0097BF5F /* BoundaryVector.cc */,
 				F5EB07CB0E7ADE3D0097BF5F /* BoundaryVector.h */,
 				F5EB07CC0E7ADE3D0097BF5F /* CholeskySolver.cc */,
@@ -271,8 +346,10 @@
 				F5EB07D10E7ADE3D0097BF5F /* ConjugateGradientSolver.cc */,
 				F5EB07D20E7ADE3D0097BF5F /* ConjugateGradientSolver.h */,
 				F5EB07D30E7ADE3D0097BF5F /* Direction.h */,
-				F5E3DCD50E8215E000D62675 /* EllipticSolver.cc */,
-				F5E3DCD40E8215E000D62675 /* EllipticSolver.h */,
+				F5E3DCD50E8215E000D62675 /* EllipticSolver2d.cc */,
+				F5E3DCD40E8215E000D62675 /* EllipticSolver2d.h */,
+				F54A2D0E0E92592200AEF8C6 /* EllipticSolver.cc */,
+				F54A2D0C0E92590F00AEF8C6 /* EllipticSolver.h */,
 				F5EB07D40E7ADE3D0097BF5F /* Euler.cc */,
 				F5EB07D50E7ADE3D0097BF5F /* Euler.h */,
 				F5EB07D60E7ADE3D0097BF5F /* Field.cc */,
@@ -342,8 +419,9 @@
 		F5EB08120E7ADE4C0097BF5F /* test */ = {
 			isa = PBXGroup;
 			children = (
+				F5C804020E95D153005CCAAA /* EllipticSolverTest.cc */,
 				F5EB08140E7ADE4C0097BF5F /* BoundaryVectorTest.cc */,
-				F5685B810E8349D80061F7D5 /* EllipticSolverTest.cc */,
+				F5685B810E8349D80061F7D5 /* EllipticSolver2dTest.cc */,
 				F5EB08150E7ADE4C0097BF5F /* FluxTest.cc */,
 				F5EB08160E7ADE4C0097BF5F /* GeometryTest.cc */,
 				F5EB08170E7ADE4C0097BF5F /* GridTest.cc */,
@@ -359,6 +437,10 @@
 				F5EB08210E7ADE4C0097BF5F /* StateTest.cc */,
 				F5EB08220E7ADE4C0097BF5F /* TangentSE2Test.cc */,
 				F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */,
+				F5FA97910E86763C00C0BB16 /* CheckFluxToX.cc */,
+				F5FA97CB0E867C7C00C0BB16 /* CheckAdjoint.cc */,
+				F54B895B0E898F6700914D47 /* CheckCurl.cc */,
+				F5A497DE0E8FFBCC00F9A49D /* BCTest.cc */,
 			);
 			name = test;
 			path = ../test;
@@ -371,14 +453,31 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F5E3DCD60E8215E000D62675 /* EllipticSolver.h in Headers */,
 				F5A9A1040E82C58200F97921 /* Array.h in Headers */,
+				F5A497DB0E8FF5CE00F9A49D /* BC.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		F553DA6D0E987EC50031D523 /* Oseen */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F553DA740E987EC50031D523 /* Build configuration list for PBXNativeTarget "Oseen" */;
+			buildPhases = (
+				F553DA700E987EC50031D523 /* Sources */,
+				F553DA720E987EC50031D523 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F553DA6E0E987EC50031D523 /* PBXTargetDependency */,
+			);
+			name = Oseen;
+			productName = main;
+			productReference = F553DA770E987EC50031D523 /* main */;
+			productType = "com.apple.product-type.tool";
+		};
 		F5BE61490E7ACE1300F26FFC /* ibpm_main */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F5BE614F0E7ACE1300F26FFC /* Build configuration list for PBXNativeTarget "ibpm_main" */;
@@ -430,6 +529,40 @@
 			productReference = F5BE61EA0E7ADC4100F26FFC /* test */;
 			productType = "com.apple.product-type.tool";
 		};
+		F5FA97960E86765500C0BB16 /* CheckFluxToX */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5FA979F0E8676AE00C0BB16 /* Build configuration list for PBXNativeTarget "CheckFluxToX" */;
+			buildPhases = (
+				F5FA97940E86765500C0BB16 /* Sources */,
+				F5FA97950E86765500C0BB16 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F5FA979C0E86766B00C0BB16 /* PBXTargetDependency */,
+			);
+			name = CheckFluxToX;
+			productName = CheckFluxToX;
+			productReference = F5A745300E86EA43000692D8 /* CheckFluxToX */;
+			productType = "com.apple.product-type.tool";
+		};
+		F5FA97D40E867FEA00C0BB16 /* CheckAdjoint */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5FA97DB0E867FEA00C0BB16 /* Build configuration list for PBXNativeTarget "CheckAdjoint" */;
+			buildPhases = (
+				F5FA97D70E867FEA00C0BB16 /* Sources */,
+				F5FA97D90E867FEA00C0BB16 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F5FA97D50E867FEA00C0BB16 /* PBXTargetDependency */,
+			);
+			name = CheckAdjoint;
+			productName = CheckFluxToX;
+			productReference = F58ED5AE0E86B0E600AE747A /* CheckAdjoint */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -446,11 +579,22 @@
 				F5BE61490E7ACE1300F26FFC /* ibpm_main */,
 				F5BE61540E7ACE3800F26FFC /* ibpm */,
 				F5BE61E90E7ADC4100F26FFC /* test */,
+				F5FA97960E86765500C0BB16 /* CheckFluxToX */,
+				F5FA97D40E867FEA00C0BB16 /* CheckAdjoint */,
+				F553DA6D0E987EC50031D523 /* Oseen */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		F553DA700E987EC50031D523 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F553DA790E987EE40031D523 /* Oseen.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F5BE61470E7ACE1300F26FFC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -464,30 +608,32 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5EB08260E7ADE7A0097BF5F /* BoundaryVector.cc in Sources */,
-				F5EB08270E7ADE7A0097BF5F /* CholeskySolver.cc in Sources */,
-				F5EB08280E7ADE7A0097BF5F /* ConjugateGradientSolver.cc in Sources */,
-				F5EB08290E7ADE7A0097BF5F /* Euler.cc in Sources */,
-				F5EB082A0E7ADE7A0097BF5F /* Field.cc in Sources */,
-				F5EB082B0E7ADE7A0097BF5F /* Flux.cc in Sources */,
-				F5EB082C0E7ADE7A0097BF5F /* Geometry.cc in Sources */,
 				F5EB082D0E7ADE7A0097BF5F /* Grid.cc in Sources */,
-				F5EB082E0E7ADE7A0097BF5F /* Logger.cc in Sources */,
-				F5EB082F0E7ADE7A0097BF5F /* NavierStokesModel.cc in Sources */,
-				F5EB08300E7ADE7A0097BF5F /* OutputForce.cc in Sources */,
-				F5EB08310E7ADE7A0097BF5F /* OutputRestart.cc in Sources */,
-				F5EB08320E7ADE7A0097BF5F /* OutputTecplot.cc in Sources */,
 				F5EB08330E7ADE7A0097BF5F /* ParmParser.cc in Sources */,
-				F5EB08340E7ADE7A0097BF5F /* ProjectionSolver.cc in Sources */,
-				F5EB08350E7ADE7A0097BF5F /* Regularizer.cc in Sources */,
 				F5EB08360E7ADE7A0097BF5F /* RigidBody.cc in Sources */,
-				F5EB08390E7ADE7A0097BF5F /* Scalar.cc in Sources */,
-				F5EB083A0E7ADE7A0097BF5F /* State.cc in Sources */,
-				F5EB083B0E7ADE7A0097BF5F /* TimeStepper.cc in Sources */,
 				F5EB083C0E7ADE7A0097BF5F /* utils.cc in Sources */,
-				F5EB083D0E7ADE7A0097BF5F /* VectorOperations.cc in Sources */,
-				F5E3DCD70E8215E000D62675 /* EllipticSolver.cc in Sources */,
-				F5AA2F520E840F9500B041AA /* AdamsBashforth.cc in Sources */,
-				F5AA2F6A0E8421F200B041AA /* RungeKutta2.cc in Sources */,
+				F5E286670E854B6200AC859E /* Field.cc in Sources */,
+				F5E286710E854E8300AC859E /* Scalar.cc in Sources */,
+				F5E2868C0E85570A00AC859E /* Flux.cc in Sources */,
+				F5E2870A0E8560EB00AC859E /* AdamsBashforth.cc in Sources */,
+				F5E2870C0E8560F300AC859E /* CholeskySolver.cc in Sources */,
+				F5E2870D0E8560F400AC859E /* ConjugateGradientSolver.cc in Sources */,
+				F5E2870F0E8560F600AC859E /* Euler.cc in Sources */,
+				F5E287100E8560F800AC859E /* Geometry.cc in Sources */,
+				F5E287120E8560FD00AC859E /* Logger.cc in Sources */,
+				F5E287140E8560FF00AC859E /* OutputForce.cc in Sources */,
+				F5E287160E85610300AC859E /* OutputRestart.cc in Sources */,
+				F5E287190E85610800AC859E /* RungeKutta2.cc in Sources */,
+				F5E2871B0E85610D00AC859E /* TimeStepper.cc in Sources */,
+				F5E2871D0E85613E00AC859E /* Regularizer.cc in Sources */,
+				F5E287270E85619D00AC859E /* State.cc in Sources */,
+				F5E2874C0E85651600AC859E /* VectorOperations.cc in Sources */,
+				F5A497DD0E8FF84300F9A49D /* BC.cc in Sources */,
+				F54A27E90E9143B900AEF8C6 /* EllipticSolver2d.cc in Sources */,
+				F53AEAB20E949E9800A62F40 /* EllipticSolver.cc in Sources */,
+				F5D301E80E95851700BD6153 /* NavierStokesModel.cc in Sources */,
+				F5D301E90E95852200BD6153 /* ProjectionSolver.cc in Sources */,
+				F5D301ED0E95872800BD6153 /* OutputTecplot.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -495,27 +641,51 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F5EB08410E7ADE9E0097BF5F /* BoundaryVectorTest.cc in Sources */,
-				F5EB08420E7ADE9E0097BF5F /* FluxTest.cc in Sources */,
-				F5EB08430E7ADE9E0097BF5F /* GeometryTest.cc in Sources */,
-				F5EB08440E7ADE9E0097BF5F /* GridTest.cc in Sources */,
-				F5EB08450E7ADE9E0097BF5F /* MotionTest.cc in Sources */,
-				F5EB08460E7ADE9E0097BF5F /* NavierStokesModelTest.cc in Sources */,
-				F5EB08470E7ADE9E0097BF5F /* ParmParserTest.cc in Sources */,
-				F5EB08480E7ADE9E0097BF5F /* ProjectionSolverTest.cc in Sources */,
-				F5EB08490E7ADE9E0097BF5F /* RegularizerTest.cc in Sources */,
-				F5EB084A0E7ADE9E0097BF5F /* RigidBodyTest.cc in Sources */,
-				F5EB084B0E7ADE9E0097BF5F /* ScalarTest.cc in Sources */,
-				F5EB084C0E7ADE9E0097BF5F /* StateTest.cc in Sources */,
-				F5EB084D0E7ADE9E0097BF5F /* TangentSE2Test.cc in Sources */,
-				F5EB084E0E7ADE9E0097BF5F /* VectorOperationsTest.cc in Sources */,
-				F5685B820E8349D80061F7D5 /* EllipticSolverTest.cc in Sources */,
+				F5E286840E85525F00AC859E /* Field.cc in Sources */,
+				F56DC36D0E97E920000D85EB /* VectorOperationsTest.cc in Sources */,
+				F583E0DC0E9971AC00F77676 /* TangentSE2Test.cc in Sources */,
+				F583E0DD0E9971AE00F77676 /* StateTest.cc in Sources */,
+				F583E0DE0E9971AF00F77676 /* ScalarTest.cc in Sources */,
+				F583E0DF0E9971B000F77676 /* RigidBodyTest.cc in Sources */,
+				F583E0E00E9971B100F77676 /* RegularizerTest.cc in Sources */,
+				F583E0E10E9971B200F77676 /* ProjectionSolverTest.cc in Sources */,
+				F583E0E20E9971B400F77676 /* ParmParserTest.cc in Sources */,
+				F583E0E30E9971B500F77676 /* NavierStokesModelTest.cc in Sources */,
+				F583E0E40E9971B600F77676 /* MotionTest.cc in Sources */,
+				F583E0E50E9971B800F77676 /* GridTest.cc in Sources */,
+				F583E0E60E9971B900F77676 /* GeometryTest.cc in Sources */,
+				F583E0E70E9971BA00F77676 /* FluxTest.cc in Sources */,
+				F583E0E80E9971BC00F77676 /* EllipticSolverTest.cc in Sources */,
+				F583E0E90E9971BE00F77676 /* EllipticSolver2dTest.cc in Sources */,
+				F583E0EB0E9971C300F77676 /* BoundaryVectorTest.cc in Sources */,
+				F583E0EC0E9971C400F77676 /* BCTest.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5FA97940E86765500C0BB16 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5FA979D0E86767E00C0BB16 /* CheckFluxToX.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5FA97D70E867FEA00C0BB16 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F54B895D0E898F7200914D47 /* CheckCurl.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		F553DA6E0E987EC50031D523 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F5BE61540E7ACE3800F26FFC /* ibpm */;
+			targetProxy = F553DA6F0E987EC50031D523 /* PBXContainerItemProxy */;
+		};
 		F5BE61D30E7ACF3300F26FFC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F5BE61540E7ACE3800F26FFC /* ibpm */;
@@ -526,9 +696,56 @@
 			target = F5BE61540E7ACE3800F26FFC /* ibpm */;
 			targetProxy = F5BE61EE0E7ADC5100F26FFC /* PBXContainerItemProxy */;
 		};
+		F5FA979C0E86766B00C0BB16 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F5BE61540E7ACE3800F26FFC /* ibpm */;
+			targetProxy = F5FA979B0E86766B00C0BB16 /* PBXContainerItemProxy */;
+		};
+		F5FA97D50E867FEA00C0BB16 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F5BE61540E7ACE3800F26FFC /* ibpm */;
+			targetProxy = F5FA97D60E867FEA00C0BB16 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		F553DA750E987EC50031D523 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_CFLAGS = "-DIBPM_VERSION=0.1";
+				OTHER_LDFLAGS = "-lfftw3";
+				PREBINDING = NO;
+				PRODUCT_NAME = main;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		F553DA760E987EC50031D523 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_CFLAGS = "-DIBPM_VERSION=0.1";
+				OTHER_LDFLAGS = "-lfftw3";
+				PREBINDING = NO;
+				PRODUCT_NAME = main;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		F5BE613B0E7ACDD800F26FFC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -659,9 +876,80 @@
 			};
 			name = Release;
 		};
+		F5FA97990E86765500C0BB16 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = CheckFluxToX;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		F5FA979A0E86765500C0BB16 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = CheckFluxToX;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		F5FA97DC0E867FEA00C0BB16 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = CheckAdjoint;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		F5FA97DD0E867FEA00C0BB16 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = CheckAdjoint;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F553DA740E987EC50031D523 /* Build configuration list for PBXNativeTarget "Oseen" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F553DA750E987EC50031D523 /* Debug */,
+				F553DA760E987EC50031D523 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F5BE613D0E7ACDD800F26FFC /* Build configuration list for PBXProject "IBPM" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -694,6 +982,24 @@
 			buildConfigurations = (
 				F5BE61EC0E7ADC4100F26FFC /* Debug */,
 				F5BE61ED0E7ADC4100F26FFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F5FA979F0E8676AE00C0BB16 /* Build configuration list for PBXNativeTarget "CheckFluxToX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5FA97990E86765500C0BB16 /* Debug */,
+				F5FA979A0E86765500C0BB16 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F5FA97DB0E867FEA00C0BB16 /* Build configuration list for PBXNativeTarget "CheckAdjoint" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5FA97DC0E867FEA00C0BB16 /* Debug */,
+				F5FA97DD0E867FEA00C0BB16 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

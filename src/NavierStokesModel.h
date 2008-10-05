@@ -75,11 +75,11 @@ public:
 //    /// Return a pointer to the associated Grid
 //    inline const Grid& getGrid() const { return _grid; }
 
-    /// Compute gamma = B(f) as in (14)
-    void B(const BoundaryVector& f, Scalar& gamma ) const;
+    /// Compute omega = B(f) as in (14)
+    void B(const BoundaryVector& f, Scalar& omega ) const;
         
-    /// Compute f = C(gamma) as in (14)
-    void C(const Scalar& gamma, BoundaryVector& f) const;
+    /// Compute f = C(omega) as in (14)
+    void C(const Scalar& omega, BoundaryVector& f) const;
         
     /*! \brief Compute nonlinear terms y = N(x)
     Pure virtual function: must be overridden by subclasses.
@@ -89,20 +89,20 @@ public:
     /// \brief Return the constant alpha = 1/ReynoldsNumber
     double getAlpha() const;
     
-    /// Compute flux q from circulation gamma, including base flow q0
-    void computeFlux(const Scalar& gamma, Flux& q ) const;
+    /// Compute flux q from vorticity omega, including base flow q0
+    void computeFlux(const Scalar& omega, Flux& q ) const;
 
-    /// \brief Compute flux q from the circulation gamma, including base flow
+    /// \brief Compute flux q from the vorticity omega, including base flow
     void refreshState( State& x ) const;
 
 private:    
-    /*! \brief Given the circulation gamma, return the streamfunction psi.
+    /*! \brief Given the vorticity omega, return the streamfunction psi.
 
     Assumes psi = 0 on the boundary, and does not add in potential flow solution
     */
-    Scalar gammaToStreamfunction(const Scalar& gamma) const;
+    Scalar vorticityToStreamfunction(const Scalar& omega) const;
     BoundaryVector getBaseFlowBoundaryVelocities() const;
-    void computeFluxWithoutBaseFlow(const Scalar& gamma, Flux& q ) const;
+    void computeFluxWithoutBaseFlow(const Scalar& omega, Flux& q ) const;
 
     // data
     const Grid& _grid;

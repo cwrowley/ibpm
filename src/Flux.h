@@ -11,8 +11,6 @@ using namespace std;
 
 namespace ibpm {
 
-class Scalar;
-
 /*!
     \file Flux.h
     \class Flux
@@ -52,6 +50,7 @@ public:
     
     /// Copy assignment
     inline Flux& operator=(const Flux& q) {
+        assert(q.Ngrid() == Ngrid());
         assert(q.Nx() == Nx());
         assert(q.Ny() == Ny());
         _data = q._data;
@@ -65,70 +64,78 @@ public:
     }
 
     /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
-    inline double& operator()(int dir, int i, int j) {
-        return _data(getIndex(dir,i,j));
+    inline double& operator()(int lev, int dir, int i, int j) {
+        assert( lev >= 0 && lev < Ngrid() );
+        return _data(lev,getIndex(dir,i,j));
     };
 
     /// q(dir,i,j) refers to the flux in direction dir (X or Y) at edge (i,j)
-    inline double operator()(int dir, int i, int j) const {
-        return _data(getIndex(dir,i,j));
+    inline double operator()(int lev, int dir, int i, int j) const {
+        assert( lev >= 0 && lev < Ngrid() );
+        return _data(lev,getIndex(dir,i,j));
     };
 
     /// Type used for referencing elements
     typedef int index;
     
     /// f(ind) refers to the value corresponding to the given index ind
-    inline double& operator()(index ind) {
+    inline double& operator()(int lev, index ind) {
+        assert( lev >= 0 && lev < Ngrid() );
         assert( (ind >= 0) && (ind < _numFluxes) );
-        return _data(ind);
+        return _data(lev, ind);
     }
 
     /// f(ind) refers to the value corresponding to the given index ind
-    inline double operator()(index ind) const {
+    inline double operator()(int lev, index ind) const {
+        assert( lev >= 0 && lev < Ngrid() );
         assert( (ind >= 0) && (ind < _numFluxes) );
-        return _data(ind);
+        return _data(lev, ind);
     }
 
     /// q.x(dir,i) refers to the x-coordinate of the flux (dir,i,j)
-    inline double x(int dir, int i) {
+    inline double x(int lev, int dir, int i) {
+        assert( lev >= 0 && lev < Ngrid() );
         assert( (dir >= X) && (dir <= Y) );
         assert(i >= 0);
         if (dir == X) {
             assert( i < Nx()+1 );
-            return getXEdge(i);
+            return getXEdge(lev,i);
         }
         else {
             assert( i < Nx() );
-            return getXCenter(i);
+            return getXCenter(lev,i);
         }
     }
 
     /// q.x(ind) returns the x-coordinate of the flux specified by ind
-    inline double x(index ind) {
+    inline double x(int lev, index ind) {
+        assert( lev >= 0 && lev < Ngrid() );
         int dir = ind / _numXFluxes;
         int i = (ind - dir*_numXFluxes) / (Ny()+dir);
-        return x(dir,i);
+        return x(lev,dir,i);
     }
     
     /// q.y(ind) returns the x-coordinate of the flux specified by ind
-    inline double y(index ind) {
+    inline double y(int lev, index ind) {
+        assert( lev >= 0 && lev < Ngrid() );
         int dir = ind / _numXFluxes;
         int i = (ind - dir*_numXFluxes) / (Ny()+dir);
         int j = ind - dir*_numXFluxes - i * (Ny()+dir);
-        return y(dir,j);
+        return y(lev,dir,j);
     }
     
     /// q.y(dir,j) refers to the y-coordinate of the flux (dir,i,j)
-    inline double y(int dir, int j) {
+    inline double y(int lev, int dir, int j) {
+        assert( lev >= 0 && lev < Ngrid() );
         assert( (dir >= X) && (dir <= Y) );
         assert(j >= 0);
         if (dir == X) {
             assert( j < Ny() );
-            return getYCenter(j);
+            return getYCenter(lev,j);
         }
         else {
             assert( j < Ny()+1 );
-            return getYEdge(j);
+            return getYEdge(lev,j);
         }
     }
 
@@ -169,34 +176,45 @@ public:
     
     /// f += g
     inline Flux& operator+=(const Flux& f) {
+        assert(f.Ngrid() == Ngrid());
         assert(f.Nx() == Nx());
         assert(f.Ny() == Ny());
-        _data += f._data;
+        for (unsigned int i=0; i < f._data.Size(); ++i) {
+            _data(i) += f._data(i);
+        }
         return *this;
     }
 
     /// f += a
     inline Flux& operator+=(double a) {
-        _data += a;
+        for (unsigned int i=0; i < _data.Size(); ++i) {
+            _data(i) += a;
+        }
         return *this;
     }
     
     /// f -= g
     inline Flux& operator-=(const Flux& f) {
+        assert(f.Ngrid() == Ngrid());
         assert(f.Nx() == Nx());
         assert(f.Ny() == Ny());
-        _data -= f._data;
+        for (unsigned int i=0; i < f._data.Size(); ++i) {
+            _data(i) -= f._data(i);
+        }
         return *this;
     }
 
     /// f -= a
     inline Flux& operator-=(double a) {
-        _data -= a;
+        for (unsigned int i=0; i < _data.Size(); ++i) {
+            _data(i) -= a;
+        }
         return *this;
     }
     
     /// f + g
     inline Flux operator+(const Flux& f) {
+        assert(f.Ngrid() == Ngrid());
         assert(f.Nx() == Nx());
         assert(f.Ny() == Ny());
         Flux g = *this;
@@ -213,6 +231,7 @@ public:
 
     /// f - g
     inline Flux operator-(const Flux& f) {
+        assert(f.Ngrid() == Ngrid());
         assert(f.Nx() == Nx());
         assert(f.Ny() == Ny());
         Flux g = *this;
@@ -263,7 +282,7 @@ public:
 private:
     int _numXFluxes;
     int _numFluxes;
-    Array::Array1<double> _data;
+    Array::Array2<double> _data;
 };  // class Flux
 
 /// -f

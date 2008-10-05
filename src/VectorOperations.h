@@ -1,8 +1,12 @@
 #ifndef _VECTOROPERATIONS_H_
 #define _VECTOROPERATIONS_H_
 
+#include "Array.h"
+using Array::Array2;
+
 namespace ibpm {
 
+class BC;
 class Scalar;
 class Flux;
 class BoundaryVector;
@@ -19,10 +23,10 @@ class BoundaryVector;
 
     \author Clancy Rowley
     \author Zhanhua Ma
-    \author $LastChangedBy: zma $
+    \author $LastChangedBy$
     \date  15 Jul 2008
-    \date $LastChangedDate: $
-    \version $Revision: $
+    \date $LastChangedDate$
+    \version $Revision$
 */
 
 /*! \brief Return the curl of Flux q, as a Scalar object.
@@ -30,35 +34,27 @@ class BoundaryVector;
 The curl is defined only at the interior nodes, and this routine returns zero at the boundary nodes.
 */
 Scalar Curl(const Flux& q);
-void Curl(const Flux& q, Scalar& gamma );
+void Curl(const Flux& q, Scalar& omega );
     
 /// \brief Return the curl of Scalar f, as a Flux object. 
 Flux Curl(const Scalar& f);
 void Curl(const Scalar& f, Flux& q);
-    
+
 /// \brief Return the inner product of Scalar f and Scalar g.
 double InnerProduct( const Scalar& f, const Scalar& g );
 
 /// \brief Return the inner product of Flux p and Flux q.
 double InnerProduct( const Flux& p, const Flux& q );
 
-/// \brief Return the sum of all x-components of Flux q
-double XSum( const Flux& q ); 
-
-/// \brief Return the sum of all y-components of Flux q
-double YSum( const Flux& q ); 
-
-/// \brief Routine for computing X & Y forces
-void computeNetForce( const BoundaryVector& f, double& xforce, double& yforce);
-
 /// \brief Compute the Laplacian of f
 void Laplacian( const Scalar& f, Scalar& g );
 Scalar Laplacian( const Scalar& f );
-    
-/*! Return the sine transform of a Scalar object using DST-I.
-(fftw library is used (real fft kind:RODFT00); only interior nodes are considered.)
-*/
-Scalar SinTransform(const Scalar& f, bool normalize=false);
+void Laplacian(
+    const Array2<double>& f,
+    double dx,
+    const BC& bc,
+    Array2<double>& g );
+        
 
 /*! \brief Return the cross product of a Flux q and a Scalar f, as a Flux.
 

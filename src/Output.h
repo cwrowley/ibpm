@@ -14,10 +14,10 @@ class State;
 Subclasses provide a callback routine for writing output in various forms.
 
 \author Clancy Rowley
-\author $LastChangedBy: $
+\author $LastChangedBy$
 \date 21 Aug 2008
-\date $LastChangedDate: $
-\version $Revision: $
+\date $LastChangedDate$
+\version $Revision$
 */
 class Output {
 public:
