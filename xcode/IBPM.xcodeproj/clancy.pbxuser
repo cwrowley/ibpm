@@ -1,5 +1,63 @@
 // !$*UTF8*$!
 {
+	F547EB2D0E99DBF4005C55BC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB08200E7ADE4C0097BF5F /* SingleWavenumber.h */;
+		name = "SingleWavenumber.h: 29";
+		rLen = 0;
+		rLoc = 871;
+		rType = 0;
+		vrLen = 955;
+		vrLoc = 342;
+	};
+	F547EB2E0E99DBF4005C55BC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		comments = "error: class '<unnamed>::VectorOperationsTest' does not have any field named '_nScalar'";
+		fRef = F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */;
+		rLen = 1;
+		rLoc = 25;
+		rType = 1;
+	};
+	F547EB2F0E99DBF4005C55BC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB08200E7ADE4C0097BF5F /* SingleWavenumber.h */;
+		name = "SingleWavenumber.h: 29";
+		rLen = 0;
+		rLoc = 871;
+		rType = 0;
+		vrLen = 876;
+		vrLoc = 0;
+	};
+	F547EB300E99DBF4005C55BC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */;
+		name = "VectorOperationsTest.cc: 112";
+		rLen = 0;
+		rLoc = 1930;
+		rType = 0;
+		vrLen = 980;
+		vrLoc = 673;
+	};
+	F547EB310E99DBF4005C55BC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB08200E7ADE4C0097BF5F /* SingleWavenumber.h */;
+		name = "SingleWavenumber.h: 29";
+		rLen = 0;
+		rLoc = 871;
+		rType = 0;
+		vrLen = 955;
+		vrLoc = 342;
+	};
+	F547EB320E99DBF4005C55BC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */;
+		name = "VectorOperationsTest.cc: 210";
+		rLen = 209;
+		rLoc = 4521;
+		rType = 0;
+		vrLen = 864;
+		vrLoc = 5599;
+	};
 	F553DA6D0E987EC50031D523 /* Oseen */ = {
 		activeExec = 0;
 		executables = (
@@ -76,36 +134,6 @@
 		vrLen = 812;
 		vrLoc = 6555;
 	};
-	F553E4D80E989B260031D523 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5EB07F80E7ADE3D0097BF5F /* OutputTecplot.cc */;
-		name = "OutputTecplot.cc: 33";
-		rLen = 16;
-		rLoc = 758;
-		rType = 0;
-		vrLen = 619;
-		vrLoc = 460;
-	};
-	F553E4D90E989B260031D523 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5EB08100E7ADE3D0097BF5F /* VectorOperations.cc */;
-		name = "VectorOperations.cc: 202";
-		rLen = 81;
-		rLoc = 4793;
-		rType = 0;
-		vrLen = 841;
-		vrLoc = 138;
-	};
-	F553E4DA0E989B260031D523 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5EB07DF0E7ADE3D0097BF5F /* ibpm.cc */;
-		name = "ibpm.cc: 205";
-		rLen = 15;
-		rLoc = 6948;
-		rType = 0;
-		vrLen = 812;
-		vrLoc = 6555;
-	};
 	F553E4DB0E989B260031D523 /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
 		fRef = F5EB07E40E7ADE3D0097BF5F /* Makefile */;
@@ -115,26 +143,6 @@
 		rType = 0;
 		vrLen = 528;
 		vrLoc = 0;
-	};
-	F553E4DC0E989B260031D523 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5EB07DF0E7ADE3D0097BF5F /* ibpm.cc */;
-		name = "ibpm.cc: 205";
-		rLen = 15;
-		rLoc = 6948;
-		rType = 0;
-		vrLen = 812;
-		vrLoc = 6555;
-	};
-	F553E4DD0E989B260031D523 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = F5EB07F80E7ADE3D0097BF5F /* OutputTecplot.cc */;
-		name = "OutputTecplot.cc: 33";
-		rLen = 16;
-		rLoc = 758;
-		rType = 0;
-		vrLen = 739;
-		vrLoc = 1681;
 	};
 	F5685B810E8349D80061F7D5 /* EllipticSolver2dTest.cc */ = {
 		uiCtxt = {
@@ -182,12 +190,13 @@
 		argumentStrings = (
 		);
 		autoAttachOnCrash = 1;
-		breakpointsEnabled = 1;
+		breakpointsEnabled = 0;
 		configStateDict = {
 		};
 		customDataFormattersEnabled = 1;
 		debuggerPlugin = GDBDebugging;
 		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
 		enableDebugStr = 1;
 		environmentEntries = (
 		);
@@ -249,7 +258,68 @@
 		fallbackIsa = XCSourceControlManager;
 		isSCMEnabled = 0;
 		scmConfiguration = {
+			repositoryName = IBPM;
 		};
+	};
+	F583E11A0E99877000F77676 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB07F80E7ADE3D0097BF5F /* OutputTecplot.cc */;
+		name = "OutputTecplot.cc: 33";
+		rLen = 16;
+		rLoc = 758;
+		rType = 0;
+		vrLen = 838;
+		vrLoc = 1625;
+	};
+	F583E11B0E99877000F77676 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB08060E7ADE3D0097BF5F /* RungeKutta3.h */;
+		name = "RungeKutta3.h: 56";
+		rLen = 0;
+		rLoc = 1392;
+		rType = 0;
+		vrLen = 889;
+		vrLoc = 201;
+	};
+	F583E11C0E99877000F77676 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB08050E7ADE3D0097BF5F /* RungeKutta3.cc */;
+		name = "RungeKutta3.cc: 2";
+		rLen = 0;
+		rLoc = 20;
+		rType = 0;
+		vrLen = 629;
+		vrLoc = 0;
+	};
+	F583E11E0E99877000F77676 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB07F80E7ADE3D0097BF5F /* OutputTecplot.cc */;
+		name = "OutputTecplot.cc: 33";
+		rLen = 16;
+		rLoc = 758;
+		rType = 0;
+		vrLen = 838;
+		vrLoc = 1625;
+	};
+	F583E11F0E99877000F77676 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB08060E7ADE3D0097BF5F /* RungeKutta3.h */;
+		name = "RungeKutta3.h: 56";
+		rLen = 0;
+		rLoc = 1392;
+		rType = 0;
+		vrLen = 889;
+		vrLoc = 201;
+	};
+	F583E1200E99877000F77676 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = F5EB08050E7ADE3D0097BF5F /* RungeKutta3.cc */;
+		name = "RungeKutta3.cc: 2";
+		rLen = 0;
+		rLoc = 20;
+		rType = 0;
+		vrLen = 629;
+		vrLoc = 0;
 	};
 	F5A497DA0E8FF5CE00F9A49D /* BC.h */ = {
 		uiCtxt = {
@@ -353,8 +423,8 @@
 	F5BE613A0E7ACDD800F26FFC /* Project object */ = {
 		activeArchitecture = i386;
 		activeBuildConfigurationName = Debug;
-		activeExecutable = F56DB2730E7AE6D800E00AC0 /* CheckAdjoint */;
-		activeTarget = F5BE61490E7ACE1300F26FFC /* ibpm_main */;
+		activeExecutable = F583E1120E997C1400F77676 /* test */;
+		activeTarget = F5BE61E90E7ADC4100F26FFC /* test */;
 		addToTargets = (
 			F5BE61E90E7ADC4100F26FFC /* test */,
 		);
@@ -506,10 +576,16 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 244939796;
-			PBXWorkspaceStateSaveDate = 244939796;
+			PBXPerProjectTemplateStateSaveDate = 244964345;
+			PBXWorkspaceStateSaveDate = 244964345;
 		};
 		perUserProjectItems = {
+			F547EB2D0E99DBF4005C55BC = F547EB2D0E99DBF4005C55BC /* PBXTextBookmark */;
+			F547EB2E0E99DBF4005C55BC = F547EB2E0E99DBF4005C55BC /* PBXTextBookmark */;
+			F547EB2F0E99DBF4005C55BC = F547EB2F0E99DBF4005C55BC /* PBXTextBookmark */;
+			F547EB300E99DBF4005C55BC = F547EB300E99DBF4005C55BC /* PBXTextBookmark */;
+			F547EB310E99DBF4005C55BC = F547EB310E99DBF4005C55BC /* PBXTextBookmark */;
+			F547EB320E99DBF4005C55BC = F547EB320E99DBF4005C55BC /* PBXTextBookmark */;
 			F553DAF40E9887C00031D523 = F553DAF40E9887C00031D523 /* PBXTextBookmark */;
 			F553DAFF0E988A890031D523 = F553DAFF0E988A890031D523 /* PBXTextBookmark */;
 			F553DB010E988A890031D523 = F553DB010E988A890031D523 /* PBXTextBookmark */;
@@ -517,12 +593,13 @@
 			F553E4D50E989B260031D523 = F553E4D50E989B260031D523 /* PBXTextBookmark */;
 			F553E4D60E989B260031D523 = F553E4D60E989B260031D523 /* PBXTextBookmark */;
 			F553E4D70E989B260031D523 = F553E4D70E989B260031D523 /* PBXTextBookmark */;
-			F553E4D80E989B260031D523 = F553E4D80E989B260031D523 /* PBXTextBookmark */;
-			F553E4D90E989B260031D523 = F553E4D90E989B260031D523 /* PBXTextBookmark */;
-			F553E4DA0E989B260031D523 = F553E4DA0E989B260031D523 /* PBXTextBookmark */;
 			F553E4DB0E989B260031D523 = F553E4DB0E989B260031D523 /* PBXTextBookmark */;
-			F553E4DC0E989B260031D523 = F553E4DC0E989B260031D523 /* PBXTextBookmark */;
-			F553E4DD0E989B260031D523 = F553E4DD0E989B260031D523 /* PBXTextBookmark */;
+			F583E11A0E99877000F77676 = F583E11A0E99877000F77676 /* PBXTextBookmark */;
+			F583E11B0E99877000F77676 = F583E11B0E99877000F77676 /* PBXTextBookmark */;
+			F583E11C0E99877000F77676 = F583E11C0E99877000F77676 /* PBXTextBookmark */;
+			F583E11E0E99877000F77676 = F583E11E0E99877000F77676 /* PBXTextBookmark */;
+			F583E11F0E99877000F77676 = F583E11F0E99877000F77676 /* PBXTextBookmark */;
+			F583E1200E99877000F77676 = F583E1200E99877000F77676 /* PBXTextBookmark */;
 		};
 		sourceControlManager = F583E1190E997C3300F77676 /* Source Control */;
 		userBuildSettings = {
@@ -843,9 +920,9 @@
 	};
 	F5EB08050E7ADE3D0097BF5F /* RungeKutta3.cc */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {730, 2940}}";
-			sepNavSelRange = "{5101, 0}";
-			sepNavVisRange = "{3478, 506}";
+			sepNavIntBoundsRect = "{{0, 0}, {540, 2744}}";
+			sepNavSelRange = "{20, 0}";
+			sepNavVisRange = "{0, 629}";
 		};
 	};
 	F5EB08060E7ADE3D0097BF5F /* RungeKutta3.h */ = {
@@ -971,9 +1048,9 @@
 	};
 	F5EB08200E7ADE4C0097BF5F /* SingleWavenumber.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {601, 854}}";
-			sepNavSelRange = "{1512, 0}";
-			sepNavVisRange = "{715, 1059}";
+			sepNavIntBoundsRect = "{{0, 0}, {524, 840}}";
+			sepNavSelRange = "{871, 0}";
+			sepNavVisRange = "{342, 955}";
 			sepNavWindowFrame = "{{15, 92}, {666, 781}}";
 		};
 	};
@@ -994,9 +1071,9 @@
 	};
 	F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {723, 8764}}";
-			sepNavSelRange = "{16605, 0}";
-			sepNavVisRange = "{9596, 902}";
+			sepNavIntBoundsRect = "{{0, 0}, {596, 9394}}";
+			sepNavSelRange = "{6110, 250}";
+			sepNavVisRange = "{5599, 864}";
 		};
 	};
 	F5FA97910E86763C00C0BB16 /* CheckFluxToX.cc */ = {

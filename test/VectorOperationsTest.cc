@@ -21,69 +21,20 @@ protected:
         _ny(8),
         _ngrid(3),
         _grid(_nx, _ny, _ngrid, 2, -1, -3),
-        _f(_grid),
-        _g(_grid),
         _x(_grid),
         _y(_grid),
-        _p(_grid),
-        _q(_grid) {
+        _nScalars( (_nx-1) * (_ny-1) + 1 ),
+        _nFluxes( _nScalars ) {
             
         // Initialize Scalars _f, _g, _x, _y
         for (int lev = 0; lev < _ngrid; ++lev) {
             for (int i=1; i<_nx; ++i) {
                 for (int j=1; j<_ny; ++j) {
-                    _f(lev,i,j) = f(lev,i,j);
-                    _g(lev,i,j) = g(lev,i,j);       
                     _x(lev,i,j) = _grid.getXEdge(lev,i);
                     _y(lev,i,j) = _grid.getYEdge(lev,j);
                 }
             }
         }
-        
-        // Initialize Flux _q
-        for (int lev = 0; lev < _ngrid; ++lev) {
-            for (int i=0; i<_nx+1; ++i) {
-                for (int j=0; j<_ny; ++j) {
-                    _q(lev,X,i,j) = qx(lev,i,j);
-                    _p(lev,X,i,j) = px(lev,i,j);                
-                }
-            }
-        }
-        for (int lev = 0; lev < _ngrid; ++lev) {
-            for (int i=0; i<_nx; ++i) {
-                for (int j=0; j<_ny+1; ++j) {
-                    _q(lev,Y,i,j) = qy(lev,i,j);
-                    _p(lev,Y,i,j) = py(lev,i,j);
-                }
-            }
-        }
-    }
-    
-    // functions to test
-    // TODO: Pick better functions, with analytic expressions (in x and y)
-    // (Single wavenumber for the scalar fields?)
-    inline double f(int lev, int i, int j) {
-        return 0.5 * i * i * _nx + 2 * j * (i + 1) + cos((double)j) * (_ny + 1);
-    }
-
-    inline double g(int lev, int i, int j) {
-        return -5 * i * i + 3 * i * j + 2 * j * j;
-    }
-        
-    inline double qx(int lev, int i, int j) {
-        return 3 * i * _nx + 5 * (j +1 )* i;
-    }
-    
-    inline double qy(int lev, int i, int j) {
-        return 4 * i *  j   + _ny + cos((double)i);
-    }
-    
-    inline double px(int lev, int i, int j) {
-        return 2*i + 3*j;
-    }
-
-    inline double py(int lev, int i, int j) {
-        return i*j - 10;
     }
     
     // Area of domain included by inner product of X-fluxes
@@ -108,17 +59,23 @@ protected:
         return Lx * Ly;
     }
     
+    // Return a Scalar test function
+    //   must have 0 <= m < _nScalars
+    Scalar getScalar( int m );
+    
+    // Return a Flux test function
+    //   must have 0 <= m < _nFluxes
+    Flux getFlux( int m );
+    
     // data
     int _nx;
     int _ny;
     int _ngrid;
     Grid _grid;
-    Scalar _f;
-    Scalar _g;
     Scalar _x;
     Scalar _y;
-    Flux _p;
-    Flux _q;
+    int _nScalars;  // number of Scalar test functions
+    int _nFluxes;   // number of Flux test functions
 };
 
 // for Scalars
@@ -151,8 +108,71 @@ protected:
         }                                       \
     }
 
+// Set boundary values of f to specified value val
+void SetScalarBoundary( double val, Scalar& f ) {
+    int lev = f.Ngrid() - 1;
+    for (int i=1; i<f.Nx(); ++i) {
+        f(lev,i,1) = val;
+        f(lev,i,f.Ny()-1) = val;
+    }
+    for (int j=1; j<f.Ny(); ++j) {
+        f(lev,1,j) = val;
+        f(lev,f.Nx()-1,j) = val;
+    }
+}
+
+Scalar VectorOperationsTest::getScalar( int m ) {
+    assert( m >= 0 && m < _nScalars );
+    Scalar u(_grid);
+    if (m == 0) {
+        u = 0;
+        return u;
+    }
+    int kx = (m-1) % (_nx-1) + 1;
+    int ky = (m-1) / (_nx-1) + 1;
+    InitializeSingleWavenumber( kx, ky, u );
+    return u;
+}
+
+// Generate divergence-free Fluxes by taking curl of Scalar streamfunctions
+Flux VectorOperationsTest::getFlux( int m ) {
+    assert( m >= 0 && m < _nFluxes );
+    Flux q(_grid);
+    Scalar psi = getScalar( m );
+    Curl( psi, q );
+    return q;
+}
+    
+#ifdef DEBUG
+TEST_F(VectorOperationsTest, PrintTestScalars) {
+    for (int m=0; m < _nScalars; ++m) {
+        Scalar f = getScalar( m );
+        cout << "m = " << m << endl;
+        f.print();
+    }
+    EXPECT_EQ(0,0);
+}
+#endif
+
+#ifdef DEBUG
+TEST_F(VectorOperationsTest, PrintTestFluxes) {
+    for (int m=0; m < _nFluxes; ++m) {
+        Flux q = getFlux( m );
+        cout << "m = " << m << endl;
+        q.print();
+    }
+    EXPECT_EQ(0,0);
+}
+#endif
+    
 TEST_F(VectorOperationsTest, ScalarDotProductSymmetric) {
-    EXPECT_DOUBLE_EQ(InnerProduct(_f,_g), InnerProduct(_f,_g) );        
+    for (int m=0; m < _nScalars; ++m) {
+        Scalar f = getScalar( m );
+        for (int n=0; n < _nScalars; ++n) {
+            Scalar g = getScalar( n );
+            EXPECT_DOUBLE_EQ(InnerProduct( f, g ), InnerProduct( g, f ) );
+        }
+    }
 }
 
 TEST_F(VectorOperationsTest, ScalarDotProductDomainArea) {
@@ -162,29 +182,33 @@ TEST_F(VectorOperationsTest, ScalarDotProductDomainArea) {
 }
 
 TEST_F(VectorOperationsTest, FluxDotProductSymmetric) {
-    EXPECT_DOUBLE_EQ( InnerProduct(_q,_p), InnerProduct(_p, _q) );
+    for (int m=0; m < _nFluxes; ++m) {
+        Flux f = getFlux( m );
+        for (int n=0; n < _nFluxes; ++n) {
+            Flux g = getFlux( n );
+            EXPECT_DOUBLE_EQ( InnerProduct( f, g ), InnerProduct( g, f ) );
+        }
+    }
 }
 
 TEST_F(VectorOperationsTest, ScalarDotProductZeroVector) {
-    Scalar one( _grid );
-    one = 1.;
     Scalar zero( _grid );
     zero = 0.;
-    double ip = InnerProduct( one, zero );
-    EXPECT_DOUBLE_EQ( 0., ip );
-    ip = InnerProduct( zero, one );
-    EXPECT_DOUBLE_EQ( 0., ip );
+    for (int m=0; m < _nScalars; ++m) {
+        Scalar f = getScalar( m );
+        double ip = InnerProduct( f, zero );
+        EXPECT_DOUBLE_EQ( 0., ip );
+    }
 }
 
 TEST_F(VectorOperationsTest, FluxDotProductZeroVector) {
-    Flux one( _grid );
-    one = 1.;
     Flux zero( _grid );
     zero = 0.;
-    double ip = InnerProduct( one, zero );
-    EXPECT_DOUBLE_EQ( 0., ip );
-    ip = InnerProduct( zero, one );
-    EXPECT_DOUBLE_EQ( 0., ip );
+    for (int m=0; m < _nFluxes; ++m) {
+        Flux f = getFlux( m );
+        double ip = InnerProduct( f, zero );
+        EXPECT_DOUBLE_EQ( 0., ip );
+    }
 }
 
 TEST_F(VectorOperationsTest, FluxDotProductDomainArea) {
@@ -287,15 +311,19 @@ TEST_F(VectorOperationsTest, FluxToXVelocity) {
     Scalar u1(_grid);
     Scalar u2(_grid);
     
-    // TODO: Eventually, loop over several different values of q1 and u2
-    q1 = 2.;
-    u2 = 5.;
-    q2 = 0;
-    XVelocityToFlux( u2, q2 );
-    FluxToXVelocity( q1, u1 );
-    double IPFlux = InnerProduct( q1, q2 );
-    double IPScalar = InnerProduct( u1, u2 );
-    EXPECT_DOUBLE_EQ( IPFlux, IPScalar );
+    double tol = 1e-13;
+    for (int m=0; m<_nScalars; ++m) {
+        u2 = getScalar( m );
+        for (int n=0; n<_nFluxes; ++n) {
+            q1 = getFlux( n );
+            q2 = 0;
+            XVelocityToFlux( u2, q2 );
+            FluxToXVelocity( q1, u1 );
+            double IPFlux = InnerProduct( q1, q2 );
+            double IPScalar = InnerProduct( u1, u2 );
+            EXPECT_NEAR( IPFlux, IPScalar, tol );
+        }
+    }
 }
 
 // < q, Y^* v > = < Y q, v > for all q and v
@@ -307,15 +335,19 @@ TEST_F(VectorOperationsTest, FluxToYVelocity) {
     Scalar v1(_grid);
     Scalar v2(_grid);
     
-    // TODO: Eventually, loop over several different values of q1 and v2
-    q1 = 3.;
-    v2 = 7.;
-    q2 = 0;
-    YVelocityToFlux( v2, q2 );
-    FluxToYVelocity( q1, v1 );
-    double IPFlux = InnerProduct( q1, q2 );
-    double IPScalar = InnerProduct( v1, v2 );
-    EXPECT_DOUBLE_EQ( IPFlux, IPScalar );
+    double tol = 1e-13;
+    for (int m=0; m<_nScalars; ++m) {
+        v2 = getScalar( m );
+        for (int n=0; n<_nFluxes; ++n) {
+            q1 = getFlux( n );
+            q2 = 0;
+            YVelocityToFlux( v2, q2 );
+            FluxToYVelocity( q1, v1 );
+            double IPFlux = InnerProduct( q1, q2 );
+            double IPScalar = InnerProduct( v1, v2 );
+            EXPECT_NEAR( IPFlux, IPScalar, tol );
+        }
+    }
 }
 
 TEST_F(VectorOperationsTest, FluxToVelocity) {
@@ -326,16 +358,20 @@ TEST_F(VectorOperationsTest, FluxToVelocity) {
     Scalar v1(_grid);
     Scalar v2(_grid);
     
-    // TODO: Eventually, loop over several different values of q1 and (u2, v2)
-    q1 = 3.;
-    u2 = 5.;
-    v2 = 7.;
-    q2 = 0;
-    VelocityToFlux( u2, v2, q2 );
-    FluxToVelocity( q1, u1, v1 );
-    double IPFlux = InnerProduct( q1, q2 );
-    double IPScalar = InnerProduct( u1, u2 ) + InnerProduct( v1, v2 );
-    EXPECT_DOUBLE_EQ( IPFlux, IPScalar );    
+    double tol = 1e-13;
+    for (int m=0; m<_nScalars; ++m) {
+        u2 = getScalar( m );
+        v2 = getScalar( _nScalars - m - 1 );
+        for (int n=0; n<_nFluxes; ++n) {
+            q1 = getFlux( n );
+            q2 = 0;
+            VelocityToFlux( u2, v2, q2 );
+            FluxToVelocity( q1, u1, v1 );
+            double IPFlux = InnerProduct( q1, q2 );
+            double IPScalar = InnerProduct( u1, u2 ) + InnerProduct( v1, v2 );
+            EXPECT_NEAR( IPFlux, IPScalar, tol );
+        }
+    }
 }
 
 // =================
@@ -345,40 +381,32 @@ TEST_F(VectorOperationsTest, FluxToVelocity) {
 // Test that q x q = 0
 TEST_F(VectorOperationsTest, CrossProductWithSelf) {
     Flux q(_grid);
-    
-    q = 5.;
-    // TODO: Eventually, test several different values of q
-    Scalar a = CrossProduct( q, q );
-    EXPECT_ALL_EQ( 0, a(lev,i,j) );
+    for (int m=0; m<_nFluxes; ++m) {
+        q = getFlux( m );
+        Scalar a = CrossProduct( q, q );
+        EXPECT_ALL_EQ( 0, a(lev,i,j) );
+    }
 }
 
 // Test that (u,0) x (0,v) = u v
+//   at least for constant u,v
+//   Note: does not hold at discrete level for non-constant u,v
 TEST_F(VectorOperationsTest, CrossProductOfOrthogonalVectors) {
     Scalar u(_grid);
     Scalar v(_grid);
     Flux q1(_grid);
     Flux q2(_grid);
 
-    // TODO: Eventually, test several different values of u, v
-    u = 3;
-    v = 5;
+    u = 3.;
+    v = 5.;
     q1 = 0;
     q2 = 0;
     XVelocityToFlux( u, q1 );
     YVelocityToFlux( v, q2 );
     Scalar cross = CrossProduct( q1, q2 );
     Scalar err = u * v - cross;
-    // set boundary elements to zero
-    for (int lev=0; lev<err.Ngrid(); ++lev) {
-        for (int i=1; i<err.Nx(); ++i) {
-            err(lev,i,1) = 0;
-            err(lev,i,err.Ny()-1) = 0;
-        }
-        for (int j=1; j<u.Ny(); ++j) {
-            err(lev,1,j) = 0;
-            err(lev,u.Nx()-1,j) = 0;
-        }
-    }
+    // fudge boundaries
+    SetScalarBoundary( 0, err );
     double normsq = InnerProduct( err, err );
 #ifdef DEBUG
     cout << "u:" << endl;
@@ -398,12 +426,15 @@ TEST_F(VectorOperationsTest, CrossProductAntiSymmetric) {
     Flux q1(_grid);
     Flux q2(_grid);
     
-    // TODO: Eventually, test several different values of q1, q2
-    q1 = 5;
-    q2 = 3;
-    Scalar q1q2 = CrossProduct( q1, q2 );
-    Scalar q2q1 = CrossProduct( q2, q1 );
-    EXPECT_ALL_EQ( q1q2(lev,i,j), -q2q1(lev,i,j) );
+    for (int m=0; m<_nFluxes; ++m) {
+        q1 = getFlux( m );
+        for (int n=0; n<_nFluxes; ++n) {
+            q2 = getFlux( n );
+            Scalar q1q2 = CrossProduct( q1, q2 );
+            Scalar q2q1 = CrossProduct( q2, q1 );
+            EXPECT_ALL_EQ( q1q2(lev,i,j), -q2q1(lev,i,j) );
+        }
+    }
 }
 
 // Test that < a, q1 x q2 > = < q1, q2 x a >
@@ -415,27 +446,34 @@ TEST_F(VectorOperationsTest, CrossProductTripleProduct) {
     Scalar q1_cross_q2(_grid);
     Flux q2_cross_a(_grid);
 
-    q1 = _q;
-    q2 = _p;
-    a = 5.;
-    q1_cross_q2 = CrossProduct( q1, q2 );
-    q2_cross_a = CrossProduct( q2, a );
-#ifdef DEBUG
-    cout << "q1:" << endl;
-    q1.print();
-    cout << "q2:" << endl;
-    q2.print();
-    cout << "a:" << endl;
-    a.print();
-    cout << "q2 x a:" << endl;
-    q2_cross_a.print();
-    cout << "q1 x q2:" << endl;
-    q1_cross_q2.print();
-#endif
-    double IPFlux = InnerProduct( q1, q2_cross_a );
-    double IPScalar = InnerProduct( a, q1_cross_q2 );
-    double tol = 1e-14 * IPFlux;
-    EXPECT_NEAR( IPFlux, IPScalar, tol );
+    double tol = 5e-14;
+    for (int m=0; m<_nScalars; ++m) {
+        a = getScalar( m );
+        for (int n=0; n<_nFluxes; ++n) {
+            q1 = getFlux( n );
+            q2 = getFlux( _nFluxes - n - 1 );
+            //    q1 = _q;
+            //    q2 = _p;
+            //    a = 5.;
+            q1_cross_q2 = CrossProduct( q1, q2 );
+            q2_cross_a = CrossProduct( q2, a );
+        #ifdef DEBUG
+            cout << "q1:" << endl;
+            q1.print();
+            cout << "q2:" << endl;
+            q2.print();
+            cout << "a:" << endl;
+            a.print();
+            cout << "q2 x a:" << endl;
+            q2_cross_a.print();
+            cout << "q1 x q2:" << endl;
+            q1_cross_q2.print();
+        #endif
+            double IPFlux = InnerProduct( q1, q2_cross_a );
+            double IPScalar = InnerProduct( a, q1_cross_q2 );
+            EXPECT_NEAR( IPFlux, IPScalar, tol );
+        }
+    }
 }
 
 // ========
@@ -461,19 +499,6 @@ TEST_F(VectorOperationsTest, CurlOfConstantFluxIsZero) {
     EXPECT_ALL_EQ( 0, a(lev,i,j) );
 }
 
-// Set boundary values of f to specified value val
-void SetScalarBoundary( double val, Scalar& f ) {
-    int lev = f.Ngrid() - 1;
-    for (int i=1; i<f.Nx(); ++i) {
-        f(lev,i,1) = val;
-        f(lev,i,f.Ny()-1) = val;
-    }
-    for (int j=1; j<f.Ny(); ++j) {
-        f(lev,1,j) = val;
-        f(lev,f.Nx()-1,j) = val;
-    }
-}
-    
 // Test curl( (ax + c, by + d) ) = a - b (constant)
 TEST_F(VectorOperationsTest, CurlOfLinearFlux) {
     double a = 7;
@@ -523,21 +548,36 @@ TEST_F(VectorOperationsTest, CurlOfLinearScalar) {
     EXPECT_ALL_Y_EQ( CurlF(lev,Y,i,j), -a * dx * exp2(lev) );
 }
 
-// Test that < curl(q), a > = < q, curl(a) >
-// for any Flux q, and any Scalar a with a = 0 on boundaries
-TEST_F(VectorOperationsTest, CurlInnerProduct) {
-    Flux q(_grid);
-    Scalar a(_grid);
-
-    // TODO: Eventually, loop over several different values of a and q,
-    //       with a = 0 on boundaries
-    InitializeSingleWavenumber( 1, 1, a );
-    q = 3;
+void TestCurlInnerProduct( const Scalar& a, const Flux& q ) {
     Scalar curlQ = Curl( q );
     Flux curlA = Curl( a );
     double IPFlux = InnerProduct( q, curlA );
     double IPScalar = InnerProduct( curlQ, a );
-    EXPECT_NEAR( IPFlux, IPScalar, 5e-15 );
+    double tol = 5e-13;
+    EXPECT_NEAR( IPFlux, IPScalar, tol );
+}        
+    
+// Test that < curl(q), a > = < q, curl(a) >
+// for any Flux q, and any Scalar a with a = 0 on boundaries
+// NOTE: For multi-domain Curl, this identity does NOT hold for arbitrary a, q
+TEST_F(VectorOperationsTest, CurlInnerProduct) {
+    Flux q(_grid);
+    Scalar a(_grid);
+
+    if (_ngrid == 1) {
+        for (int m=0; m<_nScalars; ++m) {
+            a = getScalar( m );
+            for (int n=0; n<_nFluxes; ++n) {
+                q = getFlux( m );
+                TestCurlInnerProduct( a, q );
+            }
+        }
+    }
+    else {
+        q = 5.;
+        a = 3.;
+        TestCurlInnerProduct( a, q );
+    }
 }
 
 TEST_F(VectorOperationsTest, ScalarCurlOfConstantEqualsZero) {      
@@ -559,7 +599,7 @@ TEST_F(VectorOperationsTest, ScalarCurlOfConstantEqualsZero) {
     EXPECT_ALL_EQ( 0., sf(lev,i,j) );      
 }
 
-TEST_F(VectorOperationsTest, LaplacianOfLinearEqualsZero) {
+TEST_F(VectorOperationsTest, LaplacianOfLinearArrayEqualsZero) {
     // construct linear field u = x + 2*y
     Array2<double> u(_nx-1, _ny-1, 1, 1);
     Array2<double> Lu(_nx-1, _ny-1, 1, 1);
@@ -592,6 +632,18 @@ TEST_F(VectorOperationsTest, LaplacianOfLinearEqualsZero) {
     Laplacian( u, _grid.Dx(), bc, Lu );
     EXPECT_ALL_EQ( 0., Lu(i,j) );
 }
+    
+TEST_F(VectorOperationsTest, LaplacianOfLinearScalarEqualsZero) {
+    // construct linear field u = x + 2*y
+    Scalar u(_grid);
+    Scalar Lu(_grid);
+    
+    u = _x + 2 * _y;
+    Laplacian( u, Lu );
+    // fudge boundary
+    SetScalarBoundary( 0, Lu );
+    EXPECT_ALL_EQ( 0., Lu(lev,i,j) );
+}    
 
 // ================================
 // = BoundaryVector inner product =
