@@ -284,7 +284,6 @@ TEST_F(VectorOperationsTest, ConstantVelocityToFlux) {
     Flux q(_grid);
     double xval = 4.;
     double yval = 12.;
-    double dx = _grid.Dx();
     q = 0.;
     u = xval;
     v = yval;

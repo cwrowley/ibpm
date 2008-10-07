@@ -1,7 +1,9 @@
 all: run_tests
 
 TEST_FILES= \
+	BCTest.o \
 	BoundaryVectorTest.o \
+	EllipticSolver2dTest.o \
 	EllipticSolverTest.o \
 	FluxTest.o \
 	GeometryTest.o \
