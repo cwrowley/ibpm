@@ -8,10 +8,10 @@
 //
 // Date: 30 Sep 2008
 //
-// $Revision$
-// $LastChangedDate$
-// $LastChangedBy$
-// $HeadURL$
+// $Revision: 177 $
+// $LastChangedDate: 2008-10-04 08:52:52 -0700 (Sat, 04 Oct 2008) $
+// $LastChangedBy: cwrowley $
+// $HeadURL: svn+ssh://rainier.princeton.edu/ibpm/trunk/src/EllipticSolver.cc $
 
 #include "EllipticSolver.h"
 #include <math.h>
@@ -38,7 +38,7 @@ EllipticSolver::~EllipticSolver() {
 void EllipticSolver::init() {
     for (int lev=0; lev<_ngrid; ++lev) {
         // calculate grid spacing on this grid level
-        double dx = _dx * exp2( lev );
+        double dx = _dx * ( 1 << lev );
         _solvers[lev] = create2dSolver( dx );
     }
 }

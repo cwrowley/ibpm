@@ -80,19 +80,18 @@ Flux Flux::UniformFlow(
     double magnitude,
     double angle
     ) {
-    double dx = grid.Dx();
-    double u = magnitude * cos( angle ) * dx;
-    double v = magnitude * sin( angle ) * dx;
+    double u = magnitude * cos( angle );
+    double v = magnitude * sin( angle );
     
     Flux q(grid);
     Flux::index ind;
     for (int lev=0; lev<grid.Ngrid(); ++lev) {
-        int gridFactor = exp2(lev);
+        double dx = grid.Dx(lev);
         for (ind = q.begin(X); ind != q.end(X); ++ind) {
-            q(lev,ind) = u * gridFactor;
+            q(lev,ind) = u * dx;
         }
         for (ind = q.begin(Y); ind != q.end(Y); ++ind) {
-            q(lev,ind) = v * gridFactor;
+            q(lev,ind) = v * dx;
         }
     }
     return q;

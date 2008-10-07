@@ -314,14 +314,14 @@ TEST_F(FluxTest, UniformFlow) {
     double mag = 3.;
     double angle = 0.;
     Flux q = Flux::UniformFlow( _grid, mag, angle );
-    EXPECT_ALL_X_EQUAL( q(lev,X,i,j), mag * _grid.Dx() * exp2(lev) );
+    EXPECT_ALL_X_EQUAL( q(lev,X,i,j), mag * _grid.Dx(lev) );
     EXPECT_ALL_Y_EQUAL( q(lev,Y,i,j), 0. );
 
     double pi = 4. * atan(1.);
     angle = pi/2.;
     q = Flux::UniformFlow( _grid, mag, angle );
     EXPECT_ALL_X_NEAR( q(lev,X,i,j), 0., 1e-15 );
-    EXPECT_ALL_Y_EQUAL( q(lev,Y,i,j), mag * _grid.Dx() * exp2(lev) );
+    EXPECT_ALL_Y_EQUAL( q(lev,Y,i,j), mag * _grid.Dx(lev) );
 }
 
 #undef EXPECT_ALL_X_EQUAL

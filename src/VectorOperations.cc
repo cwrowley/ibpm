@@ -40,7 +40,7 @@ void Curl(const Flux& q, Scalar& f ) {
     // Start with finest grid, to coarsest grid
     for (int lev=0; lev<q.Ngrid(); ++lev ) {
         // compute curl at all nodes
-        double dx = q.Dx() * exp2(lev);
+        double dx = q.Dx(lev);
         double bydx2 = 1. / (dx * dx);
         for (int i=1; i<nx; ++i) {
             for (int j=1; j<ny; ++j) {
@@ -238,7 +238,7 @@ double InnerProduct (const Scalar& f, const Scalar& g){
     }
     // Coarser grids
     for (int lev=1; lev < f.Ngrid(); ++lev) {
-        dx2 = f.Dx() * f.Dx() * exp2(2*lev);        
+        dx2 = f.Dx(lev) * f.Dx(lev);        
         // Interface points
         // corners
         ip += f(lev,nx2,ny2) * g(lev,nx2,ny2) * dx2 * 15./16;
@@ -463,7 +463,7 @@ void FluxToXVelocity(const Flux& q, Scalar& u) {
     //  1  B C C C C C B
 
     for (int lev=1; lev < q.Ngrid(); ++lev) {
-        double bydx = exp2(-lev) / q.Dx();
+        double bydx = 1. / q.Dx(lev);
         // left and right borders (excluding interface) (B)
         for (int j=1; j<ny; ++j) {
             for (int i=1; i<nx2; ++i) {
@@ -555,7 +555,7 @@ void FluxToYVelocity(const Flux& q, Scalar& v) {
     //  1  B C C C C C B
     
     for (int lev=1; lev < q.Ngrid(); ++lev) {
-        double bydx = exp2(-lev) / q.Dx();
+        double bydx = 1. / q.Dx(lev);
         // top and bottom borders (excluding interface) (B)
         for (int i=1; i<nx; ++i) {
             for (int j=1; j<ny2; ++j) {
@@ -645,7 +645,7 @@ void XVelocityToFlux(const Scalar& u, Flux& q) {
     //  0  A C C C C C C C A
         
     for (int lev=0; lev < u.Ngrid(); ++lev) {
-        double dx = exp2(lev) * u.Dx();
+        double dx = g.Dx(lev);
         // Interior points
         // If on fine grid, compute all interior points
         if (lev == 0) {
@@ -771,7 +771,7 @@ void YVelocityToFlux(const Scalar& v, Flux& q) {
     //  0  A A A A A A A A
 
     for (int lev=0; lev < g.Ngrid(); ++lev) {
-        double dx = exp2(lev) * g.Dx();
+        double dx = g.Dx(lev);
         // Interior points
         // If on fine grid, compute all interior points
         if (lev == 0) {

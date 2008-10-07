@@ -35,6 +35,9 @@ protected:
 
 TEST_F(GridTest, TestDx) {
     EXPECT_DOUBLE_EQ( _dx, _grid.Dx() );
+    EXPECT_DOUBLE_EQ( _dx, _grid.Dx(0) );
+    EXPECT_DOUBLE_EQ( _dx * 2, _grid.Dx(1) );
+    EXPECT_DOUBLE_EQ( _dx * 4, _grid.Dx(2) );    
 }
 
 TEST_F(GridTest, TestXCenter) {

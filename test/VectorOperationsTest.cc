@@ -215,7 +215,7 @@ TEST_F(VectorOperationsTest, FluxDotProductDomainArea) {
     Flux h( _grid );
     Flux l( _grid );
     for (int lev=0; lev<_ngrid; ++lev) {
-        double dx = exp2(lev);
+        double dx = 1 << lev;
         for (int i=0; i<_nx+1; ++i) {
             for (int j=0; j<_ny; ++j) {
                 h(lev,X,i,j) = 1 * dx;
@@ -232,7 +232,7 @@ TEST_F(VectorOperationsTest, FluxDotProductDomainArea) {
     EXPECT_DOUBLE_EQ( InnerProduct(h,l), fluxXArea() );
 
     for (int lev=0; lev<_ngrid; ++lev) {
-        double dx = exp2(lev);
+        double dx = 1 << lev;
         for (int i=0; i<_nx+1; ++i) {
             for (int j=0; j<_ny; ++j) {
                 h(lev,X,i,j) = 0 * dx;
@@ -292,14 +292,14 @@ TEST_F(VectorOperationsTest, ConstantVelocityToFlux) {
     XVelocityToFlux( u, q );
     YVelocityToFlux( v, q );
     // fudge boundaries
-    double dx_coarse = dx * exp2(_ngrid-1);
+    double dx_coarse = _grid.Dx(_ngrid-1);
     SetFluxBoundary( xval * dx_coarse, yval * dx_coarse, q );
 #ifdef DEBUG
     cout << "q:" << endl;
     q.print();
 #endif
-    EXPECT_ALL_X_EQ( xval * dx * exp2(lev), q(lev,X,i,j) );
-    EXPECT_ALL_Y_EQ( yval * dx * exp2(lev), q(lev,Y,i,j) );
+    EXPECT_ALL_X_EQ( xval * _grid.Dx(lev), q(lev,X,i,j) );
+    EXPECT_ALL_Y_EQ( yval * _grid.Dx(lev), q(lev,Y,i,j) );
 }
 
 // < q, X^* u > = < X q, u > for all q and u
@@ -534,7 +534,7 @@ TEST_F(VectorOperationsTest, CurlOfLinearScalar) {
     // should not be correct value, since Curl assumes zero boundary conditions
     // on coarsest grid
     // So set to correct value here
-    double dx = _grid.Dx() * exp2(_ngrid-1);
+    double dx = _grid.Dx(_ngrid-1);
     SetFluxBoundary( b * dx, -a * dx, CurlF );
     
     dx = _grid.Dx();
@@ -544,8 +544,8 @@ TEST_F(VectorOperationsTest, CurlOfLinearScalar) {
     cout << "X: " << b * dx << endl;
     cout << "Y: " << -a * dx << endl;
 #endif
-    EXPECT_ALL_X_EQ( CurlF(lev,X,i,j), b * dx * exp2(lev) );
-    EXPECT_ALL_Y_EQ( CurlF(lev,Y,i,j), -a * dx * exp2(lev) );
+    EXPECT_ALL_X_EQ( CurlF(lev,X,i,j), b * _grid.Dx(lev) );
+    EXPECT_ALL_Y_EQ( CurlF(lev,Y,i,j), -a * _grid.Dx(lev) );
 }
 
 void TestCurlInnerProduct( const Scalar& a, const Flux& q ) {

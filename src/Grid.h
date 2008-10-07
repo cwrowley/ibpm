@@ -1,6 +1,8 @@
 #ifndef _GRID_H_
 #define _GRID_H_
 
+#include <assert.h>
+
 namespace ibpm {
 
 /*!
@@ -81,6 +83,12 @@ public:
     
     /// Return grid spacing on finest level (same in x- and y-directions)
     inline double Dx() const { return _dx; }
+    
+    /// Return grid spacing at specified grid level
+    inline double Dx(int lev) const {
+        assert( lev >= 0 && lev < _ngrid );
+        return _dx * (1 << lev);
+    }
 
     /// Return the x-coordinate of the center of cell i  (i in 0..m-1)
     double getXCenter(int lev, int i) const;

@@ -48,7 +48,7 @@ int main() {
     // Initialize flux:
     // velocity = ( -y, x )
     for (int lev=0; lev<ngrid; ++lev) {
-        double dx = grid.Dx() * exp2(lev);
+        double dx = grid.Dx(lev);
         // X-flux
         for (int i=0; i<=nx; ++i) {
             for (int j=0; j<ny; ++j) {

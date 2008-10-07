@@ -34,6 +34,7 @@ public:
     inline int NyExt() const { return _grid.NyExt(); }
     inline int Ngrid() const { return _grid.Ngrid(); }
     inline double Dx() const { return _grid.Dx(); }
+    inline double Dx(int lev) const { return _grid.Dx(lev); }
     inline const Grid& getGrid() const { return _grid; }
     inline void setGrid( const Grid& grid ) { _grid = grid; }
 
