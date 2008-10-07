@@ -84,7 +84,7 @@ inline void ArrayExit(const char *x)
 #endif
 
 #ifdef HAVE_POSIX_MEMALIGN
-#ifdef _AIX
+#if defined( _AIX ) || defined( __PGI )
 extern "C" int posix_memalign(void **memptr, size_t alignment, size_t size);
 #endif
 #else

@@ -418,7 +418,7 @@ TEST_F(VectorOperationsTest, CrossProductOfOrthogonalVectors) {
     cout << "err:" << endl;
     err.print();
 #endif
-    EXPECT_NEAR( 0., normsq, 1e-28 );
+    EXPECT_NEAR( 0., normsq, 2e-28 );
 }
 
 // Test that q1 x q2 = -q2 x q1

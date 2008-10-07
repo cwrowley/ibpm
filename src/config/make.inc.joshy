@@ -1,14 +1,14 @@
 # config file for joshy.princeton.edu, using PGI compiler
 
 CXX = pgcpp
-CXXFLAGS = -fast -Minline=levels:10 -DNDEBUG
+CXXFLAGS = -fast -Minform=severe -Mipa=fast,inline -Msmartalloc -DNDEBUG
 # for debugging, uncomment the following line
-CXXFLAGS = -g
+CXXFLAGS = -Minform=severe -g
 
 lib_dirs = \
 	-L/home/cwrowley/pgi/lib \
-	-L/nfs/sequoia/sahuja/joshy/fftw3/lib
+	-L/opt/fftw3.pgi/lib
 
 include_dirs = \
 	-I/home/cwrowley/pgi/include \
-	-I/nfs/sequoia/sahuja/joshy/fftw3/include
+	-I/opt/fftw3.pgi/include 
