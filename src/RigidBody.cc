@@ -132,6 +132,24 @@ void RigidBody::addLine_n(
     }
 } 
 
+void RigidBody::addLine_aoa(
+    double l,
+    double aoa,
+    int numPoints
+    ) {
+	double pi =  3.141592653589793238462643383279502884197169399375;
+	double alpha = aoa / 180 * pi;
+    double deltaX = l * cos(alpha) / (numPoints - 1);
+    double deltaY = l * sin(alpha) / (numPoints - 1);
+	double x1 = - l * cos(alpha) / 2;
+	double y1 = l * sin(alpha) / 2;
+    for(int i=0; i < numPoints; i++) {
+        double x = x1 + i * deltaX;
+        double y = y1 - i * deltaY;
+		addPoint(x,y);
+    }
+} 
+
 int RigidBody::getNumPoints() const {
     return _refPoints.size();
 };
@@ -289,6 +307,18 @@ bool RigidBody::load(istream& in) {
 #ifdef DEBUG
             cerr << "Add a line: (" << x0 << ", " << y0 << ") - ("
                 << x1 << ", " << y1 << "), n = " << numPoints << endl;
+#endif
+        }
+        else if ( cmd == "line_aoa" ) {
+            double l;
+            double aoa;
+            int numPoints;
+            one_line >> l >> aoa >> numPoints;
+            RB_CHECK_FOR_ERRORS;
+            addLine_aoa( l, aoa, numPoints );
+#ifdef DEBUG
+            cerr << "Add a line: length" << l << ", AoA" << aoa  
+                ", n = " << numPoints << endl;
 #endif
         }
         else if ( cmd == "motion" ) {

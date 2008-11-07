@@ -141,5 +141,20 @@ Scalar LinearizedNavierStokes::N(const State& x) const {
     return g;
 }
     
-    
+
+Scalar AdjointNavierStokes::N(const State& x) const {
+    Scalar g = Laplacian( CrossProduct( x.q, _x0.q ));
+    g -= Curl(CrossProduct( x.q, _x0.omega ));
+    return g;
+}
+ 
+Scalar LinearizedPeriodicNavierStokes::N(const State& x) const {
+	int k = x.timestep % _period;
+	cout << "At time step " << x.timestep << ", phase k = " << k << endl; 
+	Flux v = CrossProduct( _x0periodic[k].q, x.omega );
+    v += CrossProduct( x.q, _x0periodic[k].omega );
+	Scalar g = Curl( v );	
+	return g;	
+}
+	   
 } // namespace ibpm

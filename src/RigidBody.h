@@ -79,6 +79,15 @@ public:
         int numPoints
     );
     
+	
+	/// Add a line with length l, centered at (0,0)
+	/// with AoA alpha and the specified number of points
+	void addLine_aoa(
+		double l,
+		double alpha, // in degree
+		int numPoints
+	);
+	
     /// Load a list of commands from the specified input stream
     /// Input format is as follows:
     ///     name Name of this object

@@ -94,7 +94,7 @@ public:
 
     /// \brief Compute flux q from the vorticity omega, including base flow
     void refreshState( State& x ) const;
-
+	
 private:    
     /*! \brief Given the vorticity omega, return the streamfunction psi.
 
@@ -163,10 +163,59 @@ private:
     State _x0;
 };
 
+//! Adjoint Navier-Stokes equations, linearized  about an equilibrium point.
+class AdjointNavierStokes : public NavierStokesModel {
+public:
+    AdjointNavierStokes(
+        const Grid& grid,
+        const Geometry& geometry,
+        double Reynolds,
+        const State& baseFlow
+        ) :
+        NavierStokesModel( grid, geometry, Reynolds ),
+        _x0( baseFlow )
+    {}
+
+    /*! \brief Compute nonlinear terms y = N(x)
+    for Adjoint Navier-Stokes equations
+    */
+    Scalar N(const State& x) const;
+
+private:
+    State _x0;
+};
+
+//! Navier-Stokes equations linearized about a periodic orbit.
+class LinearizedPeriodicNavierStokes : public NavierStokesModel {
+public:
+    LinearizedPeriodicNavierStokes(
+        const Grid& grid,
+        const Geometry& geometry,
+        double Reynolds,        
+        const vector<State> x0periodic,
+		const int period
+		) :
+        NavierStokesModel( grid, geometry, Reynolds ),        	
+		_x0periodic(x0periodic),
+		_period(period)
+    {	
+		assert(_period == static_cast<int>(x0periodic.size())); 
+	}
+
+    /*! \brief Compute nonlinear terms y = N(x)
+    for linearized Navier-Stokes equations
+    */
+    Scalar N(const State& x) const;
+		
+private:    
+	const vector<State> _x0periodic;
+	const int _period;
+};
+
 
 //! Adjoint Navier-Stokes equations, linearized about an equilibrium point.
 // For now, just make AdjointNavierStokes identical to LinearizedNavierStokes
-typedef LinearizedNavierStokes AdjointNavierStokes;
+//typedef LinearizedNavierStokes AdjointNavierStokes;
 
 
 } // namespace ibpm

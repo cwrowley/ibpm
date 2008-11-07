@@ -26,7 +26,7 @@ class State {
 public:
     /// Default constructor: do not allocate memory
     State();
-    
+    	  		
     State( const Grid& grid, int numPoints );
 
     /// \brief Instantiate a state by reading data from the specified file
@@ -48,7 +48,7 @@ public:
 
     /// \brief Routine for computing X & Y forces
     void computeNetForce( double& xforce, double& yforce ) const;
-        
+			    
     // public data
     Flux q;
     Scalar omega;

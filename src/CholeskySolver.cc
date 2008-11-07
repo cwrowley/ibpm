@@ -95,7 +95,7 @@ void CholeskySolver::computeFactorization( const array2<double>& matrixM ) {
                 sum -= _lower(i,k) * _lower(j,k);
             }
             if( i==j ) {
-                assert( sum > 0 );
+				assert( sum > 0 );
                 _diagonal(i) = sqrt(sum);
             }
             else {

@@ -5,7 +5,9 @@
 #include "BC.h"
 #include "Field.h"
 #include "Grid.h"
-
+#include <iostream>
+using namespace std;  
+ 
 namespace ibpm {
 
 /*!
@@ -57,7 +59,7 @@ public:
     /// Copy assignment
     inline Scalar& operator=(const Scalar& f) {
         assert( f.Ngrid() == Ngrid() );
-        assert( f.Nx() == Nx() );
+		assert( f.Nx() == Nx() );
         assert( f.Ny() == Ny() );
         for (unsigned int i=0; i<_data.Size(); ++i) {
             _data(i) = f._data(i);

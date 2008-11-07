@@ -56,7 +56,7 @@ ProjectionSolver* TimeStepper::createSolver(double beta) {
         return new CholeskySolver( _grid, _model, beta );
     }
 }
-
+  
 void TimeStepper::init() {
     _model.init();
 }

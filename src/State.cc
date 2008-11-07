@@ -61,8 +61,6 @@ void State::computeNetForce( double& xforce, double& yforce) const {
     xforce *= dx2;
     yforce *= dx2;
 }
-    
-    
 
 bool State::load(const std::string& filename) {
 
