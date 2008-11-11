@@ -137,8 +137,8 @@ template<class T> T ParmParser::getParm(
     defaultStr << defaultVal; \
     appendUsageMessage( parm, a, description, defaultStr.str() );
 
-/// Search the parameter list for the given entry parm, returning
-/// defaultVal if not specified or invalid
+// Search the parameter list for the given entry parm, returning
+// defaultVal if not specified or invalid
 int ParmParser::getInt( string parm, string description, int defaultVal ) {
     PP_APPEND_USAGE("<int>");
     return getParm( parm, description, defaultVal );

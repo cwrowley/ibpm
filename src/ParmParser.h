@@ -25,19 +25,29 @@ public:
     /// Constructor, taking command line arguments as input
     ParmParser(int argc, char* argv[]);
 
-    /// Search the parameter list for the given flag, that does not take
+    /// \brief Search the parameter list for the given flag, that does not take
     /// an argument.  Returns true if the flag is present
     bool getFlag( string flag, string description );
     
-    /// Search the parameter list for the given entry parm and a single
-    /// argument of the indicated type, returning defaultVal if not specified
-    /// If argument is invalid, print a warning message and return defaultVal
+    /// \brief Search the parameter list for the given entry \a parm and a single
+    /// integer argument, returning \a defaultVal if not specified.
+    /// If argument is invalid, print a warning message and return \a defaultVal
     int getInt( string parm, string description, int defaultVal );
+    
+    /// \brief Search the parameter list for \a description, and return the
+    /// corresponding double value, or \a defaultVal if not specified.
     double getDouble( string parm, string description, double defaultVal );
+
+    /// \brief Search the parameter list for \a description, and return the
+    /// corresponding string value, or \a defaultVal if not specified.
     string getString( string parm, string description, string defaultVal );
+
+    /// \brief Search the parameter list for \a description, and return the
+    /// corresponding boolean value, or \a defaultVal if not specified.
     bool getBool( string parm, string description, bool defaultVal );
 
-    /// \brief Check if any input parameters were invalid, or unused
+    /// \brief Check if any input parameters were invalid, or unused.
+    ///
     /// Returns true if everything is valid and all parameters used
     /// If any were not used, prints them to standard error and returns false
     bool inputIsValid();

@@ -25,12 +25,15 @@ namespace ibpm {
 
 class EllipticSolver2d {
 public:
+    /// Type for arrays used to store 2d scalar fields
     typedef Array::Array2<double> Array2d;
+    
     /// \brief Instantiate a new solver.
     ///
-    /// Here, nx and ny are the number of cells in x- and y-directions.  Note
-    /// that the number of gridpoints is (nx+1) x (ny+1), and the number of
-    /// interior gridpoints is (nx-1) x (ny-1).
+    /// Here, nx and ny are the number of cells in x- and y-directions, and dx
+    /// is the grid spacing.
+    /// Note that the number of gridpoints is (nx+1) x (ny+1), and the number
+    /// of interior gridpoints is (nx-1) x (ny-1).
     EllipticSolver2d( int nx, int ny, double dx );
     virtual ~EllipticSolver2d() = 0;
 

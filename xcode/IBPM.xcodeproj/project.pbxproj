@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		F53AEAB20E949E9800A62F40 /* EllipticSolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = F54A2D0E0E92592200AEF8C6 /* EllipticSolver.cc */; };
 		F54A27E90E9143B900AEF8C6 /* EllipticSolver2d.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5E3DCD50E8215E000D62675 /* EllipticSolver2d.cc */; };
-		F54B895D0E898F7200914D47 /* CheckCurl.cc in Sources */ = {isa = PBXBuildFile; fileRef = F54B895B0E898F6700914D47 /* CheckCurl.cc */; };
 		F553DA730E987EC50031D523 /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
 		F553DA790E987EE40031D523 /* Oseen.cc in Sources */ = {isa = PBXBuildFile; fileRef = F557BD7B0E7AE50C0006234C /* Oseen.cc */; };
 		F56DC36D0E97E920000D85EB /* VectorOperationsTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */; };
@@ -60,6 +59,7 @@
 		F5EB08360E7ADE7A0097BF5F /* RigidBody.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB08010E7ADE3D0097BF5F /* RigidBody.cc */; };
 		F5EB083C0E7ADE7A0097BF5F /* utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB080E0E7ADE3D0097BF5F /* utils.cc */; };
 		F5EB083E0E7ADE8B0097BF5F /* ibpm.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5EB07DF0E7ADE3D0097BF5F /* ibpm.cc */; };
+		F5F55E370EA1017500677156 /* CheckLaplacian.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5F55E360EA1017500677156 /* CheckLaplacian.cc */; };
 		F5FA979D0E86767E00C0BB16 /* CheckFluxToX.cc in Sources */ = {isa = PBXBuildFile; fileRef = F5FA97910E86763C00C0BB16 /* CheckFluxToX.cc */; };
 		F5FA979E0E86769000C0BB16 /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
 		F5FA97DA0E867FEA00C0BB16 /* libibpm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5BE61550E7ACE3800F26FFC /* libibpm.a */; };
@@ -208,6 +208,7 @@
 		F5EB08210E7ADE4C0097BF5F /* StateTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StateTest.cc; path = ../test/StateTest.cc; sourceTree = SOURCE_ROOT; };
 		F5EB08220E7ADE4C0097BF5F /* TangentSE2Test.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TangentSE2Test.cc; path = ../test/TangentSE2Test.cc; sourceTree = SOURCE_ROOT; };
 		F5EB08230E7ADE4C0097BF5F /* VectorOperationsTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VectorOperationsTest.cc; path = ../test/VectorOperationsTest.cc; sourceTree = SOURCE_ROOT; };
+		F5F55E360EA1017500677156 /* CheckLaplacian.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckLaplacian.cc; sourceTree = "<group>"; };
 		F5FA97910E86763C00C0BB16 /* CheckFluxToX.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckFluxToX.cc; sourceTree = "<group>"; };
 		F5FA97CB0E867C7C00C0BB16 /* CheckAdjoint.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckAdjoint.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -441,6 +442,7 @@
 				F5FA97CB0E867C7C00C0BB16 /* CheckAdjoint.cc */,
 				F54B895B0E898F6700914D47 /* CheckCurl.cc */,
 				F5A497DE0E8FFBCC00F9A49D /* BCTest.cc */,
+				F5F55E360EA1017500677156 /* CheckLaplacian.cc */,
 			);
 			name = test;
 			path = ../test;
@@ -674,7 +676,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F54B895D0E898F7200914D47 /* CheckCurl.cc in Sources */,
+				F5F55E370EA1017500677156 /* CheckLaplacian.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -916,6 +918,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = "-lfftw3";
 				PREBINDING = NO;
 				PRODUCT_NAME = CheckAdjoint;
 				ZERO_LINK = YES;
@@ -932,6 +935,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = "-lfftw3";
 				PREBINDING = NO;
 				PRODUCT_NAME = CheckAdjoint;
 				ZERO_LINK = NO;
