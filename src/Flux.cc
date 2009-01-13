@@ -16,7 +16,6 @@
 #include "Flux.h"
 #include "Scalar.h"
 #include "Grid.h"
-#include <blitz/array.h>
 
 namespace ibpm {
 
