@@ -10,6 +10,7 @@
 // $HeadURL$
 
 #include <iostream>
+#include <iomanip>
 #include "ibpm.h"
 
 using namespace std;
@@ -25,18 +26,19 @@ int main(int argc, char* argv[]) {
     // Setup grid
     int nx = 100;
     int ny = 100;
+    int ngrid=1;
     double length = 4.0;
     double xOffset = -1;
     double yOffset = -2;
-    Grid grid( nx, ny, length, xOffset, yOffset );
+    Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
     
     
     // Make a flat plate, length 1, with center at 1/4 chord
     RigidBody plate;
-    plate.addLine( 0, 0, 1, 0, grid.getDx() );
+    plate.addLine( 0, 0, 1, 0, grid.Dx() );
     plate.setCenter( 0.25, 0 );
     
-    // Set the motion to plunging: amplitude = 0.25, period 0.1 time unit
+    // Set the motion to pitching, amplitude = 0.25, period 10 time units
     double amplitude = 0.25;
     double freq = 0.1;
     PitchPlunge motion( amplitude, freq, 0, 0 );
@@ -52,18 +54,17 @@ int main(int argc, char* argv[]) {
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
     cout << "Setting up Navier Stokes model..." << flush;
     NonlinearNavierStokes model( grid, geom, Reynolds, q_potential );
-    // model.init();
+    model.init();
     cout << "done" << endl;
 
     // Setup timestepper
     double dt = 0.005;
-    // Euler solver(model, dt);
-    RungeKutta2 solver(model, dt);
+    AdamsBashforth solver(grid, model, dt);
     solver.init();
 
     // Build the state variable, zero initial conditions
-    State x(grid, geom);
-    x.gamma = 0.;
+    State x(grid, geom.getNumPoints());
+    x.omega = 0.;
 
     // Setup output routines
     OutputForce force( "tecplot/force.dat" );
@@ -84,7 +85,7 @@ int main(int argc, char* argv[]) {
             << "  time = " << setw(5) << x.time
             << "  theta = " << theta << endl;
         solver.advance( x );
-        computeNetForce(x.f, drag, lift);
+        x.computeNetForce( drag, lift);
         cout << " x force : " << setw(16) << drag*2 << " , y force : "
             << setw(16) << lift*2 << "\n";
         logger.doOutput( x );
