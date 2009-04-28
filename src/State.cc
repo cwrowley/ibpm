@@ -103,7 +103,7 @@ bool State::load(const std::string& filename) {
             cerr << "Warning: grids do not match.  Resizing grid." << endl;
             success = false;
         }
-        Grid newgrid( nx, ny, 1, dx * nx, x0, y0 );
+        Grid newgrid( nx, ny, ngrid, dx * nx, x0, y0 );
         resize( newgrid, numPoints );
     }
 
