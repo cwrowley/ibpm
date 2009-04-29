@@ -1,0 +1,15 @@
+# standard config file, using gcc compiler
+# a modified make.inc for using g++ on joshy, by Zhanhua Ma, Apr 28, 2009
+
+CXX = g++
+ CXXFLAGS = -Wall -g -O4 -funroll-loops -DNDEBUG #-fast
+# for debugging, uncomment the following line
+#CXXFLAGS = -Wall -g
+
+lib_dirs = \
+	-L/home/cwrowley/pgi/lib \
+	-L/opt/fftw3.pgi/lib
+
+include_dirs = \
+	-I/home/cwrowley/pgi/include \
+	-I/opt/fftw3.pgi/include 
