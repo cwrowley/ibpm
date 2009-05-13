@@ -85,5 +85,33 @@ TEST_F(GridTest, TestYBoundaries) {
 //    EXPECT_DOUBLE_EQ(_grid.getYEdge(0,20), 1);        
 //}
 
+TEST_F(GridTest, TestXIndex) {
+	double i = 5;
+	double drift1 = (_dx / 2 ) * 0.94;
+	double x1 = i * _dx + drift1;
+	double x2 = (i + 1) * _dx - drift1;
+		
+	EXPECT_DOUBLE_EQ( 0, _grid.getXGridIndex(_xOffset) );
+	EXPECT_DOUBLE_EQ( _nx, _grid.getXGridIndex(_xOffset + _xLength) );
+	EXPECT_DOUBLE_EQ( 1, _grid.getXGridIndex(_xOffset + _dx) );	
+	EXPECT_DOUBLE_EQ( _nx - 1, _grid.getXGridIndex(_xOffset + _xLength - _dx) );
+	EXPECT_DOUBLE_EQ( i , _grid.getXGridIndex(_xOffset + x1) );
+	EXPECT_DOUBLE_EQ( i + 1, _grid.getXGridIndex(_xOffset + x2) );
+}
+
+TEST_F(GridTest, TestYIndex) {
+	double j = 5;
+	double drift1 = (_dx / 2 ) * 0.94;
+	double y1 = j * _dx + drift1;
+	double y2 = (j + 1) * _dx - drift1;
+		
+	EXPECT_DOUBLE_EQ( 0, _grid.getYGridIndex(_yOffset) );
+	EXPECT_DOUBLE_EQ( _ny, _grid.getYGridIndex(_yOffset + _yLength) );
+	EXPECT_DOUBLE_EQ( 1, _grid.getYGridIndex(_yOffset + _dx) );	
+	EXPECT_DOUBLE_EQ( _ny - 1, _grid.getYGridIndex(_yOffset + _yLength - _dx) );
+	EXPECT_DOUBLE_EQ( j , _grid.getYGridIndex(_yOffset + y1) );
+	EXPECT_DOUBLE_EQ( j + 1, _grid.getYGridIndex(_yOffset + y2) );
+}
+
 }  // namespace
 

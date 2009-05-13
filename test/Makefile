@@ -10,6 +10,7 @@ TEST_FILES= \
 	GridTest.o \
 	MotionTest.o \
 	NavierStokesModelTest.o \
+	OutputProbesTest.o\
 	ParmParserTest.o \
 	ProjectionSolverTest.o \
 	RegularizerTest.o \
