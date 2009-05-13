@@ -102,6 +102,13 @@ public:
     /// Return the y-coordinate of the bottom edge of cell j  (j in 0..n)
     double getYEdge(int lev, int j) const;
     
+    /// Return the grid index i corresponding to the given x-coordinate 
+	/// Currently, only works for the finest grid level. 
+    int getXGridIndex( double x ) const;
+
+    /// Return the grid index j corresponding to the given x-coordinate 
+	/// Currently, only works for the finest grid level. 
+    int getYGridIndex( double y ) const;
 
 private:
     double getXOffset( int lev ) const;

@@ -97,5 +97,29 @@ double Grid::getYEdge(int lev, int j) const {
     return getYOffset(lev) + j * Dx(lev);
 }
 
+// Return the grid index i corresponding to the given x-coordinate 
+// Currently, only works for the finest grid level.
+int Grid::getXGridIndex( double x ) const {
+	double xpos = x - _xOffset;
+	assert ( xpos <=  _dx * _nx);
+	int i = int(floor( xpos / _dx ));
+	if ( (xpos - i * _dx) >= (_dx / 2) ) {
+		 i = int(ceil( xpos / _dx ));
+	}
+	return i;
+}
+
+// Return the grid index j corresponding to the given j-coordinate 
+// Currently, only works for the finest grid level.
+int Grid::getYGridIndex( double y ) const {
+	double ypos = y - _yOffset;
+	assert ( ypos <=  _dx * _ny);
+	int j = int(floor( ypos / _dx ));
+	if ( (ypos - j * _dx) >= (_dx / 2) ) {
+		 j = int(ceil( ypos / _dx ));
+	}
+	return j;
+}
+
 } // namespace
 
