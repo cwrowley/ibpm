@@ -17,7 +17,7 @@ namespace ibpm {
     \brief Store a 2D array of scalar values, located at interior cell nodes.
     
     For a grid with nx cells in the x-direction and ny cells in the y-direction,
-    there are (nx-1)*(ny+1) nodes.  
+    there are (nx+1)*(ny+1) nodes.  
     
     There are (nx-1)*(ny-1) inner nodes, and 2*(nx+ny) boundary nodes.
     Only the interior nodes are stored in a Scalar, and the boundary nodes are
