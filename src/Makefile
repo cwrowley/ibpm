@@ -32,6 +32,7 @@ OBJS = \
 	OutputForce.o \
 	OutputRestart.o \
 	OutputTecplot.o \
+	OutputProbes.o\
 	ParmParser.o \
 	ProjectionSolver.o \
 	Regularizer.o \
