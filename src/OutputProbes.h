@@ -35,11 +35,17 @@ class OutputProbes : public Output {
 public:
     /// \brief Constructor
     /// \param[in] filename, to which probe data will be written.
+    /// For instance, if filename = "out/probe%02.dat"
+    /// then the following files will be created:
+    ///   out/probe00.dat   (description of probe locations)
+    ///   out/probe01.dat   (first probe)
+    ///   out/probe02.dat   (second probe)
+    ///   ...
     OutputProbes(string filename, Grid& grid);
 
-    /// Open the file with name (filename + "info"), 
-    /// and write probe information (probe #, probe position).
-    /// Also, for each probe, open a file with name (filename + "probe #").
+    /// Write a file with description of probe locations
+    ///   (this file has index 0)
+    /// Also, open a file for each probe
     /// If a file with the same name is already present, it is overwritten.
     /// Returns true if successful.
     bool init();
@@ -86,14 +92,14 @@ public:
     
     /// Return the gridpoint x coordinate of the corresponding probe
     inline double getProbeCoordX( unsigned int index ){
-        assert( index <= _probes.size() && index >= 1 ) ; 
-        return _grid.getXEdge( _lev, _probes[index-1].i ); 
+        assert( index <= _probes.size() && index >= 1 );
+        return _grid.getXEdge( _lev, _probes[index-1].i );
     }
     
     /// Return the gridpoint y coordinate of the corresponding probe
     inline double getProbeCoordY( unsigned int index ){
-        assert( index <= _probes.size() && index >= 1 ); 
-        return _grid.getYEdge( _lev, _probes[index-1].j ); 
+        assert( index <= _probes.size() && index >= 1 );
+        return _grid.getYEdge( _lev, _probes[index-1].j );
     }
     
 private:
@@ -107,9 +113,13 @@ private:
         int i,j;
         FILE *fp;
     };
+
+    bool writeSummaryFile(void);
+
+    // Private data
     string _filename;
     Grid _grid;
-    FILE* _info_fp;
+    bool _hasBeenInitialized;
     vector<Probe> _probes;
     static const int _lev;
     static const int _dimen;

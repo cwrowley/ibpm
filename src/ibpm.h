@@ -44,6 +44,7 @@
 #include "OutputTecplot.h"
 #include "OutputRestart.h"
 #include "OutputForce.h"
+#include "OutputProbes.h"
 
 // utilities
 #include "utils.h"

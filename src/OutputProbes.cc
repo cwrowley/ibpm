@@ -27,24 +27,12 @@ const int OutputProbes::_dimen = 2; // two-dimensional domain for now
 OutputProbes::OutputProbes(string filename, Grid& grid ) :
     _filename( filename ),
     _grid( grid ),
-    _info_fp( NULL )
+    _hasBeenInitialized( false )
 {}
 
 bool OutputProbes::init() {
-    _info_fp = fopen( (_filename + "info").c_str(), "w" );
-    if ( _info_fp == NULL ) return false;
-    
-    // write: probe#, probe grid indices i,  j,  probe coordinates x, y 
-    for ( unsigned int n = 0 ; n < _probes.size(); n++ ) {
-        int i = getProbeIndexX( n+1 );
-        int j = getProbeIndexY( n+1 );
-        double x = getProbeCoordX( n+1 );
-        double y = getProbeCoordY( n+1 );
-        fprintf( _info_fp, "%2d %3d %d %.5e %.5e\n", 
-                n+1, i, j, x, y ); 
-    }
-    fclose( _info_fp ); 
-    
+    if ( !writeSummaryFile() ) return false;
+
     // open files for each probe to output data
     for ( unsigned int n = 0; n < _probes.size(); n++ ) {
         char name[256];
@@ -52,6 +40,7 @@ bool OutputProbes::init() {
         _probes[n].fp = fopen( name, "w" );
         if ( _probes[n].fp == NULL ) return false;
     }
+    _hasBeenInitialized = true;
     return true;
 }
 
@@ -90,12 +79,12 @@ bool OutputProbes::doOutput( const State& state) {
 }
 
 void OutputProbes::addProbeByIndex( int i, int j ){
-    // check if has been initialized
-    if ( _info_fp != NULL ) {
-        cout << "Warning: Addition of probes is allowed only before initialization." << endl;
+    if ( _hasBeenInitialized ) {
+        cout << "Error: Addition of probes is allowed only "
+             << "before initialization." << endl;
         exit(1);
     }
-    
+
     if ( i < 1 || j < 1 || i > _grid.Nx()-1 || j > _grid.Ny()-1 ) {
         cout << "Warning: invalid probe position: (" << i << "," << j << ")"
             << endl
@@ -120,7 +109,26 @@ void OutputProbes::addProbe( int i, int j ) {
 void OutputProbes::addProbe( double xcord, double ycord ) {
     addProbeByPosition( xcord, ycord ); 
 }
-    
+
+// Write summary of probe info, to file with index 0
+bool OutputProbes::writeSummaryFile(void) {
+    char fname[BUFSIZ];
+    sprintf( fname, _filename.c_str(), 0);
+    FILE *fp = fopen( fname, "w" );
+    if ( fp == NULL ) return false;
+    // write: probe#, probe grid indices i,  j,  probe coordinates x, y 
+    for ( unsigned int n = 0 ; n < _probes.size(); n++ ) {
+        int i = getProbeIndexX( n+1 );
+        int j = getProbeIndexY( n+1 );
+        double x = getProbeCoordX( n+1 );
+        double y = getProbeCoordY( n+1 );
+        fprintf( fp, "%2d %3d %d %.5e %.5e\n", 
+                n+1, i, j, x, y ); 
+    }
+    fclose( fp );
+    return true;
+}
+
 void OutputProbes::print() {
     cout << "\n-- Probe locations: by grid indices --" << endl;
     for (unsigned int n = 0; n < _probes.size(); n++ ) {
