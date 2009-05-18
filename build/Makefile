@@ -8,7 +8,9 @@
 # $Author: zma $
 # $HeadURL: svn+ssh://rainier.princeton.edu/ibpm/trunk/src/Makefile $
 
-all: libibpm.a ibpm
+EXECUTABLES = ibpm checkgeom
+
+all: libibpm.a $(EXECUTABLES)
 
 include ../config/make.inc
 
@@ -58,14 +60,14 @@ CXXFLAGS += $(include_dirs)
 libibpm.a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 
-ibpm: ibpm.o libibpm.a
+$(EXECUTABLES) : % : %.o libibpm.a
 	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 clean:
-	-/bin/rm -rf *.o
+	-/bin/rm -rf *.o .depend
 
 distclean: clean
-	-/bin/rm -rf libibpm.a ibpm
+	-/bin/rm -rf libibpm.a $(EXECUTABLES)
 
 depend:
 	$(MAKEDEPEND) $(CXXFLAGS) ../src/*.cc > .depend
