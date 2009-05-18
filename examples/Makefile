@@ -8,7 +8,7 @@
 # $Author$
 # $HeadURL$
 
-include ../src/make.inc
+include ../config/make.inc
 
 TARGETS = pitching plunging Oseen RigidBodyLoad bin2plt bininfo
 
@@ -18,15 +18,17 @@ MAKEDEPEND = gcc -MM
 LDFLAGS += $(lib_dirs)
 CXXFLAGS += -I../src $(include_dirs)
 
-IBPMLIB = ../lib/libibpm.a 
+IBPMLIB = libibpm.a 
 
-.PHONY:  clean depend
+.PHONY: lib clean depend
 
 all: $(TARGETS)
 
-% : %.o $(IBPMLIB)
-	cd ../src && $(MAKE) lib
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+% : %.o lib
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< ../build/$(IBPMLIB) $(LDLIBS)
+
+lib:
+	cd ../build && $(MAKE)
 
 %.o : %.cc
 	$(CXX) $(CXXFLAGS) -c $^

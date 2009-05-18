@@ -20,11 +20,11 @@ TEST_FILES= \
 	TangentSE2Test.o \
 	VectorOperationsTest.o \
 
-include ../src/make.inc
+include ../config/make.inc
 
 CXXFLAGS += $(include_dirs) -I../src
 LDFLAGS += $(lib_dirs)
-IBPMLIB = ../lib/libibpm.a
+IBPMLIB = ../build/libibpm.a
 MAKEDEPEND = gcc -MM
 
 .PHONY: $(IBPMLIB) clean distclean depend
@@ -32,14 +32,14 @@ MAKEDEPEND = gcc -MM
 run_tests: runner
 	./runner 2> runner.err
 
-$(IBPMLIB):
-	cd ../src && $(MAKE) lib
-
 % : %.o $(IBPMLIB)
 	$(CXX) $(LDFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
 
 runner: $(TEST_FILES) $(IBPMLIB)
 	$(CXX) $(LDFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
+
+$(IBPMLIB):
+	cd ../build && $(MAKE)
 
 %.o : %.cc
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) $<

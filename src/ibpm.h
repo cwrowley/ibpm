@@ -13,6 +13,8 @@
     \version $Revision$
 */
 
+#define IBPM_VERSION "1.0"
+
 // basic classes
 #include "Grid.h"
 #include "RigidBody.h"

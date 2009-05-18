@@ -8,22 +8,19 @@
 # $Author$
 # $HeadURL$
 
-all: lib test ibpm
-
-.PHONY: lib test ibpm doc clean
-DIRS = src doc test
-
-lib:
-	cd src && $(MAKE) lib
-
-test:
-	cd test && $(MAKE) run_tests
+.PHONY: ibpm test doc clean distclean
+DIRS = build test doc
 
 ibpm:
-	cd src && $(MAKE) ibpm
+	cd build && $(MAKE)
+
+test:
+	cd test && $(MAKE)
 
 doc:
-	cd doc && $(MAKE) doc
+	cd doc && $(MAKE)
+
+all: ibpm test doc
 
 clean:
 	for dir in $(DIRS); do ( cd $$dir && $(MAKE) clean; ) done
@@ -32,5 +29,3 @@ distclean: clean
 	for dir in $(DIRS); do \
 	  ( cd $$dir && $(MAKE) distclean; )\
 	done
-	/bin/rm -f bin/ibpm
-	/bin/rm -f lib/libibpm.a

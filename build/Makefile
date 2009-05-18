@@ -3,14 +3,14 @@
 # Clancy Rowley
 # Princeton University
 #
-# $Date$
-# $Revision$
-# $Author$
-# $HeadURL$
+# $Date: 2009-05-12 21:37:53 -0600 (Tue, 12 May 2009) $
+# $Revision: 201 $
+# $Author: zma $
+# $HeadURL: svn+ssh://rainier.princeton.edu/ibpm/trunk/src/Makefile $
 
-all: lib ibpm
-	
-include make.inc
+all: libibpm.a ibpm
+
+include ../config/make.inc
 
 OBJS = \
 	AdamsBashforth.o \
@@ -43,33 +43,31 @@ OBJS = \
 	utils.o \
 	VectorOperations.o
 
-LDLIBS = -lfftw3 -lm
+VPATH = ../src
+
 AR = ar
 ARFLAGS = -r
 MAKEDEPEND = gcc -MM
 
+LDLIBS = -lfftw3 -lm
 LDFLAGS += $(lib_dirs)
-CXXFLAGS += $(VERSIONDEF) $(include_dirs)
+CXXFLAGS += $(include_dirs)
 
-IBPMLIB = ../lib/libibpm.a 
-IBPM = ../bin/ibpm
+.PHONY: clean distclean depend
 
-.PHONY: ibpm clean depend
+libibpm.a: $(OBJS)
+	$(AR) $(ARFLAGS) $@ $?
 
-lib: $(IBPMLIB) 
-
-ibpm: $(IBPM)
-
-$(IBPMLIB): $(OBJS) 
-	$(AR) $(ARFLAGS) $(IBPMLIB) $?
-
-$(IBPM): ibpm.o $(IBPMLIB)
+ibpm: ibpm.o libibpm.a
 	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 clean:
-	/bin/rm -rf *.o
+	-/bin/rm -rf *.o
+
+distclean: clean
+	-/bin/rm -rf libibpm.a ibpm
 
 depend:
-	$(MAKEDEPEND) $(CXXFLAGS) *.cc > .depend
+	$(MAKEDEPEND) $(CXXFLAGS) ../src/*.cc > .depend
 
 -include .depend
