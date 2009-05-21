@@ -53,7 +53,7 @@ Section~\ref{sec:install} describes how to compile the library and executables. 
 To compile and run the code, you will need the following:
 \begin{itemize}
 	\item A C++ compiler
-	\item The FFTW library, version~3, available free from \url{http://www.fftw.org/})
+	\item The FFTW library, version~3, available free from \url{http://www.fftw.org/}
 \end{itemize}
 We assume you are building on a Unix-based system, such as Mac OS X or Linux, and have standard build tools such as GNU Make.
 
@@ -88,7 +88,7 @@ Let $q$ denote the (vector-valued) velocity flux, $\psi$ the streamfunction, and
 	EC\psi &= u_B.
 		\label{eq:no_slip}
 \end{align}
-The first equation is the momentum equation, the second is a Poisson equation for the streamfunction, and the third equation is a constraint representing the no-slip condition, so that velocities at the boundary points match prescribed velocities~$u_B$. The discrete operators in the above equation are described in the table below, where $\delta$ is the grid spacing and $\nu=1/Re$ is one over the Reynolds number.  (Note that in~\cite{ColTai-07}, $\gamma$ denotes the circulation about one cell, while in this code we work with vorticity~$\omega$.  The two are related by $\gamma = \delta^2\omega$.)
+The first equation is the momentum equation, the second is a Poisson equation for the streamfunction, and the third equation is a constraint representing the no-slip condition, so that velocities at the boundary points match prescribed velocities~$u_B$. The discrete operators in the above equation are described in the table below, where $\nu=1/Re$ is one over the Reynolds number.  (Note that in~\cite{ColTai-07}, $\gamma$ denotes the circulation about one cell, while in this code we work with vorticity~$\omega$.  The two are related by $\gamma = \delta^2\omega$, where $\delta$ is the grid spacing.)
 \begin{center}
 \begin{tabular}{ccp{3.7in}}
 Operator & Maps & Definition\\
@@ -234,14 +234,14 @@ ibpm -nx 200 -ny 300 -length 4 -xoffset -1 -yoffset -3 -geom myshape.geom
 Parameters related to the flow solver are specified as follows:
 
 \begin{center}
-\begin{tabular}{lp{2.5in}l}
+\begin{tabular}{lp{2.3in}l}
 Flag & Description & Default\\
 \hline
 \verb|-Re <real>|        & Reynolds number & 100\\
 \verb|-dt <real>|        & timestep & 0.01\\
 \verb|-model <string>|   & type of model (linear, nonlinear, adjoint, linearperiodic) & nonlinear\\
 \verb|-baseflow <string>| & base flow for linear/adjoint model\\
-\verb|-scheme <string>|   & timestepping scheme (euler,ab2,rk2,rk3) & rk2\\
+\verb|-scheme <string>|   & timestepping scheme (euler, ab2, rk2, rk3) & rk2\\
 \verb|-ic <string>|       & initial condition filename \\
 \verb|-nsteps <int>|    & number of timesteps to compute & 250\\
 \end{tabular}
@@ -261,9 +261,9 @@ As the solution evolves in time, various output files can be written, and their 
 Flag & Description & Default\\
 \hline
 \verb|-outdir <string>| & directory for saving output & {\tt .}\\
-\verb|-tecplot <int>|   & if $>0$, write a Tecplot file every n timesteps & 100\\
-\verb|-restart <int>|   & if $>0$, write a restart file every n timesteps & 100\\
-\verb|-force <int>|     & if $>0$, write forces every n timesteps & 1\\
+\verb|-tecplot <int>|   & if $>0$, write a Tecplot file every $n$ timesteps & 100\\
+\verb|-restart <int>|   & if $>0$, write a restart file every $n$ timesteps & 100\\
+\verb|-force <int>|     & if $>0$, write forces every $n$ timesteps & 1\\
 \end{tabular}
 \end{center}
 If the directory for output files does not exist, it is created, and all output files are written to this directory.  Forces are written to a single file, whose columns are:
@@ -308,18 +308,18 @@ A {\em geometry\/} consists of one or more {\em rigid bodies}.  A rigid body is 
     point x y   # add a point at this location
     point x y
     point x y
-    line x1 y1 x2 y2 dx     # add a line, spacing dx
-    line_n x1 y1 x2 y2 npts # add a line with npts points
-    circle xc yc radius dx  # add a circle
-    circle_n xc yc radius npts
-    raw naca0012.dat        # read a list of points from a file
-    motion fixed x y theta  # assign a particular motion
+    line x1 y1 x2 y2 dx        # add a line, spacing dx
+    line_n x1 y1 x2 y2 npts    # add a line with npts points
+    circle xc yc radius dx     # add a circle, specifying spacing
+    circle_n xc yc radius npts # add a circle, specifying num points
+    raw naca0012.dat           # read a list of points from a file
+    motion fixed x y theta     # assign a particular motion
 \end{Verbatim}
 
 The command {\tt line} constructs a line between points $(x_1,y_1)$ and $(x_2,y_2)$, with spacing {\tt dx} between points.  The command {\tt line\_n} constructs a similar line, but specifying the number of points instead of the spacing.  The {\tt circle} command behaves similarly, constructing a circle with the given center $(x_c,y_c)$ and radius, where the spacing between points on the circle is approximately {\tt dx}.
 
 \paragraph{Note about spacing of boundary points}
-The spacing between points on the boundary of a body should be smaller than the grid spacing, but not too small.  If the spacing is not too coarse, fluid will ``leak'' through the boundary, and if the spacing is too small, the solver may not converge.
+The spacing between points on the boundary of a body should be smaller than the grid spacing, but not too small.  If the spacing is too coarse, fluid will ``leak'' through the boundary, and if the spacing is too fine, the solver may not converge.
 
 \paragraph{Motion}
 The points that make up a rigid body may be translated together by specifying a {\tt motion}.  The simplest motion is just translation and rotation, specified by
@@ -356,9 +356,11 @@ The overall geometry is a collection of rigid bodies, for instance specified as 
     end
 \end{Verbatim}
 
+The {\tt name} command is optional, and whitespace is ignored.
+
 \subsection{Tool for checking geometries}
 \label{sub:tool_for_checking_geometries}
-The tool {\tt checkgeom} may be used to validate the syntax of geometry input files, and to plot the corresponding boundary points on a specified grid.  This is useful both to check that the geometry looks generally as expected before running a large simulation, but more importantly, it can be used to check for ``leaks'': as stated previously, if the boundary points are too coarsely spaced, relative to the underlying uniform grid, then the fluid can penetrate the boundary.
+The program {\tt checkgeom} may be used to validate the syntax of geometry input files, and to plot the corresponding boundary points on a specified grid.  This is useful both to check that the geometry looks generally as expected before running a large simulation, but more importantly, it can be used to check for ``leaks'': as stated previously, if the boundary points are too coarsely spaced, relative to the underlying uniform grid, then the fluid can penetrate the boundary.
 
 The options for {\tt checkgeom} are as follows:
 
