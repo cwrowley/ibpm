@@ -8,7 +8,7 @@
 # $Author$
 # $HeadURL$
 
-all: doc ibpm_design.pdf
+all: doc ibpm_manual.pdf
 
 .PHONY: doc clean distclean
 .SUFFIXES: .tex .pdf
