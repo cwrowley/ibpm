@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     string geomFile = parser.getString(
         "geom", "filename for reading geometry", "ibpm.geom" );
     string outFileName = parser.getString(
-        "o", "output filename", "checkgeom.plt" );
+        "o", "filename for writing Tecplot file", "" );
     
     if ( ! parser.inputIsValid() || helpFlag ) {
         parser.printUsage( cerr );
@@ -67,9 +67,12 @@ int main(int argc, char* argv[]) {
         cout << "  " << geom.getNumPoints() << " points on the boundary" << endl;
     }
     else {
-        exit(-1);
+        cout << "  There were errors reading the geometry file." << endl;
+        return 1;
     }
     
+    if ( outFileName == "" ) return 0;
+
     Regularizer regularizer( grid, geom );
     regularizer.update();
     State x( grid, geom.getNumPoints() );

@@ -132,11 +132,13 @@ bool Geometry::load(istream& in) {
             EatWhitespace( name );
             RigidBody body;
             body.setName( name );
-            body.load( in );
-            addBody( body );
+            if ( body.load( in ) ) {
+                addBody( body );
 #ifdef DEBUG
-            cerr << "Load a new body, named [" << name << "]" << endl;
+                cerr << "Load a new body, named [" << name << "]" << endl;
 #endif
+            }
+            else error_found = true;
         }
         else if ( cmd == "end" ) {
 #ifdef DEBUG
@@ -147,6 +149,7 @@ bool Geometry::load(istream& in) {
         else {
             cerr << "WARNING: could not parse the following line:" << endl;
             cerr << buf << endl;
+            error_found = true;
         }
     }
     if ( error_found ) return false;
