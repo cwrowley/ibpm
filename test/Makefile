@@ -24,22 +24,25 @@ include ../config/make.inc
 
 CXXFLAGS += $(include_dirs) -I../src
 LDFLAGS += $(lib_dirs)
-IBPMLIB = ../build/libibpm.a
+BUILDDIR = ../build
+IBPMLIB = libibpm.a
+LIBS = $(BUILDDIR)/$(IBPMLIB) -lgtest -lgtest_main -lfftw3 -lm
+
 MAKEDEPEND = gcc -MM
 
-.PHONY: $(IBPMLIB) clean distclean depend
+.PHONY: lib clean distclean depend
 
 run_tests: runner
 	./runner 2> runner.err
 
-% : %.o $(IBPMLIB)
-	$(CXX) $(LDFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
+runner: lib $(TEST_FILES)
+	$(CXX) $(LDFLAGS) -o $@ $(TEST_FILES) $(LIBS)
 
-runner: $(TEST_FILES) $(IBPMLIB)
-	$(CXX) $(LDFLAGS) -o $@ $^ -lgtest -lgtest_main -lfftw3 -lm
+lib:
+	cd $(BUILDDIR) && make $(IBPMLIB)
 
-$(IBPMLIB):
-	cd ../build && $(MAKE)
+% : %.o lib
+	$(CXX) $(LDFLAGS) -o $@ $< $(LIBS)
 
 %.o : %.cc
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) $<
