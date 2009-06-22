@@ -129,7 +129,7 @@ BoundaryVector NavierStokesModel::getBaseFlowBoundaryVelocities() const {
 }
 
 Scalar NonlinearNavierStokes::N(const State& x) const {
-    Flux v = CrossProduct( x.q, x.omega );
+	Flux v = CrossProduct( x.q, x.omega );
     Scalar g = Curl( v );
     return g;
 }

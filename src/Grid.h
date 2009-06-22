@@ -2,7 +2,10 @@
 #define _GRID_H_
 
 #include <assert.h>
-
+#include <math.h>
+//JON
+#include <iostream>
+using namespace std;
 namespace ibpm {
 
 /*!
@@ -28,7 +31,8 @@ namespace ibpm {
 
 class Grid {
 public:
-    /// Constructor: set all grid parameters
+
+    /// Constructor: set all standard grid parameters
     Grid(
          int nx,
          int ny,
@@ -37,7 +41,19 @@ public:
          double xOffset,
          double yOffset
     );
-
+	
+	/// Constructor: set all grid parameters, including x- and y- shifts
+    Grid(
+         int nx,
+         int ny,
+         int ngrid,
+         double length,
+         double xOffset,
+         double yOffset,
+		 double xShift,
+		 double yShift
+		 );
+	
     /// Default constructor: set all parameters to zero
     Grid();
 
@@ -50,18 +66,39 @@ public:
         double xOffset,
         double yOffset
     );
-    
+	
+	/// Set all grid parameters, including x- and y- shifts
+    void resize(
+		int nx,
+		int ny,
+		int ngrid,
+		double length,
+		double xOffset,
+		double yOffset,
+		double xShift,
+		double yShift
+	);
     /// Return number of cells in x-direction
     inline int Nx() const { return _nx; }
 
     /// Return number of coarse cells outside each fine domain, in x-direction
-    inline int NxExt() const { return _nx / 4; }
+	// This counts the number of cells to the left of the fine domain
+	// This distinction is key when the grid is shifted
+	// To round to the nearest integer we add 0.5 and use the floor function
+	// However, due to asserts enforced in Grid.cc, this is nominally an integer already
+    inline int NxExt() const { 
+		return (int) floor( _nx / 4 * ( 1 - _xShift ) + 0.5 ); 
+	}
     
     /// Return number of cells in y-direction
     inline int Ny() const { return _ny; }
     
     /// Return number of coarse cells outside each fine domain, in y-direction
-    inline int NyExt() const { return _ny / 4; }
+	// This counts the number of cells below the fine domain
+	// This distinction is key when the grid is shifted
+	// To round to the nearest integer we add 0.5 and use the floor function
+	// However, due to asserts enforced in Grid.cc, this is nominally an integer already
+    inline int NyExt() const { return (int) floor( _ny / 4 * ( 1 - _yShift ) + 0.5 ); }
     
     /// Given indices (i,j) on a coarse grid, return corresponding indices
     /// (ii,jj) on the fine grid
@@ -101,14 +138,26 @@ public:
     
     /// Return the y-coordinate of the bottom edge of cell j  (j in 0..n)
     double getYEdge(int lev, int j) const;
-    
+	
     /// Return the grid index i corresponding to the given x-coordinate 
 	/// Currently, only works for the finest grid level. 
     int getXGridIndex( double x ) const;
-
+	
     /// Return the grid index j corresponding to the given x-coordinate 
 	/// Currently, only works for the finest grid level. 
     int getYGridIndex( double y ) const;
+	
+    /// Set shift parameter in x
+    void setXShift(double xShift);
+
+    /// Get the current x-shift parameter
+    double getXShift() const;
+	
+	/// Set shift parameter in y
+    void setYShift(double yShift);
+	
+    /// Get the current y-shift parameter
+    double getYShift() const;
 
 private:
     double getXOffset( int lev ) const;
@@ -119,6 +168,8 @@ private:
     double _dx;
     double _xOffset;
     double _yOffset;
+    double _xShift;
+	double _yShift;
 };
 
 } // namespace

@@ -87,8 +87,8 @@ public:
         return *this;
     }
     
-    inline double Nx() const { return _nx; }
-    inline double Ny() const { return _ny; }
+    inline int Nx() const { return _nx; }
+    inline int Ny() const { return _ny; }
     
 private:
     int _nx;

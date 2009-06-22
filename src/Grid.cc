@@ -26,10 +26,28 @@ Grid::Grid(
     double length,
     double xOffset,
     double yOffset
-    ) {
+    ) :
+    _xShift(0.),
+	_yShift(0.) {
     resize( nx, ny, ngrid, length, xOffset, yOffset );
 }
-
+//JON	
+Grid::Grid(
+   int nx,
+   int ny,
+   int ngrid,
+   double length,
+   double xOffset,
+   double yOffset,
+   double xShift,
+   double yShift
+   )
+   {
+   resize( nx, ny, ngrid, length, xOffset, yOffset );
+   setXShift( xShift );
+   setYShift( yShift );
+}
+	
 /// Default constructor: set all parameters to zero
 Grid::Grid() {
     _nx = 0;
@@ -38,6 +56,8 @@ Grid::Grid() {
     _xOffset = 0;
     _yOffset = 0;
     _dx = 0;
+    _xShift = 0.;
+	_yShift = 0.;
 };
 
 /// Set all grid parameters
@@ -57,17 +77,38 @@ void Grid::resize(
     _yOffset = yOffset;
     _dx = length / nx;
 }
-
+	
+/// Set all grid parameters
+void Grid::resize(
+	int nx,
+	int ny,
+	int ngrid,
+	double length,
+	double xOffset,
+	double yOffset,
+	double xShift,
+	double yShift
+	) {
+	assert( ngrid == 1 || ( nx % 4 == 0 && ny % 4 == 0 ) );
+	_nx = nx;
+	_ny = ny;
+	_ngrid = ngrid;
+	_xOffset = xOffset;
+	_yOffset = yOffset;
+	_xShift = xShift;
+	_yShift = yShift;
+	_dx = length / nx;
+}
+	
 // Return the x-coordinate of the left-most gridpoint of level lev
 double Grid::getXOffset(int lev) const {
-    return _xOffset -  0.5 * ( ( 1 << lev ) - 1 ) * (_nx * _dx);
+    return _xOffset + 0.5 * ( _xShift - 1 ) * ( ( 1 << lev ) - 1 ) * (_nx * _dx);
 }
     
 // Return the y-coordinate of the bottom gridpoint of level lev
 double Grid::getYOffset(int lev) const {
-    return _yOffset -  0.5 * ( ( 1 << lev ) - 1 ) * (_ny * _dx);
+    return _yOffset + 0.5 * ( _yShift - 1 ) * ( ( 1 << lev ) - 1 ) * (_ny * _dx);
 }
-    
     
 // Return the x-coordinate of the center of cell i  (i in 0..m-1)
 double Grid::getXCenter(int lev, int i) const {
@@ -97,6 +138,30 @@ double Grid::getYEdge(int lev, int j) const {
     return getYOffset(lev) + j * Dx(lev);
 }
 
+// Set the shift parameter in x
+void Grid::setXShift( double xShift ) {
+    assert( fabs( xShift ) <= 1 );
+    assert( fmod( xShift*_nx,4 ) == 0 );
+    _xShift = xShift;
+}
+
+// Return the shift parameter in x
+double Grid::getXShift() const {
+    return _xShift;
+}
+
+// Set the shift parameter in y
+void Grid::setYShift( double yShift ) {
+	assert( fabs( yShift ) <= 1 );
+	assert( fmod( yShift*_ny,4 ) == 0 );
+	_yShift = yShift;
+}
+	
+// Return the shift parameter in y
+double Grid::getYShift() const {
+	return _yShift;
+}
+
 // Return the grid index i corresponding to the given x-coordinate 
 // Currently, only works for the finest grid level.
 int Grid::getXGridIndex( double x ) const {
@@ -122,4 +187,3 @@ int Grid::getYGridIndex( double y ) const {
 }
 
 } // namespace
-

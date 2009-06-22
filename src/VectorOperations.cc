@@ -22,7 +22,8 @@
 #include "BoundaryVector.h"
 #include "VectorOperations.h"
 #include <fftw3.h>
-
+#include <iostream>
+using namespace std;
 using Array::Array2;
 
 namespace ibpm {
@@ -242,22 +243,22 @@ double InnerProduct (const Scalar& f, const Scalar& g){
         // Interface points
         // corners
         ip += f(lev,nx2,ny2) * g(lev,nx2,ny2) * dx2 * 15./16;
-        ip += f(lev,nx-nx2,ny2) * g(lev,nx-nx2,ny2) * dx2 * 15./16;
-        ip += f(lev,nx2,ny-ny2) * g(lev,nx2,ny-ny2) * dx2 * 15./16;
-        ip += f(lev,nx-nx2,ny-ny2) * g(lev,nx-nx2,ny-ny2) * dx2 * 15./16;
+        ip += f(lev,nx/2+nx2,ny2) * g(lev,nx/2+nx2,ny2) * dx2 * 15./16;
+        ip += f(lev,nx2,ny/2+ny2) * g(lev,nx2,ny/2+ny2) * dx2 * 15./16;
+        ip += f(lev,nx/2+nx2,ny/2+ny2) * g(lev,nx/2+nx2,ny/2+ny2) * dx2 * 15./16;
         // edges
-        for (int j=ny2+1; j < ny - ny2; ++j) {
+        for (int j=ny2+1; j < ny/2 + ny2; ++j) {
             // left & right
             int i = nx2;
             ip += f(lev,i,j) * g(lev, i,j) * dx2 * 0.75;
-            i = nx - nx2;
+            i = nx/2 + nx2;
             ip += f(lev,i,j) * g(lev,i,j) * dx2 * 0.75;
         }
-        for (int i=nx2+1; i< nx - nx2; ++i) {
+        for (int i=nx2+1; i< nx/2 + nx2; ++i) {
             // top & bottom
             int j=ny2;
             ip += f(lev,i,j) * g(lev, i,j) * dx2 * 0.75;
-            j = ny-ny2;
+            j = ny/2+ny2;
             ip += f(lev,i,j) * g(lev,i,j) * dx2 * 0.75;
         }
         // Left border
@@ -267,18 +268,18 @@ double InnerProduct (const Scalar& f, const Scalar& g){
             }
         }
         // Right border
-        for (int i = nx - nx2 + 1; i < nx; ++i ) {
+        for (int i = nx/2 + nx2 + 1; i < nx; ++i ) {
             for (int j = 1; j < ny; ++j) {
                 ip += f(lev, i, j) * g(lev, i, j) * dx2;
             }
         }
-        for (int i = nx2; i < nx - nx2 + 1; ++i ) {
+        for (int i = nx2; i < nx/2 + nx2 + 1; ++i ) {
             // Bottom border
             for (int j=1; j < ny2; ++ j ) {
                 ip += f(lev, i, j) * g(lev, i, j) * dx2;
             }
             // Top border
-            for (int j=ny - ny2 + 1; j < ny; ++j) {
+            for (int j = ny/2 + ny2 + 1; j < ny; ++j) {
                 ip += f(lev, i, j) * g(lev, i, j) * dx2;
             }
         }
@@ -312,25 +313,25 @@ double InnerProduct (const Flux& p, const Flux& q){
     // Coarser grids
     for (int lev=1; lev < p.Ngrid(); ++lev) {
         // left and right interfaces (edges)
-        for (int j=ny2; j<ny-ny2; ++j) {
+        for (int j=ny2; j<ny/2+ny2; ++j) {
             ip += p(lev,X,nx2,j) * q(lev,X,nx2,j) * 0.75;
-            ip += p(lev,X,nx-nx2,j) * q(lev,X,nx-nx2,j) * 0.75;
+            ip += p(lev,X,nx/2+nx2,j) * q(lev,X,nx/2+nx2,j) * 0.75;
         }
         // left and right coarse points
         for (int j=0; j<ny; ++j) {
             for (int i=1; i<nx2; ++i) {
                 ip += p(lev,X,i,j) * q(lev,X,i,j);
             }
-            for (int i=nx-nx2+1; i<nx; ++i) {
+            for (int i=nx/2+nx2+1; i<nx; ++i) {
                 ip += p(lev,X,i,j) * q(lev,X,i,j);
             }
         }
         // top and bottom coarse points
-        for (int i=nx2; i<nx-nx2+1; ++i) {
+        for (int i=nx2; i<nx/2+nx2+1; ++i) {
             for (int j=0; j<ny2; ++j) {
                 ip += p(lev,X,i,j) * q(lev,X,i,j);
             }
-            for (int j=ny-ny2; j<ny; ++j) {
+            for (int j=ny/2+ny2; j<ny; ++j) {
                 ip += p(lev,X,i,j) * q(lev,X,i,j);
             }
         }
@@ -348,25 +349,25 @@ double InnerProduct (const Flux& p, const Flux& q){
     // Coarser grids
     for (int lev=1; lev < p.Ngrid(); ++lev) {
         // left and right interfaces (edges)
-        for (int i=nx2; i<nx-nx2; ++i) {
+        for (int i=nx2; i<nx/2+nx2; ++i) {
             ip += p(lev,Y,i,ny2) * q(lev,Y,i,ny2) * 0.75;
-            ip += p(lev,Y,i,ny-ny2) * q(lev,Y,i,ny-ny2) * 0.75;
+            ip += p(lev,Y,i,ny/2+ny2) * q(lev,Y,i,ny/2+ny2) * 0.75;
         }
         // left and right coarse points
         for (int i=0; i<nx; ++i) {
             for (int j=1; j<ny2; ++j) {
                 ip += p(lev,Y,i,j) * q(lev,Y,i,j);
             }
-            for (int j=ny-ny2+1; j<ny; ++j) {
+            for (int j=ny/2+ny2+1; j<ny; ++j) {
                 ip += p(lev,Y,i,j) * q(lev,Y,i,j);
             }
         }
         // top and bottom coarse points
-        for (int j=ny2; j<ny-ny2+1; ++j) {
+        for (int j=ny2; j<ny/2+ny2+1; ++j) {
             for (int i=0; i<nx2; ++i) {
                 ip += p(lev,Y,i,j) * q(lev,Y,i,j);
             }
-            for (int i=nx-nx2; i<nx; ++i) {
+            for (int i=nx/2+nx2; i<nx; ++i) {
                 ip += p(lev,Y,i,j) * q(lev,Y,i,j);
             }
         }
@@ -389,7 +390,7 @@ Flux CrossProduct(const Flux& q, const Scalar& f){
 
     Scalar u( f.getGrid() );
     Scalar v( f.getGrid() );
-    
+    	
     FluxToXVelocity( q, u );
     u *= f;
     u *= -1;
@@ -461,7 +462,7 @@ void FluxToXVelocity(const Flux& q, Scalar& u) {
     //  3  B D 0 0 0 D B
     //  2  B F E E E F B
     //  1  B C C C C C B
-
+	
     for (int lev=1; lev < q.Ngrid(); ++lev) {
         double bydx = 1. / q.Dx(lev);
         // left and right borders (excluding interface) (B)
@@ -469,33 +470,33 @@ void FluxToXVelocity(const Flux& q, Scalar& u) {
             for (int i=1; i<nx2; ++i) {
                 u(lev,i,j) = ( q(lev,X,i,j) + q(lev,X,i,j-1) ) * 0.5 * bydx;
             }
-            for (int i=nx-nx2+1; i<nx; ++i) {
+            for (int i=nx/2+nx2+1; i<nx; ++i) {
                 u(lev,i,j) = ( q(lev,X,i,j) + q(lev,X,i,j-1) ) * 0.5 * bydx;
             }
         }
         // top and bottom borders (excluding interfaces) (C)
-        for (int i=nx2; i<=nx-nx2; ++i) {
+        for (int i=nx2; i<=nx/2+nx2; ++i) {
             for (int j = 1; j<ny2; ++j ) {
                 u(lev,i,j) = ( q(lev,X,i,j) + q(lev,X,i,j-1) ) * 0.5 * bydx;
             }
-            for (int j = ny-ny2+1; j<ny; ++j) {
+            for (int j = ny/2+ny2+1; j<ny; ++j) {
                 u(lev,i,j) = ( q(lev,X,i,j) + q(lev,X,i,j-1) ) * 0.5 * bydx;                
             }
         }
         
         // left and right interfaces, excluding corners (D)
-        for ( int j=ny2+1; j<ny-ny2; ++j ) {
+        for ( int j=ny2+1; j<ny/2+ny2; ++j ) {
             u(lev,nx2,j) = ( q(lev,X,nx2,j) + q(lev,X,nx2,j-1) ) * 0.5 * bydx;
-            u(lev,nx-nx2,j) = ( q(lev,X,nx-nx2,j) + q(lev,X,nx-nx2,j-1) ) * 0.5 * bydx;
+            u(lev,nx/2+nx2,j) = ( q(lev,X,nx/2+nx2,j) + q(lev,X,nx/2+nx2,j-1) ) * 0.5 * bydx;
         }
         // top and bottom interfaces, excluding corners (E)
-        for ( int i=nx2+1; i<nx-nx2; ++i ) {
+        for ( int i=nx2+1; i<nx/2+nx2; ++i ) {
             int ii, jj;  // fine coords
             u.getGrid().c2f(i,ny2,ii,jj);
             u(lev,i,ny2) = ( q(lev,X,i,ny2-1) * 2./3 + q(lev-1,X,ii,jj) * 1./3 +
                     ( q(lev-1,X,ii-1,jj) + q(lev-1,X,ii+1,jj) ) * 1./6 ) * bydx;
-            u.getGrid().c2f(i,ny-ny2,ii,jj);
-            u(lev,i,ny-ny2) = ( q(lev,X,i,ny-ny2) * 2./3 + q(lev-1,X,ii,jj-1) * 1./3 +
+            u.getGrid().c2f(i,ny/2+ny2,ii,jj);
+            u(lev,i,ny/2+ny2) = ( q(lev,X,i,ny/2+ny2) * 2./3 + q(lev-1,X,ii,jj-1) * 1./3 +
                     ( q(lev-1,X,ii-1,jj-1) + q(lev-1,X,ii+1,jj-1) ) * 1./6 ) * bydx;
         }
         // corners (F)
@@ -506,17 +507,17 @@ void FluxToXVelocity(const Flux& q, Scalar& u) {
                       q(lev-1,X,1,0) * 2./15 ) * bydx;
 
         // lower right
-        i = nx - nx2;
+        i = nx/2 + nx2;
         u(lev,i,j) = ( q(lev,X,i,j-1) * 8./15 + q(lev,X,i,j) * 6./15 +
                       q(lev-1,X,nx-1,0) * 2./15 ) * bydx;
 
         // upper left
-        i = nx2; j = ny - ny2;
+        i = nx2; j = ny/2 + ny2;
         u(lev,i,j) = ( q(lev,X,i,j) * 8./15 + q(lev,X,i,j-1) * 6./15 +
                       q(lev-1,X,1,ny-1) * 2./15 ) * bydx;
 
         // upper right
-        i = nx - nx2;
+        i = nx/2 + nx2;
         u(lev,i,j) = ( q(lev,X,i,j) * 8./15 + q(lev,X,i,j-1) * 6./15 +
                       q(lev-1,X,nx-1,ny-1) * 2./15 ) * bydx;
     }
@@ -561,33 +562,33 @@ void FluxToYVelocity(const Flux& q, Scalar& v) {
             for (int j=1; j<ny2; ++j) {
                 v(lev,i,j) = ( q(lev,Y,i,j) + q(lev,Y,i-1,j) ) * 0.5 * bydx;
             }
-            for (int j=ny-ny2+1; j<ny; ++j) {
+            for (int j=ny/2+ny2+1; j<ny; ++j) {
                 v(lev,i,j) = ( q(lev,Y,i,j) + q(lev,Y,i-1,j) ) * 0.5 * bydx;
             }
         }
         // left and right borders (excluding interfaces) (C)
-        for (int j=ny2; j<=ny-ny2; ++j) {
+        for (int j=ny2; j<=ny/2+ny2; ++j) {
             for (int i = 1; i<nx2; ++i ) {
                 v(lev,i,j) = ( q(lev,Y,i,j) + q(lev,Y,i-1,j) ) * 0.5 * bydx;
             }
-            for (int i = nx-nx2+1; i<nx; ++i) {
+            for (int i = nx/2+nx2+1; i<nx; ++i) {
                 v(lev,i,j) = ( q(lev,Y,i,j) + q(lev,Y,i-1,j) ) * 0.5 * bydx;                
             }
         }
         
         // top and bottom interfaces, excluding corners (D)
-        for ( int i=nx2+1; i<nx-nx2; ++i ) {
+        for ( int i=nx2+1; i<nx/2+nx2; ++i ) {
             v(lev,i,ny2) = ( q(lev,Y,i,ny2) + q(lev,Y,i-1,ny2) ) * 0.5 * bydx;
-            v(lev,i,ny-ny2) = ( q(lev,Y,i,ny-ny2) + q(lev,Y,i-1,ny-ny2) ) * 0.5 * bydx;
+            v(lev,i,ny/2+ny2) = ( q(lev,Y,i,ny/2+ny2) + q(lev,Y,i-1,ny/2+ny2) ) * 0.5 * bydx;
         }
         // left and right interfaces, excluding corners (E)
-        for ( int j=ny2+1; j<ny-ny2; ++j ) {
+        for ( int j=ny2+1; j<ny/2+ny2; ++j ) {
             int ii, jj;  // fine coords
             v.getGrid().c2f(nx2,j,ii,jj);
             v(lev,nx2,j) = ( q(lev,Y,nx2-1,j) * 2./3 + q(lev-1,Y,ii,jj) * 1./3 +
                             ( q(lev-1,Y,ii,jj-1) + q(lev-1,Y,ii,jj+1) ) * 1./6 ) * bydx;
-            v.getGrid().c2f(nx-nx2,j,ii,jj);
-            v(lev,nx-nx2,j) = ( q(lev,Y,nx-nx2,j) * 2./3 + q(lev-1,Y,ii-1,jj) * 1./3 +
+            v.getGrid().c2f(nx/2+nx2,j,ii,jj);
+            v(lev,nx/2+nx2,j) = ( q(lev,Y,nx/2+nx2,j) * 2./3 + q(lev-1,Y,ii-1,jj) * 1./3 +
                                ( q(lev-1,Y,ii-1,jj-1) + q(lev-1,Y,ii-1,jj+1) ) * 1./6 ) * bydx;
         }
         // corners (F)
@@ -596,15 +597,15 @@ void FluxToYVelocity(const Flux& q, Scalar& v) {
         v(lev,i,j) = ( q(lev,Y,i-1,j) * 8./15 + q(lev,Y,i,j) * 6./15 +
                       q(lev-1,Y,0,1) * 2./15 ) * bydx;
         
-        j = ny - ny2;
+        j = ny/2 + ny2;
         v(lev,i,j) = ( q(lev,Y,i-1,j) * 8./15 + q(lev,Y,i,j) * 6./15 +
                       q(lev-1,Y,0,ny-1) * 2./15 ) * bydx;
         
-        j = ny2; i = nx - nx2;
+        j = ny2; i = nx/2 + nx2;
         v(lev,i,j) = ( q(lev,Y,i,j) * 8./15 + q(lev,Y,i-1,j) * 6./15 +
                       q(lev-1,Y,nx-1,1) * 2./15 ) * bydx;
         
-        j = ny - ny2;
+        j = ny/2 + ny2;
         v(lev,i,j) = ( q(lev,Y,i,j) * 8./15 + q(lev,Y,i-1,j) * 6./15 +
                       q(lev-1,Y,nx-1,ny-1) * 2./15 ) * bydx;
     }
@@ -662,22 +663,22 @@ void XVelocityToFlux(const Scalar& u, Flux& q) {
                 for (int j=1; j<ny2; ++j) {
                     q(lev,X,i,j) = ( u(lev,i,j) + u(lev,i,j+1) ) * 0.5 * dx;
                 }
-                for (int j=ny-ny2; j<ny-1; ++j) {
+                for (int j=ny/2+ny2; j<ny-1; ++j) {
                     q(lev,X,i,j) = ( u(lev,i,j) + u(lev,i,j+1) ) * 0.5 * dx;
                 }
             }
             // left and right portions of coarse grid (D)
-            for (int j=ny2; j<ny-ny2; ++j) {
+            for (int j=ny2; j<ny/2+ny2; ++j) {
                 for (int i=1; i<=nx2; ++i) {
                     q(lev,X,i,j) = ( u(lev,i,j) + u(lev,i,j+1) ) * 0.5 * dx;
                 }
-                for (int i=nx-nx2; i<nx; ++i) {
+                for (int i=nx/2+nx2; i<nx; ++i) {
                     q(lev,X,i,j) = ( u(lev,i,j) + u(lev,i,j+1) ) * 0.5 * dx;
                 }
             }
             // get interior portion of coarse grid from fine grid (G)
-            for (int i=nx2+1; i<nx-nx2; ++i) {
-                for (int j=ny2; j<ny-ny2; ++j) {
+            for (int i=nx2+1; i<nx/2+nx2; ++i) {
+                for (int j=ny2; j<ny/2+ny2; ++j) {
                     int ii,jj; // fine gridpoints
                     g.c2f(i,j,ii,jj);
                     q(lev,X,i,j) = q(lev-1,X,ii,jj) + q(lev-1,X,ii,jj+1);
@@ -698,9 +699,9 @@ void XVelocityToFlux(const Scalar& u, Flux& q) {
                 int ii,jj;  // coarse indices
                 g.f2c(0,j,ii,jj);
                 q(lev,X,0,j) = ( 0.75 * u(lev+1,nx2,jj) + 0.25 * u(lev+1,nx2,jj+1) ) * dx;
-                q(lev,X,nx,j) = ( 0.75 * u(lev+1,nx-nx2,jj) + 0.25 * u(lev+1,nx-nx2,jj+1) ) * dx;
+                q(lev,X,nx,j) = ( 0.75 * u(lev+1,nx/2+nx2,jj) + 0.25 * u(lev+1,nx/2+nx2,jj+1) ) * dx;
                 q(lev,X,0,j+1) = ( 0.25 * u(lev+1,nx2,jj) + 0.75 * u(lev+1,nx2,jj+1) ) * dx;
-                q(lev,X,nx,j+1) = ( 0.25 * u(lev+1,nx-nx2,jj) + 0.75 * u(lev+1,nx-nx2,jj+1) ) * dx;
+                q(lev,X,nx,j+1) = ( 0.25 * u(lev+1,nx/2+nx2,jj) + 0.75 * u(lev+1,nx/2+nx2,jj+1) ) * dx;
             }
         }
         for (int i=1; i<nx; ++i) {
@@ -718,7 +719,7 @@ void XVelocityToFlux(const Scalar& u, Flux& q) {
                     int ii,jj; // coarse points
                     g.f2c(i,0,ii,jj);
                     q(lev,X,i,0) = ( u(lev,i,1) + u(lev+1,ii,ny2) ) * 0.5 * dx;
-                    q(lev,X,i,ny-1) = ( u(lev,i,ny-1) + u(lev+1,ii,ny-ny2) ) * 0.5 * dx;
+                    q(lev,X,i,ny-1) = ( u(lev,i,ny-1) + u(lev+1,ii,ny/2+ny2) ) * 0.5 * dx;
                 }
                 for (int i=1; i<nx; i += 2) {
                     // points that do not correspond to coarse points
@@ -727,7 +728,7 @@ void XVelocityToFlux(const Scalar& u, Flux& q) {
                     q(lev,X,i,0) = ( 0.5 * u(lev,i,1) +
                                   0.25 * u(lev+1,ii,ny2) + 0.25 * u(lev+1,ii+1,ny2) ) * dx;
                     q(lev,X,i,ny-1) = ( 0.5 * u(lev,i,ny-1) +
-                                     0.25* u(lev+1,ii,ny-ny2) + 0.25 * u(lev+1,ii+1,ny-ny2) ) * dx;
+                                     0.25* u(lev+1,ii,ny/2+ny2) + 0.25 * u(lev+1,ii+1,ny/2+ny2) ) * dx;
                 }
             }
         }
@@ -788,22 +789,22 @@ void YVelocityToFlux(const Scalar& v, Flux& q) {
                 for (int i=1; i<nx2; ++i) {
                     q(lev,Y,i,j) = ( v(lev,i,j) + v(lev,i+1,j) ) * 0.5 * dx;
                 }
-                for (int i=nx-nx2; i<nx-1; ++i) {
+                for (int i=nx/2+nx2; i<nx-1; ++i) {
                     q(lev,Y,i,j) = ( v(lev,i,j) + v(lev,i+1,j) ) * 0.5 * dx;
                 }
             }
             // top and bottom portions of coarse grid (D)
-            for (int i=nx2; i<nx-nx2; ++i) {
+            for (int i=nx2; i<nx/2+nx2; ++i) {
                 for (int j=1; j<=ny2; ++j) {
                     q(lev,Y,i,j) = ( v(lev,i,j) + v(lev,i+1,j) ) * 0.5 * dx;
                 }
-                for (int j=ny-ny2; j<ny; ++j) {
+                for (int j=ny/2+ny2; j<ny; ++j) {
                     q(lev,Y,i,j) = ( v(lev,i,j) + v(lev,i+1,j) ) * 0.5 * dx;
                 }
             }
             // get interior portion of coarse grid from fine grid (G)
-            for (int j=ny2+1; j<ny-ny2; ++j) {
-                for (int i=nx2; i<nx-nx2; ++i) {
+            for (int j=ny2+1; j<ny/2+ny2; ++j) {
+                for (int i=nx2; i<nx/2+nx2; ++i) {
                     int ii,jj; // fine gridpoints
                     g.c2f(i,j,ii,jj);
                     q(lev,Y,i,j) = q(lev-1,Y,ii,jj) + q(lev-1,Y,ii+1,jj);
@@ -824,9 +825,9 @@ void YVelocityToFlux(const Scalar& v, Flux& q) {
                 int ii,jj;  // coarse indices
                 g.f2c(i,0,ii,jj);
                 q(lev,Y,i,0) = ( 0.75 * v(lev+1,ii,ny2) + 0.25 * v(lev+1,ii+1,ny2) ) * dx;
-                q(lev,Y,i,ny) = ( 0.75 * v(lev+1,ii,ny-ny2) + 0.25 * v(lev+1,ii+1,ny-ny2) ) * dx;
+                q(lev,Y,i,ny) = ( 0.75 * v(lev+1,ii,ny/2+ny2) + 0.25 * v(lev+1,ii+1,ny/2+ny2) ) * dx;
                 q(lev,Y,i+1,0) = ( 0.25 * v(lev+1,ii,ny2) + 0.75 * v(lev+1,ii+1,ny2) ) * dx;
-                q(lev,Y,i+1,ny) = ( 0.25 * v(lev+1,ii,ny-ny2) + 0.75 * v(lev+1,ii+1,ny-ny2) ) * dx;
+                q(lev,Y,i+1,ny) = ( 0.25 * v(lev+1,ii,ny/2+ny2) + 0.75 * v(lev+1,ii+1,ny/2+ny2) ) * dx;
             }
         }
         for (int j=1; j<ny; ++j) {
@@ -844,7 +845,7 @@ void YVelocityToFlux(const Scalar& v, Flux& q) {
                     int ii,jj; // coarse points
                     g.f2c(0,j,ii,jj);
                     q(lev,Y,0,j) = ( v(lev,1,j) + v(lev+1,nx2,jj) ) * 0.5 * dx;
-                    q(lev,Y,nx-1,j) = ( v(lev,nx-1,j) + v(lev+1,nx-nx2,jj) ) * 0.5 * dx;
+                    q(lev,Y,nx-1,j) = ( v(lev,nx-1,j) + v(lev+1,nx/2+nx2,jj) ) * 0.5 * dx;
                 }
                 for (int j=1; j<ny; j += 2) {
                     // points that do not correspond to coarse points
@@ -853,7 +854,7 @@ void YVelocityToFlux(const Scalar& v, Flux& q) {
                     q(lev,Y,0,j) = ( 0.5 * v(lev,1,j) +
                                     0.25 * v(lev+1,nx2,jj) + 0.25 * v(lev+1,nx2,jj+1) ) * dx;
                     q(lev,Y,nx-1,j) = ( 0.5 * v(lev,nx-1,j) +
-                                       0.25* v(lev+1,nx-nx2,jj) + 0.25 * v(lev+1,nx-nx2,jj+1) ) * dx;
+                                       0.25* v(lev+1,nx/2+nx2,jj) + 0.25 * v(lev+1,nx/2+nx2,jj+1) ) * dx;
                 }
             }
         }

@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+
 using namespace std;
 
 namespace ibpm {
@@ -68,7 +69,7 @@ bool OutputTecplot::doOutput(const State& state) {
     sprintf( filename, _filename.c_str(), state.timestep );
     char title[256];
     sprintf( title, _title.c_str(), state.timestep );
-    
+    			
     // Get grid dimensions
     const Grid& grid = state.omega.getGrid();
     int nx = grid.Nx();

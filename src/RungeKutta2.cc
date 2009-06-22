@@ -61,7 +61,7 @@ void RungeKutta2::advance(State& x) {
     // Update the value of the time
     x.time += _timestep;
     ++x.timestep;
-
+	
     // If the body is moving, update the positions of the bodies
     if ( _model.isTimeDependent() ) {
         _model.updateOperators( x.time );

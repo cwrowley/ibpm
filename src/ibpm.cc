@@ -58,6 +58,10 @@ int main(int argc, char* argv[]) {
         "xoffset", "x-coordinate of left edge of finest domain", -2. );
     double yOffset = parser.getDouble(
         "yoffset", "y-coordinate of bottom edge of finest domain", -2. );
+	double xShift = parser.getDouble( 
+		"xshift", "percentage offset between grid levels in x-direction", 0. );
+    double yShift = parser.getDouble(
+		"yshift", "percentage offset between grid levels in y-direction", 0. );
     string geomFile = parser.getString(
         "geom", "filename for reading geometry", name + ".geom" );
     double Reynolds = parser.getDouble("Re", "Reynolds number", 100.);
@@ -139,8 +143,12 @@ int main(int argc, char* argv[]) {
         << "  ngrid   " << ngrid << endl
         << "  length  " << length << endl
         << "  xoffset " << xOffset << endl
-        << "  yoffset " << yOffset << endl;
+		<< "  yoffset " << yOffset << endl
+		<< "  xshift  " << xShift << endl
+		<< "  yshift  " << yShift << endl;
     Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
+	grid.setXShift( xShift );
+	grid.setYShift( yShift );
 
     // Setup geometry
     Geometry geom;
@@ -256,11 +264,10 @@ int main(int argc, char* argv[]) {
     }
     logger.init();
     logger.doOutput( x );
-    
     cout << "Integrating for " << numSteps << " steps" << endl;
 
     for(int i=1; i <= numSteps; ++i) {
-        cout << "step " << i << endl;
+        cout << "step " << i << endl; 
 		solver->advance( x );
         double lift;
         double drag;

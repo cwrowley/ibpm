@@ -85,7 +85,8 @@ void RigidBody::addCircle(
     ) {
     double dTheta = dx / radius;
     double twopi = 8. * atan(1.);
-    int numPoints = twopi / dTheta + 1;
+	// To round a value x, take floor( x + 0.5 )
+    int numPoints = (int) floor( twopi / dTheta + 1 + 0.5 );
     addCircle_n( xc, yc, radius, numPoints );
 }
 
@@ -112,7 +113,8 @@ void RigidBody::addLine(
     double dx
     ) {
     double length = sqrt( (x2-x1) * (x2-x1) + (y2-y1) * (y2-y1) );
-    int numPoints = length / dx + 1;
+	// To round a value x, take floor( x + 0.5 )
+    int numPoints = (int) floor( length / dx + 1 + 0.5 );
     addLine_n( x1, y1, x2, y2, numPoints );
 }
 

@@ -2,7 +2,7 @@
 # a modified make.inc for using g++ on joshy, by Zhanhua Ma, Apr 28, 2009
 
 CXX = g++
- CXXFLAGS = -Wall -g -O4 -funroll-loops -DNDEBUG #-fast
+CXXFLAGS = -Wall -g -O4 -funroll-loops -DNDEBUG #-fast
 # for debugging, uncomment the following line
 #CXXFLAGS = -Wall -g
 

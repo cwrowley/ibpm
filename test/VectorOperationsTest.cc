@@ -13,21 +13,35 @@ using Array::Array2;
 using namespace ibpm;
 
 namespace {
+	
+// Test an x, y shift for complete shifting, shifting by one grid pt, and no shift
+// The shift values must be global for the parameterized tests
+// According _nx and _ny must also be global	
+const int _nx(8);
+const int _ny(12);
 
-class VectorOperationsTest : public testing::Test {
+//const double _xShiftVal[] = {-1., (double) -4/_nx, 0., (double) 4/_nx, 1.};	
+//const double _yShiftVal[] = {-1., (double) -4/_ny, (double) 4/_ny, 1.};	
+
+const double _xShiftVal[] = {(double) -4/_nx, 0., (double) 4/_nx};	
+const double _yShiftVal[] = {(double) -4/_ny, (double) 4/_ny};	
+	
+class VectorOperationsTestX : public testing::TestWithParam<double> {
 protected:
-    VectorOperationsTest() : 
-        _nx(8),
-        _ny(8),
+    VectorOperationsTestX() : 
         _ngrid(3),
         _grid(_nx, _ny, _ngrid, 2, -1, -3),
         _x(_grid),
         _y(_grid),
         _nScalars( (_nx-1) * (_ny-1) + 1 ),
         _nFluxes( _nScalars ) {
-            
-        // Initialize Scalars _f, _g, _x, _y
-        for (int lev = 0; lev < _ngrid; ++lev) {
+			
+		setXYScalars();
+    }
+    
+	// Initialize scalars _x, _y for a given grid
+	void setXYScalars() {
+		for (int lev = 0; lev < _ngrid; ++lev) {
             for (int i=1; i<_nx; ++i) {
                 for (int j=1; j<_ny; ++j) {
                     _x(lev,i,j) = _grid.getXEdge(lev,i);
@@ -35,8 +49,8 @@ protected:
                 }
             }
         }
-    }
-    
+	}
+	
     // Area of domain included by inner product of X-fluxes
     // (right and left edges excluded)
     double fluxXArea() {
@@ -45,7 +59,7 @@ protected:
         return Lx * Ly / ( _grid.Dx() * _grid.Dx() );
     }
 
-    // Area of domain included by inner product of Y-flues
+    // Area of domain included by inner product of Y-fluxes
     // (top and bottom edges excluded)
     double fluxYArea() {
         double Lx = _grid.getXEdge(_ngrid-1,_nx) - _grid.getXEdge(_ngrid-1,0);
@@ -68,8 +82,6 @@ protected:
     Flux getFlux( int m );
     
     // data
-    int _nx;
-    int _ny;
     int _ngrid;
     Grid _grid;
     Scalar _x;
@@ -77,7 +89,12 @@ protected:
     int _nScalars;  // number of Scalar test functions
     int _nFluxes;   // number of Flux test functions
 };
-
+	
+class VectorOperationsTestY : public VectorOperationsTestX {
+protected:
+	VectorOperationsTestY() { }
+};	
+	
 // for Scalars
 #define EXPECT_ALL_EQ(a,b)                      \
     for (int lev=0; lev<_ngrid; ++lev) {        \
@@ -121,7 +138,7 @@ void SetScalarBoundary( double val, Scalar& f ) {
     }
 }
 
-Scalar VectorOperationsTest::getScalar( int m ) {
+Scalar VectorOperationsTestX::getScalar( int m ) {
     assert( m >= 0 && m < _nScalars );
     Scalar u(_grid);
     if (m == 0) {
@@ -135,7 +152,7 @@ Scalar VectorOperationsTest::getScalar( int m ) {
 }
 
 // Generate divergence-free Fluxes by taking curl of Scalar streamfunctions
-Flux VectorOperationsTest::getFlux( int m ) {
+Flux VectorOperationsTestX::getFlux( int m ) {
     assert( m >= 0 && m < _nFluxes );
     Flux q(_grid);
     Scalar psi = getScalar( m );
@@ -144,7 +161,7 @@ Flux VectorOperationsTest::getFlux( int m ) {
 }
     
 #ifdef DEBUG
-TEST_F(VectorOperationsTest, PrintTestScalars) {
+TEST_F(VectorOperationsTestX, PrintTestScalars) {
     for (int m=0; m < _nScalars; ++m) {
         Scalar f = getScalar( m );
         cout << "m = " << m << endl;
@@ -155,7 +172,7 @@ TEST_F(VectorOperationsTest, PrintTestScalars) {
 #endif
 
 #ifdef DEBUG
-TEST_F(VectorOperationsTest, PrintTestFluxes) {
+TEST_F(VectorOperationsTestX, PrintTestFluxes) {
     for (int m=0; m < _nFluxes; ++m) {
         Flux q = getFlux( m );
         cout << "m = " << m << endl;
@@ -164,8 +181,9 @@ TEST_F(VectorOperationsTest, PrintTestFluxes) {
     EXPECT_EQ(0,0);
 }
 #endif
-    
-TEST_F(VectorOperationsTest, ScalarDotProductSymmetric) {
+
+TEST_P(VectorOperationsTestX, ScalarDotProductSymmetric) {
+	_grid.setXShift( GetParam() );
     for (int m=0; m < _nScalars; ++m) {
         Scalar f = getScalar( m );
         for (int n=0; n < _nScalars; ++n) {
@@ -174,14 +192,34 @@ TEST_F(VectorOperationsTest, ScalarDotProductSymmetric) {
         }
     }
 }
+	
+TEST_P(VectorOperationsTestY, ScalarDotProductSymmetric) {
+	_grid.setYShift( GetParam() );
+	for (int m=0; m < _nScalars; ++m) {
+		Scalar f = getScalar( m );
+		for (int n=0; n < _nScalars; ++n) {
+			Scalar g = getScalar( n );
+			EXPECT_DOUBLE_EQ(InnerProduct( f, g ), InnerProduct( g, f ) );
+		}
+	}
+}
 
-TEST_F(VectorOperationsTest, ScalarDotProductDomainArea) {
+TEST_P(VectorOperationsTestX, ScalarDotProductDomainArea) {
+	_grid.setXShift( GetParam() );
     Scalar one( _grid );
     one = 1.;
     EXPECT_DOUBLE_EQ( scalarArea(), InnerProduct( one, one ) );
 }
 
-TEST_F(VectorOperationsTest, FluxDotProductSymmetric) {
+TEST_P(VectorOperationsTestY, ScalarDotProductDomainArea) {
+	_grid.setYShift( GetParam() );
+	Scalar one( _grid );
+	one = 1.;
+	EXPECT_DOUBLE_EQ( scalarArea(), InnerProduct( one, one ) );
+}	
+
+TEST_P(VectorOperationsTestX, FluxDotProductSymmetric) {
+	_grid.setXShift( GetParam() );
     for (int m=0; m < _nFluxes; ++m) {
         Flux f = getFlux( m );
         for (int n=0; n < _nFluxes; ++n) {
@@ -190,195 +228,369 @@ TEST_F(VectorOperationsTest, FluxDotProductSymmetric) {
         }
     }
 }
+	
+TEST_P(VectorOperationsTestY, FluxDotProductSymmetric) {
+	_grid.setYShift( GetParam() );
+	for (int m=0; m < _nFluxes; ++m) {
+		Flux f = getFlux( m );
+		for (int n=0; n < _nFluxes; ++n) {
+			Flux g = getFlux( n );
+			EXPECT_DOUBLE_EQ( InnerProduct( f, g ), InnerProduct( g, f ) );
+		}
+	}
+}	
 
-TEST_F(VectorOperationsTest, ScalarDotProductZeroVector) {
-    Scalar zero( _grid );
-    zero = 0.;
-    for (int m=0; m < _nScalars; ++m) {
-        Scalar f = getScalar( m );
-        double ip = InnerProduct( f, zero );
-        EXPECT_DOUBLE_EQ( 0., ip );
-    }
+TEST_P(VectorOperationsTestX, ScalarDotProductZeroVector) {
+	_grid.setXShift( GetParam() );
+	Scalar zero( _grid );
+	zero = 0.;
+	for (int m=0; m < _nScalars; ++m) {
+		Scalar f = getScalar( m );
+		double ip = InnerProduct( f, zero );
+		EXPECT_DOUBLE_EQ( 0., ip );
+	}
 }
-
-TEST_F(VectorOperationsTest, FluxDotProductZeroVector) {
-    Flux zero( _grid );
-    zero = 0.;
-    for (int m=0; m < _nFluxes; ++m) {
-        Flux f = getFlux( m );
-        double ip = InnerProduct( f, zero );
-        EXPECT_DOUBLE_EQ( 0., ip );
-    }
+	
+TEST_P(VectorOperationsTestY, ScalarDotProductZeroVector) {
+	_grid.setYShift( GetParam() );
+	Scalar zero( _grid );
+	zero = 0.;
+	for (int m=0; m < _nScalars; ++m) {
+		Scalar f = getScalar( m );
+		double ip = InnerProduct( f, zero );
+		EXPECT_DOUBLE_EQ( 0., ip );
+	}
 }
-
-TEST_F(VectorOperationsTest, FluxDotProductDomainArea) {
-    Flux h( _grid );
-    Flux l( _grid );
-    for (int lev=0; lev<_ngrid; ++lev) {
-        double dx = 1 << lev;
-        for (int i=0; i<_nx+1; ++i) {
-            for (int j=0; j<_ny; ++j) {
-                h(lev,X,i,j) = 1 * dx;
-                l(lev,X,i,j) = 1 * dx;
-            }
-        }
-        for (int i=0; i<_nx; ++i) {
-            for (int j=0; j<_ny+1; ++j) {
-                h(lev,Y,i,j) = 0 * dx;
-                l(lev,Y,i,j) = 0 * dx;
-            }
-        }
-    }
-    EXPECT_DOUBLE_EQ( InnerProduct(h,l), fluxXArea() );
-
-    for (int lev=0; lev<_ngrid; ++lev) {
-        double dx = 1 << lev;
-        for (int i=0; i<_nx+1; ++i) {
-            for (int j=0; j<_ny; ++j) {
-                h(lev,X,i,j) = 0 * dx;
-                l(lev,X,i,j) = 0 * dx;
-            }
-        }
-        for (int i=0; i<_nx; ++i) {
-            for (int j=0; j<_ny+1; ++j) {
-                h(lev,Y,i,j) = 1 * dx;
-                l(lev,Y,i,j) = 1 * dx;
-            }
-        }
-    }
-    EXPECT_DOUBLE_EQ( InnerProduct(h,l), fluxYArea() );
+	
+	
+TEST_P(VectorOperationsTestX, FluxDotProductZeroVector) {
+	_grid.setXShift( GetParam() );
+	Flux zero( _grid );
+	zero = 0.;
+	for (int m=0; m < _nFluxes; ++m) {
+		Flux f = getFlux( m );
+		double ip = InnerProduct( f, zero );
+		EXPECT_DOUBLE_EQ( 0., ip );
+	}
 }
+	
+TEST_P(VectorOperationsTestY, FluxDotProductZeroVector) {
+	_grid.setYShift( GetParam() );
+	Flux zero( _grid );
+	zero = 0.;
+	for (int m=0; m < _nFluxes; ++m) {
+		Flux f = getFlux( m );
+		double ip = InnerProduct( f, zero );
+		EXPECT_DOUBLE_EQ( 0., ip );
+	}
+}	
+	
+	
+TEST_P(VectorOperationsTestX, FluxDotProductDomainArea) {
+	_grid.setXShift( GetParam() );
+	Flux h( _grid );
+	Flux l( _grid );
+	for (int lev=0; lev<_ngrid; ++lev) {
+		double dx = 1 << lev;
+		for (int i=0; i<_nx+1; ++i) {
+			for (int j=0; j<_ny; ++j) {
+				h(lev,X,i,j) = 1 * dx;
+				l(lev,X,i,j) = 1 * dx;
+			}
+		}
+		for (int i=0; i<_nx; ++i) {
+			for (int j=0; j<_ny+1; ++j) {
+				h(lev,Y,i,j) = 0 * dx;
+				l(lev,Y,i,j) = 0 * dx;
+			}
+		}
+	}
+	EXPECT_DOUBLE_EQ( InnerProduct(h,l), fluxXArea() );
+	
+	for (int lev=0; lev<_ngrid; ++lev) {
+		double dx = 1 << lev;
+		for (int i=0; i<_nx+1; ++i) {
+			for (int j=0; j<_ny; ++j) {
+				h(lev,X,i,j) = 0 * dx;
+				l(lev,X,i,j) = 0 * dx;
+			}
+		}
+		for (int i=0; i<_nx; ++i) {
+			for (int j=0; j<_ny+1; ++j) {
+				h(lev,Y,i,j) = 1 * dx;
+				l(lev,Y,i,j) = 1 * dx;
+			}
+		}
+	}
+	EXPECT_DOUBLE_EQ( InnerProduct(h,l), fluxYArea() );
+}	
 
+TEST_P(VectorOperationsTestY, FluxDotProductDomainArea) {
+	_grid.setYShift( GetParam() );
+	Flux h( _grid );
+	Flux l( _grid );
+	for (int lev=0; lev<_ngrid; ++lev) {
+		double dx = 1 << lev;
+		for (int i=0; i<_nx+1; ++i) {
+			for (int j=0; j<_ny; ++j) {
+				h(lev,X,i,j) = 1 * dx;
+				l(lev,X,i,j) = 1 * dx;
+			}
+		}
+		for (int i=0; i<_nx; ++i) {
+			for (int j=0; j<_ny+1; ++j) {
+				h(lev,Y,i,j) = 0 * dx;
+				l(lev,Y,i,j) = 0 * dx;
+			}
+		}
+	}
+	EXPECT_DOUBLE_EQ( InnerProduct(h,l), fluxXArea() );
+	
+	for (int lev=0; lev<_ngrid; ++lev) {
+		double dx = 1 << lev;
+		for (int i=0; i<_nx+1; ++i) {
+			for (int j=0; j<_ny; ++j) {
+				h(lev,X,i,j) = 0 * dx;
+				l(lev,X,i,j) = 0 * dx;
+			}
+		}
+		for (int i=0; i<_nx; ++i) {
+			for (int j=0; j<_ny+1; ++j) {
+				h(lev,Y,i,j) = 1 * dx;
+				l(lev,Y,i,j) = 1 * dx;
+			}
+		}
+	}
+	EXPECT_DOUBLE_EQ( InnerProduct(h,l), fluxYArea() );
+}	
+	
 // =============================
 // = Flux to velocity and back =
 // =============================
 
 // Set X and Y Flux values at the coarsest grid level to xval and yval, resp.
 void SetFluxBoundary(double xval, double yval, Flux& q) {
-    int lev = q.Ngrid()-1;
-    // X flux
-    for (int i=0; i<=q.Nx(); ++i) {
-        q(lev,X,i,0) = xval;
-        q(lev,X,i,q.Ny()-1) = xval;
-    }
-    for (int j=1; j<q.Ny()-1; ++j) {
-        q(lev,X,0,j) = xval;
-        q(lev,X,q.Nx(),j) = xval;
-    }
-    
-    // Y flux
-    for (int j=0; j<=q.Ny(); ++j) {
-        q(lev,Y,0,j) = yval;
-        q(lev,Y,q.Nx()-1,j) = yval;
-    }
-    for (int i=1; i<q.Nx()-1; ++i) {
-        q(lev,Y,i,0) = yval;
-        q(lev,Y,i,q.Ny()) = yval;
-    }
+	int lev = q.Ngrid()-1;
+	// X flux
+	for (int i=0; i<=q.Nx(); ++i) {
+		q(lev,X,i,0) = xval;
+		q(lev,X,i,q.Ny()-1) = xval;
+	}
+	for (int j=1; j<q.Ny()-1; ++j) {
+		q(lev,X,0,j) = xval;
+		q(lev,X,q.Nx(),j) = xval;
+	}
+	
+	// Y flux
+	for (int j=0; j<=q.Ny(); ++j) {
+		q(lev,Y,0,j) = yval;
+		q(lev,Y,q.Nx()-1,j) = yval;
+	}
+	for (int i=1; i<q.Nx()-1; ++i) {
+		q(lev,Y,i,0) = yval;
+		q(lev,Y,i,q.Ny()) = yval;
+	}
 }
 
 // If u = const, then corresponding X-Flux should be constant too
-TEST_F(VectorOperationsTest, ConstantVelocityToFlux) {
-    Scalar u(_grid);
-    Scalar v(_grid);
-    Flux q(_grid);
-    double xval = 4.;
-    double yval = 12.;
-    q = 0.;
-    u = xval;
-    v = yval;
-    
-    XVelocityToFlux( u, q );
-    YVelocityToFlux( v, q );
-    // fudge boundaries
-    double dx_coarse = _grid.Dx(_ngrid-1);
-    SetFluxBoundary( xval * dx_coarse, yval * dx_coarse, q );
+TEST_P(VectorOperationsTestX, ConstantVelocityToFlux) {
+	_grid.setXShift( GetParam() );
+	Scalar u(_grid);
+	Scalar v(_grid);
+	Flux q(_grid);
+	double xval = 4.;
+	double yval = 12.;
+	q = 0.;
+	u = xval;
+	v = yval;
+	
+	XVelocityToFlux( u, q );
+	YVelocityToFlux( v, q );
+	// fudge boundaries
+	double dx_coarse = _grid.Dx(_ngrid-1);
+	SetFluxBoundary( xval * dx_coarse, yval * dx_coarse, q );
 #ifdef DEBUG
-    cout << "q:" << endl;
-    q.print();
+	cout << "q:" << endl;
+	q.print();
 #endif
-    EXPECT_ALL_X_EQ( xval * _grid.Dx(lev), q(lev,X,i,j) );
-    EXPECT_ALL_Y_EQ( yval * _grid.Dx(lev), q(lev,Y,i,j) );
+	EXPECT_ALL_X_EQ( xval * _grid.Dx(lev), q(lev,X,i,j) );
+	EXPECT_ALL_Y_EQ( yval * _grid.Dx(lev), q(lev,Y,i,j) );
 }
 
+TEST_P(VectorOperationsTestY, ConstantVelocityToFlux) {
+	_grid.setYShift( GetParam() );
+	Scalar u(_grid);
+	Scalar v(_grid);
+	Flux q(_grid);
+	double xval = 4.;
+	double yval = 12.;
+	q = 0.;
+	u = xval;
+	v = yval;
+	
+	XVelocityToFlux( u, q );
+	YVelocityToFlux( v, q );
+	// fudge boundaries
+	double dx_coarse = _grid.Dx(_ngrid-1);
+	SetFluxBoundary( xval * dx_coarse, yval * dx_coarse, q );
+#ifdef DEBUG
+	cout << "q:" << endl;
+	q.print();
+#endif
+	EXPECT_ALL_X_EQ( xval * _grid.Dx(lev), q(lev,X,i,j) );
+	EXPECT_ALL_Y_EQ( yval * _grid.Dx(lev), q(lev,Y,i,j) );
+}
+	
 // < q, X^* u > = < X q, u > for all q and u
 //    X is the map from from Flux (at edges) to Scalar x-velocity (at nodes)
 //    X^* is its adjoint, a map from Scalar x-velocity to Flux
-TEST_F(VectorOperationsTest, FluxToXVelocity) {
-    Flux q1(_grid);
-    Flux q2(_grid);
-    Scalar u1(_grid);
-    Scalar u2(_grid);
-    
-    double tol = 1e-13;
-    for (int m=0; m<_nScalars; ++m) {
-        u2 = getScalar( m );
-        for (int n=0; n<_nFluxes; ++n) {
-            q1 = getFlux( n );
-            q2 = 0;
-            XVelocityToFlux( u2, q2 );
-            FluxToXVelocity( q1, u1 );
-            double IPFlux = InnerProduct( q1, q2 );
-            double IPScalar = InnerProduct( u1, u2 );
-            EXPECT_NEAR( IPFlux, IPScalar, tol );
-        }
-    }
+TEST_P(VectorOperationsTestX, FluxToXVelocity) {
+	_grid.setXShift( GetParam() );
+	Flux q1(_grid);
+	Flux q2(_grid);
+	Scalar u1(_grid);
+	Scalar u2(_grid);
+	
+	double tol = 1e-13;
+	for (int m=0; m<_nScalars; ++m) {
+		u2 = getScalar( m );
+		for (int n=0; n<_nFluxes; ++n) {
+			q1 = getFlux( n );
+			q2 = 0;
+			XVelocityToFlux( u2, q2 );
+			FluxToXVelocity( q1, u1 );
+			double IPFlux = InnerProduct( q1, q2 );
+			double IPScalar = InnerProduct( u1, u2 );
+			EXPECT_NEAR( IPFlux, IPScalar, tol );
+		}
+	}
 }
-
+	
+TEST_P(VectorOperationsTestY, FluxToXVelocity) {
+	_grid.setYShift( GetParam() );
+	Flux q1(_grid);
+	Flux q2(_grid);
+	Scalar u1(_grid);
+	Scalar u2(_grid);
+	
+	double tol = 1e-13;
+	for (int m=0; m<_nScalars; ++m) {
+		u2 = getScalar( m );
+		for (int n=0; n<_nFluxes; ++n) {
+			q1 = getFlux( n );
+			q2 = 0;
+			XVelocityToFlux( u2, q2 );
+			FluxToXVelocity( q1, u1 );
+			double IPFlux = InnerProduct( q1, q2 );
+			double IPScalar = InnerProduct( u1, u2 );
+			EXPECT_NEAR( IPFlux, IPScalar, tol );
+		}
+	}
+}
+		
 // < q, Y^* v > = < Y q, v > for all q and v
 //    Y is the map from from Flux (at edges) to Scalar y-velocity (at nodes)
 //    Y^* is its adjoint, a map from Scalar y-velocity to Flux
-TEST_F(VectorOperationsTest, FluxToYVelocity) {
-    Flux q1(_grid);
-    Flux q2(_grid);
-    Scalar v1(_grid);
-    Scalar v2(_grid);
-    
-    double tol = 1e-13;
-    for (int m=0; m<_nScalars; ++m) {
-        v2 = getScalar( m );
-        for (int n=0; n<_nFluxes; ++n) {
-            q1 = getFlux( n );
-            q2 = 0;
-            YVelocityToFlux( v2, q2 );
-            FluxToYVelocity( q1, v1 );
-            double IPFlux = InnerProduct( q1, q2 );
-            double IPScalar = InnerProduct( v1, v2 );
-            EXPECT_NEAR( IPFlux, IPScalar, tol );
-        }
-    }
-}
+TEST_P(VectorOperationsTestX, FluxToYVelocity) {
+	_grid.setXShift( GetParam() );
+	Flux q1(_grid);
+	Flux q2(_grid);
+	Scalar v1(_grid);
+	Scalar v2(_grid);
+	
+	double tol = 1e-13;
+	for (int m=0; m<_nScalars; ++m) {
+		v2 = getScalar( m );
+		for (int n=0; n<_nFluxes; ++n) {
+			q1 = getFlux( n );
+			q2 = 0;
+			YVelocityToFlux( v2, q2 );
+			FluxToYVelocity( q1, v1 );
+			double IPFlux = InnerProduct( q1, q2 );
+			double IPScalar = InnerProduct( v1, v2 );
+			EXPECT_NEAR( IPFlux, IPScalar, tol );
+		}
+	}
+}	
+	
+TEST_P(VectorOperationsTestY, FluxToYVelocity) {
+	_grid.setYShift( GetParam() );
+	Flux q1(_grid);
+	Flux q2(_grid);
+	Scalar v1(_grid);
+	Scalar v2(_grid);
+	
+	double tol = 1e-13;
+	for (int m=0; m<_nScalars; ++m) {
+		v2 = getScalar( m );
+		for (int n=0; n<_nFluxes; ++n) {
+			q1 = getFlux( n );
+			q2 = 0;
+			YVelocityToFlux( v2, q2 );
+			FluxToYVelocity( q1, v1 );
+			double IPFlux = InnerProduct( q1, q2 );
+			double IPScalar = InnerProduct( v1, v2 );
+			EXPECT_NEAR( IPFlux, IPScalar, tol );
+		}
+	}
+}	
 
-TEST_F(VectorOperationsTest, FluxToVelocity) {
-    Flux q1(_grid);
-    Flux q2(_grid);
-    Scalar u1(_grid);
-    Scalar u2(_grid);
-    Scalar v1(_grid);
-    Scalar v2(_grid);
-    
-    double tol = 1e-13;
-    for (int m=0; m<_nScalars; ++m) {
-        u2 = getScalar( m );
-        v2 = getScalar( _nScalars - m - 1 );
-        for (int n=0; n<_nFluxes; ++n) {
-            q1 = getFlux( n );
-            q2 = 0;
-            VelocityToFlux( u2, v2, q2 );
-            FluxToVelocity( q1, u1, v1 );
-            double IPFlux = InnerProduct( q1, q2 );
-            double IPScalar = InnerProduct( u1, u2 ) + InnerProduct( v1, v2 );
-            EXPECT_NEAR( IPFlux, IPScalar, tol );
-        }
-    }
-}
-
+TEST_P(VectorOperationsTestX, FluxToVelocity) {
+	_grid.setXShift( GetParam() );
+	Flux q1(_grid);
+	Flux q2(_grid);
+	Scalar u1(_grid);
+	Scalar u2(_grid);
+	Scalar v1(_grid);
+	Scalar v2(_grid);
+	
+	double tol = 1e-13;
+	for (int m=0; m<_nScalars; ++m) {
+		u2 = getScalar( m );
+		v2 = getScalar( _nScalars - m - 1 );
+		for (int n=0; n<_nFluxes; ++n) {
+			q1 = getFlux( n );
+			q2 = 0;
+			VelocityToFlux( u2, v2, q2 );
+			FluxToVelocity( q1, u1, v1 );
+			double IPFlux = InnerProduct( q1, q2 );
+			double IPScalar = InnerProduct( u1, u2 ) + InnerProduct( v1, v2 );
+			EXPECT_NEAR( IPFlux, IPScalar, tol );
+		}
+	}
+}	
+	
+TEST_P(VectorOperationsTestY, FluxToVelocity) {
+	_grid.setYShift( GetParam() );
+	Flux q1(_grid);
+	Flux q2(_grid);
+	Scalar u1(_grid);
+	Scalar u2(_grid);
+	Scalar v1(_grid);
+	Scalar v2(_grid);
+	
+	double tol = 1e-13;
+	for (int m=0; m<_nScalars; ++m) {
+		u2 = getScalar( m );
+		v2 = getScalar( _nScalars - m - 1 );
+		for (int n=0; n<_nFluxes; ++n) {
+			q1 = getFlux( n );
+			q2 = 0;
+			VelocityToFlux( u2, v2, q2 );
+			FluxToVelocity( q1, u1, v1 );
+			double IPFlux = InnerProduct( q1, q2 );
+			double IPScalar = InnerProduct( u1, u2 ) + InnerProduct( v1, v2 );
+			EXPECT_NEAR( IPFlux, IPScalar, tol );
+		}
+	}
+}	
+	
 // =================
 // = Cross product =
 // =================
 
 // Test that q x q = 0
-TEST_F(VectorOperationsTest, CrossProductWithSelf) {
+TEST_F(VectorOperationsTestX, CrossProductWithSelf) {
     Flux q(_grid);
     for (int m=0; m<_nFluxes; ++m) {
         q = getFlux( m );
@@ -390,7 +602,7 @@ TEST_F(VectorOperationsTest, CrossProductWithSelf) {
 // Test that (u,0) x (0,v) = u v
 //   at least for constant u,v
 //   Note: does not hold at discrete level for non-constant u,v
-TEST_F(VectorOperationsTest, CrossProductOfOrthogonalVectors) {
+TEST_F(VectorOperationsTestX, CrossProductOfOrthogonalVectors) {
     Scalar u(_grid);
     Scalar v(_grid);
     Flux q1(_grid);
@@ -421,7 +633,7 @@ TEST_F(VectorOperationsTest, CrossProductOfOrthogonalVectors) {
 }
 
 // Test that q1 x q2 = -q2 x q1
-TEST_F(VectorOperationsTest, CrossProductAntiSymmetric) {
+TEST_F(VectorOperationsTestX, CrossProductAntiSymmetric) {
     Flux q1(_grid);
     Flux q2(_grid);
     
@@ -438,7 +650,7 @@ TEST_F(VectorOperationsTest, CrossProductAntiSymmetric) {
 
 // Test that < a, q1 x q2 > = < q1, q2 x a >
 // for all Scalars a, Fluxes q1, q2
-TEST_F(VectorOperationsTest, CrossProductTripleProduct) {
+TEST_F(VectorOperationsTestX, CrossProductTripleProduct) {
     Flux q1(_grid);
     Flux q2(_grid);
     Scalar a(_grid);
@@ -480,7 +692,7 @@ TEST_F(VectorOperationsTest, CrossProductTripleProduct) {
 // ========
 
 // Test curl( a ) = 0 if a is constant in space
-TEST_F(VectorOperationsTest, CurlOfConstantScalarIsZero) {
+TEST_F(VectorOperationsTestX, CurlOfConstantScalarIsZero) {
     Scalar a(_grid);
     a = 3;
     Flux q = Curl(a);
@@ -491,7 +703,7 @@ TEST_F(VectorOperationsTest, CurlOfConstantScalarIsZero) {
 }
 
 // Test curl( q ) = 0 if q is constant in space
-TEST_F(VectorOperationsTest, CurlOfConstantFluxIsZero) {
+TEST_F(VectorOperationsTestX, CurlOfConstantFluxIsZero) {
     Flux q(_grid);
     q = 5;
     Scalar a = Curl(q);
@@ -499,7 +711,7 @@ TEST_F(VectorOperationsTest, CurlOfConstantFluxIsZero) {
 }
 
 // Test curl( (ax + c, by + d) ) = a - b (constant)
-TEST_F(VectorOperationsTest, CurlOfLinearFlux) {
+TEST_F(VectorOperationsTestX, CurlOfLinearFlux) {
     double a = 7;
     double b = 11;
     double c = 13;
@@ -521,7 +733,7 @@ TEST_F(VectorOperationsTest, CurlOfLinearFlux) {
 }
 
 // Test curl( ax + by + c ) = (b, -a)  (constant)
-TEST_F(VectorOperationsTest, CurlOfLinearScalar) {
+TEST_F(VectorOperationsTestX, CurlOfLinearScalar) {
     double a = 7;
     double b = 11;
     double c = 13;
@@ -546,7 +758,7 @@ TEST_F(VectorOperationsTest, CurlOfLinearScalar) {
     EXPECT_ALL_X_EQ( CurlF(lev,X,i,j), b * _grid.Dx(lev) );
     EXPECT_ALL_Y_EQ( CurlF(lev,Y,i,j), -a * _grid.Dx(lev) );
 }
-
+ 
 void TestCurlInnerProduct( const Scalar& a, const Flux& q ) {
     Scalar curlQ = Curl( q );
     Flux curlA = Curl( a );
@@ -555,11 +767,12 @@ void TestCurlInnerProduct( const Scalar& a, const Flux& q ) {
     double tol = 5e-13;
     EXPECT_NEAR( IPFlux, IPScalar, tol );
 }        
-    
+   
 // Test that < curl(q), a > = < q, curl(a) >
 // for any Flux q, and any Scalar a with a = 0 on boundaries
 // NOTE: For multi-domain Curl, this identity does NOT hold for arbitrary a, q
-TEST_F(VectorOperationsTest, CurlInnerProduct) {
+TEST_P(VectorOperationsTestX, CurlInnerProduct) {
+	_grid.setXShift( GetParam() );
     Flux q(_grid);
     Scalar a(_grid);
 
@@ -578,8 +791,29 @@ TEST_F(VectorOperationsTest, CurlInnerProduct) {
         TestCurlInnerProduct( a, q );
     }
 }
-
-TEST_F(VectorOperationsTest, ScalarCurlOfConstantEqualsZero) {      
+	
+TEST_P(VectorOperationsTestY, CurlInnerProduct) {
+	_grid.setYShift( GetParam() );
+	Flux q(_grid);
+	Scalar a(_grid);
+	
+	if (_ngrid == 1) {
+		for (int m=0; m<_nScalars; ++m) {
+			a = getScalar( m );
+			for (int n=0; n<_nFluxes; ++n) {
+				q = getFlux( m );
+				TestCurlInnerProduct( a, q );
+			}
+		}
+	}
+	else {
+		q = 5.;
+		a = 3.;
+		TestCurlInnerProduct( a, q );
+	}
+}
+	
+TEST_F(VectorOperationsTestX, ScalarCurlOfConstantEqualsZero) {      
     // Test 1: Curl of a non-zero constant Flux object
     // (w/ different Flux.x and Flux.y).
     Flux fluxc(_grid);
@@ -598,7 +832,7 @@ TEST_F(VectorOperationsTest, ScalarCurlOfConstantEqualsZero) {
     EXPECT_ALL_EQ( 0., sf(lev,i,j) );      
 }
 
-TEST_F(VectorOperationsTest, LaplacianOfLinearArrayEqualsZero) {
+TEST_F(VectorOperationsTestX, LaplacianOfLinearArrayEqualsZero) {
     // construct linear field u = x + 2*y
     Array2<double> u(_nx-1, _ny-1, 1, 1);
     Array2<double> Lu(_nx-1, _ny-1, 1, 1);
@@ -632,7 +866,7 @@ TEST_F(VectorOperationsTest, LaplacianOfLinearArrayEqualsZero) {
     EXPECT_ALL_EQ( 0., Lu(i,j) );
 }
     
-TEST_F(VectorOperationsTest, LaplacianOfLinearScalarEqualsZero) {
+TEST_F(VectorOperationsTestX, LaplacianOfLinearScalarEqualsZero) {
     // construct linear field u = x + 2*y
     Scalar u(_grid);
     Scalar Lu(_grid);
@@ -647,7 +881,8 @@ TEST_F(VectorOperationsTest, LaplacianOfLinearScalarEqualsZero) {
 // ================================
 // = BoundaryVector inner product =
 // ================================
-TEST_F(VectorOperationsTest, BoundaryVectorInnerProduct) {
+TEST_P(VectorOperationsTestX, BoundaryVectorInnerProduct) {
+	_grid.setXShift( GetParam() );
     const int n=10;
     BoundaryVector x(n);
     BoundaryVector y(n);
@@ -671,6 +906,39 @@ TEST_F(VectorOperationsTest, BoundaryVectorInnerProduct) {
 
 }
 
+TEST_P(VectorOperationsTestY, BoundaryVectorInnerProduct) {
+	_grid.setYShift( GetParam() );
+	const int n=10;
+	BoundaryVector x(n);
+	BoundaryVector y(n);
+	BoundaryVector::index ind;
+	
+	x = 1;
+	y = 1;
+	EXPECT_DOUBLE_EQ( InnerProduct(x,y), 2.0*n );
+	
+	// loop over x-components
+	for (ind = x.begin(X); ind != x.end(X); ++ind) {
+		x(ind) = 2;
+		y(ind) = 3;
+	}
+	// loop over y-components
+	for (ind = x.begin(Y); ind != x.end(Y); ++ind) {
+		x(ind) = 5;
+		y(ind) = 7;
+	}
+	EXPECT_DOUBLE_EQ( InnerProduct(x,y), 6*n + 35*n );
+	
+}
+
+INSTANTIATE_TEST_CASE_P(
+	xShiftTests, VectorOperationsTestX, ::testing::ValuesIn(_xShiftVal) 
+);		
+
+INSTANTIATE_TEST_CASE_P(
+	yShiftTests, VectorOperationsTestY, ::testing::ValuesIn(_yShiftVal) 
+);	
+	
 #undef EXPECT_ALL_EQ
 #undef EXPECT_ALL_X_EQ
 #undef EXPECT_ALL_Y_EQ

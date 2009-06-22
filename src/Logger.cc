@@ -46,7 +46,7 @@ void Logger::addOutput(Output* output, int numSkip) {
 
 /// \brief Call all output routines needed at the current timestep.
 bool Logger::doOutput(const State& x) {
-    assert( _hasBeenInitialized );
+	assert( _hasBeenInitialized );
     vector<Entry>::iterator entry;
     bool successful = true;
     for (entry = _outputs.begin(); entry != _outputs.end(); ++entry) {

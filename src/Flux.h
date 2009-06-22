@@ -110,7 +110,11 @@ public:
     /// q.x(ind) returns the x-coordinate of the flux specified by ind
     inline double x(int lev, index ind) {
         assert( lev >= 0 && lev < Ngrid() );
-        int dir = ind / _numXFluxes;
+		if ( ind < _numXFluxes ) { 
+			dir = 0; 
+		} else {
+			dir = 1;
+		}
         int i = (ind - dir*_numXFluxes) / (Ny()+dir);
         return x(lev,dir,i);
     }
@@ -118,7 +122,11 @@ public:
     /// q.y(ind) returns the x-coordinate of the flux specified by ind
     inline double y(int lev, index ind) {
         assert( lev >= 0 && lev < Ngrid() );
-        int dir = ind / _numXFluxes;
+		if ( ind < _numXFluxes ) { 
+			dir = 0; 
+		} else {
+			dir = 1;
+		}
         int i = (ind - dir*_numXFluxes) / (Ny()+dir);
         int j = ind - dir*_numXFluxes - i * (Ny()+dir);
         return y(lev,dir,j);

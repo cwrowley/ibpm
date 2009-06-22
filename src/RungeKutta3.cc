@@ -97,7 +97,7 @@ bool RungeKutta3::load(const string& basename) {
 // Save the ProjectionSolver's state, if necessary
 // (e.g. the Cholesky factorization)
 bool RungeKutta3::save(const string& basename) {
-    bool success;
+    bool success = false;
     // save first solver
     if (_solver1 != 0) {
         success = _solver1->save( basename + "_01" );

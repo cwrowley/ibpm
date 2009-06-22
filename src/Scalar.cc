@@ -46,10 +46,10 @@ void Scalar::coarsify() {
     // Fine grid unchanged: start with next finest grid
     for (int lev=1; lev<Ngrid(); ++lev) {
         // Loop over interior gridpoints, that correspond to finer grid
-        for (int i=NxExt()+1; i<Nx()-NxExt(); ++i) {
-            for (int j=NyExt()+1; j<Ny()-NyExt(); ++j) {
+        for (int i=NxExt()+1; i<Nx()/2+NxExt(); ++i) {
+            for (int j=NyExt()+1; j<Ny()/2+NyExt(); ++j) {
                 // get corresponding point on fine grid
-                int ii,jj;
+				int ii,jj;
                 getGrid().c2f(i,j,ii,jj);
                 _data(lev,i,j) = 0.25 * _data(lev-1,ii,jj) +
                     0.125 * ( _data(lev-1,ii+1,jj) + _data(lev-1,ii,jj+1) +
@@ -93,16 +93,20 @@ void Scalar::getBC( int lev, BC& bc ) const {
     assert( lev >= 0 && lev < Ngrid()-1 );
 
     // top and bottom boundaries
+	/* if grid is shifted completely up or down, 
+	   then all poinsts on the shared boundary must take a value of 0,
+	   as required on the boundary of the outermost grid */ 
     for (int i=0; i<=Nx(); ++i) {
         int ii,jj;  // indices on coarse grid
         getGrid().f2c(i,0,ii,jj);
         // copy point that coincides with coarse point
-        bc.bottom(i) = (*this)( lev+1, ii, jj );
-        bc.top(i) = (*this)( lev+1, ii, Ny()-jj );
+		bc.bottom(i) = (*this)( lev+1, ii, jj );
+		bc.top(i) = (*this)( lev+1, ii, Ny()/2+jj );
+		
         if ( ++i <= Nx() ) {
             // interpolate point in between coarse points
-            bc.bottom(i) = 0.5 * ( (*this)( lev+1, ii, jj ) + (*this)( lev+1, ii+1, jj) );
-            bc.top(i) = 0.5 * ( (*this)( lev+1, ii, Ny()-jj ) + (*this)( lev+1, ii+1, Ny()-jj) );
+			bc.bottom(i) = 0.5 * ( (*this)( lev+1, ii, jj ) + (*this)( lev+1, ii+1, jj) );
+			bc.top(i) = 0.5 * ( (*this)( lev+1, ii, Ny()/2+jj ) + (*this)( lev+1, ii+1, Ny()/2+jj) );
         }
     }
 
@@ -111,12 +115,12 @@ void Scalar::getBC( int lev, BC& bc ) const {
         int ii,jj;  // indices on coarse grid
         getGrid().f2c(0,j,ii,jj);
         // copy point that coincides with coarse point
-        bc.left(j) = (*this)( lev+1, ii, jj );
-        bc.right(j) = (*this)( lev+1, Nx()-ii, jj );
+		bc.left(j) = (*this)( lev+1, ii, jj );
+		bc.right(j) = (*this)( lev+1, Nx()/2+ii, jj );
         if ( ++j <= Ny() ) {
             // interpolate point in between coarse points
-            bc.left(j) = 0.5 * ( (*this)( lev+1, ii, jj ) + (*this)( lev+1, ii, jj+1) );
-            bc.right(j) = 0.5 * ( (*this)( lev+1, Nx()-ii, jj ) + (*this)( lev+1, Nx()-ii, jj+1 ) );
+			bc.left(j) = 0.5 * ( (*this)( lev+1, ii, jj ) + (*this)( lev+1, ii, jj+1) );
+			bc.right(j) = 0.5 * ( (*this)( lev+1, Nx()/2+ii, jj ) + (*this)( lev+1, Nx()/2+ii, jj+1 ) );
         }
     }
 }

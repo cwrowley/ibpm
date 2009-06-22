@@ -68,7 +68,6 @@ void EllipticSolverTest::TestHelmholtz( const Grid& grid, double alpha ) {
     HelmholtzSolver helmholtz( grid, alpha );
     int nx = grid.Nx();
     int ny = grid.Ny();
-    int ngrid = grid.Ngrid();
     
     for (int kx = 0; kx < nx; ++kx) {
         for (int ky = 0; ky < ny; ++ky) {
