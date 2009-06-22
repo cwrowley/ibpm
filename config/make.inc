@@ -1,1 +1,1 @@
-make.inc.gccjoshy
+make.inc.jhtu
