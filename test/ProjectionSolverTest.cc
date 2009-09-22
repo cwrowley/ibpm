@@ -50,11 +50,11 @@ protected:
 
         Flux q0 = Flux::UniformFlow( _grid, 1.0, 0. );
 
-        _modelWithNoBodies = new NonlinearNavierStokes(
+        _modelWithNoBodies = new NavierStokesModel(
             _grid, _emptyGeometry, Reynolds, q0 );
         _modelWithNoBodies->init();
         
-        _modelWithBodies = new NonlinearNavierStokes(
+        _modelWithBodies = new NavierStokesModel(
             _grid, _nonemptyGeometry, Reynolds, q0 );
         _modelWithBodies->init();
     }
@@ -67,7 +67,7 @@ protected:
     // Compute the linear term on the LHS of the projection equations:
     //   (1 - h/2 L) omega
     // where L is given by the associated NavierStokesModel
-    Scalar ComputeLinearTerm(Model& model, const Scalar& omega) {
+    Scalar ComputeLinearTerm(NavierStokesModel& model, const Scalar& omega) {
         Scalar result = Laplacian( omega );
         result *= model.getAlpha();
         result *= -_timestep / 2.;
@@ -80,7 +80,7 @@ protected:
     //  (1 - h/2 L) omega + h B f = a
     //                      C f = b
     void verify(
-        Model& model,
+        NavierStokesModel& model,
         ProjectionSolver& solver
         ) {
         const int nPoints = model.getNumPoints();
@@ -119,8 +119,8 @@ protected:
     Grid _grid;
     Geometry _emptyGeometry;
     Geometry _nonemptyGeometry;
-    Model* _modelWithNoBodies;
-    Model* _modelWithBodies;
+    NavierStokesModel* _modelWithNoBodies;
+    NavierStokesModel* _modelWithBodies;
 };
 
 typedef ProjectionSolverTest CGSolverTest;

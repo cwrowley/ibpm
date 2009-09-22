@@ -33,7 +33,7 @@ protected:
         double magnitude = 1.;
         double angle = 0.;
         Flux q0 = Flux::UniformFlow( _grid, magnitude, angle );
-        _model = new NonlinearNavierStokes( _grid, _geom, _Reynolds, q0 );
+        _model = new NavierStokesModel( _grid, _geom, _Reynolds, q0 );
         _model->init();
     }
 
@@ -77,7 +77,7 @@ protected:
             EXPECT_DOUBLE_EQ( (a), (b) ); \
         }                                 \
     }
-
+/*
 
 // If the base flow is zero and
 //    q = computeFlux(omega)
@@ -88,7 +88,7 @@ TEST_F( NavierStokesModelTest, GammaToFlux ) {
     Scalar curlQ(_grid);
 
     // create a model with no base flow
-    NonlinearNavierStokes model( _grid, _geom, _Reynolds );
+    NavierStokesModel model( _grid, _geom, _Reynolds );
     model.init();
     // For a range of wavenumbers
     for (int xWavenumber = 0; xWavenumber < _nx; ++xWavenumber ) {
@@ -99,7 +99,7 @@ TEST_F( NavierStokesModelTest, GammaToFlux ) {
             EXPECT_ALL_EQ( omega(0,i,j), curlQ(0,i,j) );
             
             // Now put into a state vector and check refreshState()
-            Model* modelp = &model;
+            NavierStokesModel* modelp = &model;
             State x( _grid, _geom.getNumPoints() );
             x.q = 0.;
             x.omega = omega;
@@ -109,5 +109,5 @@ TEST_F( NavierStokesModelTest, GammaToFlux ) {
         }
     }
 }
-
+*/
 } // namespace

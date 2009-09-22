@@ -6,7 +6,7 @@
 namespace ibpm {
 
 class ProjectionSolver;
-class Model;
+class NavierStokesModel;
 class BoundaryVector;
 
 /*!
@@ -31,7 +31,7 @@ public:
     /// Constructor.  Store the tolerance as private data
     ConjugateGradientSolver(
         const Grid& grid,
-        const Model& model,
+        const NavierStokesModel& model,
         double beta,
         double tolerance
     );

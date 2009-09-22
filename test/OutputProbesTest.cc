@@ -18,10 +18,10 @@ protected:
         _xOffset(-1),
         _yOffset(-3),
         _dx(_xLength/_nx),
+        _filename("testOutputProbes.probe"), 
         _grid(_nx, _ny, _ngrid, _xLength, _xOffset, _yOffset),
-		_filename("testOutputProbes.probe"), 
 		_flagInitialization(false),
-		_probe(_filename, _grid){			
+		_probe(_filename, _grid) {			
 		}
 	
     virtual ~OutputProbesTest() {}

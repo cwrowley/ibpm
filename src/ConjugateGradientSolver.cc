@@ -13,7 +13,7 @@
 // $LastChangedBy$
 // $HeadURL$
 
-#include "Model.h"
+#include "NavierStokesModel.h"
 #include "ProjectionSolver.h"
 #include "ConjugateGradientSolver.h"
 
@@ -23,7 +23,7 @@ const int MAX_ITERATIONS = 3000;
 
 ConjugateGradientSolver::ConjugateGradientSolver(
     const Grid& grid,
-    const Model& model,
+    const NavierStokesModel& model,
     double beta,
     double tolerance
     ) :

@@ -15,7 +15,7 @@
 
 #include "Scalar.h"
 #include "BoundaryVector.h"
-#include "Model.h"
+#include "NavierStokesModel.h"
 #include "ProjectionSolver.h"
 #include <string>
 
@@ -25,7 +25,7 @@ namespace ibpm {
 // 
 ProjectionSolver::ProjectionSolver(
     const Grid& grid,
-    const Model& model,
+    const NavierStokesModel& model,
     double beta) :
     _beta(beta),
     _grid(grid),
@@ -77,7 +77,7 @@ void ProjectionSolver::solve(
     Ainv( c, c );           // c = Ainv(Bf)
     omega = omegaStar - c;
 }
-
+    
 void ProjectionSolver::Ainv(const Scalar& x, Scalar& y) {
     _helmholtz.solve( x, y );
 }

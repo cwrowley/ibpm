@@ -88,7 +88,7 @@ public:
         assert( j>=1  && j< Ny() );
         return _data(lev,i,j);
     }
-
+		
     /// f[lev] returns a 2d array of grid level lev
     inline Array::Array2<double> operator[](int lev) {
         return _data[lev];

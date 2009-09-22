@@ -14,7 +14,7 @@
 // $HeadURL$
 
 #include "CholeskySolver.h"
-#include "Model.h"
+#include "NavierStokesModel.h"
 #include "assert.h"
 #include <string>
 #include <fstream>
@@ -27,7 +27,7 @@ namespace ibpm {
 // Allocate memory for the Cholesky factorization, but do not compute it
 CholeskySolver::CholeskySolver(
     const Grid& grid,
-    const Model& model,
+    const NavierStokesModel& model,
     double beta
     ) :
     ProjectionSolver( grid, model, beta ),

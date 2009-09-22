@@ -15,20 +15,20 @@ all: libibpm.a $(EXECUTABLES)
 include ../config/make.inc
 
 OBJS = \
-	AdamsBashforth.o \
 	BC.o \
 	BoundaryVector.o \
 	CholeskySolver.o \
 	ConjugateGradientSolver.o \
 	EllipticSolver.o \
 	EllipticSolver2d.o \
-	Euler.o \
 	Field.o \
 	Flux.o \
 	Geometry.o \
 	Grid.o \
+	IBSolver.o \
 	Logger.o \
 	NavierStokesModel.o \
+	OutputEnergy.o \
 	OutputForce.o \
 	OutputRestart.o \
 	OutputTecplot.o \
@@ -37,11 +37,8 @@ OBJS = \
 	ProjectionSolver.o \
 	Regularizer.o \
 	RigidBody.o \
-	RungeKutta2.o \
-	RungeKutta3.o \
 	Scalar.o \
 	State.o \
-	TimeStepper.o \
 	utils.o \
 	VectorOperations.o
 

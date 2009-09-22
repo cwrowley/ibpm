@@ -3,7 +3,7 @@
 
 #include "Scalar.h"
 #include "BoundaryVector.h"
-#include "Model.h"
+#include "NavierStokesModel.h"
 #include "EllipticSolver.h"
 #include <string>
 using std::string;
@@ -59,7 +59,7 @@ class ProjectionSolver {
 public:
 
     /// Constructor
-    ProjectionSolver(const Grid& grid, const Model& model, double beta);
+    ProjectionSolver(const Grid& grid, const NavierStokesModel& model, double beta);
 
     /// Destructor
     virtual ~ProjectionSolver();
@@ -121,7 +121,7 @@ protected:
 private:
 	double _beta;
     const Grid _grid;
-	const Model& _model;
+	const NavierStokesModel& _model;
     HelmholtzSolver _helmholtz;
 };
 

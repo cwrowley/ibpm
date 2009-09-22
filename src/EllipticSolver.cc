@@ -8,10 +8,10 @@
 //
 // Date: 30 Sep 2008
 //
-// $Revision: 177 $
-// $LastChangedDate: 2008-10-04 08:52:52 -0700 (Sat, 04 Oct 2008) $
-// $LastChangedBy: cwrowley $
-// $HeadURL: svn+ssh://rainier.princeton.edu/ibpm/trunk/src/EllipticSolver.cc $
+// $Revision$
+// $LastChangedDate$
+// $LastChangedBy$
+// $HeadURL$
 
 #include "EllipticSolver.h"
 #include <math.h>

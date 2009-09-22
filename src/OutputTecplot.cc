@@ -29,39 +29,52 @@ OutputTecplot::OutputTecplot( string filename, string title ) {
     _filename = filename;
     _title = title;
 }
-
-// Small class for storing a list of pointers to variables, and their names
-class VarList {
-public:
-    void addVariable( const Scalar* var, string name ) {
-        _vars.push_back( var );
-        _names.push_back( name );
+    
+// Write a Tecplot file with the specified filename and title,
+// with data given in the VarList passed in
+// For now, write only finest grid (level 0)
+bool OutputTecplot::writeTecplotFileASCII( const char* filename, const char* title, const VarList& list ) {
+    
+    int numVars = list.getNumVars();
+    assert( numVars > 0 );
+    // Get grid information
+    const Grid& grid = list.getVariable(0)->getGrid();
+    int nx = grid.Nx();
+    int ny = grid.Ny();
+    
+    // Write the header for the Tecplot file
+    cerr << "Writing Tecplot file " << filename << endl;
+    FILE *fp = fopen( filename, "w" );
+    if (fp == NULL) return false;
+    fprintf( fp, "TITLE = \"%s\"\n", title );
+    fprintf( fp, "VARIABLES = ");
+    for (int i=0; i<numVars; ++i) {
+        fprintf( fp, "\"%s\" ", list.getName(i).c_str() );
     }
-
-    int getNumVars() const {
-        return _vars.size();
+    fprintf( fp, "\n" );
+    fprintf( fp, "ZONE T=\"Rectangular zone\"\n" );
+    fprintf( fp, "I=%d, J=%d, K=1, ZONETYPE=Ordered\n", nx-1, ny-1 );
+    fprintf( fp, "DATAPACKING=POINT\n" );
+    fprintf( fp, "DT=(");
+    for (int i=0; i<numVars; ++i) {
+        fprintf( fp, "SINGLE ");
     }
-
-    string getName(int i) const {
-        return _names[i];
+    fprintf( fp, ")\n" );
+    
+    // Write the data
+    const int lev=0; // finest grid
+    for (int j=1; j<ny; ++j) {
+        for (int i=1; i<nx; ++i) {
+            for (int ind=0; ind < numVars; ++ind ) {
+                fprintf( fp, "%.5e ", (*list.getVariable(ind))(lev,i,j) );
+            }
+            fprintf( fp, "\n" );
+        }
     }
     
-    const Scalar* getVariable(int i) const {
-        return _vars[i];
-    }
-    
-private:
-    vector<const Scalar*> _vars;
-    vector<string> _names;
-};
-
-// Opens a new file with the specified name, and writes an ASCII Tecplot file
-// containing the variables in the VarList passed in
-bool writeTecplotFileASCII(
-    const char* filename,
-    const char* title,
-    const VarList& list
-);
+    fclose(fp);
+    return true;
+}
 
 bool OutputTecplot::doOutput(const State& state) {
     // Add timestep to filename and title
@@ -105,56 +118,6 @@ bool OutputTecplot::doOutput(const State& state) {
     // Write the Tecplot file
     bool status = writeTecplotFileASCII( filename, title, list );
     return status;
-}
-
-// Write a Tecplot file with the specified filename and title,
-// with data given in the VarList passed in
-// For now, write only finest grid (level 0)
-bool writeTecplotFileASCII(
-    const char* filename,
-    const char* title,
-    const VarList& list
-    ) {
-
-    int numVars = list.getNumVars();
-    assert( numVars > 0 );
-    // Get grid information
-    const Grid& grid = list.getVariable(0)->getGrid();
-    int nx = grid.Nx();
-    int ny = grid.Ny();
-
-    // Write the header for the Tecplot file
-    cerr << "Writing Tecplot file " << filename << endl;
-    FILE *fp = fopen( filename, "w" );
-    if (fp == NULL) return false;
-    fprintf( fp, "TITLE = \"%s\"\n", title );
-    fprintf( fp, "VARIABLES = ");
-    for (int i=0; i<numVars; ++i) {
-        fprintf( fp, "\"%s\" ", list.getName(i).c_str() );
-    }
-    fprintf( fp, "\n" );
-    fprintf( fp, "ZONE T=\"Rectangular zone\"\n" );
-    fprintf( fp, "I=%d, J=%d, K=1, ZONETYPE=Ordered\n", nx-1, ny-1 );
-    fprintf( fp, "DATAPACKING=POINT\n" );
-    fprintf( fp, "DT=(");
-    for (int i=0; i<numVars; ++i) {
-        fprintf( fp, "SINGLE ");
-    }
-    fprintf( fp, ")\n" );
-    
-    // Write the data
-    const int lev=0; // finest grid
-    for (int j=1; j<ny; ++j) {
-        for (int i=1; i<nx; ++i) {
-            for (int ind=0; ind < numVars; ++ind ) {
-                fprintf( fp, "%.5e ", (*list.getVariable(ind))(lev,i,j) );
-            }
-            fprintf( fp, "\n" );
-        }
-    }
-
-    fclose(fp);
-    return true;
 }
 
 } // namespace ibpm

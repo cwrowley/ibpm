@@ -10,7 +10,6 @@
 #include "VectorOperations.h"
 #include "Regularizer.h"
 #include "EllipticSolver.h"
-#include "Model.h"
 #include <math.h>
 
 namespace ibpm {
@@ -32,26 +31,26 @@ $LastChangedBy$
 $HeadURL$
 */
 
-class NavierStokesModel : public Model {
+class NavierStokesModel {
 public:
-    /*! \brief Constructor, given a specified grid, geometry, Reynolds number,
+    /*! \brief Constructor, given a specified grid, geometry, 
         and potential flow flux
     */
     NavierStokesModel(
         const Grid& grid,
         const Geometry& geometry,
-        double Reynolds,
+		double Reynolds,
         const Flux& q_potential
     );
-
+    
     /// \brief Constructor, assuming potential flow part is zero
     NavierStokesModel(
         const Grid& grid,
         const Geometry& geometry,
-        double Reynolds
+		double Reynolds
     );
 
-    virtual ~NavierStokesModel();
+    ~NavierStokesModel();
 
     /// Perform initial calculations needed to use model
     void init();
@@ -80,27 +79,25 @@ public:
         
     /// Compute f = C(omega) as in (14)
     void C(const Scalar& omega, BoundaryVector& f) const;
-        
-    /*! \brief Compute nonlinear terms y = N(x)
-    Pure virtual function: must be overridden by subclasses.
-    */
-    virtual Scalar N(const State& x) const = 0;
-    
-    /// \brief Return the constant alpha = 1/ReynoldsNumber
+	
+	/// \brief Return the constant alpha = 1/ReynoldsNumber
     double getAlpha() const;
-    
+	
     /// Compute flux q from vorticity omega, including base flow q0
     void computeFlux(const Scalar& omega, Flux& q ) const;
 
     /// \brief Compute flux q from the vorticity omega, including base flow
     void refreshState( State& x ) const;
 	
-private:    
-    /*! \brief Given the vorticity omega, return the streamfunction psi.
-
-    Assumes psi = 0 on the boundary, and does not add in potential flow solution
-    */
+	/*! \brief Given the vorticity omega, return the streamfunction psi.
+	 
+	 Assumes psi = 0 on the boundary, and does not add in potential flow solution
+	 */
     Scalar vorticityToStreamfunction(const Scalar& omega) const;
+	
+private:    
+    // Perhaps copy constructor should be made private to prevent future memory deallocation errors
+    
     BoundaryVector getBaseFlowBoundaryVelocities() const;
     void computeFluxWithoutBaseFlow(const Scalar& omega, Flux& q ) const;
 
@@ -109,114 +106,10 @@ private:
     const Geometry& _geometry;
     Regularizer _regularizer;
     Flux _baseFlow;
-    double _ReynoldsNumber;
+	double _ReynoldsNumber;
     PoissonSolver _poisson;
     bool _hasBeenInitialized;
 };
-
-//! Full nonlinear Navier-Stokes equations.
-class NonlinearNavierStokes : public NavierStokesModel {
-public:
-    NonlinearNavierStokes(
-        const Grid& grid,
-        const Geometry& geometry,
-        double Reynolds,
-        const Flux& q_potential
-        ) :
-        NavierStokesModel( grid, geometry, Reynolds, q_potential )
-    {}
-
-    NonlinearNavierStokes(
-        const Grid& grid,
-        const Geometry& geometry,
-        double Reynolds
-        ) :
-        NavierStokesModel( grid, geometry, Reynolds )
-    {}
-    
-    /*! \brief Compute nonlinear terms y = N(x)
-    for full nonlinear Navier-Stokes equations
-    */
-    Scalar N(const State& x) const;
-    
-};
-
-//! Navier-Stokes equations linearized about an equilibrium point.
-class LinearizedNavierStokes : public NavierStokesModel {
-public:
-    LinearizedNavierStokes(
-        const Grid& grid,
-        const Geometry& geometry,
-        double Reynolds,
-        const State& baseFlow
-        ) :
-        NavierStokesModel( grid, geometry, Reynolds ),
-        _x0( baseFlow )
-    {}
-
-    /*! \brief Compute nonlinear terms y = N(x)
-    for linearized Navier-Stokes equations
-    */
-    Scalar N(const State& x) const;
-
-private:
-    State _x0;
-};
-
-//! Adjoint Navier-Stokes equations, linearized  about an equilibrium point.
-class AdjointNavierStokes : public NavierStokesModel {
-public:
-    AdjointNavierStokes(
-        const Grid& grid,
-        const Geometry& geometry,
-        double Reynolds,
-        const State& baseFlow
-        ) :
-        NavierStokesModel( grid, geometry, Reynolds ),
-        _x0( baseFlow )
-    {}
-
-    /*! \brief Compute nonlinear terms y = N(x)
-    for Adjoint Navier-Stokes equations
-    */
-    Scalar N(const State& x) const;
-
-private:
-    State _x0;
-};
-
-//! Navier-Stokes equations linearized about a periodic orbit.
-class LinearizedPeriodicNavierStokes : public NavierStokesModel {
-public:
-    LinearizedPeriodicNavierStokes(
-        const Grid& grid,
-        const Geometry& geometry,
-        double Reynolds,        
-        const vector<State> x0periodic,
-		const int period
-		) :
-        NavierStokesModel( grid, geometry, Reynolds ),        	
-		_x0periodic(x0periodic),
-		_period(period)
-    {	
-		assert(_period == static_cast<int>(x0periodic.size())); 
-	}
-
-    /*! \brief Compute nonlinear terms y = N(x)
-    for linearized Navier-Stokes equations
-    */
-    Scalar N(const State& x) const;
-		
-private:    
-	const vector<State> _x0periodic;
-	const int _period;
-};
-
-
-//! Adjoint Navier-Stokes equations, linearized about an equilibrium point.
-// For now, just make AdjointNavierStokes identical to LinearizedNavierStokes
-//typedef LinearizedNavierStokes AdjointNavierStokes;
-
 
 } // namespace ibpm
 

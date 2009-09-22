@@ -22,25 +22,20 @@ $HeadURL$
 using namespace std;
 using namespace ibpm;
 
-enum ModelType { LINEAR, NONLINEAR, ADJOINT, LINEARPERIODIC, INVALID };
-
-// Return a solver of the appropriate type (e.g. Euler, RK2 )
-TimeStepper* GetSolver(
-    Grid& grid,
-    NavierStokesModel& model,
-    double dt,
-    string solverType
-);
+enum ModelType { LINEAR, NONLINEAR, ADJOINT, LINEARPERIODIC, SFD, INVALID };
 
 // Return the type of model specified in the string modelName
 ModelType str2model( string modelName );
+
+// Return the integration scheme specified in the string integratorType
+Scheme::SchemeType str2scheme( string integratorType );
 
 /*! \brief Main routine for IBFS code
  *  Set up a timestepper and advance the flow in time.
  */
 int main(int argc, char* argv[]) {
     cout << "Immersed Boundary Projection Method (IBPM), version "
-        << IBPM_VERSION << endl;
+        << IBPM_VERSION << "\n" << endl;
 
     // Get parameters
     ParmParser parser( argc, argv );
@@ -65,14 +60,14 @@ int main(int argc, char* argv[]) {
     string geomFile = parser.getString(
         "geom", "filename for reading geometry", name + ".geom" );
     double Reynolds = parser.getDouble("Re", "Reynolds number", 100.);
-    double dt = parser.getDouble( "dt", "timestep", 0.01 );
+    double dt = parser.getDouble( "dt", "timestep", 0.02 );
     string modelName = parser.getString(
-        "model", "type of model (linear, nonlinear, adjoint, linearperiodic)", 
+        "model", "type of model (linear, nonlinear, adjoint, linearperiodic, sfd)", 
 		"nonlinear" );
     string baseFlow = parser.getString(
         "baseflow", "base flow for linear/adjoint model", "" );
     string integratorType = parser.getString(
-        "scheme", "timestepping scheme (euler,ab2,rk2,rk3)", "rk2" );
+        "scheme", "timestepping scheme (euler,ab2,rk3,rk3b)", "rk3" );
     string icFile = parser.getString( "ic", "initial condition filename", "");
     string outdir = parser.getString(
         "outdir", "directory for saving output", "." );
@@ -82,6 +77,7 @@ int main(int argc, char* argv[]) {
         "restart", "if >0, write a restart file every n timesteps", 100);
     int iForce = parser.getInt(
         "force", "if >0, write forces every n timesteps", 1);
+    int iEnergy = parser.getInt( "energy", "if >0, write forces every n timesteps", 0);
     int numSteps = parser.getInt(
         "nsteps", "number of timesteps to compute", 250 );
 	int period = parser.getInt(
@@ -92,16 +88,22 @@ int main(int argc, char* argv[]) {
 		"pbaseflowname", "name of periodic baseflow, e.g. 'flow/ibpmperiodic%05d.bin', with '%05d' as time, decided by periodstart/period", "" );
     bool subtractBaseflow = parser.getBool(
 		"subbaseflow", "Subtract ic by baseflow (1/0(true/false))", false);
+    bool resetTime = parser.getBool( "resettime", "Reset time when subtracting ic by baseflow (1/0(true/false))", false);
+    double chi = parser.getDouble( "chi", "sfd gain", 0.02 );
+	double Delta = parser.getDouble( "Delta", "sfd cutoff-freq", 15. );
 	string numDigitInFileName = parser.getString(
 		"numdigfilename", "number of digits for time representation in filename", "%05d");
+
 	ModelType modelType = str2model( modelName );
+	Scheme::SchemeType schemeType = str2scheme( integratorType );
     
     if ( ! parser.inputIsValid() || modelType == INVALID || helpFlag ) {
         parser.printUsage( cerr );
         exit(1);
     }
     
-    if ( modelType != NONLINEAR ) {
+	// modify this long if statement?
+    if ( ( modelType != NONLINEAR ) && ( modelType != SFD ) ) {
 		if (modelType != LINEARPERIODIC && baseFlow == "" ){
 			cout << "ERROR: for linear or adjoint models, "
             "must specify a base flow" << endl;
@@ -130,22 +132,23 @@ int main(int argc, char* argv[]) {
 
     // output command line arguments
     string cmd = parser.getParameters();
-    cout << "Command:" << endl << cmd << endl;
+    cout << "Command:" << endl << cmd << "\n" << endl;
     parser.saveParameters( outdir + name + ".cmd" );
 
     // Name of this run
-    cout << "Run name: " << name << endl;
+    cout << "Run name: " << name << "\n" << endl;
 
     // Setup grid
     cout << "Grid parameters:" << endl
-        << "  nx      " << nx << endl
-        << "  ny      " << ny << endl
-        << "  ngrid   " << ngrid << endl
-        << "  length  " << length << endl
-        << "  xoffset " << xOffset << endl
-		<< "  yoffset " << yOffset << endl
-		<< "  xshift  " << xShift << endl
-		<< "  yshift  " << yShift << endl;
+        << "    nx      " << nx << endl
+        << "    ny      " << ny << endl
+        << "    ngrid   " << ngrid << endl
+        << "    length  " << length << endl
+        << "    xoffset " << xOffset << endl
+		<< "    yoffset " << yOffset << endl
+		<< "    xshift  " << xShift << endl
+		<< "    yshift  " << yShift << endl
+        << endl;
     Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
 	grid.setXShift( xShift );
 	grid.setYShift( yShift );
@@ -154,32 +157,35 @@ int main(int argc, char* argv[]) {
     Geometry geom;
     cout << "Reading geometry from file " << geomFile << endl;
     if ( geom.load( geomFile ) ) {
-        cout << "  " << geom.getNumPoints() << " points on the boundary" << endl;
+        cout << "    " << geom.getNumPoints() << " points on the boundary" << "\n" << endl;
     }
     else {
         exit(-1);
     }
-
+	
     // Setup equations to solve
-    cout << "Reynolds number = " << Reynolds << endl;
+    cout << "Reynolds number = " << Reynolds << "\n" << endl;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
+	NavierStokesModel model( grid, geom, Reynolds, q_potential );
+    model.init();
 	
-    cout << "Setting up Navier Stokes model..." << flush;
-    NavierStokesModel* model = NULL;
+    cout << "Setting up Immersed Boundary Solver..." << flush;
+    IBSolver* solver = NULL;
 	State x00( grid, geom.getNumPoints() );	
+
 	switch (modelType){
-		case NONLINEAR:		
-			model = new NonlinearNavierStokes( grid, geom, Reynolds, q_potential);
+		case NONLINEAR:	
+			solver = new NonlinearIBSolver( grid, model, dt, schemeType );
 			break;
 		case LINEAR:
 			x00.load( baseFlow );
-			model = new LinearizedNavierStokes( grid, geom, Reynolds, x00 );
+			solver = new LinearizedIBSolver( grid, model, dt, schemeType, x00 );
 			break;			
 		case ADJOINT:
 			x00.load( baseFlow );
-			model = new AdjointNavierStokes( grid, geom, Reynolds, x00 );
+			solver = new AdjointIBSolver( grid, model, dt, schemeType, x00 );
 			break;			
 		case LINEARPERIODIC:{
 			// load periodic baseflow files
@@ -187,12 +193,19 @@ int main(int argc, char* argv[]) {
 			char pbffilename[256];
 			string pbf = periodBaseFlowName;
 			for (int i=0; i < period; i++) {
-				cout << "loading the " << i << "-th periodic baseflow:" << endl;
+				//cout << "loading the " << i << "-th periodic baseflow:" << endl;
 				sprintf(pbffilename, pbf.c_str(), i + periodStart);
 				x0[i].load(pbffilename);					  
 			}
 			x00 = x0[0];
-			model = new LinearizedPeriodicNavierStokes( grid, geom, Reynolds, x0, period);		
+			solver = new LinearizedPeriodicIBSolver( grid, model, dt, schemeType, x0, period ) ;	
+			break;
+			}
+		case SFD:{ 
+            cout << "SFD parameters:" << endl;
+            cout << "    chi =   " << chi << endl;
+            cout << "    Delta = " << Delta << endl << endl;
+			solver = new SFDSolver( grid, model, dt, schemeType, Delta, chi ) ;
 			break;
 			}
 		case INVALID:
@@ -200,19 +213,20 @@ int main(int argc, char* argv[]) {
 			exit(1);
 			break;
 	}
-	assert( model != NULL );
-    model->init();
-	cout << "done" << endl;
 	
+	assert( solver != NULL );
+
     // Setup timestepper
-    TimeStepper* solver = GetSolver( grid, *model, dt, integratorType );
-    cout << "Using " << solver->getName() << " timestepper" << endl;
-    cout << "  dt = " << dt << endl;
-    if ( ! solver->load( outdir + name ) ) {
+    cout << "using " << solver->getName() << " timestepper" << endl;
+    cout << "    dt = " << dt << "\n" << endl;
+	if ( ! solver->load( outdir + name ) ) {
+        // Set the tolerance for a ConjugateGradient solver below
+        // Otherwise default is tol = 1e-7
+        // solver->setTol( 1e-8 )
         solver->init();
         solver->save( outdir + name );
     }
-
+	
     // Load initial condition
     State x( grid, geom.getNumPoints() );
     x.omega = 0.;
@@ -221,10 +235,10 @@ int main(int argc, char* argv[]) {
 	if (icFile != "") {	
 	    cout << "Loading initial condition from file: " << icFile << endl;
         if ( ! x.load(icFile) ) {
-            cout << "  (failed: using zero initial condition)" << endl;
+            cout << "    (failed: using zero initial condition)" << endl;
         }
 		if ( subtractBaseflow == true ) {
-            cout << "  Subtract initial condition by baseflow to form a linear initial perturbation" << endl;
+            cout << "    Subtracting initial condition by baseflow to form a linear initial perturbation" << endl;
 			if (modelType != NONLINEAR) {
 				assert((x.q).Ngrid() == (x00.q).Ngrid());
 				assert((x.omega).Ngrid() == (x00.omega).Ngrid());
@@ -236,36 +250,46 @@ int main(int argc, char* argv[]) {
 				cout << "Flag subbaseflow should be true only for linear cases"<< endl;
 				exit(1);				
 			}
+            if (resetTime == true) {
+                x.timestep = 0;
+                x.time = 0.;
+            }
 		}
     }
     else {
         cout << "Using zero initial condition" << endl;
     }
-	cout << "initial time = " << x.timestep << endl;
+	cout << endl << "Initial timestep = " << x.timestep << "\n" << endl;
 	
     // Setup output routines
     OutputTecplot tecplot( outdir + name + numDigitInFileName + ".plt", "Test run, step" +  numDigitInFileName);
     OutputRestart restart( outdir + name + numDigitInFileName + ".bin" );
     OutputForce force( outdir + name + ".force" ); 
-
+    OutputEnergy energy( outdir + name + ".energy" ); 
+    
     Logger logger;
     // Output Tecplot file every timestep
     if ( iTecplot > 0 ) {
-        cout << "Writing Tecplot file every " << iTecplot << " steps" << endl;
+        cout << "Writing Tecplot file every " << iTecplot << " step(s)" << endl;
         logger.addOutput( &tecplot, iTecplot );
     }
     if ( iRestart > 0 ) {
-        cout << "Writing restart file every " << iRestart << " steps" << endl;
+        cout << "Writing restart file every " << iRestart << " step(s)" << endl;
         logger.addOutput( &restart, iRestart );
     }
     if ( iForce > 0 ) {
-        cout << "Writing forces every " << iForce << " steps" << endl;
+        cout << "Writing forces every " << iForce << " step(s)" << endl;
         logger.addOutput( &force, iForce );
     }
+    if ( iEnergy > 0 ) {
+        cout << "Writing energy every " << iForce << " step(s)" << endl;
+        logger.addOutput( &energy, iEnergy );
+    }
+    cout << endl;
     logger.init();
     logger.doOutput( x );
+    
     cout << "Integrating for " << numSteps << " steps" << endl;
-
     for(int i=1; i <= numSteps; ++i) {
         cout << "step " << i << endl; 
 		solver->advance( x );
@@ -277,14 +301,15 @@ int main(int argc, char* argv[]) {
         logger.doOutput( x );
     }
     logger.cleanup();
-    delete solver;
-    delete model;
+	
+	delete solver;
     return 0;
 }
 
 ModelType str2model( string modelName ) {
     ModelType type;
     MakeLowercase( modelName );
+
     if ( modelName == "nonlinear" ) {
         type = NONLINEAR;
     }
@@ -297,6 +322,9 @@ ModelType str2model( string modelName ) {
 	else if ( modelName == "linearperiodic" ) {
         type = LINEARPERIODIC;
     }
+	else if ( modelName == "sfd" ) {
+		type = SFD;
+	}
     else {
         cerr << "Unrecognized model: " << modelName << endl;
         type = INVALID;
@@ -304,28 +332,27 @@ ModelType str2model( string modelName ) {
     return type;
 }
 
-TimeStepper* GetSolver(
-    Grid& grid,
-    NavierStokesModel& model,
-    double dt,
-    string solverType
-    ) {
-    MakeLowercase( solverType );
-    if ( solverType == "euler" ) {
-        return new Euler( grid, model, dt );
+Scheme::SchemeType str2scheme( string schemeName ) {
+	Scheme::SchemeType type;
+    MakeLowercase( schemeName );
+    if ( schemeName == "euler" ) {
+        type = Scheme::EULER;
     }
-    else if ( solverType == "ab2" ) {
-        return new AdamsBashforth( grid, model, dt );
+    else if ( schemeName == "ab2" ) {
+        type = Scheme::AB2;
     }
-    else if ( solverType == "rk2" ) {
-        return new RungeKutta2( grid, model, dt );
+    else if ( schemeName == "rk3" ) {
+        type = Scheme::RK3;
     }
-    else if ( solverType == "rk3" ) {
-        return new RungeKutta3( grid, model, dt );
+    else if ( schemeName == "rk3b" ) {
+        type = Scheme::RK3b;
     }
     else {
-        cerr << "ERROR: unrecognized solver: " << solverType << endl;
+        cerr << "Unrecognized integration scheme: " << schemeName;
+		cerr << "    Exiting program." << endl;
         exit(1);
     }
+    return type;
 }
+
 

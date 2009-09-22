@@ -15,146 +15,122 @@
 #include "NavierStokesModel.h"
 
 namespace ibpm {
-
-NavierStokesModel::NavierStokesModel(
-    const Grid& grid,
-    const Geometry& geometry,
-    double Reynolds,
-    const Flux& q_potential
-    ) :
+	
+	NavierStokesModel::NavierStokesModel(
+	const Grid& grid,
+	const Geometry& geometry,
+	double Reynolds,
+	const Flux& q_potential
+	) :
     _grid( grid ),
     _geometry( geometry ),
     _regularizer( grid, geometry ),
     _baseFlow( q_potential ),
-    _ReynoldsNumber( Reynolds ),
+	_ReynoldsNumber( Reynolds ),
     _poisson( grid ),
     _hasBeenInitialized( false )
-{}
-
-NavierStokesModel::NavierStokesModel(
-    const Grid& grid,
-    const Geometry& geometry,
-    double Reynolds
-    ) :
+	{}
+	
+	NavierStokesModel::NavierStokesModel(
+	const Grid& grid,
+	const Geometry& geometry,
+	double Reynolds
+	) :
     _grid( grid ),
     _geometry( geometry ),
     _regularizer( grid, geometry ),
     _baseFlow( grid ),
-    _ReynoldsNumber( Reynolds ),
+	_ReynoldsNumber( Reynolds ),
     _poisson( grid ),
     _hasBeenInitialized( false )
     {
-    _baseFlow = 0.;
-}
-
-NavierStokesModel::~NavierStokesModel() {}
+		_baseFlow = 0.;
+	}
+	
+    NavierStokesModel::~NavierStokesModel() {}
     
-void NavierStokesModel::init() {
-    if ( _hasBeenInitialized ) return;  // do only once
-    // Update regularizer
-    _regularizer.update();    
-    _hasBeenInitialized = true;
-}
-
-bool NavierStokesModel::isTimeDependent() const {
-    return ! _geometry.isStationary();
-}
-
-int NavierStokesModel::getNumPoints() const {
-    return _geometry.getNumPoints();
-}
- 
-// Return the boundary velocities minus the base flow velocity at the boundary
-BoundaryVector NavierStokesModel::getConstraints() const {
-    BoundaryVector b = _geometry.getVelocities();
-    BoundaryVector b0 = getBaseFlowBoundaryVelocities();
-    b -= b0;
-    return b;
-}
+	void NavierStokesModel::init() {
+		if ( _hasBeenInitialized ) return;  // do only once
+		// Update regularizer
+		_regularizer.update();    
+		_hasBeenInitialized = true;
+	}
+	
+	bool NavierStokesModel::isTimeDependent() const {
+		return ! _geometry.isStationary();
+	}
+	
+	int NavierStokesModel::getNumPoints() const {
+		return _geometry.getNumPoints();
+	}
+	
+	double NavierStokesModel::getAlpha() const {
+		return 1. / _ReynoldsNumber;
+	}
+	
+	// Return the boundary velocities minus the base flow velocity at the boundary
+	BoundaryVector NavierStokesModel::getConstraints() const {
+		BoundaryVector b = _geometry.getVelocities();
+		BoundaryVector b0 = getBaseFlowBoundaryVelocities();
+		b -= b0;
+		return b;
+	}
     
-void NavierStokesModel::updateOperators( double time ) {
-    _geometry.moveBodies(time);
-    _regularizer.update();
-}
+	void NavierStokesModel::updateOperators( double time ) {
+		_geometry.moveBodies(time);
+		_regularizer.update();
+	}
     
-double NavierStokesModel::getAlpha() const {
-    return 1. / _ReynoldsNumber;
-}
-    
-void NavierStokesModel::B(const BoundaryVector& f, Scalar& omega ) const {
-    assert( _hasBeenInitialized );
-    Flux q = _regularizer.toFlux( f );
-    Curl( q, omega );
-}
+	void NavierStokesModel::B(const BoundaryVector& f, Scalar& omega ) const {
+		assert( _hasBeenInitialized );
+		Flux q = _regularizer.toFlux( f );
+		Curl( q, omega );
+	}
+	
+	void NavierStokesModel::C(const Scalar& omega, BoundaryVector& f) const {
+		assert( _hasBeenInitialized );
+		Flux q(_grid);
+		computeFluxWithoutBaseFlow( omega, q );
+		f = _regularizer.toBoundary( q );
+	}
+	
+	void NavierStokesModel::computeFluxWithoutBaseFlow(const Scalar& omega,
+													   Flux& q ) const {
+		assert( _hasBeenInitialized );
+		Scalar streamfunction = vorticityToStreamfunction( omega );
+		Curl( streamfunction, q );
+	}
+	
+	void NavierStokesModel::computeFlux(const Scalar& omega, Flux& q ) const {
+		assert( _hasBeenInitialized );
+		computeFluxWithoutBaseFlow( omega, q );
+		q += _baseFlow;
+	}
+	
+	void NavierStokesModel::refreshState( State& x ) const {
+		computeFlux( x.omega, x.q );
+	}
+	
+	// Convert vorticity omega into streamfunction psi:
+	//    Laplacian psi = - omega
+	Scalar NavierStokesModel::vorticityToStreamfunction( const Scalar& omega ) const {
+		assert( _hasBeenInitialized );
+		// Solve L psi = omega, with zero Dirichlet bc's
+		Scalar psi = -1. * omega;
+		psi.coarsify();
+		_poisson.solve( psi, psi );
+		return psi;
+	}
+	
+	BoundaryVector NavierStokesModel::getBaseFlowBoundaryVelocities() const {
+		assert( _hasBeenInitialized );
+		BoundaryVector velocity = _regularizer.toBoundary( _baseFlow );
+		return velocity;
+	}
 
-void NavierStokesModel::C(const Scalar& omega, BoundaryVector& f) const {
-    assert( _hasBeenInitialized );
-    Flux q(_grid);
-    computeFluxWithoutBaseFlow( omega, q );
-    f = _regularizer.toBoundary( q );
-}
-
-void NavierStokesModel::computeFluxWithoutBaseFlow(const Scalar& omega,
-                                                   Flux& q ) const {
-    assert( _hasBeenInitialized );
-    Scalar streamfunction = vorticityToStreamfunction( omega );
-    Curl( streamfunction, q );
-}
-
-void NavierStokesModel::computeFlux(const Scalar& omega, Flux& q ) const {
-    assert( _hasBeenInitialized );
-    computeFluxWithoutBaseFlow( omega, q );
-    q += _baseFlow;
-}
-
-void NavierStokesModel::refreshState( State& x ) const {
-    computeFlux( x.omega, x.q );
-}
-
-// Convert vorticity omega into streamfunction psi:
-//    Laplacian psi = - omega
-Scalar NavierStokesModel::vorticityToStreamfunction( const Scalar& omega ) const {
-    assert( _hasBeenInitialized );
-    // Solve L psi = omega, with zero Dirichlet bc's
-    Scalar psi = -1. * omega;
-    psi.coarsify();
-    _poisson.solve( psi, psi );
-    return psi;
-}
-
-BoundaryVector NavierStokesModel::getBaseFlowBoundaryVelocities() const {
-    assert( _hasBeenInitialized );
-    BoundaryVector velocity = _regularizer.toBoundary( _baseFlow );
-    return velocity;
-}
-
-Scalar NonlinearNavierStokes::N(const State& x) const {
-	Flux v = CrossProduct( x.q, x.omega );
-    Scalar g = Curl( v );
-    return g;
-}
-
-Scalar LinearizedNavierStokes::N(const State& x) const {
-    Flux v = CrossProduct( _x0.q, x.omega );
-    v += CrossProduct( x.q, _x0.omega );
-    Scalar g = Curl( v );
-    return g;
-}
-    
-
-Scalar AdjointNavierStokes::N(const State& x) const {
-    Scalar g = Laplacian( CrossProduct( x.q, _x0.q ));
-    g -= Curl(CrossProduct( x.q, _x0.omega ));
-    return g;
-}
- 
-Scalar LinearizedPeriodicNavierStokes::N(const State& x) const {
-	int k = x.timestep % _period;
-	cout << "At time step " << x.timestep << ", phase k = " << k << endl; 
-	Flux v = CrossProduct( _x0periodic[k].q, x.omega );
-    v += CrossProduct( x.q, _x0periodic[k].omega );
-	Scalar g = Curl( v );	
-	return g;	
-}
-	   
+	
 } // namespace ibpm
+
+
+
+ 

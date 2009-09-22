@@ -31,10 +31,7 @@
 #include "NavierStokesModel.h"
 
 // timesteppers
-#include "Euler.h"
-#include "RungeKutta2.h"
-#include "RungeKutta3.h"  
-#include "AdamsBashforth.h"
+#include "IBSolver.h"
 
 // motion
 #include "Motion.h"
@@ -45,6 +42,7 @@
 #include "Logger.h"
 #include "OutputTecplot.h"
 #include "OutputRestart.h"
+#include "OutputEnergy.h"
 #include "OutputForce.h"
 #include "OutputProbes.h"
 

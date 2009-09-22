@@ -39,7 +39,7 @@ public:
     
     CholeskySolver(
         const Grid& grid,
-        const Model& model,
+        const NavierStokesModel& model,
         double beta
     );
     
