@@ -24,7 +24,7 @@ protected:
 		_probe(_filename, _grid) {			
 		}
 	
-    virtual ~OutputProbesTest() {}
+    virtual ~OutputProbesTest() { }
 
     int _nx;
     int _ny;
