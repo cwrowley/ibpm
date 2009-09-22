@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
         cout << "nx = " << x.omega.Nx() << endl
              << "ny = " << x.omega.Ny() << endl
              << "dx = " << x.omega.Dx() << endl
-             << "x0 = " << x.omega.getXEdge(0) << endl
-             << "y0 = " << x.omega.getYEdge(0) << endl
+             << "x0 = " << x.omega.getXEdge(0,0) << endl
+             << "y0 = " << x.omega.getYEdge(0,0) << endl
              << "numPoints = " << x.f.getNumPoints() << endl;
     }
     

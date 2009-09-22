@@ -55,13 +55,13 @@ int main(int argc, char* argv[]) {
     double alpha = 0;  // angle of background flow
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
     cout << "Setting up Navier Stokes model..." << flush;
-    NonlinearNavierStokes model( grid, geom, Reynolds, q_potential );
+    NavierStokesModel model( grid, geom, Reynolds, q_potential );
     model.init();
     cout << "done" << endl;
 
     // Setup timestepper
     double dt = 0.001;
-    AdamsBashforth solver(grid, model, dt);
+    NonlinearIBSolver solver( grid, model, dt, Scheme::AB2 );
     solver.init();
 
     // Build the state variable, zero initial conditions

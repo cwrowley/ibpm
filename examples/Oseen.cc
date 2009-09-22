@@ -70,12 +70,12 @@ int main(int argc, char* argv[]) {
     Flux q0( grid );
     q0 = 0;
 
-	NonlinearNavierStokes model( grid, geom, Reynolds, q0 );
+	NavierStokesModel model( grid, geom, Reynolds, q0 );
     model.init();
     
 	// Setup timestepper
 	double dt = 0.05;
-	Euler solver( grid, model, dt );
+    NonlinearIBSolver solver( grid, model, dt, Scheme::EULER );
     solver.init();
 
 	// Setup initial condition
