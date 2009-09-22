@@ -11,11 +11,9 @@ CXXFLAGS = -Wall -g -O4 -funroll-loops -DNDEBUG #-fast
 # CXXFLAGS = -Wall -g
 
 lib_dirs = \
-	-L/home/jhtu/lib \
 	-L/usr/local/lib
 	
 
 include_dirs = \
-	-I/home/jhtu/include \
 	-I/usr/local/include
 	
