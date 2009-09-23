@@ -1,0 +1,15 @@
+namespace ibpm {
+
+/*! \page References References
+
+\section References
+
+\subsection TaiCol07
+K. Taira and T. Colonius, <em>J. Comput. Phys.</em> \b 225(2):2118-2137, 2007.
+
+\subsection ColTai08
+T. Colonius and K. Taira, <em>Comp. Meth. Appl. Mech. Eng.</em> \b 197(25-28):2131-2146, 2008.
+
+*/
+
+} // namespace ibpm

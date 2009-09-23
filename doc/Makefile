@@ -10,17 +10,25 @@
 
 all: doc ibpm_manual.pdf
 
-.PHONY: doc clean distclean
+SUBDIRS = examples snippets
+
+.PHONY: doc clean distclean $(SUBDIRS)
 .SUFFIXES: .tex .pdf
 
-doc:
+doc: $(SUBDIRS)
 	doxygen
+
+$(SUBDIRS):
+	$(MAKE) -C $@
 
 .tex.pdf:
 	(pdflatex $<; pdflatex $<; pdflatex $<)
 
 clean:
-	/bin/rm -f *.aux *.toc *.blg *.fdb_latexmk *.log *.out *.pdfsync
+	-$(RM) -f *.aux *.toc *.blg *.fdb_latexmk *.log *.out *.pdfsync
+	for dir in $(SUBDIRS); do \
+	  $(MAKE) -C $$dir clean; \
+	done
 
 distclean: clean
-	/bin/rm -rf html latex ibpm_design.pdf
+	-$(RM) -rf html latex ibpm_design.pdf

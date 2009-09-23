@@ -1,0 +1,39 @@
+namespace ibpm {
+
+/*! \mainpage Immersed Boundary Projection Method
+
+\section TOC Table of contents
+	- \ref Overview
+	- \ref Installation
+	- \ref Method "What the code does"
+	- \ref CLtool "Command line tool"
+	- \ref Library "Library overview"
+	- \ref References
+
+\section Overview
+The code described in this manual uses an immersed boundary method to solve the two-dimensional incompressible Navier-Stokes equations around complex geometries, using the projection method described in \ref TaiCol07.  In particular, this code implements the ``fast method'' described in Section 3.3 of \ref ColTai08, using the multi-domain approach for far-field boundary conditions, as described in section 4 of this paper.
+
+\subsection Organization How this manual is organized
+
+This package provides a command-line tool \c ibpm, as well as a library (<tt>libibpm.a</tt>) that can be used for writing customized programs, such as post-processing utilities, or computational wrappers around the main solver.
+
+\ref Installation describes how to compile the library and executables.  \ref Method describes what the code does, giving the highlights of the numerical method.  \ref CLtool describes the simplest way to use the code, via the command-line tool.  \ref Library "Library overview" describes the high-level classes provided by the library, geared towards users of the library.
+
+
+\section Installation
+
+installation instructions here
+
+\section Method
+
+what the code does
+
+\section CLtool Command line
+
+command line tool
+
+
+
+*/
+
+} // namespace ibpm

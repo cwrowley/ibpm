@@ -1,0 +1,68 @@
+namespace ibpm {
+
+/*! \page Library Library overview
+
+The algorithms used by the main \p ibpm code are made available in a library that can be used by other codes, for instance to write wrapper routines around the main timestepper, or to perform post-processing tasks.  The library is written in an object-oriented style, with the various algorithms and data structures provided by different classes.  Here, we give an overview of the various classes and their roles, as well as some \ref Examples.  For a detailed description of their interfaces, consult the Doxygen documentation, or the corresponding header files.
+
+An overview of the classes and their interactions is shown in the figure below.
+
+\image html IBPMDesign.pdf Overview of the main classes in the IBPM library.
+\image latex IBPMDesign.pdf Overview of the main classes in the IBPM library.
+
+\section DataStructures Data structures
+
+The main data structures consist of a Grid that specifies the grid characteristics, a Geometry that specifies the configuration of the bodies and the locations of their boundary points, and variables that take on values either on the grid (Scalar, Flux), or on the boundary points (BoundaryVector).
+
+A Grid defines the number of grid points in x- and y-directions, as well as the physical dimensions, and the number of grids to be used in a multi-domain solver.
+
+Two classes, Scalar and Flux, define variables that take on values on the grid.  In particular, a Scalar variable (such as vorticity and streamfunction) takes on a single value at each node in the figure below.
+
+\image html grid.pdf "Layout of staggered grid"
+\image latex grid.pdf "Layout of staggered grid"
+
+A Flux is vector-valued: the x-component is defined as the flux through vertical edges in the figure (blue arrows), while the y-component is defined as the flux through horizontal edges (red arrows).
+
+A Geometry defines the configuration of the bodies and the locations of their boundary points.  In particular, a Geometry contains a number of RigidBody objects, each with an associated Motion that prescribes the motion of that body in time.
+
+A BoundaryVector defines a vector-valued function that takes on values at the boundary points defined by a particular Geometry.  For instance, the x- and y-forces at the boundary points are described by a BoundaryVector, as are the velocities at the boundary points, in the case of a moving body.
+
+Finally, a State consists of the complete flow state at any time.  In particular, a State has components
+
+\code
+Scalar omega;       // vorticity at each node
+Flux q;             // u- and v-velocity flux through cell edges
+BoundaryVector f;   // forces at each of the boundary points
+int timestep;       // current timestep
+double time;        // current time
+\endcode
+
+\section Examples
+
+\subsection GridSec Grid
+For example, the following code defines a grid:
+
+\include setup_grid.cc
+
+output:
+
+\include setup_grid.out
+
+
+
+\subsection CylExamp Flow past a cylinder
+
+The following is a complete program to compute flow past a cylinder:
+
+\include cylinder.cc
+
+output:
+
+\include cylinder.out
+
+\image html cylinder.png "Vorticity from cylinder example"
+\image latex cylinder.png "Vorticity from cylinder example"
+
+
+*/
+
+} // namespace ibpm
