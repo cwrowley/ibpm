@@ -33,13 +33,14 @@ public:
              double tol
              );
 	virtual ~IBSolver();
-    virtual void init();
+    void init();
+    void reset();
 	bool load(const string& basename); 
 	bool save(const string& basename);
 	string getName();
 	void advance( State& x );  
 	void advance( State& x, const Scalar& Bu );  
-	virtual void advanceSubstep( State& x, const Scalar& nonlinear, int i ); 
+	void advanceSubstep( State& x, const Scalar& nonlinear, int i ); 
     void setTol( double tol );
 
 protected: 

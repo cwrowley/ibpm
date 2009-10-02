@@ -67,6 +67,10 @@ void IBSolver::init() {
 		_solver[i] -> init();
 	}
 }
+    
+void IBSolver::reset() {	
+    _oldSaved = false;
+}    
 	
 bool IBSolver::load(const string& basename) {
 	bool successInit = false;
@@ -168,9 +172,9 @@ void IBSolver::advanceSubstep( State& x, const Scalar& nonlinear, int i ) {
 	a += _scheme.an(i)*nonlinear;
 	
 	if ( _scheme.bn(i) != 0 ) {
+        // for ab2
 		if ( _oldSaved == false ) {
 			_Nprev = nonlinear;
-			_oldSaved = true;
 		}
 		
 		a += _scheme.bn(i) * _Nprev;
@@ -188,6 +192,7 @@ void IBSolver::advanceSubstep( State& x, const Scalar& nonlinear, int i ) {
 	// Update the state, for instance to compute the corresponding flux
 	_model.refreshState( x );	
 	_Nprev = _Ntemp;
+    _oldSaved = true;       
 }	
 	
 	
