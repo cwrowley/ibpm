@@ -40,7 +40,7 @@ public:
 	string getName();
 	void advance( State& x );  
 	void advance( State& x, const Scalar& Bu );  
-	void advanceSubstep( State& x, const Scalar& nonlinear, int i ); 
+	virtual void advanceSubstep( State& x, const Scalar& nonlinear, int i ); // virtual for SFD 
     void setTol( double tol );
 
 protected: 
