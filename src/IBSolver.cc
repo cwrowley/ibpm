@@ -192,7 +192,9 @@ void IBSolver::advanceSubstep( State& x, const Scalar& nonlinear, int i ) {
 	// Update the state, for instance to compute the corresponding flux
 	_model.refreshState( x );	
 	_Nprev = _Ntemp;
-    _oldSaved = true;       
+    if( _oldSaved == false ) {
+        _oldSaved = true;       
+    }
 }	
 	
 	
