@@ -61,6 +61,7 @@ bool OutputForce::doOutput(const State& x) {
     if ( _fp == NULL ) return false;
     fprintf( _fp, "%5d %.5e %.5e %.5e\n", x.timestep, x.time, drag, lift );   
     fflush( _fp );
+    
     return true;
 }
 

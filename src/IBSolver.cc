@@ -158,25 +158,23 @@ void IBSolver::advance( State& x, const Scalar& Bu ) {
 	++x.timestep;
 }     
 	
-void IBSolver::advanceSubstep( State& x, const Scalar& nonlinear, int i ) {
+void IBSolver::advanceSubstep( State& x, const Scalar& nonlinear, int i ) {    
 	// If the body is moving, update the positions of the bodies
 	if ( _model.isTimeDependent() ) {
 		_model.updateOperators( x.time + _scheme.cn(i) * _dt );
 	}		
     
 	// Evaluate Right-Hand-Side (a) for first equation of ProjectionSolver
-	_Ntemp = nonlinear;
-	
 	Scalar a = Laplacian( x.omega );
 	a *= 0.5 * _model.getAlpha() * ( _scheme.an(i) + _scheme.bn(i) );
 	a += _scheme.an(i)*nonlinear;
 	
-	if ( _scheme.bn(i) != 0 ) {
+	if ( _scheme.bn(i) != 0 ) {        
         // for ab2
 		if ( _oldSaved == false ) {
 			_Nprev = nonlinear;
 		}
-		
+        
 		a += _scheme.bn(i) * _Nprev;
 	}
 	
@@ -191,7 +189,8 @@ void IBSolver::advanceSubstep( State& x, const Scalar& nonlinear, int i ) {
 
 	// Update the state, for instance to compute the corresponding flux
 	_model.refreshState( x );	
-	_Nprev = _Ntemp;
+	_Nprev = nonlinear;
+    
     if( _oldSaved == false ) {
         _oldSaved = true;       
     }

@@ -165,27 +165,35 @@ int main(int argc, char* argv[]) {
 	
     // Setup equations to solve
     cout << "Reynolds number = " << Reynolds << "\n" << endl;
+    cout << "Setting up Immersed Boundary Solver..." << flush;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
     Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
-	NavierStokesModel model( grid, geom, Reynolds, q_potential );
-    model.init();
-	
-    cout << "Setting up Immersed Boundary Solver..." << flush;
+    
+    NavierStokesModel* model = NULL;
     IBSolver* solver = NULL;
 	State x00( grid, geom.getNumPoints() );	
 
 	switch (modelType){
 		case NONLINEAR:	
-			solver = new NonlinearIBSolver( grid, model, dt, schemeType );
+            model =  new NavierStokesModel( grid, geom, Reynolds, q_potential );
+			solver = new NonlinearIBSolver( grid, *model, dt, schemeType );
 			break;
 		case LINEAR:
-			x00.load( baseFlow );
-			solver = new LinearizedIBSolver( grid, model, dt, schemeType, x00 );
+            if ( ! x00.load( baseFlow ) ) {
+                cout << "baseflow failed to load.  Exiting program." << endl;
+                exit(1);
+            }
+            model =  new NavierStokesModel( grid, geom, Reynolds );
+			solver = new LinearizedIBSolver( grid, *model, dt, schemeType, x00 );
 			break;			
 		case ADJOINT:
-			x00.load( baseFlow );
-			solver = new AdjointIBSolver( grid, model, dt, schemeType, x00 );
+            if ( ! x00.load( baseFlow ) ) {
+                cout << "baseflow failed to load.  Exiting program." << endl;
+                exit(1);
+            }
+            model =  new NavierStokesModel( grid, geom, Reynolds );
+			solver = new AdjointIBSolver( grid, *model, dt, schemeType, x00 );
 			break;			
 		case LINEARPERIODIC:{
 			// load periodic baseflow files
@@ -198,14 +206,16 @@ int main(int argc, char* argv[]) {
 				x0[i].load(pbffilename);					  
 			}
 			x00 = x0[0];
-			solver = new LinearizedPeriodicIBSolver( grid, model, dt, schemeType, x0, period ) ;	
+            model =  new NavierStokesModel( grid, geom, Reynolds );
+			solver = new LinearizedPeriodicIBSolver( grid, *model, dt, schemeType, x0, period ) ;	
 			break;
 			}
 		case SFD:{ 
             cout << "SFD parameters:" << endl;
             cout << "    chi =   " << chi << endl;
             cout << "    Delta = " << Delta << endl << endl;
-			solver = new SFDSolver( grid, model, dt, schemeType, Delta, chi ) ;
+            model =  new NavierStokesModel( grid, geom, Reynolds, q_potential );
+			solver = new SFDSolver( grid, *model, dt, schemeType, Delta, chi ) ;
 			break;
 			}
 		case INVALID:
@@ -214,8 +224,10 @@ int main(int argc, char* argv[]) {
 			break;
 	}
 	
-	assert( solver != NULL );
-
+	assert( model != NULL );
+    assert( solver != NULL );
+    model->init();
+    
     // Setup timestepper
     cout << "using " << solver->getName() << " timestepper" << endl;
     cout << "    dt = " << dt << "\n" << endl;
