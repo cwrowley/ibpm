@@ -42,14 +42,19 @@ public:
     /// Makes a copy of it internally.
     void addBody(const RigidBody& body);
 
+    /// \brief Return number of boundary points
     int getNumPoints() const;
 
+    /// \brief Return the boundary points in the geometry
     BoundaryVector getPoints() const;
     
+    /// \brief Return the velocities of the boundary points
     BoundaryVector getVelocities() const;
 
+    /// \brief Return true if the body is not moving; false otherwise
     bool isStationary() const;
 
+    /// \brief Move the boundary points and update their velocities
     void moveBodies(double time) const;
 
     /// \brief Load a geometry from the specified input stream.

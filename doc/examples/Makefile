@@ -1,5 +1,5 @@
 # Makefile for compiling and running examples
-# CWR, 19 Aug 2009
+# CWR, 23 Sep 2009
 
 .PHONY: all clean lib
 
