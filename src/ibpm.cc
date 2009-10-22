@@ -281,6 +281,8 @@ int main(int argc, char* argv[]) {
     else {
         cout << "Using zero initial condition" << endl;
     }
+    // Calculate flux for state, in case only vorticity was saved
+    model->refreshState( x );     
 
 	cout << endl << "Initial timestep = " << x.timestep << "\n" << endl;
 	
