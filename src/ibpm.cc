@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
 		"subbaseflow", "Subtract ic by baseflow (1/0(true/false))", false);
     bool resetTime = parser.getBool( "resettime", "Reset time when subtracting ic by baseflow (1/0(true/false))", false);
     double chi = parser.getDouble( "chi", "sfd gain", 0.02 );
-	double Delta = parser.getDouble( "Delta", "sfd cutoff-freq", 15. );
+	double Delta = parser.getDouble( "Delta", "sfd cutoff frequency", 15. );
 	string numDigitInFileName = parser.getString(
 		"numdigfilename", "number of digits for time representation in filename", "%05d");
 
@@ -172,6 +172,7 @@ int main(int argc, char* argv[]) {
     
     NavierStokesModel* model = NULL;
     IBSolver* solver = NULL;
+    SFDSolver* SFDsolver = NULL;
 	State x00( grid, geom.getNumPoints() );	
 
 	switch (modelType){
@@ -215,7 +216,8 @@ int main(int argc, char* argv[]) {
             cout << "    chi =   " << chi << endl;
             cout << "    Delta = " << Delta << endl << endl;
             model =  new NavierStokesModel( grid, geom, Reynolds, q_potential );
-			solver = new SFDSolver( grid, *model, dt, schemeType, Delta, chi ) ;
+			SFDsolver = new SFDSolver( grid, *model, dt, schemeType, Delta, chi ) ;
+            solver = SFDsolver;
 			break;
 			}
 		case INVALID:
@@ -226,6 +228,9 @@ int main(int argc, char* argv[]) {
 	
 	assert( model != NULL );
     assert( solver != NULL );
+    if( chi != 0 ) {
+        assert( SFDsolver != null );
+    }
     model->init();
     
     // Setup timestepper
@@ -267,10 +272,16 @@ int main(int argc, char* argv[]) {
                 x.time = 0.;
             }
 		}
+        
+        if ( chi != 0.0 ) {
+            SFDsolver->loadFilteredState( icFile );
+        }
+         
     }
     else {
         cout << "Using zero initial condition" << endl;
     }
+
 	cout << endl << "Initial timestep = " << x.timestep << "\n" << endl;
 	
     // Setup output routines
@@ -303,14 +314,29 @@ int main(int argc, char* argv[]) {
     
     cout << "Integrating for " << numSteps << " steps" << endl;
     for(int i=1; i <= numSteps; ++i) {
-        cout << "step " << i << endl; 
+        cout << "\nstep " << i << endl; 
+        State xtemp( x ); // For SFD norm calculation
+        
 		solver->advance( x );
         double lift;
         double drag;
         x.computeNetForce( drag, lift );
-        cout << "x force : " << setw(16) << drag*2 << " , y force : "
+        cout << "    x force: " << setw(16) << drag*2 << ", y force: "
             << setw(16) << lift*2 << "\n";
         logger.doOutput( x );
+        
+        // For SFD
+        if( chi!= 0.0 ) {
+            Scalar dx = xtemp.omega-x.omega;
+            double twoNorm = sqrt(InnerProduct(dx, dx)) / dt;
+            
+            if ( (x.timestep % iRestart == 0 ) && (chi != 0.0) ) {
+                SFDsolver->saveFilteredState( outdir, name, numDigitInFileName );
+            }
+            
+            cout << "    ||dx||/dt = " << setw(13) << twoNorm << endl;
+        }
+         
     }
     logger.cleanup();
 	

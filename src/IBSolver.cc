@@ -263,7 +263,6 @@ void SFDSolver::advanceSubstep( State& x, const Scalar& nonlinear, int i ) {
 	if ( _scheme.bn(i) != 0 ) {
 		if ( _rhsSaved == false ) {
 			_rhsPrev = rhs;
-			_rhsSaved = true;
 		}
 		
 		a += _scheme.bn(i) * _rhsPrev;
@@ -276,8 +275,12 @@ void SFDSolver::advanceSubstep( State& x, const Scalar& nonlinear, int i ) {
         _xhat.time += _dt;
         _xhat.timestep++;
     }
-		
+    
 	_rhsPrev = rhs;
+    
+    if( _rhsSaved == false ) {
+        _rhsSaved = true;       
+    }
 }
  
 void SFDSolver::saveFilteredState( string outdir, string name, string numDigitInFileName ) { 
@@ -301,6 +304,8 @@ void SFDSolver::loadFilteredState( string icFile ) {
     else {
         cout << "Setting xhat = x" << endl;
     }
+    
+    _xhatSaved = true;
 }
 
 } // ibpm
