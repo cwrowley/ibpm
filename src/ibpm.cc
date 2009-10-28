@@ -228,7 +228,8 @@ int main(int argc, char* argv[]) {
 	
 	assert( model != NULL );
     assert( solver != NULL );
-    if( chi != 0 ) {
+    if( modelType == SFD ) {
+        assert( chi != 0 );
         assert( SFDsolver != null );
     }
     model->init();
@@ -273,7 +274,7 @@ int main(int argc, char* argv[]) {
             }
 		}
         
-        if ( chi != 0.0 ) {
+        if ( modelType == SFD ) {
             SFDsolver->loadFilteredState( icFile );
         }
          
@@ -328,7 +329,7 @@ int main(int argc, char* argv[]) {
         logger.doOutput( x );
         
         // For SFD
-        if( chi!= 0.0 ) {
+        if( modelType == SFD ) {
             Scalar dx = xtemp.omega-x.omega;
             double twoNorm = sqrt(InnerProduct(dx, dx)) / dt;
             
