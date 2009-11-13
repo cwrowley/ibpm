@@ -158,6 +158,9 @@ public:
 	
     /// Get the current y-shift parameter
     double getYShift() const;
+    
+    /// Compare two grids
+    bool isEqual( Grid grid2 );
 
 private:
     double getXOffset( int lev ) const;

@@ -75,6 +75,8 @@ bool State::load(const std::string& filename) {
     double dx;
     double x0;
     double y0;
+    double xShift;
+    double yShift;
     
     fread( &nx, sizeof( int ), 1, fp );
     fread( &ny, sizeof( int ), 1, fp );
@@ -82,7 +84,9 @@ bool State::load(const std::string& filename) {
     fread( &dx, sizeof( double ), 1, fp );
     fread( &x0, sizeof( double ), 1, fp );
     fread( &y0, sizeof( double ), 1, fp );
-
+    fread( &xShift, sizeof( double ), 1, fp );
+    fread( &yShift, sizeof( double ), 1, fp );
+    
     int numPoints;
     // read Geometry info
     fread( &numPoints, sizeof( int ), 1, fp );
@@ -95,6 +99,8 @@ bool State::load(const std::string& filename) {
         dx != q.Dx() ||
         x0 != q.getXEdge(0,0) ||
         y0 != q.getYEdge(0,0) ||
+        xShift != q.getXShift() ||
+        yShift != q.getYShift() ||
         numPoints != f.getNumPoints() ) {
         
         // If old grid was previously allocated, print a warning and set
@@ -154,6 +160,8 @@ bool State::save(std::string filename) const {
     double dx = grid.Dx();
     double x0 = grid.getXEdge(0,0);
     double y0 = grid.getYEdge(0,0);
+    double xShift = grid.getXShift();
+    double yShift = grid.getYShift();
     
     fwrite( &nx, sizeof( int ), 1, fp );
     fwrite( &ny, sizeof( int ), 1, fp );
@@ -161,6 +169,8 @@ bool State::save(std::string filename) const {
     fwrite( &dx, sizeof( double ), 1, fp );
     fwrite( &x0, sizeof( double ), 1, fp );
     fwrite( &y0, sizeof( double ), 1, fp );
+    fwrite( &xShift, sizeof( double ), 1, fp );
+    fwrite( &yShift, sizeof( double ), 1, fp );
         
     // write Geometry info
     int numPoints = f.getNumPoints();

@@ -99,7 +99,7 @@ void Grid::resize(
 	_yShift = yShift;
 	_dx = length / nx;
 }
-	
+
 // Return the x-coordinate of the left-most gridpoint of level lev
 double Grid::getXOffset(int lev) const {
     return _xOffset + 0.5 * ( _xShift - 1 ) * ( ( 1 << lev ) - 1 ) * (_nx * _dx);
@@ -184,6 +184,19 @@ int Grid::getYGridIndex( double y ) const {
 		 j = int(ceil( ypos / _dx ));
 	}
 	return j;
+}
+
+// Compare two grids
+bool Grid::isEqual( Grid grid2 ) {
+    bool nx_eq = ( _nx == grid2.Nx() );
+    bool ny_eq = ( _ny == grid2.Ny() );
+    bool ngrid_eq = ( _ngrid == grid2.Ngrid() );
+    bool dx_eq = ( _dx == grid2.Dx() );
+    bool xOffset_eq = ( _xOffset == grid2.getXEdge(0,0) );
+    bool yOffset_eq = ( _yOffset == grid2.getYEdge(0,0) );
+    bool xShift_eq = ( _xShift == grid2.getXShift() );
+    bool yShift_eq = ( _yShift == grid2.getYShift() );
+    return( nx_eq * ny_eq * ngrid_eq * dx_eq * xOffset_eq * yOffset_eq * xShift_eq * yShift_eq );
 }
 
 } // namespace

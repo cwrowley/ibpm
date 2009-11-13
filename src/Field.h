@@ -35,6 +35,8 @@ public:
     inline int Ngrid() const { return _grid.Ngrid(); }
     inline double Dx() const { return _grid.Dx(); }
     inline double Dx(int lev) const { return _grid.Dx(lev); }
+    inline double getXShift() const { return _grid.getXShift(); }
+    inline double getYShift() const { return _grid.getYShift(); }
     inline const Grid& getGrid() const { return _grid; }
     inline void setGrid( const Grid& grid ) { _grid = grid; }
 

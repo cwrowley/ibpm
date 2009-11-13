@@ -149,9 +149,7 @@ int main(int argc, char* argv[]) {
 		<< "    xshift  " << xShift << endl
 		<< "    yshift  " << yShift << endl
         << endl;
-    Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
-	grid.setXShift( xShift );
-	grid.setYShift( yShift );
+    Grid grid( nx, ny, ngrid, length, xOffset, yOffset, xShift, yShift );
 
     // Setup geometry
     Geometry geom;
