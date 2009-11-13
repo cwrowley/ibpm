@@ -21,6 +21,7 @@
 #include "Flux.h"
 #include "BoundaryVector.h"
 #include "VectorOperations.h"
+#include "NavierStokesModel.h"
 #include <fftw3.h>
 #include <iostream>
 using namespace std;
@@ -172,45 +173,45 @@ void Laplacian(const Scalar& f, Scalar& g) {
 //    g(0,nx-1,ny-1) = ( f(0,nx-2,ny-1) + f(0,nx-1,ny-2) - 4 * f(0,nx-1,ny-1) ) * bydx2;
 }
 
-    void Laplacian( const Array2<double>& f,
-                    double dx,
-                    const BC& bc,
-                    Array2<double>& g ) {
-        assert( f.Nx() == g.Nx() );
-        assert( f.Ny() == g.Ny() );
-        assert( dx > 0. );
-        assert( bc.Nx() == f.Nx() + 1 );
-        assert( bc.Ny() == f.Ny() + 1 );
-        double bydx2 = 1. / (dx * dx);
-        int nx = bc.Nx();
-        int ny = bc.Ny();
-        
-        for (int i=2; i<nx-1; ++i) {
-            for (int j=2; j<ny-1; ++j) {
-                g(i,j) = f(i-1,j) + f(i+1,j) + f(i,j-1) + f(i,j+1) -4*f(i,j);
-                g(i,j) *= bydx2;
-            }
-        }
-        // left and right edges
+void Laplacian( const Array2<double>& f,
+                double dx,
+                const BC& bc,
+                Array2<double>& g ) {
+    assert( f.Nx() == g.Nx() );
+    assert( f.Ny() == g.Ny() );
+    assert( dx > 0. );
+    assert( bc.Nx() == f.Nx() + 1 );
+    assert( bc.Ny() == f.Ny() + 1 );
+    double bydx2 = 1. / (dx * dx);
+    int nx = bc.Nx();
+    int ny = bc.Ny();
+    
+    for (int i=2; i<nx-1; ++i) {
         for (int j=2; j<ny-1; ++j) {
-            g(1,j) = bc.left(j) + f(2,j) + f(1,j+1) + f(1,j-1) - 4*f(1,j);
-            g(1,j) *= bydx2;
-            g(nx-1,j) = bc.right(j) + f(nx-2,j) + f(nx-1,j+1) + f(nx-1,j-1) - 4*f(nx-1,j);
-            g(nx-1,j) *= bydx2;
+            g(i,j) = f(i-1,j) + f(i+1,j) + f(i,j-1) + f(i,j+1) -4*f(i,j);
+            g(i,j) *= bydx2;
         }
-        // top and bottom edges
-        for (int i=2; i<nx-1; ++i) {
-            g(i,1) = bc.bottom(i) + f(i,2) + f(i+1,1) + f(i-1,1) - 4*f(i,1);
-            g(i,1) *= bydx2;
-            g(i,ny-1) = bc.top(i) + f(i,ny-2) + f(i+1,ny-1) + f(i-1,ny-1) - 4*f(i,ny-1);
-            g(i,ny-1) *= bydx2;
-        }
-        // corners
-        g(1,1) = ( bc.left(1) + bc.bottom(1) + f(1,2) + f(2,1) - 4 * f(1,1) ) * bydx2;
-        g(nx-1,1) = ( bc.right(1) + bc.bottom(nx-1) + f(nx-1,2) + f(nx-2,1) - 4 * f(nx-1,1) ) * bydx2;
-        g(1,ny-1) = ( bc.left(ny-1) + bc.top(1) + f(1,ny-2) + f(2,ny-1) - 4 * f(1,ny-1) ) * bydx2;
-        g(nx-1,ny-1) = ( bc.right(ny-1) + bc.top(nx-1) + f(nx-2,ny-1) + f(nx-1,ny-2) - 4 * f(nx-1,ny-1) ) * bydx2;        
     }
+    // left and right edges
+    for (int j=2; j<ny-1; ++j) {
+        g(1,j) = bc.left(j) + f(2,j) + f(1,j+1) + f(1,j-1) - 4*f(1,j);
+        g(1,j) *= bydx2;
+        g(nx-1,j) = bc.right(j) + f(nx-2,j) + f(nx-1,j+1) + f(nx-1,j-1) - 4*f(nx-1,j);
+        g(nx-1,j) *= bydx2;
+    }
+    // top and bottom edges
+    for (int i=2; i<nx-1; ++i) {
+        g(i,1) = bc.bottom(i) + f(i,2) + f(i+1,1) + f(i-1,1) - 4*f(i,1);
+        g(i,1) *= bydx2;
+        g(i,ny-1) = bc.top(i) + f(i,ny-2) + f(i+1,ny-1) + f(i-1,ny-1) - 4*f(i,ny-1);
+        g(i,ny-1) *= bydx2;
+    }
+    // corners
+    g(1,1) = ( bc.left(1) + bc.bottom(1) + f(1,2) + f(2,1) - 4 * f(1,1) ) * bydx2;
+    g(nx-1,1) = ( bc.right(1) + bc.bottom(nx-1) + f(nx-1,2) + f(nx-2,1) - 4 * f(nx-1,1) ) * bydx2;
+    g(1,ny-1) = ( bc.left(ny-1) + bc.top(1) + f(1,ny-2) + f(2,ny-1) - 4 * f(1,ny-1) ) * bydx2;
+    g(nx-1,ny-1) = ( bc.right(ny-1) + bc.top(nx-1) + f(nx-2,ny-1) + f(nx-1,ny-2) - 4 * f(nx-1,ny-1) ) * bydx2;        
+}
     
 Scalar Laplacian( const Scalar& f ) {
     Scalar g( f.getGrid() );
@@ -376,6 +377,16 @@ double InnerProduct (const Flux& p, const Flux& q){
     return ip;
 }
 
+/*  Take the inner product of two vorticity fields by
+    taking the L2 inner product of the first vorticity field
+    with the streamfunction of the second.  This is equiv-
+    alent to taking the L2 inner product of the two fluxes.
+ */
+double InnerProduct( const Scalar omega1, const Scalar omega2, const NavierStokesModel& model ) {
+    Scalar psi2 = model.vorticityToStreamfunction( omega2 );
+    return InnerProduct( omega1, psi2 );
+}    
+    
 // Return cross product of a Flux q and a Scalar f, as a Flux object.
 //   q x f = ( f v, -f u )
 //

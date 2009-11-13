@@ -10,6 +10,7 @@ class BC;
 class Scalar;
 class Flux;
 class BoundaryVector;
+class NavierStokesModel;
 
 /*!
     \file VectorOperations.h
@@ -41,10 +42,17 @@ Flux Curl(const Scalar& f);
 void Curl(const Scalar& f, Flux& q);
 
 /// \brief Return the inner product of Scalar f and Scalar g.
-double InnerProduct( const Scalar& f, const Scalar& g );
+double InnerProduct( const Scalar& f, const Scalar& g );  
 
 /// \brief Return the inner product of Flux p and Flux q.
 double InnerProduct( const Flux& p, const Flux& q );
+    
+    
+/// \brief Return the inner product of two (Scalar) vorticity fields
+/*  This is disticnt from the standard L2 inner product so that the product of
+    vorticity fields is equal to the product of fluxes (ie both yield KE)
+ */
+double InnerProduct( const Scalar& omega1, const Scalar& omega2, const NavierStokesModel& model );  
 
 /// \brief Compute the Laplacian of f
 void Laplacian( const Scalar& f, Scalar& g );

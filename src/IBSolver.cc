@@ -121,7 +121,6 @@ ProjectionSolver* IBSolver::createSolver(double beta) {
 	// Check whether all bodies are stationary
 	//      If so, return a CholeskySolver
 	//      If not, return a ConjugateGradientSolver
-	
 	if ( _model.isTimeDependent() ) {
 		cerr << "Using ConjugateGradient solver for projection step" << endl
 		<< "  tolerance = " << _tol << endl;
@@ -215,7 +214,7 @@ Scalar LinearizedIBSolver::N(const State& x) const {
 }	
 	
 Scalar AdjointIBSolver::N(const State& x) const {
-	Scalar g = Laplacian( CrossProduct( x.q, _x0.q ));
+    Scalar g = Laplacian( CrossProduct( _x0.q, x.q ));
 	g -= Curl(CrossProduct( x.q, _x0.omega ));
 	return g;
 }	
