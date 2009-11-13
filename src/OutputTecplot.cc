@@ -119,5 +119,10 @@ bool OutputTecplot::doOutput(const State& state) {
     bool status = writeTecplotFileASCII( filename, title, list );
     return status;
 }
-
+    
+void OutputTecplot::setFilename( string filename ) {
+    _filename = filename;
+}
+    
+    
 } // namespace ibpm

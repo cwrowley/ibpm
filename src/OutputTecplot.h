@@ -62,6 +62,9 @@ public:
     /// \brief Write the Tecplot file
     bool doOutput(const State& x);
     
+    /// \brief Change the filename for the output file
+    void setFilename( string filename );
+    
 private:
     string _filename;
     string _title;

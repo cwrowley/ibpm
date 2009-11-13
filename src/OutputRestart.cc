@@ -33,4 +33,8 @@ bool OutputRestart::doOutput(const State& x) {
     return status;
 }
 
+void OutputRestart::setFilename( string formatString ) {
+    _formatString = formatString;
+}
+
 } // namespace ibpm

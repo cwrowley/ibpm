@@ -31,6 +31,9 @@ public:
     /// \brief Write the restart file
     bool doOutput(const State& x);
     
+    /// \brief Change the filename for the output file
+    void setFilename( string formatString );
+    
 private:
     string _formatString;
 };
