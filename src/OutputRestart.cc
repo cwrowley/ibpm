@@ -38,3 +38,4 @@ void OutputRestart::setFilename( string formatString ) {
 }
 
 } // namespace ibpm
+

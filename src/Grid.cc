@@ -31,7 +31,7 @@ Grid::Grid(
 	_yShift(0.) {
     resize( nx, ny, ngrid, length, xOffset, yOffset );
 }
-//JON	
+	
 Grid::Grid(
    int nx,
    int ny,
@@ -187,7 +187,7 @@ int Grid::getYGridIndex( double y ) const {
 }
 
 // Compare two grids
-bool Grid::isEqual( Grid grid2 ) {
+bool Grid::isEqualTo( Grid grid2 ) {
     bool nx_eq = ( _nx == grid2.Nx() );
     bool ny_eq = ( _ny == grid2.Ny() );
     bool ngrid_eq = ( _ngrid == grid2.Ngrid() );

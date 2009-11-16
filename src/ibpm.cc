@@ -328,14 +328,16 @@ int main(int argc, char* argv[]) {
         
         // For SFD
         if( modelType == SFD ) {
-            Scalar dx = xtemp.omega-x.omega;
-            double twoNorm = sqrt(InnerProduct(dx, dx)) / dt;
+            // Inner product of fluxes is equal to inner product of vorticity (with weighted inner product for latter)
+            Flux dq = xtemp.q-x.q;
+            double q = sqrt( InnerProduct( x.q, x.q ) );
+            double twoNorm = sqrt( InnerProduct( dq, dq ) ) / ( q * dt );
             
             if ( (x.timestep % iRestart == 0 ) && (chi != 0.0) ) {
                 SFDsolver->saveFilteredState( outdir, name, numDigitInFileName );
             }
             
-            cout << "    ||dx||/dt = " << setw(13) << twoNorm << endl;
+            cout << "    ||dx||/||x||/dt = " << setw(13) << twoNorm << endl;
         }
          
     }
