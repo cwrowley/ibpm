@@ -312,7 +312,7 @@ int main(int argc, char* argv[]) {
     cout << endl;
     logger.init();
     logger.doOutput( x );
-    
+
     cout << "Integrating for " << numSteps << " steps" << endl;
     for(int i=1; i <= numSteps; ++i) {
         cout << "\nstep " << i << endl; 
@@ -325,7 +325,7 @@ int main(int argc, char* argv[]) {
         cout << "    x force: " << setw(16) << drag*2 << ", y force: "
             << setw(16) << lift*2 << "\n";
         logger.doOutput( x );
-        
+
         // For SFD
         if( modelType == SFD ) {
             // Inner product of fluxes is equal to inner product of vorticity (with weighted inner product for latter)
@@ -342,7 +342,7 @@ int main(int argc, char* argv[]) {
          
     }
     logger.cleanup();
-	
+
 	delete solver;
     return 0;
 }

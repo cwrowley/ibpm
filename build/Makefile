@@ -38,6 +38,7 @@ OBJS = \
 	Regularizer.o \
 	RigidBody.o \
 	Scalar.o \
+	ScalarToTecplot.o \
 	State.o \
 	utils.o \
 	VectorOperations.o

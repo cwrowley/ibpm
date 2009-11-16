@@ -45,6 +45,7 @@
 #include "OutputEnergy.h"
 #include "OutputForce.h"
 #include "OutputProbes.h"
+#include "ScalarToTecplot.h"
 
 // utilities
 #include "utils.h"

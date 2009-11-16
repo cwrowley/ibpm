@@ -17,6 +17,7 @@
 #include "State.h"
 #include "Output.h"
 #include "VectorOperations.h"
+#include "ScalarToTecplot.h"
 #include <stdio.h>
 #include <string>
 #include <vector>
@@ -25,57 +26,11 @@ using namespace std;
 
 namespace ibpm {
 
-OutputTecplot::OutputTecplot( string filename, string title ) {
+OutputTecplot::OutputTecplot( string filename, string title ) : _pltWriter() {
     _filename = filename;
     _title = title;
 }
     
-// Write a Tecplot file with the specified filename and title,
-// with data given in the VarList passed in
-// For now, write only finest grid (level 0)
-bool OutputTecplot::writeTecplotFileASCII( const char* filename, const char* title, const VarList& list ) {
-    
-    int numVars = list.getNumVars();
-    assert( numVars > 0 );
-    // Get grid information
-    const Grid& grid = list.getVariable(0)->getGrid();
-    int nx = grid.Nx();
-    int ny = grid.Ny();
-    
-    // Write the header for the Tecplot file
-    cerr << "Writing Tecplot file " << filename << endl;
-    FILE *fp = fopen( filename, "w" );
-    if (fp == NULL) return false;
-    fprintf( fp, "TITLE = \"%s\"\n", title );
-    fprintf( fp, "VARIABLES = ");
-    for (int i=0; i<numVars; ++i) {
-        fprintf( fp, "\"%s\" ", list.getName(i).c_str() );
-    }
-    fprintf( fp, "\n" );
-    fprintf( fp, "ZONE T=\"Rectangular zone\"\n" );
-    fprintf( fp, "I=%d, J=%d, K=1, ZONETYPE=Ordered\n", nx-1, ny-1 );
-    fprintf( fp, "DATAPACKING=POINT\n" );
-    fprintf( fp, "DT=(");
-    for (int i=0; i<numVars; ++i) {
-        fprintf( fp, "SINGLE ");
-    }
-    fprintf( fp, ")\n" );
-    
-    // Write the data
-    const int lev=0; // finest grid
-    for (int j=1; j<ny; ++j) {
-        for (int i=1; i<nx; ++i) {
-            for (int ind=0; ind < numVars; ++ind ) {
-                fprintf( fp, "%.5e ", (*list.getVariable(ind))(lev,i,j) );
-            }
-            fprintf( fp, "\n" );
-        }
-    }
-    
-    fclose(fp);
-    return true;
-}
-
 bool OutputTecplot::doOutput(const State& state) {
     // Add timestep to filename and title
     char filename[256];
@@ -83,40 +38,24 @@ bool OutputTecplot::doOutput(const State& state) {
     char title[256];
     sprintf( title, _title.c_str(), state.timestep );
     			
-    // Get grid dimensions
-    const Grid& grid = state.omega.getGrid();
-    int nx = grid.Nx();
-    int ny = grid.Ny();
-    int ngrid = grid.Ngrid();
-
-    // Calculate the variables for output
-    // Calculate the grid
-    Scalar x(grid);
-    Scalar y(grid);
-    for (int lev=0; lev<ngrid; ++lev) {
-        for (int i=1; i<nx; ++i) {
-            for (int j=1; j<ny; ++j) {
-                x(lev,i,j) = grid.getXEdge(lev,i);
-                y(lev,i,j) = grid.getYEdge(lev,j);
-            }
-        }
-    }
-    
     // Calculate velocities
-    Scalar u(grid);
-    Scalar v(grid);
+    Scalar u( state.omega.getGrid() );
+    Scalar v( state.omega.getGrid() );
     FluxToVelocity( state.q, u, v );
+    
+    // Create vector of Scalar fields
+    vector<Scalar> varVec;
+    varVec.push_back( u );
+    varVec.push_back( v);
+    varVec.push_back( state.omega );
+    
+    vector<string> varNameVec;
+    varNameVec.push_back( "u" );
+    varNameVec.push_back( "v" );
+    varNameVec.push_back( "Vorticity" );
         
-    // Store pointers to variables and corresponding names in vectors
-    VarList list;
-    list.addVariable( &x, "x" );
-    list.addVariable( &y, "y" );
-    list.addVariable( &u, "u" );
-    list.addVariable( &v, "v" );
-    list.addVariable( &(state.omega), "Vorticity" );
-
-    // Write the Tecplot file
-    bool status = writeTecplotFileASCII( filename, title, list );
+    // Write the tecplot file
+    bool status = _pltWriter.write( varVec, varNameVec, filename, title );
     return status;
 }
     
@@ -124,5 +63,8 @@ void OutputTecplot::setFilename( string filename ) {
     _filename = filename;
 }
     
+void OutputTecplot::setTitle( string title ) {
+    _title = title;
+}
     
 } // namespace ibpm
