@@ -44,7 +44,6 @@ public:
 private:
     string _filename;
     string _title;
-    ScalarToTecplot _pltWriter;
 };
 
 } // namespace ibpm

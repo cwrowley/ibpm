@@ -26,7 +26,7 @@ using namespace std;
 
 namespace ibpm {
 
-OutputTecplot::OutputTecplot( string filename, string title ) : _pltWriter() {
+OutputTecplot::OutputTecplot( string filename, string title ) {
     _filename = filename;
     _title = title;
 }
@@ -44,10 +44,10 @@ bool OutputTecplot::doOutput(const State& state) {
     FluxToVelocity( state.q, u, v );
     
     // Create vector of Scalar fields
-    vector<Scalar> varVec;
-    varVec.push_back( u );
-    varVec.push_back( v);
-    varVec.push_back( state.omega );
+    vector<const Scalar*> varVec;
+    varVec.push_back( &u );
+    varVec.push_back( &v);
+    varVec.push_back( &state.omega );
     
     vector<string> varNameVec;
     varNameVec.push_back( "u" );
@@ -55,7 +55,7 @@ bool OutputTecplot::doOutput(const State& state) {
     varNameVec.push_back( "Vorticity" );
         
     // Write the tecplot file
-    bool status = _pltWriter.write( varVec, varNameVec, filename, title );
+    bool status = ScalarToTecplot( varVec, varNameVec, filename, title );
     return status;
 }
     

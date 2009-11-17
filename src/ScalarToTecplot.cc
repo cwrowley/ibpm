@@ -1,5 +1,4 @@
 
-
 #include "ScalarToTecplot.h"
 #include <stdio.h>
 #include <string>
@@ -80,12 +79,12 @@ bool writeTecplotFileASCII( const char* filename, const char* title, const VarLi
 }  
     
     
-bool ScalarToTecplot::write( const vector<Scalar>& varVec, vector<string> varNameVec, string filename, string title ) {
+bool ScalarToTecplot( vector<const Scalar*> varVec, vector<string> varNameVec, string filename, string title ) {
     assert( varVec.size() > 0 );
     assert( varVec.size() == varNameVec.size() );
     
     // Get grid dimensions
-    const Grid& grid = varVec[0].getGrid();
+    const Grid& grid = varVec[0]->getGrid();
     int nx = grid.Nx();
     int ny = grid.Ny();
     int ngrid = grid.Ngrid();
@@ -108,7 +107,7 @@ bool ScalarToTecplot::write( const vector<Scalar>& varVec, vector<string> varNam
     list.addVariable( &x, "x" );
     list.addVariable( &y, "y" );
     for( unsigned int i = 0; i < varVec.size(); i++ ) {
-        list.addVariable( &varVec[i], varNameVec[i] );
+        list.addVariable( varVec[i], varNameVec[i] );
     }
     
     // Add timestep to filename and title
@@ -122,14 +121,14 @@ bool ScalarToTecplot::write( const vector<Scalar>& varVec, vector<string> varNam
     return status;
 }
     
-bool ScalarToTecplot::write( const Scalar& var, string varName, string filename, string title ) {
-    vector<Scalar> varVec;
+bool ScalarToTecplot( const Scalar* var, string varName, string filename, string title ) {
+    vector<const Scalar*> varVec;
     varVec.push_back( var );
     
     vector<string> varNameVec;
     varNameVec.push_back( varName );
     
-    bool status = write( varVec, varNameVec, filename, title);
+    bool status = ScalarToTecplot( varVec, varNameVec, filename, title);
     return status;
 }
     
