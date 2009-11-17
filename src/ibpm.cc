@@ -314,7 +314,7 @@ int main(int argc, char* argv[]) {
     logger.doOutput( x );
 
     cout << "Integrating for " << numSteps << " steps" << endl;
-    for(int i=1; i <= 1; ++i) {
+    for(int i=1; i <= numSteps; ++i) {
         cout << "\nstep " << i << endl; 
         State xtemp( x ); // For SFD norm calculation
         
