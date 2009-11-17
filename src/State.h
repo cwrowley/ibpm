@@ -40,6 +40,12 @@ public:
 
     /// \brief Save the state to a file (e.g. as a restart file)
     /// Return true if successful
+    /*  WARNING:  At this point, the xshift and yshift parameters are not saved
+     and are not checked for compatibility when loading.  Caution should be
+     taken when working with shifted grids.  This approach was taken to pre-
+     serve backwards compatibility with previously saved binary files.  In 
+     the future perhaps using HDF5 would prevent such problems.
+     */
     bool save(std::string filename) const;
 
     /// \brief Load the state from a file (e.g. as a restart file)
