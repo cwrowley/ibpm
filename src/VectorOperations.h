@@ -52,7 +52,7 @@ double InnerProduct( const Flux& p, const Flux& q );
 /*  This is disticnt from the standard L2 inner product so that the product of
     vorticity fields is equal to the product of fluxes (ie both yield KE)
  */
-double VorticityInnerProduct( const Scalar& omega1, const Scalar& omega2, const NavierStokesModel& model );  
+double VorticityInnerProduct( const Scalar& omega1, const Scalar& omega2, const NavierStokesModel& model );
 
 /// \brief Compute the Laplacian of f
 void Laplacian( const Scalar& f, Scalar& g );

@@ -382,10 +382,10 @@ double InnerProduct (const Flux& p, const Flux& q){
     with the streamfunction of the second.  This is equiv-
     alent to taking the L2 inner product of the two fluxes.
  */
-double VorticityInnerProduct( const Scalar omega1, const Scalar omega2, const NavierStokesModel& model ) {
+double VorticityInnerProduct( const Scalar& omega1, const Scalar& omega2, const NavierStokesModel& model ) { 
     Scalar psi2 = model.vorticityToStreamfunction( omega2 );
     return InnerProduct( omega1, psi2 );
-}    
+}
     
 // Return cross product of a Flux q and a Scalar f, as a Flux object.
 //   q x f = ( f v, -f u )
