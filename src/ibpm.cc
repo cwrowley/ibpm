@@ -312,7 +312,7 @@ int main(int argc, char* argv[]) {
     cout << endl;
     logger.init();
     logger.doOutput( x );
-
+    
     cout << "Integrating for " << numSteps << " steps" << endl;
     for(int i=1; i <= numSteps; ++i) {
         cout << "\nstep " << i << endl; 

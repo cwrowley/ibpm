@@ -35,12 +35,13 @@ private:
     vector<string> _names;
 };
     
-bool writeTecplotFileASCII( const char* filename, const char* title, const VarList& list ) {
-    
+bool writeTecplotFileASCII( const char* filename, const char* title, const VarList& list, int lev ) {
     int numVars = list.getNumVars();
     assert( numVars > 0 );
+    
     // Get grid information
     const Grid& grid = list.getVariable(0)->getGrid();
+    assert( lev < grid.Ngrid() );
     int nx = grid.Nx();
     int ny = grid.Ny();
     
@@ -64,7 +65,6 @@ bool writeTecplotFileASCII( const char* filename, const char* title, const VarLi
     fprintf( fp, ")\n" );
     
     // Write the data
-    const int lev=0; // finest grid
     for (int j=1; j<ny; ++j) {
         for (int i=1; i<nx; ++i) {
             for (int ind=0; ind < numVars; ++ind ) {
@@ -79,7 +79,7 @@ bool writeTecplotFileASCII( const char* filename, const char* title, const VarLi
 }  
     
     
-bool ScalarToTecplot( vector<const Scalar*> varVec, vector<string> varNameVec, string filename, string title ) {
+bool ScalarToTecplot( vector<const Scalar*> varVec, vector<string> varNameVec, string filename, string title, int lev ) {
     assert( varVec.size() > 0 );
     assert( varVec.size() == varNameVec.size() );
     
@@ -88,16 +88,17 @@ bool ScalarToTecplot( vector<const Scalar*> varVec, vector<string> varNameVec, s
     int nx = grid.Nx();
     int ny = grid.Ny();
     int ngrid = grid.Ngrid();
+    assert( lev < ngrid );
     
     // Calculate the variables for output
     // Calculate the grid
     Scalar x(grid);
     Scalar y(grid);
-    for (int lev=0; lev<ngrid; ++lev) {
+    for (int _lev=0; _lev<ngrid; ++_lev) {
         for (int i=1; i<nx; ++i) {
             for (int j=1; j<ny; ++j) {
-                x(lev,i,j) = grid.getXEdge(lev,i);
-                y(lev,i,j) = grid.getYEdge(lev,j);
+                x(_lev,i,j) = grid.getXEdge(_lev,i);
+                y(_lev,i,j) = grid.getYEdge(_lev,j);
             }
         }
     }
@@ -117,20 +118,26 @@ bool ScalarToTecplot( vector<const Scalar*> varVec, vector<string> varNameVec, s
     sprintf( _title, title.c_str() );
     
     // Write the Tecplot file
-    bool status = writeTecplotFileASCII( _filename, _title, list );
+    bool status = writeTecplotFileASCII( _filename, _title, list, lev );
     return status;
 }
     
-bool ScalarToTecplot( const Scalar* var, string varName, string filename, string title ) {
+bool ScalarToTecplot( const Scalar* var, string varName, string filename, string title, int lev ) {
     vector<const Scalar*> varVec;
     varVec.push_back( var );
     
     vector<string> varNameVec;
     varNameVec.push_back( varName );
     
-    bool status = ScalarToTecplot( varVec, varNameVec, filename, title);
+    bool status = ScalarToTecplot( varVec, varNameVec, filename, title, lev);
     return status;
 }
     
-
+bool ScalarToTecplot( vector<const Scalar*> varVec, vector<string> varNameVec, string filename, string title ) { 
+    return ScalarToTecplot( varVec, varNameVec, filename, title, 0 );
+}
+    
+bool ScalarToTecplot( const Scalar* var, string varName, string filename, string title ) {
+    return ScalarToTecplot( var, varName, filename, title, 0 );
+}
 } // namespace ibpm
