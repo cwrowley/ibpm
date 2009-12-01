@@ -440,6 +440,7 @@ Scalar CrossProduct(const Flux& q1, const Flux& q2){
     
     f -= u * v;  // f is now u1 * v2 - u2 * v1
     
+    f.coarsify();   // fill in overlapping grid regions
     return f;
 };
 

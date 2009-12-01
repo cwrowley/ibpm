@@ -90,7 +90,7 @@ bool State::load(const std::string& filename) {
     int numPoints;
     // read Geometry info
     fread( &numPoints, sizeof( int ), 1, fp );
-    
+
     // check that Grid and Geometry in file match those expected
     bool success = true;
     if ( nx != q.Nx() || 
