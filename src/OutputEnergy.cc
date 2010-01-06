@@ -34,7 +34,9 @@ bool OutputEnergy::doOutput(const State& x) {
     FluxToXVelocity(x.q,u);
     FluxToYVelocity(x.q,v);
     energy = .5 * sqrt( InnerProduct( u, u ) + InnerProduct( v, v ) );
-    
+    cout << energy << endl;
+    energy = .5 * sqrt( InnerProduct( x.q, x.q ) );
+    cout << energy << endl;
     if ( _fp == NULL ) return false;
     fprintf( _fp, "%5d %.5e %.5e\n", x.timestep, x.time, energy );   
     fflush( _fp );

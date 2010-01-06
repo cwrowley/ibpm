@@ -107,6 +107,14 @@ bool State::load(const std::string& filename) {
         // the return value to false
         if ( q.Nx() > 0 ) {
             cerr << "Warning: grids do not match.  Resizing grid." << endl;
+            /*cerr << "    nx:        " << ( nx == q.Nx() ) << endl
+                 << "    ny:        " << ( ny == q.Ny() ) << endl
+                 << "    ngrid:     " << ( ngrid == q.Ngrid() ) << endl
+                 << "    dx:        " << ( dx == q.Dx() ) << endl
+                 << "    x0:        " << ( x0 == q.getXEdge(0,0) ) << endl
+                 << "    y0:        " << ( y0 == q.getYEdge(0,0) ) << endl
+                 << "    numPoints: " << ( numPoints == f.getNumPoints() ) << endl
+                 << endl;*/
             success = false;
         }
         //Grid newgrid( nx, ny, ngrid, dx * nx, x0, y0, xShift, yShift );

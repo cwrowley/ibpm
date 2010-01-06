@@ -49,7 +49,7 @@ double InnerProduct( const Flux& p, const Flux& q );
     
     
 /// \brief Return the inner product of two (Scalar) vorticity fields
-/*  This is disticnt from the standard L2 inner product so that the product of
+/*  This is distinct from the standard L2 inner product so that the product of
     vorticity fields is equal to the product of fluxes (ie both yield KE)
  */
 double VorticityInnerProduct( const Scalar& omega1, const Scalar& omega2, const NavierStokesModel& model );
