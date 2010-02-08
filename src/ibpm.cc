@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     int iTecplot = parser.getInt( "tecplot", "if >0, write a Tecplot file every n timesteps", 100);
     int iRestart = parser.getInt( "restart", "if >0, write a restart file every n timesteps", 100);
     int iForce = parser.getInt( "force", "if >0, write forces every n timesteps", 1);
-    int iEnergy = parser.getInt( "energy", "if >0, write forces every n timesteps", 0);
+    int iEnergy = parser.getInt( "energy", "if >0, write energy every n timesteps", 0);
     int numSteps = parser.getInt( "nsteps", "number of timesteps to compute", 250 );
 	int period = parser.getInt( "period", "period of periodic baseflow", 1);
 	int periodStart = parser.getInt( "periodstart", "start time of periodic baseflow", 0);
