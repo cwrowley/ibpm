@@ -1,1 +1,1 @@
-make.inc.ystoneDebug
+make.inc.ystone

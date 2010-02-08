@@ -11,11 +11,11 @@ namespace ibpm {
 class VarList {
 public:
     void addVariable( const Scalar* var, string varName ) {
-        if (getNumVars() > 0) {
+        if ( getNumVars() > 0 ) {
            assert( _vars[0]->getGrid().isEqualTo( var->getGrid() ) );
         }
-        //_vars.push_back( var );
-        //_names.push_back( varName );
+        _vars.push_back( var );
+        _names.push_back( varName );
     }
     
     int getNumVars() const {
