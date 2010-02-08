@@ -187,7 +187,7 @@ int Grid::getYGridIndex( double y ) const {
 }
 
 // Compare two grids
-bool Grid::isEqualTo( const Grid grid2 ) {
+bool Grid::isEqualTo( const Grid& grid2 ) const {
     bool nx_eq = ( _nx == grid2.Nx() );
     bool ny_eq = ( _ny == grid2.Ny() );
     bool ngrid_eq = ( _ngrid == grid2.Ngrid() );

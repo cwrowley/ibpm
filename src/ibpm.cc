@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
     assert( solver != NULL );
     if( modelType == SFD ) {
         assert( chi != 0 );
-        assert( SFDsolver != null );
+        assert( SFDsolver != NULL );
     }
     model->init();
     

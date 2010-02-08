@@ -160,7 +160,7 @@ public:
     double getYShift() const;
     
     /// Compare two grids
-    bool isEqualTo( const Grid grid2 );
+    bool isEqualTo( const Grid& grid2 ) const;
 
 private:
     double getXOffset( int lev ) const;
