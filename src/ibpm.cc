@@ -243,10 +243,6 @@ int main(int argc, char* argv[]) {
 				cout << "Flag subbaseflow should be true only for linear cases"<< endl;
 				exit(1);				
 			}
-            if (resetTime == true) {
-                x.timestep = 0;
-                x.time = 0.;
-            }
 		}
         
         if ( modelType == SFD ) {
@@ -257,6 +253,13 @@ int main(int argc, char* argv[]) {
     else {
         cout << "Using zero initial condition" << endl;
     }
+    
+    // Reset time
+    if (resetTime == true) {
+        x.timestep = 0;
+        x.time = 0.;
+    }
+    
     // Calculate flux for state, in case only vorticity was saved
     model->refreshState( x );     
 
