@@ -62,7 +62,7 @@ string IBSolver::getName() {
 	return _name;
 }
     
-string IBSolver::getTimestep() {
+double IBSolver::getTimestep() {
     return _dt;
 }
 	
