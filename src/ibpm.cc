@@ -40,7 +40,17 @@ int main(int argc, char* argv[]) {
     // Get parameters
     ParmParser parser( argc, argv );
     bool helpFlag = parser.getFlag( "h", "print this help message and exit" );
+    
+    // Output parameters
     string name = parser.getString( "name", "run name", "ibpm" );
+    string outdir = parser.getString( "outdir", "directory for saving output", "." );
+    int iTecplot = parser.getInt( "tecplot", "if >0, write a Tecplot file every n timesteps", 100);
+    int iRestart = parser.getInt( "restart", "if >0, write a restart file every n timesteps", 100);
+    int iForce = parser.getInt( "force", "if >0, write forces every n timesteps", 1);
+    int iEnergy = parser.getInt( "energy", "if >0, write energy every n timesteps", 0);
+	string numDigitInFileName = parser.getString( "numdigfilename", "number of digits for time representation in filename", "%05d");
+    
+    // Grid parameters
     int nx = parser.getInt( "nx", "number of gridpoints in x-direction", 200 );
     int ny = parser.getInt( "ny", "number of gridpoints in y-direction", 200 );
     int ngrid = parser.getInt( "ngrid", "number of grid levels for multi-domain scheme", 1 );
@@ -49,28 +59,33 @@ int main(int argc, char* argv[]) {
     double yOffset = parser.getDouble( "yoffset", "y-coordinate of bottom edge of finest domain", -2. );
 	double xShift = parser.getDouble( "xshift", "percentage offset between grid levels in x-direction", 0. );
     double yShift = parser.getDouble( "yshift", "percentage offset between grid levels in y-direction", 0. );
+    
+    // Simulation parameters
     string geomFile = parser.getString( "geom", "filename for reading geometry", name + ".geom" );
     double Reynolds = parser.getDouble("Re", "Reynolds number", 100.);
-    double dt = parser.getDouble( "dt", "timestep", 0.02 );
     string modelName = parser.getString( "model", "type of model (linear, nonlinear, adjoint, linearperiodic, sfd)", "nonlinear" );
     string baseFlow = parser.getString( "baseflow", "base flow for linear/adjoint model", "" );
-    string integratorType = parser.getString( "scheme", "timestepping scheme (euler,ab2,rk3,rk3b)", "rk3" );
+    
+    // Initial condition
     string icFile = parser.getString( "ic", "initial condition filename", "");
-    string outdir = parser.getString( "outdir", "directory for saving output", "." );
-    int iTecplot = parser.getInt( "tecplot", "if >0, write a Tecplot file every n timesteps", 100);
-    int iRestart = parser.getInt( "restart", "if >0, write a restart file every n timesteps", 100);
-    int iForce = parser.getInt( "force", "if >0, write forces every n timesteps", 1);
-    int iEnergy = parser.getInt( "energy", "if >0, write energy every n timesteps", 0);
+    bool resetTime = parser.getBool( "resettime", "Reset time when subtracting ic by baseflow (1/0(true/false))", false);
+    bool subtractBaseflow = parser.getBool( "subbaseflow", "Subtract ic by baseflow (1/0(true/false))", false);
+    
+    // Integration parameters
+    double dt = parser.getDouble( "dt", "timestep", 0.02 );
     int numSteps = parser.getInt( "nsteps", "number of timesteps to compute", 250 );
+    string integratorType = parser.getString( "scheme", "timestepping scheme (euler,ab2,rk3,rk3b)", "rk3" );
+    
+    // Linear-periodic model
 	int period = parser.getInt( "period", "period of periodic baseflow", 1);
 	int periodStart = parser.getInt( "periodstart", "start time of periodic baseflow", 0);
 	string periodBaseFlowName = parser.getString( "pbaseflowname", "name of periodic baseflow, e.g. 'flow/ibpmperiodic%05d.bin', with '%05d' as time, decided by periodstart/period", "" );
-    bool subtractBaseflow = parser.getBool( "subbaseflow", "Subtract ic by baseflow (1/0(true/false))", false);
-    bool resetTime = parser.getBool( "resettime", "Reset time when subtracting ic by baseflow (1/0(true/false))", false);
+    
+    // SFD
     double chi = parser.getDouble( "chi", "sfd gain", 0.02 );
 	double Delta = parser.getDouble( "Delta", "sfd cutoff frequency", 15. );
-	string numDigitInFileName = parser.getString( "numdigfilename", "number of digits for time representation in filename", "%05d");
 
+    
 	ModelType modelType = str2model( modelName );
 	Scheme::SchemeType schemeType = str2scheme( integratorType );
     
@@ -292,7 +307,7 @@ int main(int argc, char* argv[]) {
     cout << endl;
     logger.init();
     logger.doOutput( x );
-    
+
     cout << "Integrating for " << numSteps << " steps" << endl;
     for(int i=1; i <= numSteps; ++i) {
         cout << "\nstep " << i << endl; 

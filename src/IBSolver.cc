@@ -61,6 +61,10 @@ IBSolver::~IBSolver() {
 string IBSolver::getName() {
 	return _name;
 }
+    
+string IBSolver::getTimestep() {
+    return _dt;
+}
 	
 void IBSolver::init() {	
 	for ( int i = 0; i < _scheme.nsteps(); i++ ) {

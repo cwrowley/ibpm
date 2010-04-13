@@ -38,6 +38,7 @@ public:
 	bool load(const string& basename); 
 	bool save(const string& basename);
 	string getName();
+    double getTimestep();
 	void advance( State& x );  
 	void advance( State& x, const Scalar& Bu );  
 	virtual void advanceSubstep( State& x, const Scalar& nonlinear, int i ); // virtual for SFD 
