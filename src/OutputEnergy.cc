@@ -28,7 +28,7 @@ bool OutputEnergy::cleanup() {
 
 bool OutputEnergy::doOutput(const State& x) {
     double energy = 0.;
-    energy = .5 * sqrt( InnerProduct( x.q, x.q ) );
+    energy = .5 * InnerProduct( x.q, x.q );
     
     if ( _fp == NULL ) return false;
     fprintf( _fp, "%5d %.5e %.5e\n", x.timestep, x.time, energy );   
