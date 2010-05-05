@@ -28,6 +28,7 @@
 #include "Motion.h"
 #include "FixedPosition.h"
 #include "PitchPlunge.h"
+#include "SigmoidalStep.h"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -348,6 +349,16 @@ bool RigidBody::load(istream& in) {
                 Motion* m = new PitchPlunge( amp1, freq1, amp2, freq2 );
                 setMotion( *m );
             }
+            else if ( motionType == "sigmoidalstep" ) {
+                // SigmoidalStep
+                double AMP;
+                double DUR;
+                double startTime;
+                one_line >> AMP >> DUR >> startTime;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new SigmoidalStep( AMP, DUR, startTime);
+                setMotion( *m ); 
+            }
         }
         else if ( cmd == "name" ) {
             string name;
@@ -444,14 +455,14 @@ void RigidBody::moveBody(double time) const {
         // add the new position to the list of current positions
         double xnew;
         double ynew;
-        g.mapPosition(p->x, p->y, xnew, ynew);
-        Point q(xnew,ynew);
+        g.mapPosition(p->x-_xCenter, p->y-_yCenter, xnew, ynew);
+        Point q(xnew+_xCenter,ynew+_yCenter);
         _currentPoints.push_back(q);
 
         // add the new velocity to the list of current velocities
         double u;
         double v;
-        g.mapVelocity(p->x, p->y, u, v);
+        g.mapVelocity(p->x-_xCenter, p->y-_yCenter, u, v);
         Point vel(u,v);
         _currentVelocities.push_back(vel);
     }
