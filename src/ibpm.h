@@ -38,6 +38,7 @@
 #include "FixedPosition.h"
 #include "PitchPlunge.h"
 #include "SigmoidalStep.h"
+#include "MotionFile.h"
 
 // output routines
 #include "Logger.h"

@@ -29,6 +29,7 @@
 #include "FixedPosition.h"
 #include "PitchPlunge.h"
 #include "SigmoidalStep.h"
+#include "MotionFile.h"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -358,6 +359,14 @@ bool RigidBody::load(istream& in) {
                 RB_CHECK_FOR_ERRORS;
                 Motion* m = new SigmoidalStep( AMP, DUR, startTime);
                 setMotion( *m ); 
+            }
+            else if ( motionType == "motionfile" ) {
+                // Motion defined in a file
+                string filename;
+                one_line >> filename;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new MotionFile( filename );
+                setMotion( *m );
             }
         }
         else if ( cmd == "name" ) {
