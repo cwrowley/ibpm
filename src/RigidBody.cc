@@ -29,6 +29,8 @@
 #include "FixedPosition.h"
 #include "PitchPlunge.h"
 #include "SigmoidalStep.h"
+#include "LagStep1.h"
+#include "LagStep2.h"
 #include "MotionFile.h"
 #include <string>
 #include <fstream>
@@ -359,6 +361,28 @@ bool RigidBody::load(istream& in) {
                 RB_CHECK_FOR_ERRORS;
                 Motion* m = new SigmoidalStep( AMP, DUR, startTime);
                 setMotion( *m ); 
+            }
+            else if ( motionType == "lagstep1" ) {
+                // First-order lag filtered square pulse
+                double AMP;
+                double PW;
+                double TAU;
+                double T0;
+                one_line >> AMP >> PW >> TAU >> T0;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new LagStep1( AMP, PW, TAU, T0);
+                setMotion( *m );
+            }
+            else if ( motionType == "lagstep2" ) {
+                // Second-order lag filtered square pulse
+                double AMP;
+                double PW;
+                double TAU;
+                double T0;
+                one_line >> AMP >> PW >> TAU >> T0;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new LagStep2( AMP, PW, TAU, T0);
+                setMotion( *m );
             }
             else if ( motionType == "motionfile" ) {
                 // Motion defined in a file
