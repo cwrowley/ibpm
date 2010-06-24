@@ -40,6 +40,7 @@
 #include "SigmoidalStep.h"
 #include "LagStep1.h"
 #include "LagStep2.h"
+#include "EldredgeManeuver.h"
 #include "MotionFile.h"
 
 // output routines

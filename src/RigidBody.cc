@@ -31,6 +31,7 @@
 #include "SigmoidalStep.h"
 #include "LagStep1.h"
 #include "LagStep2.h"
+#include "EldredgeManeuver.h"
 #include "MotionFile.h"
 #include <string>
 #include <fstream>
@@ -382,6 +383,19 @@ bool RigidBody::load(istream& in) {
                 one_line >> AMP >> PW >> TAU >> T0;
                 RB_CHECK_FOR_ERRORS;
                 Motion* m = new LagStep2( AMP, PW, TAU, T0);
+                setMotion( *m );
+            }
+            else if ( motionType == "eldredge" ) {
+                // Eldredge's canonical maneuver
+                double AMP;
+                double a;
+                double t1;
+                double t2;
+                double t3;
+                double t4;
+                one_line >> AMP >> a >> t1 >> t2 >> t3 >> t4;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new EldredgeManeuver( AMP, a, t1, t2, t3, t4);
                 setMotion( *m );
             }
             else if ( motionType == "motionfile" ) {
