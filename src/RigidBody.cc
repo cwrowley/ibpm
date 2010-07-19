@@ -27,11 +27,14 @@
 #include "TangentSE2.h"
 #include "Motion.h"
 #include "FixedPosition.h"
+#include "FixedVelocity.h"
 #include "PitchPlunge.h"
 #include "SigmoidalStep.h"
 #include "LagStep1.h"
 #include "LagStep2.h"
 #include "EldredgeManeuver.h"
+#include "Eldredge1.h"
+#include "Eldredge2.h"
 #include "MotionFile.h"
 #include <string>
 #include <fstream>
@@ -342,6 +345,16 @@ bool RigidBody::load(istream& in) {
                 Motion* m = new FixedPosition( x, y, theta );
                 setMotion( *m );
             }
+            else if ( motionType == "fixedvel" ) {
+                // FixedVelocity
+                double xdot;
+                double ydot;
+                double thetadot;
+                one_line >> xdot >> ydot >> thetadot;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new FixedVelocity( xdot, ydot, thetadot );
+                setMotion( *m );
+            }
             else if ( motionType == "pitchplunge" ) {
                 // PitchPlunge
                 double amp1;
@@ -396,6 +409,32 @@ bool RigidBody::load(istream& in) {
                 one_line >> AMP >> a >> t1 >> t2 >> t3 >> t4;
                 RB_CHECK_FOR_ERRORS;
                 Motion* m = new EldredgeManeuver( AMP, a, t1, t2, t3, t4);
+                setMotion( *m );
+            }
+            else if ( motionType == "eldredge1" ) {
+                // Eldredge's canonical maneuver for plunging
+                double AMP;
+                double a;
+                double t1;
+                double t2;
+                double t3;
+                double t4;
+                one_line >> AMP >> a >> t1 >> t2 >> t3 >> t4;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new Eldredge1( AMP, a, t1, t2, t3, t4);
+                setMotion( *m );
+            }
+            else if ( motionType == "eldredge2" ) {
+                // Eldredge's canonical maneuver for plunging
+                double AMP;
+                double a;
+                double t1;
+                double t2;
+                double t3;
+                double t4;
+                one_line >> AMP >> a >> t1 >> t2 >> t3 >> t4;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new Eldredge2( AMP, a, t1, t2, t3, t4);
                 setMotion( *m );
             }
             else if ( motionType == "motionfile" ) {

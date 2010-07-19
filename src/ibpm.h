@@ -36,11 +36,14 @@
 // motion
 #include "Motion.h"
 #include "FixedPosition.h"
+#include "FixedVelocity.h"
 #include "PitchPlunge.h"
 #include "SigmoidalStep.h"
 #include "LagStep1.h"
 #include "LagStep2.h"
 #include "EldredgeManeuver.h"
+#include "Eldredge1.h"
+#include "Eldredge2.h"
 #include "MotionFile.h"
 
 // output routines
