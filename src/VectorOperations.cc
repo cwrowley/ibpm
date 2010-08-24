@@ -218,18 +218,18 @@ Scalar Laplacian( const Scalar& f ) {
     Laplacian( f, g );
     return g;
 }
-
-// Inner product of two Scalars. 
-double InnerProduct (const Scalar& f, const Scalar& g){
+    
+    
+// ~~~~~~~~~~~~~~~~~~~~~~
+// Inner product of two Scalars, taken over the finest domain only
+double FineGridInnerProduct( const Scalar& f, const Scalar& g ) {
     assert( f.Ngrid() == g.Ngrid() );
     assert( f.Nx() == g.Nx() );
     assert( f.Ny() == g.Ny() );
     
-    double ip = 0;
+    double ip = 0.;
     int nx = f.Nx();
     int ny = f.Ny();
-    int nx2 = f.NxExt();  // # coarse cells outside each fine domain
-    int ny2 = f.NyExt();
     
     // Finest grid interior points
     double dx2 = f.Dx() * f.Dx();
@@ -238,6 +238,27 @@ double InnerProduct (const Scalar& f, const Scalar& g){
             ip += f( 0 ,i, j ) * g( 0 ,i, j ) * dx2;
         }
     }
+    
+    return ip;
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~
+
+// Inner product of two Scalars. 
+double InnerProduct (const Scalar& f, const Scalar& g){
+    assert( f.Ngrid() == g.Ngrid() );
+    assert( f.Nx() == g.Nx() );
+    assert( f.Ny() == g.Ny() );
+    
+    int nx = f.Nx();
+    int ny = f.Ny();
+    int nx2 = f.NxExt();  // # coarse cells outside each fine domain
+    int ny2 = f.NyExt();
+    double dx2 = f.Dx() * f.Dx();
+    
+    double ip = FineGridInnerProduct( f, g );
+   
     // Coarser grids
     for (int lev=1; lev < f.Ngrid(); ++lev) {
         dx2 = f.Dx(lev) * f.Dx(lev);        
@@ -291,6 +312,36 @@ double InnerProduct (const Scalar& f, const Scalar& g){
 // Inner product of Flux p and Flux q.
 // Note that this is not multiplied by dx * dx, since the Fluxes are already
 // multiplied by these (i.e., inner product is really over *velocities*).
+
+// Finest grid, all interior points
+double FineGridInnerProduct( const Flux& p, const Flux& q ) { 
+    assert( p.Ngrid() == q.Ngrid() );
+    assert( p.Nx() == q.Nx() );
+    assert( p.Ny() == q.Ny() );
+    
+    int nx = p.Nx();
+    int ny = p.Ny();
+    
+    double ip = 0.;
+    
+    // X-fluxes
+    for (int j=0; j<ny; ++j) {
+        for (int i=1; i<nx; ++i){
+            ip += p(0,X,i,j) * q(0,X,i,j);
+        }
+    }
+    
+    // Y-fluxes    
+    for (int i=0; i<nx; ++i) {
+        for (int j=1; j<ny; ++j){
+            ip += p(0,Y,i,j) * q(0,Y,i,j);
+        }
+    }
+     
+    return ip;
+}
+    
+// All grids
 double InnerProduct (const Flux& p, const Flux& q){
     assert( p.Ngrid() == q.Ngrid() );
     assert( p.Nx() == q.Nx() );
@@ -300,18 +351,9 @@ double InnerProduct (const Flux& p, const Flux& q){
     int nx2 = p.NxExt();
     int ny2 = p.NyExt();
 
-    double ip = 0;
+    double ip = FineGridInnerProduct( p, q );
     
-    // 
-    // X-fluxes
-    //
-    // Finest grid, all interior points
-    for (int j=0; j<ny; ++j) {
-        for (int i=1; i<nx; ++i){
-            ip += p(0,X,i,j) * q(0,X,i,j);
-        }
-    }
-    // Coarser grids
+    // X-fluxes, coarser grids
     for (int lev=1; lev < p.Ngrid(); ++lev) {
         // left and right interfaces (edges)
         for (int j=ny2; j<ny/2+ny2; ++j) {
@@ -338,16 +380,8 @@ double InnerProduct (const Flux& p, const Flux& q){
         }
     }
 
-    // 
-    // Y-fluxes
-    //
-    // Finest grid, all interior points
-    for (int i=0; i<nx; ++i) {
-        for (int j=1; j<ny; ++j){
-            ip += p(0,Y,i,j) * q(0,Y,i,j);
-        }
-    }
-    // Coarser grids
+     
+    // Y-fluxes, coarser grids
     for (int lev=1; lev < p.Ngrid(); ++lev) {
         // left and right interfaces (edges)
         for (int i=nx2; i<nx/2+nx2; ++i) {
@@ -382,6 +416,13 @@ double InnerProduct (const Flux& p, const Flux& q){
     with the streamfunction of the second.  This is equiv-
     alent to taking the L2 inner product of the two fluxes.
  */
+// Fine grid
+double FineGridVorticityInnerProduct( const Scalar& omega1, const Scalar& omega2, const NavierStokesModel& model ) { 
+    Scalar psi2 = model.vorticityToStreamfunction( omega2 );
+    return FineGridInnerProduct( omega1, psi2 );
+}
+    
+// All grids
 double VorticityInnerProduct( const Scalar& omega1, const Scalar& omega2, const NavierStokesModel& model ) { 
     Scalar psi2 = model.vorticityToStreamfunction( omega2 );
     return InnerProduct( omega1, psi2 );

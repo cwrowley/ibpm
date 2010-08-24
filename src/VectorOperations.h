@@ -41,17 +41,26 @@ void Curl(const Flux& q, Scalar& omega );
 Flux Curl(const Scalar& f);
 void Curl(const Scalar& f, Flux& q);
 
+/// \brief Return the inner product of Scalar f and Scalar g, calculated over the finest grid only.
+double FineGridInnerProduct( const Scalar& f, const Scalar& g );  
+    
 /// \brief Return the inner product of Scalar f and Scalar g.
 double InnerProduct( const Scalar& f, const Scalar& g );  
+
+/// \brief Return the inner product of Flux p and Flux q, calculated over the finest grid only.
+double FineGridInnerProduct( const Flux& p, const Flux& q );
 
 /// \brief Return the inner product of Flux p and Flux q.
 double InnerProduct( const Flux& p, const Flux& q );
     
     
-/// \brief Return the inner product of two (Scalar) vorticity fields
+/// \brief Return the energy-equivalent inner product of two (Scalar) vorticity fields, calculated over the fine grid only.
 /*  This is distinct from the standard L2 inner product so that the product of
-    vorticity fields is equal to the product of fluxes (ie both yield KE)
+ vorticity fields is equal to the product of fluxes (ie both yield KE)
  */
+double FineGridVorticityInnerProduct( const Scalar& omega1, const Scalar& omega2, const NavierStokesModel& model );
+    
+/// \brief Return the energy-equivalent inner product of two (Scalar) vorticity fields.
 double VorticityInnerProduct( const Scalar& omega1, const Scalar& omega2, const NavierStokesModel& model );
 
 /// \brief Compute the Laplacian of f

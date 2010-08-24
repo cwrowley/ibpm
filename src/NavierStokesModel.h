@@ -71,8 +71,8 @@ public:
 //    /// Return a pointer to the associated Geometry
 //    inline const Geometry& getGeometry() const { return _geometry; }
 //
-//    /// Return a pointer to the associated Grid
-//    inline const Grid& getGrid() const { return _grid; }
+    /// Return a pointer to the associated Grid
+    inline const Grid& getGrid() const { return _grid; }
 
     /// Compute omega = B(f) as in (14)
     void B(const BoundaryVector& f, Scalar& omega ) const;
