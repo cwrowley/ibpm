@@ -42,6 +42,7 @@
 #include "LagStep1.h"
 #include "LagStep2.h"
 #include "EldredgeManeuver.h"
+#include "EldredgeCombined2.h" // combines EldredgeManeuver for pitch and Eldredge2 for plunge
 #include "Eldredge1.h"
 #include "Eldredge2.h"
 #include "MotionFile.h"

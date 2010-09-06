@@ -33,6 +33,7 @@
 #include "LagStep1.h"
 #include "LagStep2.h"
 #include "EldredgeManeuver.h"
+#include "EldredgeCombined2.h"
 #include "Eldredge1.h"
 #include "Eldredge2.h"
 #include "MotionFile.h"
@@ -409,6 +410,25 @@ bool RigidBody::load(istream& in) {
                 one_line >> AMP >> a >> t1 >> t2 >> t3 >> t4;
                 RB_CHECK_FOR_ERRORS;
                 Motion* m = new EldredgeManeuver( AMP, a, t1, t2, t3, t4);
+                setMotion( *m );
+            }
+            else if ( motionType == "eldredgecombined2" ) {
+                // combining type eldredge for pitch and eldredge2 for plunge
+                double AMPa;
+                double a;
+                double a1;
+                double a2;
+                double a3;
+                double a4;
+                double AMPb;
+                double b;
+                double b1;
+                double b2;
+                double b3;
+                double b4;
+                one_line >> AMPa >> a >> a1 >> a2 >> a3 >> a4 >> AMPb >> b >> b1 >> b2 >> b3 >> b4;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new EldredgeCombined2( AMPa, a, a1, a2, a3, a4, AMPb, b, b1, b2, b3, b4);
                 setMotion( *m );
             }
             else if ( motionType == "eldredge1" ) {
