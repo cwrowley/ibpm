@@ -7,11 +7,6 @@
 
 namespace ibpm {
 
-double TTTTfv;
-double INTX;
-double INTY;
-double INTTHETA;
-
 /*!
     \file FixedVelocity.h
     \class FixedVelocity
@@ -36,27 +31,27 @@ public:
         _xdot(xdot),
         _ydot(ydot),
         _thetadot(thetadot) {
-        INTX = 0.;
-        INTY = 0.;
-        INTTHETA = 0.;
-        TTTTfv = 0.;
+        _intX = 0.;
+        _intY = 0.;
+        _intTheta = 0.;
+        _oldtime = 0.;
     }
     
     /// Returns transformation for sinusoidal pitch/plunge:
     ///    (0, 0, theta(t), 0, 0, thetadot(t))
     inline TangentSE2 getTransformation(double time) const {
-        double dtt = time-TTTTfv;
+        double dtt = time-_oldtime;
         if (dtt > 1) dtt = 0.;
-        INTX = INTX + _xdot*dtt;
-        INTY = INTY + _ydot*dtt;
-        INTTHETA = INTTHETA + _thetadot*dtt;
-        TTTTfv = time;
-        cout << " INTX = " << INTX << endl;
-        cout << " INTY = " << INTY << endl;
-        cout << " INTTHETA = " << INTTHETA << endl;
-        cout << " TTTT = " << TTTTfv << endl;
+        _intX = _intX + _xdot*dtt;
+        _intY = _intY + _ydot*dtt;
+        _intTheta = _intTheta + _thetadot*dtt;
+        _oldtime = time;
+        cout << " _intX = " << _intX << endl;
+        cout << " _intY = " << _intY << endl;
+        cout << " _intTheta = " << _intTheta << endl;
+        cout << " _oldtime = " << _oldtime << endl;
         cout << " dt = " << dtt << endl;
-        return TangentSE2( INTX, INTY, INTTHETA, _xdot, _ydot, _thetadot );
+        return TangentSE2( _intX, _intY, _intTheta, _xdot, _ydot, _thetadot );
     }
 
     inline Motion* clone() const {
@@ -71,6 +66,10 @@ private:
     double _xdot;
     double _ydot;
     double _thetadot;
+    mutable double _intX;
+    mutable double _intY;
+    mutable double _intTheta;
+    mutable double _oldtime;
 };
 
 } // namespace ibpm

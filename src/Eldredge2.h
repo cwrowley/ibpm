@@ -7,8 +7,6 @@
 
 namespace ibpm {
 
-double TTTT;
-double INTG;
 
 /*!
     \file Eldredge2.h
@@ -42,8 +40,8 @@ public:
         _t4(t4) {
         double tt = (_t2+_t3)/2.;
         cout << " got her"<< endl;
-        INTG = 0.;
-        TTTT = 0.;
+        _intG = 0.;
+        _oldtime = 0.;
         cout << " not here" << endl;
         _maxG = log((cosh(_a*(tt-_t1))*cosh(_a*(tt-_t4)))/(cosh(_a*(tt-_t2))*cosh(_a*(tt-_t3))));
 //        _maxG = log((cosh(_a*(tt-t1)))/(cosh(_a*(tt-_t2))));
@@ -63,14 +61,14 @@ public:
         dGdt = _a*(tanh(_a*t1d)-tanh(_a*t2d)-tanh(_a*t3d)+tanh(_a*t4d));
 
         // The following is a hack to compute integral of G so that I can step vertical velocity...
-        double dtt = time-TTTT;
-        INTG = INTG + G*dtt;
-        TTTT = time;
+        double dtt = time-_oldtime;
+        _intG = _intG + G*dtt;
+        _oldtime = time;
         cout << "dtt = " << dtt << endl;
-        cout << "intG = " << INTG << endl;
+        cout << "intG = " << _intG << endl;
         cout << "G = " << G*_AMP/_maxG << endl;
-        cout << "intG*stuff = " << INTG*_AMP/_maxG << endl;
-        return TangentSE2( 0, INTG*_AMP/_maxG, 0, 0, G*_AMP/_maxG, 0 );
+        cout << "intG*stuff = " << _intG*_AMP/_maxG << endl;
+        return TangentSE2( 0, _intG*_AMP/_maxG, 0, 0, G*_AMP/_maxG, 0 );
     }
 
     inline Motion* clone() const {
@@ -92,6 +90,8 @@ private:
     double _t3;
     double _t4;
     double _maxG;
+    mutable double _intG;
+    mutable double _oldtime;
 };
 
 } // namespace ibpm
