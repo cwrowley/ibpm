@@ -84,6 +84,8 @@ public:
 	/// with AoA alpha and the specified number of points
 	void addLine_aoa(
 		double l,
+                double xC, //center of rotation
+                double yC,
 		double alpha, // in degree
 		int numPoints
 	);

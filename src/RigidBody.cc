@@ -145,19 +145,27 @@ void RigidBody::addLine_n(
 
 void RigidBody::addLine_aoa(
     double l,
+    double xC,
+    double yC,
     double aoa,
     int numPoints
     ) {
+        double x0, y0, x0r, y0r, x1r, y1r, x1, y1;
 	double pi =  3.141592653589793238462643383279502884197169399375;
 	double alpha = aoa / 180 * pi;
-    double deltaX = l * cos(alpha) / (numPoints - 1);
-    double deltaY = l * sin(alpha) / (numPoints - 1);
-	double x1 = - l * cos(alpha) / 2;
-	double y1 = l * sin(alpha) / 2;
-    for(int i=0; i < numPoints; i++) {
-        double x = x1 + i * deltaX;
-        double y = y1 - i * deltaY;
-		addPoint(x,y);
+        double cosa = cos(alpha);
+        double sina = sin(alpha);
+        double delta = l / (numPoints - 1);
+        for(int i=0; i < numPoints; i++) {
+            x0 = i * delta;
+            y0 = 0.;    // (x0,y0) point before rotation
+            x0r = x0-xC;
+            y0r = y0-yC; // (x0r,y0r) referenced to center (xC,yC)
+            x1r = x0r*cosa - y0r*sina;
+            y1r = x0r*sina + y0r*cosa; // (x1r,y1r) after rotation, referenced to center (xC,yC)
+            x1 = x1r+xC;
+            y1 = y1r+yC;
+            addPoint(x1,y1);
     }
 } 
 
@@ -322,11 +330,14 @@ bool RigidBody::load(istream& in) {
         }
         else if ( cmd == "line_aoa" ) {
             double l;
+            double xC;
+            double yC;
             double aoa;
             int numPoints;
-            one_line >> l >> aoa >> numPoints;
+            one_line >> l >> xC >> yC >> aoa >> numPoints;
             RB_CHECK_FOR_ERRORS;
-            addLine_aoa( l, aoa, numPoints );
+            addLine_aoa( l, xC, yC, aoa, numPoints );
+            setCenter( xC, yC );
 #ifdef DEBUG
             cerr << "Add a line: length" << l << ", AoA" << aoa  
                 ", n = " << numPoints << endl;
