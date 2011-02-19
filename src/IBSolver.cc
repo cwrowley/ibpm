@@ -125,7 +125,7 @@ ProjectionSolver* IBSolver::createSolver(double beta) {
 	// Check whether all bodies are stationary
 	//      If so, return a CholeskySolver
 	//      If not, return a ConjugateGradientSolver
-	if ( _model.isTimeDependent() ) {
+	if ( _model.geTimeDependent() ) {
 		cerr << "Using ConjugateGradient solver for projection step" << endl
 		<< "  tolerance = " << _tol << endl;
 		return new ConjugateGradientSolver( _grid, _model, beta, _tol );    
