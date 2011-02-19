@@ -111,8 +111,9 @@ void BaseFlow::setMotion(const Motion& motion) {
 void BaseFlow::moveFlow(double time) {
     if ( _motion == NULL ) return;
         double x,y,theta,xdot,ydot,thetadot;   /// Motion of rigid body
-        double xdotBF, ydotBF;    /// Velocity components of base flow (Uinf,alphaBF)
-        double alpha, gamma, Uinfprime;
+        double xdotF, ydotF;    /// Velocity components of base flow (Uinf,alphaBF)
+	    double xdotT, ydotT;      /// Total velocity (sum of xdot and xdotBF)
+	    double alpha, gamma, Uinfprime;
         double xdotnew, ydotnew;
 	TangentSE2 g = _motion->getTransformation(time);
         g.getPosition(x,y,theta);
@@ -130,14 +131,16 @@ void BaseFlow::moveFlow(double time) {
 //        xdotnew = _mag*cos(theta+_alpha) - xdot;
 //        ydotnew = _mag*sin(theta+_alpha) - ydot;
 // NEW VERSION
-        xdotBF = _mag*cos(_alphaBF);
-        ydotBF = _mag*sin(_alphaBF);
-	    gamma = atan2(ydotBF + ydot,xdotBF + xdot);
-        alpha = theta - gamma;
-        Uinfprime = sqrt((xdotBF+xdot)*(xdotBF+xdot) + (ydotBF+ydot)*(ydotBF+ydot));
+        xdotF = _mag*cos(_alphaBF);
+        ydotF = _mag*sin(_alphaBF);
+    	xdotT = xdotF - xdot;
+	    ydotT = -1.*ydotF + ydot;
+	    gamma = atan2(ydotT,xdotT);
+        alpha = -1.*theta - gamma;
+        Uinfprime = sqrt( xdotT*xdotT + ydotT*ydotT );
         xdotnew = Uinfprime * cos(alpha);
         ydotnew = Uinfprime * sin(alpha);
-        TangentSE2 gnew(x,y,theta,xdotnew,ydotnew,thetadot);
+        TangentSE2 gnew(x,y,theta,xdotnew,ydotnew,-1.*thetadot);
         // Update the baseFlow based on this new motion 
         _q.setFlow( gnew, _xCenter, _yCenter);	
 }
