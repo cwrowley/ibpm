@@ -20,75 +20,90 @@ namespace ibpm {
 	const Grid& grid,
 	const Geometry& geometry,
 	double Reynolds,
-	const Flux& q_potential
+	const BaseFlow& q_potential
 	) :
     _grid( grid ),
     _geometry( geometry ),
     _regularizer( grid, geometry ),
     _baseFlow( q_potential ),
-	_ReynoldsNumber( Reynolds ),
+    _ReynoldsNumber( Reynolds ),
     _poisson( grid ),
     _hasBeenInitialized( false )
 	{}
 	
-	NavierStokesModel::NavierStokesModel(
-	const Grid& grid,
-	const Geometry& geometry,
-	double Reynolds
-	) :
+    NavierStokesModel::NavierStokesModel(
+    const Grid& grid,
+    const Geometry& geometry,
+    double Reynolds
+    ) :
     _grid( grid ),
     _geometry( geometry ),
     _regularizer( grid, geometry ),
     _baseFlow( grid ),
-	_ReynoldsNumber( Reynolds ),
+    _ReynoldsNumber( Reynolds ),
     _poisson( grid ),
     _hasBeenInitialized( false )
     {
-		_baseFlow = 0.;
-	}
+        _baseFlow.setFlux(0.);
+    }
 	
     NavierStokesModel::~NavierStokesModel() {}
     
-	void NavierStokesModel::init() {
-		if ( _hasBeenInitialized ) return;  // do only once
-		// Update regularizer
-		_regularizer.update();    
-		_hasBeenInitialized = true;
-	}
+    void NavierStokesModel::init() {
+        if ( _hasBeenInitialized ) return;  // do only once
+        // Update regularizer
+        _regularizer.update();    
+        _hasBeenInitialized = true;
+    }
 	
-	bool NavierStokesModel::isTimeDependent() const {
-		return ! _geometry.isStationary();
-	}
+    bool NavierStokesModel::isTimeDependent() const {
+        bool flag = false;
+        if( (!_geometry.isStationary()) || (!_baseFlow.isStationary()) ) flag = true;
+        return flag;
+    }
+
+    bool NavierStokesModel::geTimeDependent() const {
+        bool flag = false;
+        if( (!_geometry.isStationary()) ) flag = true;
+        return flag;  
+    }
+  
+    bool NavierStokesModel::bfTimeDependent() const {
+        bool flag = false;
+        if( (!_baseFlow.isStationary()) ) flag = true;
+        return flag;
+    }
 	
-	int NavierStokesModel::getNumPoints() const {
-		return _geometry.getNumPoints();
-	}
+    int NavierStokesModel::getNumPoints() const {
+        return _geometry.getNumPoints();
+    }
 	
-	double NavierStokesModel::getAlpha() const {
-		return 1. / _ReynoldsNumber;
-	}
+    double NavierStokesModel::getAlpha() const {
+        return 1. / _ReynoldsNumber;
+    }
 	
-	// Return the boundary velocities minus the base flow velocity at the boundary
-	BoundaryVector NavierStokesModel::getConstraints() const {
-		BoundaryVector b = _geometry.getVelocities();
-		BoundaryVector b0 = getBaseFlowBoundaryVelocities();
-		b -= b0;
-		return b;
-	}
+    // Return the boundary velocities minus the base flow velocity at the boundary
+    BoundaryVector NavierStokesModel::getConstraints() const {
+        BoundaryVector b = _geometry.getVelocities();
+        BoundaryVector b0 = getBaseFlowBoundaryVelocities();
+        b -= b0;
+        return b;
+    }
     
-	void NavierStokesModel::updateOperators( double time ) {
-		_geometry.moveBodies(time);
-		_regularizer.update();
-	}
+    void NavierStokesModel::updateOperators( double time ) {
+        _geometry.moveBodies(time);
+        _baseFlow.moveFlow(time);
+        _regularizer.update();
+    }
     
-	void NavierStokesModel::B(const BoundaryVector& f, Scalar& omega ) const {
-		assert( _hasBeenInitialized );
-		Flux q = _regularizer.toFlux( f );
-		Curl( q, omega );
-	}
+    void NavierStokesModel::B(const BoundaryVector& f, Scalar& omega ) const {
+        assert( _hasBeenInitialized );
+        Flux q = _regularizer.toFlux( f );
+        Curl( q, omega );
+    }
 	
-	void NavierStokesModel::C(const Scalar& omega, BoundaryVector& f) const {
-		assert( _hasBeenInitialized );
+    void NavierStokesModel::C(const Scalar& omega, BoundaryVector& f) const {
+        assert( _hasBeenInitialized );
 		Flux q(_grid);
 		computeFluxWithoutBaseFlow( omega, q );
 		f = _regularizer.toBoundary( q );
@@ -104,7 +119,7 @@ namespace ibpm {
 	void NavierStokesModel::computeFlux(const Scalar& omega, Flux& q ) const {
 		assert( _hasBeenInitialized );
 		computeFluxWithoutBaseFlow( omega, q );
-		q += _baseFlow;
+		q += _baseFlow.getFlux();
 	}
 	
 	void NavierStokesModel::refreshState( State& x ) const {
@@ -124,7 +139,7 @@ namespace ibpm {
 	
 	BoundaryVector NavierStokesModel::getBaseFlowBoundaryVelocities() const {
 		assert( _hasBeenInitialized );
-		BoundaryVector velocity = _regularizer.toBoundary( _baseFlow );
+		BoundaryVector velocity = _regularizer.toBoundary( _baseFlow.getFlux() );
 		return velocity;
 	}
 
