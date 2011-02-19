@@ -31,20 +31,18 @@ class BaseFlow {
 public:
     /// Default constructor: do not allocate memory
     BaseFlow();
-
-
     
-	/// Initialize without any constant or moving base flow
+    /// Initialize without any constant or moving base flow
     BaseFlow( const Grid& grid );
 	
-	/// Initialize without any motion
-	BaseFlow( const Grid& grid, double mag, double alpha);
+    /// Initialize without any motion
+    BaseFlow( const Grid& grid, double mag, double alpha);
 	
-	/// Initialize without any constant base flow
-	BaseFlow( const Grid& grid, const Motion& motion );
+    /// Initialize without any constant base flow
+    BaseFlow( const Grid& grid, const Motion& motion );
 	
-	/// Initialize with constant and moving component
-	BaseFlow( const Grid& grid, double mag, double alpha, const Motion& motion );
+    /// Initialize with constant and moving component
+    BaseFlow( const Grid& grid, double mag, double alpha, const Motion& motion );
 
     ~BaseFlow();
     
@@ -107,8 +105,6 @@ private:
     bool _isStationary;
     Motion *_motion;
 };
-
-
 
 
 } // namespace ibpm

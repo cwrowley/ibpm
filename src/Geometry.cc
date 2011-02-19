@@ -45,7 +45,8 @@ int Geometry::getNumPoints() const {
 
 Motion* Geometry::transferMotion() {
     /*
-        This should only be used if there is a single RigidBody in motion.
+        This transfers the motion of the first RigidBody to an unsteady base flow.
+        This is only implemented for a single RigidBody in motion.
         If there are more bodies, then we need to keep a copy of the motion 
           that we are about to delete, so that we can transform all of the 
           remaining bodies into a frame fixed to the first body.
@@ -54,20 +55,24 @@ Motion* Geometry::transferMotion() {
     vector<RigidBody>::iterator body;
     Motion* tempmotion = NULL;
     body = _bodies.begin();
-    for (body = _bodies.begin(); body != _bodies.end(); ++body) {
-        if( body->isStationary() == false ) {
-            tempmotion = body->getMotion();
-            body->clearMotion();
-            break;    
-        }
+    if( body->isStationary() == false ) {
+        tempmotion = body->getMotion();
+        body->clearMotion();  // this removes the motion and resets the isStationary flag to true.
     }
-    // recompute whether or not remaining geometry objects are stationary
+    // recompute whether or not remaining RigidBody objects are stationary
     _isStationary = true;
     for (body = _bodies.begin(); body != _bodies.end(); ++body) {
         if( body->isStationary() == false ) _isStationary = false;
     }
     return tempmotion->clone(); 
 } 
+
+void Geometry::transferCenter(double &x, double &y) {
+    // This fills (x,y) with the center (xC,yC) from the first RigidBody. 
+    vector<RigidBody>::iterator body;
+    body = _bodies.begin();
+    body->getCenter(x,y);
+}
 
 BoundaryVector Geometry::getPoints() const {
     BoundaryVector coords(_numPoints);

@@ -65,33 +65,33 @@ BaseFlow::BaseFlow(const Grid& grid ) {
 
 BaseFlow::BaseFlow(const Grid& grid, double mag, double alpha) {
     _xCenter = 0;
-	_yCenter = 0;
-	_isStationary = true;
-	_motion = NULL;
-	_time = 0.;
-        _mag = mag;
-	_magBF = mag;
-	_alpha = alpha;
-	_alphaBF = alpha;
-	_gamma = -1.*_alphaBF;
-	resize( grid );
-	_q = Flux::UniformFlow( grid, _magBF, _alphaBF);
+    _yCenter = 0;
+    _isStationary = true;
+    _motion = NULL;
+    _time = 0.;
+    _mag = mag;
+    _magBF = mag;
+    _alpha = alpha;
+    _alphaBF = alpha;
+    _gamma = -1.*_alphaBF;
+    resize( grid );
+    _q = Flux::UniformFlow( grid, _magBF, _alphaBF);
 }
 
 BaseFlow::BaseFlow(const Grid& grid, double mag, double alpha, const Motion& motion) {
     _xCenter = 0;
-	_yCenter = 0;
-	_motion = motion.clone();
-	_isStationary = motion.isStationary();
-	_motion = NULL;
-	_time = 0.;
-        _mag = mag;
-	_magBF = mag;
-	_alpha = alpha;
-	_alphaBF = alpha;
-	_gamma = -1.*_alphaBF;
-	resize( grid );
-	_q = Flux::UniformFlow( grid, _magBF, _alphaBF);
+    _yCenter = 0;
+    _motion = motion.clone();
+    _isStationary = motion.isStationary();
+    _motion = NULL;
+    _time = 0.;
+    _mag = mag;
+    _magBF = mag;
+    _alpha = alpha;
+    _alphaBF = alpha;
+    _gamma = -1.*_alphaBF;
+    resize( grid );
+    _q = Flux::UniformFlow( grid, _magBF, _alphaBF);
 }
 
 void BaseFlow::resize( const Grid& grid ) {
@@ -104,50 +104,50 @@ bool BaseFlow::isStationary() const {
 
 void BaseFlow::setMotion(const Motion& motion) {
     // Delete the old motion, if present
-	if ( _motion != NULL ) {
-	    delete _motion;
-	}
-	// make a local copy of the new motion
-	_motion = motion.clone();
-	_isStationary = motion.isStationary();
+    if ( _motion != NULL ) {
+        delete _motion;
+    }
+    // make a local copy of the new motion
+    _motion = motion.clone();
+    _isStationary = motion.isStationary();
 }
 
 void BaseFlow::setAlphaMag(double time) {
-        double x,y,theta,xdot,ydot,thetadot;   /// Motion of rigid body
-        double xdotBF, ydotBF;    /// Velocity components of base flow (Uinf,alphaBF)
-        double xdotT, ydotT;      /// Total velocity (sum of xdot and xdotBF)
- 	TangentSE2 g = _motion->getTransformation(time);
-        g.getPosition(x,y,theta);
-        g.getVelocity(xdot,ydot,thetadot);
-        xdotBF = _magBF*cos(_alphaBF);
-        ydotBF = _magBF*sin(_alphaBF);
-    	xdotT = xdotBF - xdot;
-        ydotT = -1.*ydotBF + ydot;
-        _gamma = atan2(ydotT,xdotT);
-        _alpha = -1.*theta - _gamma;
-        _mag = sqrt( xdotT*xdotT + ydotT*ydotT );
+    double x,y,theta,xdot,ydot,thetadot;   /// Motion of rigid body
+    double xdotBF, ydotBF;    /// Velocity components of base flow (Uinf,alphaBF)
+    double xdotT, ydotT;      /// Total velocity (sum of xdot and xdotBF)
+    TangentSE2 g = _motion->getTransformation(time);
+    g.getPosition(x,y,theta);
+    g.getVelocity(xdot,ydot,thetadot);
+    xdotBF = _magBF*cos(_alphaBF);
+    ydotBF = _magBF*sin(_alphaBF);
+    xdotT = xdotBF - xdot;
+    ydotT = -1.*ydotBF + ydot;
+    _gamma = atan2(ydotT,xdotT);
+    _alpha = -1.*theta - _gamma;
+    _mag = sqrt( xdotT*xdotT + ydotT*ydotT );
 }
 
 void BaseFlow::moveFlow(double time) {
     if ( _motion == NULL ) return;
-        double x,y,theta,xdot,ydot,thetadot;   /// Motion of rigid body
-	TangentSE2 g = _motion->getTransformation(time);
-        g.getPosition(x,y,theta);
-        g.getVelocity(xdot,ydot,thetadot);
-/*      The flow is decomposed into a base flow of magnitude _mag at
-          an angle _alpha = -theta-_gamma, and a purely rotational component
-          $-\dot{\theta}$ centered at the body center of rotation. 
+    double x,y,theta,xdot,ydot,thetadot;   /// Motion of rigid body
+    TangentSE2 g = _motion->getTransformation(time);
+    g.getPosition(x,y,theta);
+    g.getVelocity(xdot,ydot,thetadot);
+    /* The flow is decomposed into a base flow of magnitude _mag at
+        an angle _alpha = -theta-_gamma, and a purely rotational component
+        $-\dot{\theta}$ centered at the body center of rotation. 
         The formulae are:
           _mag = (_magBF*cos(_alphaBF) - \dot{x}, -_magBF*sin(_alphaBF) + \dot{y})
           _alpha = -theta - gamma
-*/
-        setAlphaMag(time);
+    */
+    setAlphaMag(time);
 
-        xdot = _mag * cos(_alpha);  // using the xdot,ydot of the baseflow
-        ydot = _mag * sin(_alpha);
-        TangentSE2 gnew(x,y,theta,xdot,ydot,-1.*thetadot);
-        // Update the baseFlow based on this new motion 
-        _q.setFlow( gnew, _xCenter, _yCenter);	
+    xdot = _mag * cos(_alpha);  // using the xdot,ydot of the baseflow
+    ydot = _mag * sin(_alpha);
+    TangentSE2 gnew(x,y,theta,xdot,ydot,-1.*thetadot);
+    // Update the baseFlow based on this new motion 
+    _q.setFlow( gnew, _xCenter, _yCenter);	
 }
 
 BaseFlow::~BaseFlow() {}

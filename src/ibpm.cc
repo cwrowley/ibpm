@@ -159,10 +159,19 @@ int main(int argc, char* argv[]) {
     cout << "Setting up Immersed Boundary Solver..." << flush;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
+    double xC = 0, yC = 0;
     BaseFlow q_potential( grid, magnitude, alpha );
+    // See if unsteady base flow can be used.  Only implemented for a single RigidBody in motion.  
+    // In the future, have a function geom.ubfEligible() that will make sure that the first RigidBody is moving.
     if( ! geom.isStationary() && (geom.getNumBodies() == 1) && ubf ) {
-        Motion* m = geom.transferMotion();
-        q_potential.setMotion( *m );
+        Motion* m = geom.transferMotion(); // pull motion from first RigidBody object
+        geom.transferCenter(xC,yC);        // pull center of motion from RigidBody object
+        q_potential.setMotion( *m ); 
+        q_potential.setCenter(xC,yC);
+    }
+    if( ubf && (geom.getNumBodies() != 1) ) {
+        cout << "Unsteady base flow is only supported for a single moving body.  Exiting program." << endl;
+        exit(1);
     }
   
     NavierStokesModel* model = NULL;
@@ -326,6 +335,7 @@ int main(int argc, char* argv[]) {
         double drag;
         double xF, yF; // forces in x and y direction (same as drag,lift if alpha=0)
         x.computeNetForce( xF, yF );
+        // If there is an unsteady base flow, transform body frame normal and parallel forces into lab frame lift and drag
         if( ! q_potential.isStationary() ) {
             q_potential.setAlphaMag(x.time);
             alpha = q_potential.getAlpha();

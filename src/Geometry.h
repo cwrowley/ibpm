@@ -57,6 +57,9 @@ public:
     /// rigid body object it came from.  
     Motion* transferMotion(); 
 
+    /// \brief Fill (x,y) with the center of rotation of the first RigidBody
+    void transferCenter(double &x, double &y);
+
     /// \brief Return the boundary points in the geometry
     BoundaryVector getPoints() const;
     
