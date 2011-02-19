@@ -96,31 +96,28 @@ Flux Flux::UniformFlow(
     return q;
 }
 
-void Flux::TSE2Flow(
-    const Grid& grid,
+void Flux::setFlow(
     TangentSE2 g,
     double xCenter,
     double yCenter
     ) {
-
     double xdot, ydot, thetadot;
     double xdiff, ydiff;
     g.getVelocity(xdot,ydot,thetadot);
     Flux::index ind;
-    for (int lev=0; lev<grid.Ngrid(); ++lev) {
-        double dx = grid.Dx(lev);
-        for(ind = (*this).begin(X); ind != (*this).end(X); ++ind) {
-            xdiff = (*this).x(lev,ind) - xCenter;
-            ydiff = (*this).y(lev,ind) - yCenter;
+    for (int lev=0; lev<Ngrid(); ++lev) {
+        double dx = Dx(lev);
+        for(ind = begin(X); ind != end(X); ++ind) {
+            xdiff = x(lev,ind) - xCenter;
+            ydiff = y(lev,ind) - yCenter;
             _data(lev,ind) = (xdot -thetadot*ydiff)*dx;
         }
-        for(ind = (*this).begin(Y); ind != (*this).end(Y); ++ind) {
-            xdiff = (*this).x(lev,ind) - xCenter;
-            ydiff = (*this).y(lev,ind) - yCenter;
+        for(ind = begin(Y); ind != end(Y); ++ind) {
+            xdiff = x(lev,ind) - xCenter;
+            ydiff = y(lev,ind) - yCenter;
             _data(lev,ind) = (ydot + thetadot*xdiff)*dx;
         }
     }
-
 }
 
 } // namespace ibpm

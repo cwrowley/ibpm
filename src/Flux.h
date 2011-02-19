@@ -291,8 +291,7 @@ public:
     );
 
     /// Return Flux for moving flow given by element g\in TSE2 and a center of rotation (xCenter, yCenter)
-    void TSE2Flow(
-        const Grid& grid,
+    void setFlow(
         TangentSE2 g,
         double xCenter,
         double yCenter

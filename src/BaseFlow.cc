@@ -114,8 +114,7 @@ void BaseFlow::moveFlow(double time) {
         ydotnew = _mag*sin(theta+_alpha) - ydot;
         TangentSE2 gnew(x,y,theta,xdotnew,ydotnew,thetadot);
         // Update the baseFlow based on this new motion 
-        Grid grid = _q.getGrid();
-        _q.TSE2Flow( grid, gnew, _xCenter, _yCenter);	
+        _q.setFlow( gnew, _xCenter, _yCenter);	
 }
 
 BaseFlow::~BaseFlow() {}
