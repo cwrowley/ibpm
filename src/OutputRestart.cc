@@ -26,7 +26,7 @@ OutputRestart::OutputRestart(string formatString) {
     _formatString = formatString;
 }
 
-bool OutputRestart::doOutput(const State& x) {
+bool OutputRestart::doOutput(const BaseFlow& q, const State& x) {
     char filename[256];
     sprintf( filename, _formatString.c_str(), x.timestep );
     bool status = x.save( filename );

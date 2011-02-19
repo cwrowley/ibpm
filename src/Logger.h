@@ -1,6 +1,7 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
+#include "BaseFlow.h"
 #include "State.h"
 #include <vector>
 using namespace std;
@@ -36,7 +37,7 @@ public:
     void addOutput(Output* output, int numSkip);
 
     /// \brief Call all output routines needed at the current timestep.
-    bool doOutput(const State& x);
+    bool doOutput(const BaseFlow& q, const State& x);
     
     /// \brief Initialize all of the output routines.
     bool init();

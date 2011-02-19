@@ -75,6 +75,14 @@ public:
         return _alpha;
     }    
 
+    /// Get the magnitude of base flow
+    inline double getMag() const {
+        return _mag;
+    }
+
+    /// Determine the magnitude and angle of the base flow, including rigid body motion
+    void setAlphaMag(double time);
+
     /// Update the BaseFlow, based on the Motion
     void moveFlow(double time);
  
@@ -87,12 +95,13 @@ public:
     inline const Flux& getFlux() const {return _q;};
 
 private:
-    double _mag;
-	double _alphaBF;  /// Initial angle of base flow
-	double _gamma;    /// Flight Path Angle
-    double _alpha;    /// True angle of attack
+    double _magBF;    /// Initial magnitude of base flow	
+    double _alphaBF;  /// Initial angle of base flow
+    double _mag;      /// True magnitude of flow, taking into account rigid body motion
+    double _gamma;    /// Flight Path Angle
+    double _alpha;    /// True angle of attack, taking into account rigid body motion
     Flux _q;
-	double _time;
+    double _time;
     double _xCenter;
     double _yCenter;
     bool _isStationary;

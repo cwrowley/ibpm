@@ -315,27 +315,27 @@ int main(int argc, char* argv[]) {
     }
     cout << endl;
     logger.init();
-    logger.doOutput( x );
+    logger.doOutput( q_potential, x );
 
     cout << "Integrating for " << numSteps << " steps" << endl;
     for(int i=1; i <= numSteps; ++i) {
         cout << "\nstep " << i << endl; 
         State xtemp( x ); // For SFD norm calculation
-        
         solver->advance( x );
         double lift;
         double drag;
         double xF, yF; // forces in x and y direction (same as drag,lift if alpha=0)
         x.computeNetForce( xF, yF );
         if( ! q_potential.isStationary() ) {
-            alpha = model->getAlphaBF();
+            q_potential.setAlphaMag(x.time);
+            alpha = q_potential.getAlpha();
         }
         cout << "    alpha: " << alpha << endl;
         drag = xF * cos(alpha) + yF * sin(alpha);
         lift = xF * -1.*sin(alpha) + yF * cos(alpha);
         cout << "    x force: " << setw(16) << drag*2 << ", y force: "
             << setw(16) << lift*2 << "\n";
-        logger.doOutput( x );
+        logger.doOutput( q_potential, x );
 
         // For SFD
         if( modelType == SFD ) {

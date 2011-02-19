@@ -39,7 +39,7 @@ public:
     bool cleanup();
 
     /// \brief Write data to the force file.
-    bool doOutput(const State& x);
+    bool doOutput(const BaseFlow& q, const State& x);
     
 private:
     string _filename;

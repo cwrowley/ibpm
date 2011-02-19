@@ -15,6 +15,7 @@
 // $HeadURL$
 
 #include "OutputForce.h"
+#include "BaseFlow.h"
 #include "State.h"
 #include "Output.h"
 #include "VectorOperations.h"
@@ -42,11 +43,15 @@ bool OutputForce::cleanup() {
     return status;
 }
 
-bool OutputForce::doOutput(const State& x) {
-    double drag = 0.;
-    double lift = 0.;
- 
-    x.computeNetForce( drag, lift );
+bool OutputForce::doOutput( const BaseFlow& q, const State& x) {
+    double xF, yF;      // force in x and y direction in domain
+    double drag, lift;  // actual drag and lift, wrt alpha
+    double alpha, mag;  // angle and magnitude of base flow
+    x.computeNetForce( xF, yF );
+    alpha = q.getAlpha();
+    mag = q.getMag();
+    drag = xF * cos(alpha) + yF * sin(alpha);
+    lift = xF * -1.*sin(alpha) + yF * cos(alpha);
 
     // Convert forces to lift and drag coefficients:
     // If L_d is dimensional lift, then in the nondimensionalization of the
@@ -55,8 +60,8 @@ bool OutputForce::doOutput(const State& x) {
     // so
     //    C_L = L_d / (1/2 rho U^2)
     //        = 2 L
-    drag *= 2;
-    lift *= 2;
+    drag *= 2./(mag*mag);
+    lift *= 2./(mag*mag);
 
     if ( _fp == NULL ) return false;
     fprintf( _fp, "%5d %.5e %.5e %.5e\n", x.timestep, x.time, drag, lift );   

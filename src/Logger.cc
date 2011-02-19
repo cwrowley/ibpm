@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <vector>
 #include "Output.h"
+#include "BaseFlow.h"
 #include "State.h"
 #include "Logger.h"
 
@@ -45,13 +46,13 @@ void Logger::addOutput(Output* output, int numSkip) {
 }
 
 /// \brief Call all output routines needed at the current timestep.
-bool Logger::doOutput(const State& x) {
+bool Logger::doOutput(const BaseFlow& q, const State& x) {
 	assert( _hasBeenInitialized );
     vector<Entry>::iterator entry;
     bool successful = true;
     for (entry = _outputs.begin(); entry != _outputs.end(); ++entry) {
         if ( entry->shouldBeCalled( x ) ) {
-            bool result = (entry->output)->doOutput( x );
+            bool result = (entry->output)->doOutput( q , x );
             successful = successful && result;
         }
     }
