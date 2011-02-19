@@ -2,6 +2,7 @@
 #define _GEOMETRY_H_
 
 #include "BoundaryVector.h"
+#include "Motion.h"
 #include "RigidBody.h"
 #include <iostream>
 #include <vector>
@@ -49,6 +50,12 @@ public:
     inline int getNumBodies() const {
         return _bodies.size();
     }
+
+    /// \brief Return motion from one of the bodies, and clear that motion
+    /// useful for unsteady baseflow, since we want to initialize baseFlow's motion
+    /// from the motion in a geometry.  We need to get that motion, and then remove it from the 
+    /// rigid body object it came from.  
+    Motion* transferMotion(); 
 
     /// \brief Return the boundary points in the geometry
     BoundaryVector getPoints() const;

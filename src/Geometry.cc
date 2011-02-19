@@ -13,6 +13,7 @@
 // $HeadURL$
 
 #include "Geometry.h"
+#include "Motion.h"
 #include "RigidBody.h"
 #include "Regularizer.h"
 #include <iostream>
@@ -41,6 +42,32 @@ Geometry::~Geometry() {}
 int Geometry::getNumPoints() const {
     return _numPoints;
 }
+
+Motion* Geometry::transferMotion() {
+    /*
+        This should only be used if there is a single RigidBody in motion.
+        If there are more bodies, then we need to keep a copy of the motion 
+          that we are about to delete, so that we can transform all of the 
+          remaining bodies into a frame fixed to the first body.
+        We go through the bodies, and take motion from the first one that is moving.  
+    */
+    vector<RigidBody>::iterator body;
+    Motion* tempmotion = NULL;
+    body = _bodies.begin();
+    for (body = _bodies.begin(); body != _bodies.end(); ++body) {
+        if( body->isStationary() == false ) {
+            tempmotion = body->getMotion();
+            body->clearMotion();
+            break;    
+        }
+    }
+    // recompute whether or not remaining geometry objects are stationary
+    _isStationary = true;
+    for (body = _bodies.begin(); body != _bodies.end(); ++body) {
+        if( body->isStationary() == false ) _isStationary = false;
+    }
+    return tempmotion->clone(); 
+} 
 
 BoundaryVector Geometry::getPoints() const {
     BoundaryVector coords(_numPoints);
