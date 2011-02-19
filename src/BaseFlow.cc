@@ -102,16 +102,30 @@ void BaseFlow::setMotion(const Motion& motion) {
 
 void BaseFlow::moveFlow(double time) {
     if ( _motion == NULL ) return;
-
         double x,y,theta,xdot,ydot,thetadot;
+        double alpha, gamma, Uinfprime;
         double xdotnew, ydotnew;
 	TangentSE2 g = _motion->getTransformation(time);
         g.getPosition(x,y,theta);
         g.getVelocity(xdot,ydot,thetadot);
- 
+/*      The flow is decomposed into a base flow $U_{\infty}'$ at
+          a given angle of attack, $\alpha_{\text{eff}}$, and a purely
+          rotational component $-\dot{\alpha}$ centered at the body
+          center of rotation. 
+        The formulae are:
+          U_{\infty}' = (U_{\infty} + \dot{x}, -\dot{y})
+          \alpha_{\text{eff}} = \alpha + \tan^{-1}(\frac{-\dot{y}}{U_{infty}+\dot{x}})       
+*/
         // The true xdot and ydot are determined by g\in TSE2 and the constant base flow (alpha,mag)
-        xdotnew = _mag*cos(theta+_alpha) - xdot;
-        ydotnew = _mag*sin(theta+_alpha) - ydot;
+// OLD VERSION
+//        xdotnew = _mag*cos(theta+_alpha) - xdot;
+//        ydotnew = _mag*sin(theta+_alpha) - ydot;
+// NEW VERSION
+        gamma = atan2(ydot,_mag + xdot);
+        alpha = theta - gamma;
+        Uinfprime = sqrt((_mag*_mag) + 2.*xdot*_mag + xdot*xdot + ydot*ydot);
+        xdotnew = Uinfprime * cos(alpha);
+        ydotnew = Uinfprime * sin(alpha);
         TangentSE2 gnew(x,y,theta,xdotnew,ydotnew,thetadot);
         // Update the baseFlow based on this new motion 
         _q.setFlow( gnew, _xCenter, _yCenter);	

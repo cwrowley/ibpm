@@ -101,6 +101,12 @@ void Flux::setFlow(
     double xCenter,
     double yCenter
     ) {
+    /*
+        This function computes the unsteady base flow motion 
+          corresponding to a moving body with motion g\in TSE(2)
+        The components xdot, ydot, thetadot are calculated in BaseFlow::moveFlow
+        The calculation is similar to Flux::UniformFlow, but with a rotational component
+    */
     double xdot, ydot, thetadot;
     double xdiff, ydiff;
     g.getVelocity(xdot,ydot,thetadot);
