@@ -24,6 +24,7 @@
 #include "Scalar.h"
 #include "Flux.h"
 #include "BoundaryVector.h"
+#include "BaseFlow.h"
 #include "State.h"
 
 // operations
