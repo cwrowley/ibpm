@@ -86,6 +86,9 @@ public:
 	
 	/// \brief Return the constant alpha = 1/ReynoldsNumber
     double getAlpha() const;
+
+    /// Return the angle of attack of the baseflow
+    inline double getAlphaBF() const { return _baseFlow.getAlpha(); }
 	
     /// Compute flux q from vorticity omega, including base flow q0
     void computeFlux(const Scalar& omega, Flux& q ) const;

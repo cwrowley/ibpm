@@ -69,7 +69,12 @@ public:
         x = _xCenter;
         y = _yCenter;
     }
-    
+
+    /// Get the angle of attack 
+    inline double getAlpha() const {
+        return _alpha;
+    }    
+
     /// Update the BaseFlow, based on the Motion
     void moveFlow(double time);
  
@@ -78,8 +83,8 @@ public:
 
     inline void setFlux(double f) { _q = f;};
 
-	/// Return flux _q
-	inline const Flux& getFlux() const {return _q;};
+    /// Return flux _q
+    inline const Flux& getFlux() const {return _q;};
 
 private:
     double _mag;

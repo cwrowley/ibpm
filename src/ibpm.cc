@@ -325,7 +325,14 @@ int main(int argc, char* argv[]) {
         solver->advance( x );
         double lift;
         double drag;
-        x.computeNetForce( drag, lift );
+        double xF, yF; // forces in x and y direction (same as drag,lift if alpha=0)
+        x.computeNetForce( xF, yF );
+        if( ! q_potential.isStationary() ) {
+            alpha = model->getAlphaBF();
+        }
+        cout << "    alpha: " << alpha << endl;
+        drag = xF * cos(alpha) + yF * sin(alpha);
+        lift = xF * -1.*sin(alpha) + yF * cos(alpha);
         cout << "    x force: " << setw(16) << drag*2 << ", y force: "
             << setw(16) << lift*2 << "\n";
         logger.doOutput( x );
