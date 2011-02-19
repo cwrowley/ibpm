@@ -43,6 +43,8 @@ BaseFlow::BaseFlow() {
     _time = 0.;
 	_mag = 0.;
 	_alpha = 0.;
+	_alphaBF = 0.;
+    _gamma = 0.;
 }
 
 BaseFlow::BaseFlow(const Grid& grid ) {
@@ -54,7 +56,9 @@ BaseFlow::BaseFlow(const Grid& grid ) {
     resize( grid );
 	_mag = 0.;
 	_alpha = 0.;
-	_q = Flux::UniformFlow( grid, _mag, _alpha);
+	_alphaBF = 0.;
+    _gamma = 0.;
+	_q = Flux::UniformFlow( grid, _mag, _alphaBF);
 }
 
 BaseFlow::BaseFlow(const Grid& grid, double mag, double alpha) {
@@ -65,8 +69,10 @@ BaseFlow::BaseFlow(const Grid& grid, double mag, double alpha) {
 	_time = 0.;
 	_mag = mag;
 	_alpha = alpha;
+	_alphaBF = alpha;
+	_gamma = -1.*_alphaBF;
 	resize( grid );
-	_q = Flux::UniformFlow( grid, _mag, _alpha);
+	_q = Flux::UniformFlow( grid, _mag, _alphaBF);
 }
 
 BaseFlow::BaseFlow(const Grid& grid, double mag, double alpha, const Motion& motion) {
@@ -78,8 +84,10 @@ BaseFlow::BaseFlow(const Grid& grid, double mag, double alpha, const Motion& mot
 	_time = 0.;
 	_mag = mag;
 	_alpha = alpha;
+	_alphaBF = alpha;
+	_gamma = -1.*_alphaBF;
 	resize( grid );
-	_q = Flux::UniformFlow( grid, _mag, _alpha);
+	_q = Flux::UniformFlow( grid, _mag, _alphaBF);
 }
 
 void BaseFlow::resize( const Grid& grid ) {
@@ -102,7 +110,8 @@ void BaseFlow::setMotion(const Motion& motion) {
 
 void BaseFlow::moveFlow(double time) {
     if ( _motion == NULL ) return;
-        double x,y,theta,xdot,ydot,thetadot;
+        double x,y,theta,xdot,ydot,thetadot;   /// Motion of rigid body
+        double xdotBF, ydotBF;    /// Velocity components of base flow (Uinf,alphaBF)
         double alpha, gamma, Uinfprime;
         double xdotnew, ydotnew;
 	TangentSE2 g = _motion->getTransformation(time);
@@ -121,9 +130,11 @@ void BaseFlow::moveFlow(double time) {
 //        xdotnew = _mag*cos(theta+_alpha) - xdot;
 //        ydotnew = _mag*sin(theta+_alpha) - ydot;
 // NEW VERSION
-        gamma = atan2(ydot,_mag + xdot);
+        xdotBF = _mag*cos(_alphaBF);
+        ydotBF = _mag*sin(_alphaBF);
+	    gamma = atan2(ydotBF + ydot,xdotBF + xdot);
         alpha = theta - gamma;
-        Uinfprime = sqrt((_mag*_mag) + 2.*xdot*_mag + xdot*xdot + ydot*ydot);
+        Uinfprime = sqrt((xdotBF+xdot)*(xdotBF+xdot) + (ydotBF+ydot)*(ydotBF+ydot));
         xdotnew = Uinfprime * cos(alpha);
         ydotnew = Uinfprime * sin(alpha);
         TangentSE2 gnew(x,y,theta,xdotnew,ydotnew,thetadot);

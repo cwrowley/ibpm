@@ -83,8 +83,9 @@ public:
 
 private:
     double _mag;
-    double _alpha;
-	
+	double _alphaBF;  /// Initial angle of base flow
+	double _gamma;    /// Flight Path Angle
+    double _alpha;    /// True angle of attack
     Flux _q;
 	double _time;
     double _xCenter;
