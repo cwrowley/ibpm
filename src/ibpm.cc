@@ -62,6 +62,7 @@ int main(int argc, char* argv[]) {
     
     // Simulation parameters
     string geomFile = parser.getString( "geom", "filename for reading geometry", name + ".geom" );
+    bool ubf = parser.getBool( "ubf", "Use unsteady base flow, or not", false );
     double Reynolds = parser.getDouble("Re", "Reynolds number", 100.);
     string modelName = parser.getString( "model", "type of model (linear, nonlinear, adjoint, linearperiodic, sfd)", "nonlinear" );
     string baseFlow = parser.getString( "baseflow", "base flow for linear/adjoint model", "" );
@@ -158,10 +159,12 @@ int main(int argc, char* argv[]) {
     cout << "Setting up Immersed Boundary Solver..." << flush;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
-    Motion* m = new FixedVelocity(0., -1., 0.);
     BaseFlow q_potential( grid, magnitude, alpha );
-    q_potential.setMotion( *m );
-    
+    if( ! geom.isStationary() && (geom.getNumBodies() == 1) && ubf ) {
+        Motion* m = geom.transferMotion();
+        q_potential.setMotion( *m );
+    }
+  
     NavierStokesModel* model = NULL;
     IBSolver* solver = NULL;
     SFDSolver* SFDsolver = NULL;

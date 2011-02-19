@@ -113,10 +113,6 @@ void BaseFlow::moveFlow(double time) {
         xdotnew = _mag*cos(theta+_alpha) - xdot;
         ydotnew = _mag*sin(theta+_alpha) - ydot;
         TangentSE2 gnew(x,y,theta,xdotnew,ydotnew,thetadot);
-        cout << "xdotnew = " << xdotnew << endl;
-        cout << "ydotnew = " << ydotnew << endl;
-        cout << "thetadot = " << thetadot << endl;
-        cout << "x = " << x << " , y = " << y << " , th = " << theta << " alpha = " << _alpha << " , mag = " << _mag << endl;
         // Update the baseFlow based on this new motion 
         Grid grid = _q.getGrid();
         _q.TSE2Flow( grid, gnew, _xCenter, _yCenter);	
