@@ -158,7 +158,9 @@ int main(int argc, char* argv[]) {
     cout << "Setting up Immersed Boundary Solver..." << flush;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
-    Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
+    Motion* m = new FixedVelocity(0., 0., 0.);
+    BaseFlow q_potential( grid, magnitude, alpha );
+    q_potential.setMotion( *m );
     
     NavierStokesModel* model = NULL;
     IBSolver* solver = NULL;
