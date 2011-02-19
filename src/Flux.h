@@ -5,6 +5,7 @@
 #include "Field.h"
 #include "Direction.h"
 #include "Array.h"
+#include "TangentSE2.h"
 #include <math.h>
 #include <iostream>
 using namespace std;
@@ -287,6 +288,14 @@ public:
         const Grid& grid,
         double magnitude,
         double angle
+    );
+
+    /// Return Flux for moving flow given by element g\in TSE2 and a center of rotation (xCenter, yCenter)
+    void TSE2Flow(
+        const Grid& grid,
+        TangentSE2 g,
+        double xCenter,
+        double yCenter
     );
 
 private:

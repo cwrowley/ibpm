@@ -15,6 +15,7 @@ all: libibpm.a $(EXECUTABLES)
 include ../config/make.inc
 
 OBJS = \
+	BaseFlow.o \
 	BC.o \
 	BoundaryVector.o \
 	CholeskySolver.o \
