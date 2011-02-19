@@ -45,6 +45,11 @@ public:
     /// \brief Return number of boundary points
     int getNumPoints() const;
 
+    /// \brief Return number of bodies
+    inline int getNumBodies() const {
+        return _bodies.size();
+    }
+
     /// \brief Return the boundary points in the geometry
     BoundaryVector getPoints() const;
     
