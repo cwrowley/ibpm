@@ -91,9 +91,11 @@ namespace ibpm {
     }
     
     void NavierStokesModel::updateOperators( double time ) {
-        _geometry.moveBodies(time);
-        _baseFlow.moveFlow(time);
-        _regularizer.update();
+        if( bfTimeDependent() ) _baseFlow.moveFlow(time);
+        if( geTimeDependent() ) {
+            _geometry.moveBodies(time);
+            _regularizer.update();
+        }
     }
     
     void NavierStokesModel::B(const BoundaryVector& f, Scalar& omega ) const {
