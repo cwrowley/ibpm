@@ -340,7 +340,6 @@ int main(int argc, char* argv[]) {
             q_potential.setAlphaMag(x.time);
             alpha = q_potential.getAlpha();
         }
-        cout << "    alpha: " << alpha << endl;
         drag = xF * cos(alpha) + yF * sin(alpha);
         lift = xF * -1.*sin(alpha) + yF * cos(alpha);
         cout << "    x force: " << setw(16) << drag*2 << ", y force: "

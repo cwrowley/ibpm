@@ -121,9 +121,9 @@ void BaseFlow::setAlphaMag(double time) {
     g.getVelocity(xdot,ydot,thetadot);
     xdotBF = _magBF*cos(_alphaBF);
     ydotBF = _magBF*sin(_alphaBF);
-    xdotT = xdotBF - xdot;
-    ydotT = -1.*ydotBF + ydot;
-    _gamma = atan2(ydotT,xdotT);
+    xdotT = xdot - xdotBF;
+    ydotT = ydot - ydotBF;
+    _gamma = atan2(ydotT,-1.*xdotT);
     _alpha = -1.*theta - _gamma;
     _mag = sqrt( xdotT*xdotT + ydotT*ydotT );
 }
