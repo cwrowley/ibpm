@@ -54,7 +54,7 @@ bool OutputProbes::cleanup() {
     return status;
 }
 
-bool OutputProbes::doOutput( const State& state) {
+bool OutputProbes::doOutput( const BaseFlow& q, const State& state) {
     // TODO: Unnecessary to transform velocity fields everywhere, when only a few probe points will be used
     Scalar u(_grid);
     Scalar v(_grid);

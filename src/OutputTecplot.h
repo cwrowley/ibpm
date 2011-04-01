@@ -33,7 +33,7 @@ public:
     OutputTecplot( string filename, string title );
     
     /// \brief Write the Tecplot file
-    bool doOutput(const State& x);
+    bool doOutput(const BaseFlow& q, const State& x);
     
     /// \brief Change the filename for the output file
     void setFilename( string filename );

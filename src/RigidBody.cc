@@ -555,6 +555,15 @@ void RigidBody::setMotion(const Motion& motion) {
     _isStationary = motion.isStationary();
 }
 
+Motion* RigidBody::getMotion() {
+    return _motion->clone();
+}
+
+void RigidBody::clearMotion() {
+    _motion = NULL;
+    _isStationary = true;
+}
+
 void RigidBody::setName(string name) {
     _name = name;
 }

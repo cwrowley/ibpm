@@ -96,4 +96,34 @@ Flux Flux::UniformFlow(
     return q;
 }
 
+void Flux::setFlow(
+    TangentSE2 g,
+    double xCenter,
+    double yCenter
+    ) {
+    /*
+        This function computes the unsteady base flow motion 
+          corresponding to a moving body with motion g\in TSE(2)
+        The components xdot, ydot, thetadot are calculated in BaseFlow::moveFlow
+        The calculation is similar to Flux::UniformFlow, but with a rotational component
+    */
+    double xdot, ydot, thetadot;
+    double xdiff, ydiff;
+    g.getVelocity(xdot,ydot,thetadot);
+    Flux::index ind;
+    for (int lev=0; lev<Ngrid(); ++lev) {
+        double dx = Dx(lev);
+        for(ind = begin(X); ind != end(X); ++ind) {
+            xdiff = x(lev,ind) - xCenter;
+            ydiff = y(lev,ind) - yCenter;
+            _data(lev,ind) = (xdot -thetadot*ydiff)*dx;
+        }
+        for(ind = begin(Y); ind != end(Y); ++ind) {
+            xdiff = x(lev,ind) - xCenter;
+            ydiff = y(lev,ind) - yCenter;
+            _data(lev,ind) = (ydot + thetadot*xdiff)*dx;
+        }
+    }
+}
+
 } // namespace ibpm

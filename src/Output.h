@@ -3,6 +3,7 @@
 
 namespace ibpm {
 
+class BaseFlow;
 class State;
 
 /*!
@@ -34,7 +35,7 @@ public:
     /// \brief Callback for performing the actual output.
     /// Returns true if successful; otherwise false.
     /// Pure virtual: must be defined by subclasses.
-    virtual bool doOutput(const State& x) = 0;
+    virtual bool doOutput(const BaseFlow& q, const State& x) = 0;
     
 };
 

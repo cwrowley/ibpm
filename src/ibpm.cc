@@ -62,6 +62,7 @@ int main(int argc, char* argv[]) {
     
     // Simulation parameters
     string geomFile = parser.getString( "geom", "filename for reading geometry", name + ".geom" );
+    bool ubf = parser.getBool( "ubf", "Use unsteady base flow, or not", false );
     double Reynolds = parser.getDouble("Re", "Reynolds number", 100.);
     string modelName = parser.getString( "model", "type of model (linear, nonlinear, adjoint, linearperiodic, sfd)", "nonlinear" );
     string baseFlow = parser.getString( "baseflow", "base flow for linear/adjoint model", "" );
@@ -158,8 +159,21 @@ int main(int argc, char* argv[]) {
     cout << "Setting up Immersed Boundary Solver..." << flush;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
-    Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
-    
+    double xC = 0, yC = 0;
+    BaseFlow q_potential( grid, magnitude, alpha );
+    // See if unsteady base flow can be used.  Only implemented for a single RigidBody in motion.  
+    // In the future, have a function geom.ubfEligible() that will make sure that the first RigidBody is moving.
+    if( ! geom.isStationary() && (geom.getNumBodies() == 1) && ubf ) {
+        Motion* m = geom.transferMotion(); // pull motion from first RigidBody object
+        geom.transferCenter(xC,yC);        // pull center of motion from RigidBody object
+        q_potential.setMotion( *m ); 
+        q_potential.setCenter(xC,yC);
+    }
+    if( ubf && (geom.getNumBodies() != 1) ) {
+        cout << "Unsteady base flow is only supported for a single moving body.  Exiting program." << endl;
+        exit(1);
+    }
+  
     NavierStokesModel* model = NULL;
     IBSolver* solver = NULL;
     SFDSolver* SFDsolver = NULL;
@@ -310,20 +324,27 @@ int main(int argc, char* argv[]) {
     }
     cout << endl;
     logger.init();
-    logger.doOutput( x );
+    logger.doOutput( q_potential, x );
 
     cout << "Integrating for " << numSteps << " steps" << endl;
     for(int i=1; i <= numSteps; ++i) {
         cout << "\nstep " << i << endl; 
         State xtemp( x ); // For SFD norm calculation
-        
         solver->advance( x );
         double lift;
         double drag;
-        x.computeNetForce( drag, lift );
+        double xF, yF; // forces in x and y direction (same as drag,lift if alpha=0)
+        x.computeNetForce( xF, yF );
+        // If there is an unsteady base flow, transform body frame normal and parallel forces into lab frame lift and drag
+        if( ! q_potential.isStationary() ) {
+            q_potential.setAlphaMag(x.time);
+            alpha = q_potential.getAlpha();
+        }
+        drag = xF * cos(alpha) + yF * sin(alpha);
+        lift = xF * -1.*sin(alpha) + yF * cos(alpha);
         cout << "    x force: " << setw(16) << drag*2 << ", y force: "
             << setw(16) << lift*2 << "\n";
-        logger.doOutput( x );
+        logger.doOutput( q_potential, x );
 
         // For SFD
         if( modelType == SFD ) {

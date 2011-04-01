@@ -26,7 +26,7 @@ bool OutputEnergy::cleanup() {
     return status;
 }
 
-bool OutputEnergy::doOutput(const State& x) {
+bool OutputEnergy::doOutput(const BaseFlow & q, const State& x) {
     double energy = 0.;
     energy = .5 * InnerProduct( x.q, x.q );
     

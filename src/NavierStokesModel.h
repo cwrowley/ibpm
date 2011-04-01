@@ -5,6 +5,7 @@
 #include "Geometry.h"
 #include "Scalar.h"
 #include "Flux.h"
+#include "BaseFlow.h"
 #include "BoundaryVector.h"
 #include "State.h"
 #include "VectorOperations.h"
@@ -40,7 +41,7 @@ public:
         const Grid& grid,
         const Geometry& geometry,
 		double Reynolds,
-        const Flux& q_potential
+        const BaseFlow& q_potential
     );
     
     /// \brief Constructor, assuming potential flow part is zero
@@ -57,6 +58,9 @@ public:
 
     /// \brief Return true if the geometry has moving bodies
     bool isTimeDependent() const;
+    bool geTimeDependent() const;  // geometry TD?
+    bool bfTimeDependent() const;  // baseflow TD?
+    
 
     /// \brief Return the number of points in the geometry
     int getNumPoints() const;
@@ -82,6 +86,9 @@ public:
 	
 	/// \brief Return the constant alpha = 1/ReynoldsNumber
     double getAlpha() const;
+
+    /// Return the angle of attack of the baseflow
+    inline double getAlphaBF() const { return _baseFlow.getAlpha(); }
 	
     /// Compute flux q from vorticity omega, including base flow q0
     void computeFlux(const Scalar& omega, Flux& q ) const;
@@ -105,7 +112,7 @@ private:
     const Grid& _grid;
     const Geometry& _geometry;
     Regularizer _regularizer;
-    Flux _baseFlow;
+    BaseFlow _baseFlow;
 	double _ReynoldsNumber;
     PoissonSolver _poisson;
     bool _hasBeenInitialized;

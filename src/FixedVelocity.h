@@ -46,11 +46,6 @@ public:
         _intY = _intY + _ydot*dtt;
         _intTheta = _intTheta + _thetadot*dtt;
         _oldtime = time;
-        cout << " _intX = " << _intX << endl;
-        cout << " _intY = " << _intY << endl;
-        cout << " _intTheta = " << _intTheta << endl;
-        cout << " _oldtime = " << _oldtime << endl;
-        cout << " dt = " << dtt << endl;
         return TangentSE2( _intX, _intY, _intTheta, _xdot, _ydot, _thetadot );
     }
 

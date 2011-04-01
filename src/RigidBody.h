@@ -131,7 +131,13 @@ public:
 
     /// Set the evolution of the current body (which may be stationary or not)
     void setMotion(const Motion& motion);
-    
+
+    /// Set the motion of the current body to NULL
+    void clearMotion();
+
+    /// Get a clone of the motion of the current body
+    Motion* getMotion();    
+
     /// Set the center of the body, about which rotations are defined
     inline void setCenter(double x, double y) {
         _xCenter = x;

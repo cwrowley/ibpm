@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     // Setup equations to solve, with uniform flow U = 1
     double magnitude = 1.;
     double angle = 0.;
-    Flux q_potential = Flux::UniformFlow( grid, magnitude, angle );
+    BaseFlow q_potential( grid, magnitude, angle );
     double Reynolds=100;
     NavierStokesModel model( grid, geom, Reynolds, q_potential );
     model.init();

@@ -31,7 +31,7 @@ OutputTecplot::OutputTecplot( string filename, string title ) {
     _title = title;
 }
     
-bool OutputTecplot::doOutput(const State& state) {
+bool OutputTecplot::doOutput(const BaseFlow& q, const State& state) {
     // Add timestep to filename and title
     char filename[256];
     sprintf( filename, _filename.c_str(), state.timestep );
