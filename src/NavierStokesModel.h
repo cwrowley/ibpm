@@ -101,7 +101,10 @@ public:
 	 Assumes psi = 0 on the boundary, and does not add in potential flow solution
 	 */
     Scalar vorticityToStreamfunction(const Scalar& omega) const;
-	
+
+    /// Return the BaseFlow
+    inline const BaseFlow& getBaseFlow() const { return _baseFlow; }
+
 private:    
     // Perhaps copy constructor should be made private to prevent future memory deallocation errors
     
