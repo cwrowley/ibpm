@@ -25,8 +25,8 @@ bool OutputEnergy::cleanup() {
     }
     return status;
 }
-
-bool OutputEnergy::doOutput(const BaseFlow & q, const State& x) {
+    
+bool OutputEnergy::doOutput(const State& x) {
     double energy = 0.;
     energy = .5 * InnerProduct( x.q, x.q );
     
@@ -35,5 +35,11 @@ bool OutputEnergy::doOutput(const BaseFlow & q, const State& x) {
     fflush( _fp );
     return true;
 }
-
+    
+bool OutputEnergy::doOutput(const BaseFlow & q, const State& x) {
+    // Currently no use for baseflow, but this method is defined for future 
+    // flexibility
+    return doOutput(x);
+}
+    
 } // namespace ibpm

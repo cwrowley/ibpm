@@ -56,6 +56,10 @@ public:
     
     /// Write velocities u, v, fluxes q.x, q,y and vorticity omega for each probe, 
     /// to the correpsonding file with name (filename + probe#).
+    bool doOutput( const State& x );
+    
+    /// Write velocities u, v, fluxes q.x, q,y and vorticity omega for each probe, 
+    /// to the correpsonding file with name (filename + probe#), making use of the baseflow too.
     bool doOutput( const BaseFlow& q, const State& x );
     
     /// \brief Add a probe by specifying its gridpoint indices 

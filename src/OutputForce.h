@@ -37,11 +37,18 @@ public:
     /// \brief Close the file.
     /// Returns true if successful
     bool cleanup();
+    
+    /// \brief Write data to the force file from a state object, angle of attack, and freestream velocity.
+    bool doOutput(const double alpha, const double mag, const State& x);
 
-    /// \brief Write data to the force file.
+    /// \brief Write data to the force file, making use of baseflow.
     bool doOutput(const BaseFlow& q, const State& x);
     
-private:
+    /// \brief Write data to the force file.
+    bool doOutput(const State& x);
+    
+    
+private:   
     string _filename;
     FILE* _fp;
 };

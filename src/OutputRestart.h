@@ -29,6 +29,9 @@ public:
     OutputRestart(string formatString);
 
     /// \brief Write the restart file
+    bool doOutput(const State& x);
+    
+    /// \brief Write the restart file, making use of the baseflow too
     bool doOutput(const BaseFlow& q, const State& x);
     
     /// \brief Change the filename for the output file

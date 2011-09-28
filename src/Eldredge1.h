@@ -6,7 +6,7 @@
 #include <math.h>
 
 namespace ibpm {
-
+    
 /*!
     \file Eldredge1.h
     \class Eldredge1

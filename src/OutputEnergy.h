@@ -23,7 +23,10 @@ public:
     /// Returns true if successful
     bool cleanup();
 
-    /// \brief Write data to the force file.
+    /// \brief Write data to the energy file.
+    bool doOutput(const State& x);
+    
+    /// \brief Write data to the energy file, making use of the baseflow.
     bool doOutput(const BaseFlow& q, const State& x);
     
 private:

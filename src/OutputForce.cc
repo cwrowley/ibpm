@@ -43,16 +43,14 @@ bool OutputForce::cleanup() {
     return status;
 }
 
-bool OutputForce::doOutput( const BaseFlow& q, const State& x) {
+// Method to compute lift, drag from state (x), angle of attack (alpha), and freestream velocity (mag)
+bool OutputForce::doOutput( const double alpha, const double mag, const State& x) {
     double xF, yF;      // force in x and y direction in domain
     double drag, lift;  // actual drag and lift, wrt alpha
-    double alpha, mag;  // angle and magnitude of base flow
     x.computeNetForce( xF, yF );
-    alpha = q.getAlpha();
-    mag = q.getMag();
     drag = xF * cos(alpha) + yF * sin(alpha);
     lift = xF * -1.*sin(alpha) + yF * cos(alpha);
-
+    
     // Convert forces to lift and drag coefficients:
     // If L_d is dimensional lift, then in the nondimensionalization of the
     // code (lengths by c, density by rho, velocity by U), we have
@@ -62,12 +60,28 @@ bool OutputForce::doOutput( const BaseFlow& q, const State& x) {
     //        = 2 L
     drag *= 2./(mag*mag);
     lift *= 2./(mag*mag);
-
+    
     if ( _fp == NULL ) return false;
     fprintf( _fp, "%5d %.5e %.5e %.5e\n", x.timestep, x.time, drag, lift );   
     fflush( _fp );
     
     return true;
 }
+
+// If no other information is provided, assume zero angle of attack, unity freestrem velocity
+bool OutputForce::doOutput(const State& x) {
+    double alpha = 0.;
+    double mag = 1.;
+    
+    return doOutput(alpha, mag, x);
+}
+
+bool OutputForce::doOutput( const BaseFlow& q, const State& x) {
+    double alpha = q.getAlpha();
+    double mag = q.getMag();
+    
+    return doOutput(alpha, mag, x);
+}
+    
 
 } // namespace ibpm

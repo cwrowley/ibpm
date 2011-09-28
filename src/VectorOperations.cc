@@ -321,7 +321,7 @@ double FineGridInnerProduct( const Flux& p, const Flux& q ) {
     
     int nx = p.Nx();
     int ny = p.Ny();
-    
+
     double ip = 0.;
     
     // X-fluxes
@@ -330,14 +330,14 @@ double FineGridInnerProduct( const Flux& p, const Flux& q ) {
             ip += p(0,X,i,j) * q(0,X,i,j);
         }
     }
-    
+
     // Y-fluxes    
     for (int i=0; i<nx; ++i) {
         for (int j=1; j<ny; ++j){
             ip += p(0,Y,i,j) * q(0,Y,i,j);
         }
     }
-     
+
     return ip;
 }
     
@@ -350,7 +350,7 @@ double InnerProduct (const Flux& p, const Flux& q){
     int ny = p.Ny();
     int nx2 = p.NxExt();
     int ny2 = p.NyExt();
-
+    
     double ip = FineGridInnerProduct( p, q );
     
     // X-fluxes, coarser grids
@@ -379,8 +379,8 @@ double InnerProduct (const Flux& p, const Flux& q){
             }
         }
     }
-
-     
+    
+    
     // Y-fluxes, coarser grids
     for (int lev=1; lev < p.Ngrid(); ++lev) {
         // left and right interfaces (edges)

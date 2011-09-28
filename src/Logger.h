@@ -37,6 +37,9 @@ public:
     void addOutput(Output* output, int numSkip);
 
     /// \brief Call all output routines needed at the current timestep.
+    bool doOutput(const State& x);
+    
+    /// \brief Call all output routines needed at the current timestep, making use of baseflow.
     bool doOutput(const BaseFlow& q, const State& x);
     
     /// \brief Initialize all of the output routines.

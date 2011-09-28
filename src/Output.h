@@ -32,7 +32,12 @@ public:
     /// Returns true if successful
     virtual bool cleanup() { return false; }
 
-    /// \brief Callback for performing the actual output.
+    /// \brief Callback for performing the actual output from a state object.
+    /// Returns true if successful; otherwise false.
+    /// Pure virtual: must be defined by subclasses.
+    virtual bool doOutput(const State& x) = 0;
+    
+    /// \brief Callback for performing the actual output from a state and a baseflow object.
     /// Returns true if successful; otherwise false.
     /// Pure virtual: must be defined by subclasses.
     virtual bool doOutput(const BaseFlow& q, const State& x) = 0;

@@ -31,7 +31,7 @@ OutputTecplot::OutputTecplot( string filename, string title ) {
     _title = title;
 }
     
-bool OutputTecplot::doOutput(const BaseFlow& q, const State& state) {
+bool OutputTecplot::doOutput(const State& state) {
     // Add timestep to filename and title
     char filename[256];
     sprintf( filename, _filename.c_str(), state.timestep );
@@ -57,6 +57,12 @@ bool OutputTecplot::doOutput(const BaseFlow& q, const State& state) {
     // Write the tecplot file
     bool status = ScalarToTecplot( varVec, varNameVec, filename, title );
     return status;
+}
+    
+bool OutputTecplot::doOutput(const BaseFlow& q, const State& x) {
+    // Currently no use for baseflow, but this method is defined for future 
+    // flexibility
+    return doOutput(x);
 }
     
 void OutputTecplot::setFilename( string filename ) {
