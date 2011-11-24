@@ -60,7 +60,8 @@ int main(int argc, char* argv[]) {
     double yOffset = parser.getDouble( "yoffset", "y-coordinate of bottom edge of finest domain", -2. );
     double xShift = parser.getDouble( "xshift", "percentage offset between grid levels in x-direction", 0. );
     double yShift = parser.getDouble( "yshift", "percentage offset between grid levels in y-direction", 0. );
-    
+    double alpha = parser.getDouble( "alpha", "angle of attack of base flow", 0.);    
+
     // Simulation parameters
     string geomFile = parser.getString( "geom", "filename for reading geometry", name + ".geom" );
     bool ubf = parser.getBool( "ubf", "Use unsteady base flow, or not", false );
@@ -159,7 +160,9 @@ int main(int argc, char* argv[]) {
     cout << "Reynolds number = " << Reynolds << "\n" << endl;
     cout << "Setting up Immersed Boundary Solver..." << flush;
     double magnitude = 1;
-    double alpha = 0;  // angle of background flow
+//    double alpha = 0;  // angle of background flow
+    double pi = 4. * atan(1.);
+    alpha = alpha*pi/180.;
     double xC = 0, yC = 0;
     BaseFlow q_potential( grid, magnitude, alpha );
     // See if unsteady base flow can be used.  Only implemented for a single RigidBody in motion.  
