@@ -1,1 +1,1 @@
-make.inc.ystone
+make.inc.gcc

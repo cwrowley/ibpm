@@ -26,9 +26,10 @@ using namespace std;
 
 namespace ibpm {
 
-OutputTecplot::OutputTecplot( string filename, string title ) {
+OutputTecplot::OutputTecplot( string filename, string title, bool TecplotAllGrids ) {
     _filename = filename;
     _title = title;
+    _TecplotAllGrids = TecplotAllGrids;
 }
     
 bool OutputTecplot::doOutput(const State& state) {
@@ -37,7 +38,9 @@ bool OutputTecplot::doOutput(const State& state) {
     sprintf( filename, _filename.c_str(), state.timestep );
     char title[256];
     sprintf( title, _title.c_str(), state.timestep );
-    			
+    bool status = false;    
+    const Grid& grid = state.omega.getGrid();	
+		
     // Calculate velocities
     Scalar u( state.omega.getGrid() );
     Scalar v( state.omega.getGrid() );
@@ -55,7 +58,15 @@ bool OutputTecplot::doOutput(const State& state) {
     varNameVec.push_back( "Vorticity" );
         
     // Write the tecplot file
-    bool status = ScalarToTecplot( varVec, varNameVec, filename, title );
+    if(_TecplotAllGrids) {
+        status = true;
+        for(int i=0;i < grid.Ngrid(); i++) {
+            sprintf( filename, _filename.c_str(), state.timestep, i );
+            cout << filename << endl;
+            status = status && ScalarToTecplot( varVec, varNameVec, filename, title, i);
+        }
+    }
+    else status = ScalarToTecplot( varVec, varNameVec, filename, title );
     return status;
 }
     

@@ -30,7 +30,7 @@ public:
     /// \brief Constructor
     /// \param[in] filename Filename in the standard printf format (e.g. "file%06d.plt"), where timestep will be supplied
     /// \param[in] title Title in the standard printf format
-    OutputTecplot( string filename, string title );
+    OutputTecplot( string filename, string title, bool TecplotAllGrids );
     
     /// \brief Write the Tecplot file
     bool doOutput(const State& x);
@@ -47,6 +47,7 @@ public:
 private:
     string _filename;
     string _title;
+    bool _TecplotAllGrids;
 };
 
 } // namespace ibpm

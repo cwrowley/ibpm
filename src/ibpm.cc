@@ -45,6 +45,7 @@ int main(int argc, char* argv[]) {
     string name = parser.getString( "name", "run name", "ibpm" );
     string outdir = parser.getString( "outdir", "directory for saving output", "." );
     int iTecplot = parser.getInt( "tecplot", "if >0, write a Tecplot file every n timesteps", 100);
+    bool TecplotAllGrids = parser.getBool( "tecplotallgrids", "Tecplot output for all grids, or not", false );
     int iRestart = parser.getInt( "restart", "if >0, write a restart file every n timesteps", 100);
     int iForce = parser.getInt( "force", "if >0, write forces every n timesteps", 1);
     int iEnergy = parser.getInt( "energy", "if >0, write energy every n timesteps", 0);
@@ -299,7 +300,8 @@ int main(int argc, char* argv[]) {
     cout << endl << "Initial timestep = " << x.timestep << "\n" << endl;
 
     // Setup output routines
-    OutputTecplot tecplot( outdir + name + numDigitInFileName + ".plt", "Test run, step" +  numDigitInFileName);
+    OutputTecplot tecplot( outdir + name + numDigitInFileName + ".plt", "Test run, step" +  numDigitInFileName, TecplotAllGrids);
+    if(TecplotAllGrids) tecplot.setFilename( outdir + name + numDigitInFileName + "_g%01d.plt" );
     OutputRestart restart( outdir + name + numDigitInFileName + ".bin" );
     OutputForce force( outdir + name + ".force" ); 
     OutputEnergy energy( outdir + name + ".energy" ); 

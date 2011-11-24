@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
     x.f = 1.;
     x.q = regularizer.toFlux( x.f );
     
-    OutputTecplot tecplot( outFileName, "Check geometry" );
+    OutputTecplot tecplot( outFileName, "Check geometry", false );
     BaseFlow q_potential(grid, 0., 0.);
     tecplot.doOutput(q_potential, x);
 
