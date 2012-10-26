@@ -1,0 +1,9 @@
+build/*.o
+build/libibpm.a
+build/checkgeom
+build/ibpm
+examples/*.cmd
+examples/*.force
+examples/*.bin
+examples/*.plt
+examples/*.cholesky
