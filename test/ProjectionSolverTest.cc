@@ -48,7 +48,7 @@ protected:
         body.addLine_n( -0.75, 0, 0.75, 0, nPoints );
         _nonemptyGeometry.addBody(body);
 
-        Flux q0 = Flux::UniformFlow( _grid, 1.0, 0. );
+        BaseFlow q0( _grid, 1.0, 0. );
 
         _modelWithNoBodies = new NavierStokesModel(
             _grid, _emptyGeometry, Reynolds, q0 );

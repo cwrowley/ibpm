@@ -32,7 +32,7 @@ protected:
         _geom.addBody(body);
         double magnitude = 1.;
         double angle = 0.;
-        Flux q0 = Flux::UniformFlow( _grid, magnitude, angle );
+        BaseFlow q0( _grid, magnitude, angle );
         _model = new NavierStokesModel( _grid, _geom, _Reynolds, q0 );
         _model->init();
     }
