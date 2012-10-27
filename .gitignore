@@ -11,6 +11,8 @@ TAGS
 test/*.o
 test/runner
 test/runner.err
+test/gtest_main.a
+test/gtest.a
 doc/*.aux
 doc/*.bbl
 doc/*.blg
