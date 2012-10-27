@@ -112,10 +112,10 @@ bool ScalarToTecplot( vector<const Scalar*> varVec, vector<string> varNameVec, s
     }
     
     // Add timestep to filename and title
-    char _filename[256];
-    sprintf( _filename, filename.c_str() );
-    char _title[256];
-    sprintf( _title, title.c_str() );
+    char _filename[BUFSIZ];
+    strncpy( _filename, filename.c_str(), BUFSIZ-1 );
+    char _title[BUFSIZ];
+    strncpy( _title, title.c_str(), BUFSIZ-1 );
     
     // Write the Tecplot file
     bool status = writeTecplotFileASCII( _filename, _title, list, lev );
