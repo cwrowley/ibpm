@@ -7,3 +7,16 @@ examples/*.force
 examples/*.bin
 examples/*.plt
 examples/*.cholesky
+TAGS
+test/*.o
+test/runner
+test/runner.err
+doc/*.aux
+doc/*.bbl
+doc/*.blg
+doc/*.log
+doc/*.out
+doc/*.pdfsync
+doc/*.synctex.gz
+doc/*.toc
+doc/ibpm_design.pdf
