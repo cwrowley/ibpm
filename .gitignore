@@ -22,3 +22,5 @@ doc/*.pdfsync
 doc/*.synctex.gz
 doc/*.toc
 doc/ibpm_design.pdf
+callgrind.out.*
+.depend
