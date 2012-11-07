@@ -1,0 +1,11 @@
+# standard config file, using gcc compiler
+
+CXX = c++
+
+# flags for compiling with optimization
+CXXFLAGS = -Wall -g -O3 -DNDEBUG
+
+# Specify directories for libraries and header files here
+# lib_dirs = -L/path/to/lib
+
+# include_dirs = -I/path/to/include
