@@ -7,9 +7,11 @@ IBPM_DIR = ../..
 SRC_DIR = $(IBPM_DIR)/src
 IBPM_LIB = $(IBPM_DIR)/build/libibpm.a
 
+include $(IBPM_DIR)/config/make.inc
+
 output_files := $(patsubst %.cc, %.out, $(wildcard *.cc))
 
-all: $(output_files) cylinder.png
+all: $(output_files)
 
 %.out: %.x
 	./$< > $@

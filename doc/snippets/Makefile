@@ -8,6 +8,8 @@ IBPM_DIR = ../..
 SRC_DIR = $(IBPM_DIR)/src
 IBPM_LIB = $(IBPM_DIR)/build/libibpm.a
 
+include $(IBPM_DIR)/config/make.inc
+
 all: $(output_files)
 
 %.out: %.x

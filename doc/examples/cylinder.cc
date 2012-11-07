@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     x.omega = 0.;
 
     // Setup output routines
-    OutputTecplot tecplot( "cyl%03d.plt", "Cylinder, step %03d" );
+    OutputTecplot tecplot( "cyl%03d.plt", "Cylinder, step %03d", false );
     
     // Output initial condition
     tecplot.doOutput( x );

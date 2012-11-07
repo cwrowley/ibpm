@@ -22,5 +22,11 @@ doc/*.pdfsync
 doc/*.synctex.gz
 doc/*.toc
 doc/ibpm_design.pdf
+doc/html
+doc/latex
+doc/ibpm_manual.pdf
+doc/examples/*.plt
+doc/examples/*.out
+doc/snippets/*.out
 callgrind.out.*
 .depend

@@ -15,6 +15,8 @@ SUBDIRS = examples snippets
 .PHONY: doc clean distclean $(SUBDIRS)
 .SUFFIXES: .tex .pdf
 
+include ../config/make.inc
+
 doc: $(SUBDIRS)
 	doxygen
 

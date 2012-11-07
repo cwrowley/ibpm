@@ -59,6 +59,8 @@ output:
 
 \include cylinder.out
 
+*/
+/*
 \image html cylinder.png "Vorticity from cylinder example"
 \image latex cylinder.png "Vorticity from cylinder example"
 
