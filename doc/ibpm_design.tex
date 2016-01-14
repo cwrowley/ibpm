@@ -103,7 +103,7 @@ The first equation is the momentum equation, the second is a Poisson equation fo
 Operator & Maps & Definition\\
 $C$ 	& $\psi\mapsto q$ & curl of a scalar\\
 $C^T$ 	& $q\mapsto \gamma$ & curl of a vector in 2d\\
-$S$ 	& $\gamma\mapsto\hat\gamma$ & discrete sin transform\\
+$S$ 	& $\gamma\mapsto\hat\gamma$ & discrete sine transform\\
 $L=-C^TC$	& $\gamma\mapsto\gamma$ & Laplacian, analogous to $\triangle u = \nabla(\nabla\cdot u) - \nabla\times\nabla\times u$\\
 $\Lambda$	& $\hat\gamma\mapsto\hat\gamma$ & eigenvalues of Laplacian\\
 $E$ 	& $q\mapsto u_B$ & restriction of fluxes everywhere to velocities at boundary\\
@@ -111,7 +111,7 @@ $E^T$	& $f\mapsto q$ & regularization of forces at boundary points to fluxes eve
 $D$		& $q\mapsto \varphi$ & divergence of a vector field
 \end{tabular}
 \end{center}
-Here, $u_B$ is a vector of velocities at boundary points.  An important aspect of the method is that the curl operator~$C$ is chosen such that its range is in the nullspace of a discrete divergence operator~$D$, such that $DC=0$, and the continuity equation is satisfied for any streamfunction~$\psi$.  The discrete Laplacian $L$ is diagonalized by the discrete sin transform~$S$, and its eigenvalues are known analytically, so the Poisson equation~(\ref{eq:poisson}) can be solved efficiently.
+Here, $u_B$ is a vector of velocities at boundary points.  An important aspect of the method is that the curl operator~$C$ is chosen such that its range is in the nullspace of a discrete divergence operator~$D$, such that $DC=0$, and the continuity equation is satisfied for any streamfunction~$\psi$.  The discrete Laplacian $L$ is diagonalized by the discrete sine transform~$S$, and its eigenvalues are known analytically, so the Poisson equation~(\ref{eq:poisson}) can be solved efficiently.
 To retrieve the fluxes $q$ from the streamfunction~$\psi$, we need to add in a (prescribed) potential flow solution~$q_\text{pot}$, so we have
 \begin{equation}
 	q = C\psi + q_\text{pot}.
@@ -160,12 +160,12 @@ We solve the constrained equation~(\ref{eq:constrained}) using the following alg
 \end{aligned}
 \label{eq:projection_alg}
 \end{equation}
-Since the matrix $\mathcal{A}$ is easily invertible using a sin transform, one may solve the first equation easily (applying boundary conditions on~$\gamma^*$).  The second equation is rather small ($\text{\#forces} \times \text{\#forces}$), and furthermore the matrix $\mathcal{M}=\mathcal{C}\mathcal{A}^{-1}\mathcal{B}$ is symmetric, since $\mathcal{A}$ and $L$ have the same eigenvectors.  When the boundary conditions are fixed (stationary bodies), then the matrix~$\mathcal{M}$ is constant in time, and so may be LU decomposed (e.g. using a Cholesky decomposition) once beforehand, and solved rapidly at each timestep.  When the boundary conditions vary in time, then $E$ changes at each step, and a direct solve is not as efficient as an iterative solve, such as a conjugate-gradient method (also for symmetric matrices).
+Since the matrix $\mathcal{A}$ is easily invertible using a sine transform, one may solve the first equation easily (applying boundary conditions on~$\gamma^*$).  The second equation is rather small ($\text{\#forces} \times \text{\#forces}$), and furthermore the matrix $\mathcal{M}=\mathcal{C}\mathcal{A}^{-1}\mathcal{B}$ is symmetric, since $\mathcal{A}$ and $L$ have the same eigenvectors.  When the boundary conditions are fixed (stationary bodies), then the matrix~$\mathcal{M}$ is constant in time, and so may be LU decomposed (e.g. using a Cholesky decomposition) once beforehand, and solved rapidly at each timestep.  When the boundary conditions vary in time, then $E$ changes at each step, and a direct solve is not as efficient as an iterative solve, such as a conjugate-gradient method (also for symmetric matrices).
 
 In the design below, we decouple the algorithm for the timestepper~(\ref{eq:timestepper}) from the algorithm (\ref{eq:projection_alg}) for solving equation~(\ref{eq:constrained}).
 
 \subsection{Multi-domain method}
-For large domains, it is not practical to use uniform grid spacing, so the method in~\cite{ColTai-07} uses a multi-domain approach in which several nested uniform grids are used.  The Poisson equations may still be solved efficiently in this case, also using a number of sin transforms, as outlined here.  We present a slightly modified version of this scheme that is slightly more accurate (the only real difference is in the definition of the operator $P^{k+1,k}$ that moves variables from a fine grid to a coarse grid).
+For large domains, it is not practical to use uniform grid spacing, so the method in~\cite{ColTai-07} uses a multi-domain approach in which several nested uniform grids are used.  The Poisson equations may still be solved efficiently in this case, also using a number of sine transforms, as outlined here.  We present a slightly modified version of this scheme that is slightly more accurate (the only real difference is in the definition of the operator $P^{k+1,k}$ that moves variables from a fine grid to a coarse grid).
 
 One defines a scalar field $u$ on a nested set of grids $u^1,\ldots,u^{N_g}$, where $u^1$ is the finest grid and $u^{N_g}$ is the coarsest.  One then defines a sequence of {\em coarsening} operators $P^k$ that move points from the full grid to an individual coarse grid~$u^k$, by suitably averaging finer gridpoints.  These coarsening operators may be defined recursively, by starting with the finest grid and averaging values to each coarser grid sequentially.
 
@@ -182,7 +182,7 @@ one first computes a sequence of coarsified forcing terms $f^1,\ldots,f^{N_g}$, 
 	L_1 u^1 &= f^1,& u^1\big|_\partial &= bc(u^2)
 \end{aligned}
 \end{equation}
-where the operators $bc(u^{k+1})$ return the values on grid $u^{k+1}$ that are on the boundary of the next finer grid~$k$.  The scaling terms $2^k$ on the right-hand side compensate for the different grid spacings on the different domains.  Since the single-grid Laplacian $L_1$ is easily inverted using a sin transform, the overall solution is efficient.
+where the operators $bc(u^{k+1})$ return the values on grid $u^{k+1}$ that are on the boundary of the next finer grid~$k$.  The scaling terms $2^k$ on the right-hand side compensate for the different grid spacings on the different domains.  Since the single-grid Laplacian $L_1$ is easily inverted using a sine transform, the overall solution is efficient.
 
 One can show that with suitably defined coarsening operators, the process above {\em exactly} solves the original Poisson problem $Lu=f$, with the standard Laplacian operator on the full grid (second-order accurate in each sub-grid, first-order accurate at the boundaries).
 
@@ -424,7 +424,7 @@ This class contains an instance of a \class{Grid} and \class{Geometry}, as well 
 \paragraph{Interface}
 \begin{description}
 	\item \code|NavierStokesModel(const Grid& grid, const Geometry& geom, double Reynolds)|\\
-		Constructor, given a specified \class{Grid} and \class{Geometry}, as well as the Reynolds number.  Set up the appropriate data needed to evaluate $\Lambda$, and the discrete sin transform $S$, $S^{-1}$.  Does not make a local copy of \class{Geometry}, but instead keeps a reference (or pointer) to the one passed.
+		Constructor, given a specified \class{Grid} and \class{Geometry}, as well as the Reynolds number.  Set up the appropriate data needed to evaluate $\Lambda$, and the discrete sine transform $S$, $S^{-1}$.  Does not make a local copy of \class{Geometry}, but instead keeps a reference (or pointer) to the one passed.
 	\item \code|~NavierStokesModel()|\\
 	\item \code|Geometry* getGeometry()|\\
 		Return a pointer to the associated \class{Geometry}.
@@ -433,9 +433,9 @@ This class contains an instance of a \class{Grid} and \class{Geometry}, as well 
 	\item \code|Scalar* getLambda()|\\
 		Return a pointer to the eigenvalues $\Lambda$ of~$L$.
 	\item \code|Scalar S(const Scalar& g)|\\
-		Transform to eigenvectors of~$L$ (discrete sin transform).
+		Transform to eigenvectors of~$L$ (discrete sine transform).
 	\item \code|Scalar Sinv(const Scalar& ghat)|\\
-		Inverse transform $S^{-1}$.  Note that for the discrete sin transform, $S^{-1}$ should equal~$S$, but in some implementations, these may differ by a normalization constant.
+		Inverse transform $S^{-1}$.  Note that for the discrete sine transform, $S^{-1}$ should equal~$S$, but in some implementations, these may differ by a normalization constant.
 	\item \code|Scalar B(const BoundaryVector& f)|\\
 		Compute $\gamma = Bf$, as in~(\ref{eq:model}).
 	\item \code|BoundaryVector C(const Scalar& gamma)|\\
@@ -606,9 +606,9 @@ ind = omega.getIndex(i,j)
 	\item \code|Scalar& curl(const Flux& q)|\\
 	Set \code|*this| (the current Scalar) to the curl of q.  Returns \code|*this|.
 	\item \code|Scalar& sinTransform(const Scalar& gamma)|\\
-	Set \code|*this| to the discrete sin transform of the argument.  (Assumes different chunks of memory.)   Returns \code|*this|.
+	Set \code|*this| to the discrete sine transform of the argument.  (Assumes different chunks of memory.)   Returns \code|*this|.
 	\item \code|Scalar& sinTransformInv(const Scalar& gamma)|\\
-	Set \code|*this| to the inverse discrete sin transform of the argument.   Returns \code|*this|.
+	Set \code|*this| to the inverse discrete sine transform of the argument.   Returns \code|*this|.
 	\item \code|Scalar& laplacian(const Scalar& gamma)|\\
 	Set \code|*this| to the Laplacian of the argument.   Returns \code|*this|.
 	\item \code|Scalar& laplacianInverse(const Scalar& gamma)|\\
@@ -621,7 +621,7 @@ ind = omega.getIndex(i,j)
 \end{description}
 
 \paragraph{Implementation}
-Laplacian and its inverse should probably be implemented using sin transform and multiplication by eigenvalues (as in f90 code).  Store this matrix of eigenvalues as private class data.
+Laplacian and its inverse should probably be implemented using sine transform and multiplication by eigenvalues (as in f90 code).  Store this matrix of eigenvalues as private class data.
 
 Probably implement using Blitz++, \code|Array<double,2>|.  Need to be able to take an FFT of this, so possibly want to allocate memory using an FFTW memory allocator (which ensures optimal alignment of doubles).  Governing principle: no matter what, make sure that the implementation of the arrays is independent from the interface, so the rest of the code does not need to change if the implementation is changed.
 
@@ -916,7 +916,7 @@ where here the first two components $(a,b)$ are treated as ``points'' in the pla
 
 
 \bibliographystyle{abbrv}
-\bibliography{jabbrv,master}
+\bibliography{references}
 
 % \begin{thebibliography}{1}
 % 
