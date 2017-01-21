@@ -1,6 +1,6 @@
-# Cylinder, diameter 1, with 314 points
-# (to match a test case with Fortran code)
+# Cylinder, diameter 1, with 160 points
+
 
 body Cylinder
-  circle_n 0 0 0.5 314
+  circle_n 0 0 0.5 160
 end
