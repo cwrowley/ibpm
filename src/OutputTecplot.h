@@ -9,7 +9,7 @@
 using std::string;
 
 namespace ibpm {
-    
+
 /*!
 \file OutputTecplot.h
 \class OutputTecplot
@@ -24,26 +24,32 @@ namespace ibpm {
 \version $Revision$
 */
 
-   
+
 class OutputTecplot : public Output {
 public:
     /// \brief Constructor
     /// \param[in] filename Filename in the standard printf format (e.g. "file%06d.plt"), where timestep will be supplied
     /// \param[in] title Title in the standard printf format
+    OutputTecplot( string filename, string title );
+
+    /// \brief Constructor
+    /// \param[in] filename Filename in the standard printf format (e.g. "file%06d.plt"), where timestep will be supplied
+    /// \param[in] title Title in the standard printf format
+    /// \param[in] TecplotAllGrids bool describing whether or not to save Tecplot data for all grid levels
     OutputTecplot( string filename, string title, bool TecplotAllGrids );
-    
+
     /// \brief Write the Tecplot file
     bool doOutput(const State& x);
-    
+
     /// \brief Write the Tecplot file
     bool doOutput(const BaseFlow& q, const State& x);
-    
+
     /// \brief Change the filename for the output file
     void setFilename( string filename );
-    
+
     /// \brief Change the title for the output file
     void setTitle( string title );
-    
+
 private:
     string _filename;
     string _title;
