@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sys/stat.h>
 #include "ibpm.h"
 
 using namespace std;
@@ -22,7 +23,7 @@ int main(int argc, char* argv[]) {
     // lift and drag
     double lift = 0.;
     double drag = 0.;
-    
+
     // Setup grid
     int nx = 100;
     int ny = 100;
@@ -31,13 +32,13 @@ int main(int argc, char* argv[]) {
     double xOffset = -1;
     double yOffset = -2;
     Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
-    
-    
+
+
     // Make a flat plate, length 1, with center at 1/4 chord
     RigidBody plate;
     plate.addLine( 0, 0, 1, 0, grid.Dx() );
     plate.setCenter( 0.25, 0 );
-    
+
     // Set the motion to pitching, amplitude = 0.25, period 10 time units
     double amplitude = 0.25;
     double freq = 0.1;
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
     double Reynolds=100;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
-    Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
+    BaseFlow q_potential( grid, magnitude, alpha );
     cout << "Setting up Navier Stokes model..." << flush;
     NavierStokesModel model( grid, geom, Reynolds, q_potential );
     model.init();
@@ -66,16 +67,19 @@ int main(int argc, char* argv[]) {
     State x(grid, geom.getNumPoints());
     x.omega = 0.;
 
+    // Create output directory, if does not already exist
+    mkdir( "pitching_out", S_IRWXU | S_IRWXG | S_IRWXO );
+
     // Setup output routines
-    OutputForce force( "tecplot/force.dat" );
-    OutputTecplot tecplot( "tecplot/pitch%03d.plt", "Pitching plate, step %03d" );
+    OutputForce force( "pitching_out/force.dat" );
+    OutputTecplot tecplot( "pitching_out/pitch%03d.plt", "Pitching plate, step %03d" );
     Logger logger;
     // Output Tecplot file every few timesteps
     logger.addOutput( &tecplot, 25 );
-    logger.addOutput( &force, 1 ); 
+    logger.addOutput( &force, 1 );
     logger.init();
     logger.doOutput( x );
-    
+
     // Step
     const double PI = 4. * atan(1.);
     int numSteps = 250;
