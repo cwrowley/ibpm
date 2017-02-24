@@ -28,11 +28,10 @@ int main(int argc, char* argv[]) {
     int nx = 100;
     int ny = 100;
     int ngrid = 1;
-    double length = 4.0;
+    double length = 4;
     double xOffset = -1;
     double yOffset = -2;
     Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
-
 
     // Make a flat plate, length 1, with center at 1/4 chord
     RigidBody plate;
@@ -46,10 +45,10 @@ int main(int argc, char* argv[]) {
     plate.setMotion( motion );
     Geometry geom;
     geom.addBody( plate );
-    geom.moveBodies(0);
+    geom.moveBodies( 0 );
 
     // Setup equations to solve
-    double Reynolds=100;
+    double Reynolds = 100;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
     BaseFlow q_potential( grid, magnitude, alpha );
@@ -66,6 +65,8 @@ int main(int argc, char* argv[]) {
     // Build the state variable, zero initial conditions
     State x(grid, geom.getNumPoints());
     x.omega = 0.;
+    x.f = 0.;
+    x.q = 0.;
 
     // Create output directory, if does not already exist
     mkdir( "pitching_out", S_IRWXU | S_IRWXG | S_IRWXO );
@@ -89,7 +90,7 @@ int main(int argc, char* argv[]) {
             << "  time = " << setw(5) << x.time
             << "  theta = " << theta << endl;
         solver.advance( x );
-        x.computeNetForce( drag, lift);
+        x.computeNetForce( drag, lift );
         cout << " x force : " << setw(16) << drag*2 << " , y force : "
             << setw(16) << lift*2 << "\n";
         logger.doOutput( x );
