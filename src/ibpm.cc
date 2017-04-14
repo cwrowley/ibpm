@@ -298,7 +298,12 @@ int main(int argc, char* argv[]) {
     }
     
     // Calculate flux for state, in case only vorticity was saved
-    model->refreshState( x );     
+    if( ! q_potential.isStationary() ) {
+       q_potential.setAlphaMag( x.time );
+       alpha = q_potential.getAlpha();
+    }
+    model->updateOperators( x.time );
+    model->refreshState( x );
 
     cout << endl << "Initial timestep = " << x.timestep << "\n" << endl;
 
