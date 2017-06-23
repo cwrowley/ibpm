@@ -5,9 +5,9 @@
 //
 // The points on the body are stored with respect to a reference configuration
 // in _refPoints
-// 
-// The current locations of the points on the body, defined by the associated 
-// Motion, are contained in _currentPoints, and are updated whenever 
+//
+// The current locations of the points on the body, defined by the associated
+// Motion, are contained in _currentPoints, and are updated whenever
 // moveBodies() is called.
 //
 // Author(s):
@@ -111,7 +111,7 @@ void RigidBody::addCircle_n(
         double x = xc + radius * cos( i * dTheta );
         double y = yc + radius * sin( i * dTheta );
         addPoint( x, y );
-    }   
+    }
 }
 
 void RigidBody::addLine(
@@ -141,7 +141,7 @@ void RigidBody::addLine_n(
         double y = y1 + i * deltaY;
         addPoint(x,y);
     }
-} 
+}
 
 void RigidBody::addLine_aoa(
     double l,
@@ -151,8 +151,8 @@ void RigidBody::addLine_aoa(
     int numPoints
     ) {
         double x0, y0, x0r, y0r, x1r, y1r, x1, y1;
-	double pi =  3.141592653589793238462643383279502884197169399375;
-	double alpha = aoa / 180 * pi;
+        double pi = 4. * atan(1.);
+        double alpha = aoa / 180 * pi;
         double cosa = cos(alpha);
         double sina = sin(alpha);
         double delta = l / (numPoints - 1);
@@ -167,7 +167,7 @@ void RigidBody::addLine_aoa(
             y1 = y1r+yC;
             addPoint(x1,y1);
     }
-} 
+}
 
 int RigidBody::getNumPoints() const {
     return _refPoints.size();
@@ -178,7 +178,7 @@ void RigidBody::saveRaw(ostream& out) {
     out << n;
     for(int i=0; i<n; i++) {
        out << "\n" << setw(10) << _refPoints[i].x
-           << setw(10) << _refPoints[i].y; 	
+           << setw(10) << _refPoints[i].y;
     }
 }
 
@@ -191,12 +191,12 @@ bool RigidBody::loadRaw(string filename) {
     if ( in.fail() ) {
         return false;
     }
-    for(int i=0; i<n; i++) { 
+    for(int i=0; i<n; i++) {
        in >> x >> y;
        if ( in.fail() ) {
            return false;
        }
-       addPoint(x,y); 
+       addPoint(x,y);
     }
     return true;
 }
@@ -339,7 +339,7 @@ bool RigidBody::load(istream& in) {
             addLine_aoa( l, xC, yC, aoa, numPoints );
             setCenter( xC, yC );
 #ifdef DEBUG
-            cerr << "Add a line: length" << l << ", AoA" << aoa  
+            cerr << "Add a line: length" << l << ", AoA" << aoa
                 ", n = " << numPoints << endl;
 #endif
         }
@@ -386,7 +386,7 @@ bool RigidBody::load(istream& in) {
                 one_line >> AMP >> DUR >> startTime;
                 RB_CHECK_FOR_ERRORS;
                 Motion* m = new SigmoidalStep( AMP, DUR, startTime);
-                setMotion( *m ); 
+                setMotion( *m );
             }
             else if ( motionType == "lagstep1" ) {
                 // First-order lag filtered square pulse
@@ -494,7 +494,7 @@ bool RigidBody::load(istream& in) {
             RB_CHECK_FOR_ERRORS;
             addPoint( x, y );
 #ifdef DEBUG
-            cerr << "Add a point: (" << x << ", " << y << ")" << endl;            
+            cerr << "Add a point: (" << x << ", " << y << ")" << endl;
 #endif
         }
         else if ( cmd == "raw" ) {
@@ -503,7 +503,7 @@ bool RigidBody::load(istream& in) {
             RB_CHECK_FOR_ERRORS;
             loadRaw( filename );
 #ifdef DEBUG
-            cerr << "Read a raw file: " << filename << endl;            
+            cerr << "Read a raw file: " << filename << endl;
 #endif
         }
         else {
@@ -519,7 +519,7 @@ bool RigidBody::load(istream& in) {
 string RigidBody::getName() {
     return _name;
 }
-    
+
 BoundaryVector RigidBody::toBoundaryVector(const vector<Point> list) {
     int n = list.size();
     BoundaryVector BVList(n);

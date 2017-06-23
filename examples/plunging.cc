@@ -12,6 +12,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sys/stat.h>
 #include <string>
 #include "ibpm.h"
 
@@ -24,60 +25,64 @@ int main(int argc, char* argv[]) {
     // lift and drag
     double lift = 0.;
     double drag = 0.;
-    
+
     // Setup grid
-    int nx = 200;
-    int ny = 200;
+    int nx = 100;
+    int ny = 100;
     int ngrid = 1;
-    double length = 4.0;
+    double length = 4;
     double xOffset = -1;
     double yOffset = -2;
     Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
-    
-    
+
     // Make a flat plate, length 1, with center at 1/4 chord
     RigidBody plate;
     plate.addLine( 0, 0, 1, 0, grid.Dx() );
     plate.setCenter( 0.25, 0 );
-    
-    // Set the motion to plunging: amplitude = 0.1, period 0.25 time unit
-    double amplitude = 0.1;
-    double freq = 0.25;
+
+    // Set the motion to plunging: amplitude = 0.25, period 10 time units
+    double amplitude = 0.25;
+    double freq = 0.1;
     PitchPlunge motion( 0, 0, amplitude, freq );
     plate.setMotion( motion );
     Geometry geom;
     geom.addBody( plate );
-    geom.moveBodies(0);
+    geom.moveBodies( 0 );
 
     // Setup equations to solve
-    double Reynolds=100;
+    double Reynolds = 100;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
-    Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
+    BaseFlow q_potential( grid, magnitude, alpha );
     cout << "Setting up Navier Stokes model..." << flush;
     NavierStokesModel model( grid, geom, Reynolds, q_potential );
     model.init();
     cout << "done" << endl;
 
     // Setup timestepper
-    double dt = 0.001;
+    double dt = 0.005;
     NonlinearIBSolver solver( grid, model, dt, Scheme::AB2 );
     solver.init();
 
     // Build the state variable, zero initial conditions
     State x(grid, geom.getNumPoints());
     x.omega = 0.;
+    x.f = 0.;
+    x.q = 0;
+
+    // Create output directory, if does not already exist
+    mkdir( "plunging_out", S_IRWXU | S_IRWXG | S_IRWXO );
 
     // Setup output routines
-    OutputTecplot tecplot( "tecplot/plunge%03d.plt", "Plunging plate, step %03d" );
-    OutputForce force( "tecplot/force.dat" );
+    OutputTecplot tecplot( "plunging_out/plunge%03d.plt", "Plunging plate, step %03d" );
+    OutputForce force( "plunging_out/force.dat" );
     Logger logger;
     // Output Tecplot file every few timesteps
-    logger.addOutput( &tecplot, 10 );
-    logger.addOutput( &force, 1 ); 
+    logger.addOutput( &tecplot, 25 );
+    logger.addOutput( &force, 1 );
     logger.init();
     logger.doOutput( x );
-    
+
     // Step
     const double PI = 4. * atan(1.);
     int numSteps = 250;

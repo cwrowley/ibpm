@@ -50,7 +50,7 @@ const double alpha = 1.256431208626170;
 
 int main(int argc, char* argv[]) {
 	cout << "Test of Oseen vortex\n";
-	
+
 	// Setup grid
 	int nx = 100;
 	int ny = 100;
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     double xOffset = -5;
     double yOffset = -5;
 	Grid grid( nx, ny, ngrid, length, xOffset, yOffset );
-	
+
 	// Empty geometry -- no body
 	Geometry geom;
     int numPoints = 0;
@@ -67,12 +67,11 @@ int main(int argc, char* argv[]) {
 	// Setup equations to solve
 	double Reynolds=100;
     // No background flow
-    Flux q0( grid );
-    q0 = 0;
+    BaseFlow q0( grid );
 
 	NavierStokesModel model( grid, geom, Reynolds, q0 );
     model.init();
-    
+
 	// Setup timestepper
 	double dt = 0.05;
     NonlinearIBSolver solver( grid, model, dt, Scheme::EULER );
@@ -87,22 +86,22 @@ int main(int argc, char* argv[]) {
 
     // Create output directory, if does not already exist
     mkdir( "oseen_out", S_IRWXU | S_IRWXG | S_IRWXO );
-    
+
     // Setup output routines
     OutputTecplot outputComputed( "oseen_out/ibpm%03d.plt",
-        "Oseen vortex, numerical, step %03d" );
+                                  "Oseen vortex, numerical, step %03d" );
     OutputTecplot outputExact( "oseen_out/exact%03d.plt",
-        "Oseen vortex, exact, step %03d");
+                               "Oseen vortex, exact, step %03d" );
     OutputTecplot outputError( "oseen_out/error%03d.plt",
-        "Oseen vortex, error, step %03d");
-    
+                               "Oseen vortex, error, step %03d" );
+
     // Output initial condition
     outputComputed.doOutput( x );
     outputExact.doOutput( exact );
     outputError.doOutput( error );
 
-	// Step
-	int numSteps = 200;
+    // Step
+    int numSteps = 200;
     int iskip = 20;
 	for(int i=1; i <= numSteps; ++i) {
 		cout << "step " << i << endl;
@@ -183,7 +182,7 @@ void initializeOseenVortex(
     double Reynolds,
     State& x
     ) {
-    
+
     double t0 = Reynolds / (4 * alpha);
-    computeExactSolution( Reynolds, t0, 0, x );    
+    computeExactSolution( Reynolds, t0, 0, x );
 }
