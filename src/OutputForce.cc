@@ -58,8 +58,8 @@ bool OutputForce::doOutput( const double alpha, const double mag, const State& x
     // so
     //    C_L = L_d / (1/2 rho U^2)
     //        = 2 L
-    drag *= 2./(mag*mag);
-    lift *= 2./(mag*mag);
+    drag *= 2.;
+    lift *= 2.;
     
     if ( _fp == NULL ) return false;
     fprintf( _fp, "%5d %.5e %.5e %.5e\n", x.timestep, x.time, drag, lift );   
