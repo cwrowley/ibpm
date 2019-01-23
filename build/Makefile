@@ -41,6 +41,7 @@ OBJS = \
 	Scalar.o \
 	ScalarToTecplot.o \
 	State.o \
+    StateVector.o \
 	utils.o \
 	VectorOperations.o
 
