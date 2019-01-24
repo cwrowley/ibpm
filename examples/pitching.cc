@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sys/stat.h>
 #include "ibpm.h"
 
 using namespace std;
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]) {
     // Set the motion to pitching, amplitude = 0.25, period 10 time units
     double amplitude = 0.25;
     double freq = 0.1;
-    PitchPlunge motion( amplitude, freq, 0, 0 );
+    PitchPlunge motion( amplitude, freq, 0, 0, 0, 0 );
     plate.setMotion( motion );
     Geometry geom;
     geom.addBody( plate );
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
     double Reynolds=100;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
-    Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
+    BaseFlow q_potential( grid, magnitude, alpha );
     cout << "Setting up Navier Stokes model..." << flush;
     NavierStokesModel model( grid, geom, Reynolds, q_potential );
     model.init();
@@ -65,10 +66,15 @@ int main(int argc, char* argv[]) {
     // Build the state variable, zero initial conditions
     State x(grid, geom.getNumPoints());
     x.omega = 0.;
+    x.q = 0.;
+    x.f = 0.;
+
+    // Create output directory, if does not already exist
+    mkdir( "pitching_out", S_IRWXU | S_IRWXG | S_IRWXO );
 
     // Setup output routines
-    OutputForce force( "tecplot/force.dat" );
-    OutputTecplot tecplot( "tecplot/pitch%03d.plt", "Pitching plate, step %03d" );
+    OutputForce force( "pitching_out/force.dat" );
+    OutputTecplot tecplot( "pitching_out/pitch%03d.plt", "Pitching plate, step %03d", 1 );
     Logger logger;
     // Output Tecplot file every few timesteps
     logger.addOutput( &tecplot, 25 );

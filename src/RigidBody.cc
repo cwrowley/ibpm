@@ -371,11 +371,13 @@ bool RigidBody::load(istream& in) {
                 // PitchPlunge
                 double amp1;
                 double freq1;
+                double phase1;
                 double amp2;
                 double freq2;
-                one_line >> amp1 >> freq1 >> amp2 >> freq2;
+                double phase2;
+                one_line >> amp1 >> freq1 >> phase1 >> amp2 >> freq2 >> phase2;
                 RB_CHECK_FOR_ERRORS;
-                Motion* m = new PitchPlunge( amp1, freq1, amp2, freq2 );
+                Motion* m = new PitchPlunge( amp1, freq1, phase1, amp2, freq2, phase2 );
                 setMotion( *m );
             }
             else if ( motionType == "sigmoidalstep" ) {

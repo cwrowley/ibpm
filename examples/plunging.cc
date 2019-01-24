@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <fstream>
 #include <string>
+#include <sys/stat.h>
 #include "ibpm.h"
 
 using namespace std;
@@ -43,7 +44,7 @@ int main(int argc, char* argv[]) {
     // Set the motion to plunging: amplitude = 0.1, period 0.25 time unit
     double amplitude = 0.1;
     double freq = 0.25;
-    PitchPlunge motion( 0, 0, amplitude, freq );
+    PitchPlunge motion( 0, 0, 0, amplitude, freq, 0 );
     plate.setMotion( motion );
     Geometry geom;
     geom.addBody( plate );
@@ -53,7 +54,7 @@ int main(int argc, char* argv[]) {
     double Reynolds=100;
     double magnitude = 1;
     double alpha = 0;  // angle of background flow
-    Flux q_potential = Flux::UniformFlow( grid, magnitude, alpha );
+    BaseFlow q_potential( grid, magnitude, alpha );
     cout << "Setting up Navier Stokes model..." << flush;
     NavierStokesModel model( grid, geom, Reynolds, q_potential );
     model.init();
@@ -67,10 +68,15 @@ int main(int argc, char* argv[]) {
     // Build the state variable, zero initial conditions
     State x(grid, geom.getNumPoints());
     x.omega = 0.;
+    x.q = 0.;
+    x.f = 0.;
+
+    // Create output directory, if does not already exist
+    mkdir( "plunging_out", S_IRWXU | S_IRWXG | S_IRWXO );
 
     // Setup output routines
-    OutputTecplot tecplot( "tecplot/plunge%03d.plt", "Plunging plate, step %03d" );
-    OutputForce force( "tecplot/force.dat" );
+    OutputTecplot tecplot( "plunging_out/plunge%03d.plt", "Plunging plate, step %03d", 1 );
+    OutputForce force( "plunging_out/force.dat" );
     Logger logger;
     // Output Tecplot file every few timesteps
     logger.addOutput( &tecplot, 10 );
