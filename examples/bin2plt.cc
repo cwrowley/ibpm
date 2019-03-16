@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
             string outname = GetBasename( argv[i] );
             outname += ".plt";
             string title( argv[i] );
-            OutputTecplot tecplot( outname, title );
+            OutputTecplot tecplot( outname, title, 1 );
             if ( ! tecplot.doOutput( x ) ) {
                 cerr << "Error writing file " << outname << endl;
             }

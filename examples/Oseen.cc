@@ -67,8 +67,7 @@ int main(int argc, char* argv[]) {
 	// Setup equations to solve
 	double Reynolds=100;
     // No background flow
-    Flux q0( grid );
-    q0 = 0;
+    BaseFlow q0( grid );
 
 	NavierStokesModel model( grid, geom, Reynolds, q0 );
     model.init();
@@ -90,11 +89,11 @@ int main(int argc, char* argv[]) {
     
     // Setup output routines
     OutputTecplot outputComputed( "oseen_out/ibpm%03d.plt",
-        "Oseen vortex, numerical, step %03d" );
+        "Oseen vortex, numerical, step %03d", 0 );
     OutputTecplot outputExact( "oseen_out/exact%03d.plt",
-        "Oseen vortex, exact, step %03d");
+        "Oseen vortex, exact, step %03d", 0 );
     OutputTecplot outputError( "oseen_out/error%03d.plt",
-        "Oseen vortex, error, step %03d");
+        "Oseen vortex, error, step %03d", 0 );
     
     // Output initial condition
     outputComputed.doOutput( x );
