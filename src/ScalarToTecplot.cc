@@ -1,7 +1,7 @@
 
 #include "ScalarToTecplot.h"
 #include <stdio.h>
-#include <string>
+#include <cstring>
 #include <vector>
 
 using namespace std;
