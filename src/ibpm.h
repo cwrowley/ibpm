@@ -26,6 +26,7 @@
 #include "BoundaryVector.h"
 #include "BaseFlow.h"
 #include "State.h"
+#include "StateVector.h"
 
 // operations
 #include "VectorOperations.h"

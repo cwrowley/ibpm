@@ -142,10 +142,22 @@ public:
         return *this;
     }
 
+    /// f += a
+    inline BoundaryVector& operator+=(double a) {
+        _data += a;
+        return *this;
+    }
+
     /// f -= g
     inline BoundaryVector& operator-=(const BoundaryVector& f) {
         assert(f._numPoints == _numPoints);
         _data -= f._data;
+        return *this;
+    }
+
+    /// f -= a
+    inline BoundaryVector& operator-=(double a) {
+        _data -= a;
         return *this;
     }
 
@@ -167,11 +179,25 @@ public:
         h += g;
         return h;
     }
+
+    /// f + a
+    inline BoundaryVector operator+(double a) {
+        BoundaryVector h = *this;
+        h += a;
+        return h;
+    }
     
     /// f - g
     inline BoundaryVector operator-(const BoundaryVector& g) {
         BoundaryVector h = *this;
         h -= g;
+        return h;
+    }
+
+    /// f - a
+    inline BoundaryVector operator-(double a) {
+        BoundaryVector h = *this;
+        h -= a;
         return h;
     }
     
