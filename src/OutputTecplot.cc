@@ -22,8 +22,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 namespace ibpm {
 
 OutputTecplot::OutputTecplot( string filename, string title, bool TecplotAllGrids ) {

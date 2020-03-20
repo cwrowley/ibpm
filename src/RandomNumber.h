@@ -5,8 +5,6 @@ typedef unsigned long long int Ullong;
 typedef unsigned int Uint;
 typedef double Doub;
 
-using namespace std;
-
 class RandomNumber {
 public:
     // Constructor. Call with any integer seed (except value of v above).

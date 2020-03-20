@@ -15,7 +15,8 @@
 
 #include "Scalar.h"
 #include <iostream>
-using namespace std;
+
+using std::cout;
 
 namespace ibpm {
 

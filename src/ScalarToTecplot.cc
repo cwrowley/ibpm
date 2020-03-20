@@ -4,8 +4,6 @@
 #include <cstring>
 #include <vector>
 
-using namespace std;
-
 namespace ibpm {
     
 class VarList {

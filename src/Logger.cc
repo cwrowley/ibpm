@@ -20,7 +20,6 @@
 #include "State.h"
 #include "Logger.h"
 
-using namespace std;
 
 namespace ibpm {
 

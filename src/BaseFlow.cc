@@ -30,7 +30,6 @@
 #include "utils.h"
 
 
-using namespace std;
 using namespace ibpm;
 
 namespace ibpm {

@@ -6,7 +6,10 @@
 #include <vector>
 #include <math.h>
 
-using namespace std;
+using std::string;
+using std::vector;
+using std::istream;
+using std::ostream;
 
 namespace ibpm {
 

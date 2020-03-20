@@ -20,8 +20,6 @@
 #include <vector>
 #include <math.h>
 
-using namespace std;
-
 namespace ibpm {
 
 Regularizer::Regularizer(const Grid& grid, const Geometry& geometry) :

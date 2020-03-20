@@ -22,7 +22,9 @@
 #include <string>
 #include "utils.h"
 
-using namespace std;
+using std::istringstream;
+using std::getline;
+using std::ifstream;
 
 namespace ibpm {
 

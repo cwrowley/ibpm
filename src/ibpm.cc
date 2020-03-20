@@ -19,7 +19,6 @@ $HeadURL$
 #include <sys/stat.h>
 #include "ibpm.h"
 
-using namespace std;
 using namespace ibpm;
 
 enum ModelType { LINEAR, NONLINEAR, ADJOINT, LINEARPERIODIC, SFD, INVALID };

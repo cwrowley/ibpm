@@ -12,6 +12,8 @@
 #include <vector>
 #include "utils.h"
 
+using std::ifstream;
+
 
 namespace ibpm {
 

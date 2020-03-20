@@ -16,7 +16,7 @@
 #include <string>
 #include <ctype.h>
 
-using namespace std;
+using std::string;
 
 void EatWhitespace( string& s ) {
     while ( isspace( s[0] ) ) {

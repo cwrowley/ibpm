@@ -8,7 +8,6 @@
 #include "TangentSE2.h"
 #include <math.h>
 #include <iostream>
-using namespace std;
 
 namespace ibpm {
 
