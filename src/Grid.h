@@ -5,7 +5,7 @@
 #include <math.h>
 //JON
 #include <iostream>
-using namespace std;
+
 namespace ibpm {
 
 /*!

@@ -6,7 +6,9 @@
 #include "Array.h"
 #include <vector>
 #include <string>
-using namespace std;
+
+using std::string;
+using std::vector;
 
 namespace ibpm {
 

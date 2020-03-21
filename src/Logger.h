@@ -4,7 +4,8 @@
 #include "BaseFlow.h"
 #include "State.h"
 #include <vector>
-using namespace std;
+
+using std::vector;
 
 namespace ibpm {
 

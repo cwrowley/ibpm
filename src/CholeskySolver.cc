@@ -20,7 +20,9 @@
 #include <fstream>
 #include <iomanip>
 
-using namespace std;
+using std::ifstream;
+using std::ofstream;
+using std::setprecision;
 
 namespace ibpm {
 

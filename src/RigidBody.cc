@@ -37,6 +37,7 @@
 #include "Eldredge1.h"
 #include "Eldredge2.h"
 #include "MotionFile.h"
+#include "MotionFilePeriodic.h"
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -44,7 +45,9 @@
 #include <sstream>
 #include "utils.h"
 
-using namespace std;
+using std::setw;
+using std::ifstream;
+using std::istringstream;
 
 namespace ibpm {
 
@@ -476,6 +479,15 @@ bool RigidBody::load(istream& in) {
                 one_line >> filename;
                 RB_CHECK_FOR_ERRORS;
                 Motion* m = new MotionFile( filename );
+                setMotion( *m );
+            }
+            else if ( motionType == "motionfileperiodic" ) {
+                // Periodic motion defined in a file
+                string filename;
+                double period;
+                one_line >> filename >> period;
+                RB_CHECK_FOR_ERRORS;
+                Motion* m = new MotionFilePeriodic( filename, period );
                 setMotion( *m );
             }
         }

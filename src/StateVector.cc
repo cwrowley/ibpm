@@ -28,6 +28,8 @@ StateVector::StateVector(const StateVector& v) {
     x.q = v.x.q;
     x.omega = v.x.omega;
     x.f = v.x.f;
+    x.timestep = v.x.timestep;
+    x.time = v.x.time;
 }
 
 StateVector::StateVector(const State& y) {
@@ -35,6 +37,8 @@ StateVector::StateVector(const State& y) {
     x.q = y.q;
     x.omega = y.omega;
     x.f = y.f;
+    x.timestep = y.timestep;
+    x.time = y.time;
 }
 
 StateVector::StateVector(const Grid& grid, int numPoints ) {

@@ -58,6 +58,8 @@ public:
         x.q = v.x.q;
         x.omega = v.x.omega;
         x.f = v.x.f;
+        x.timestep = v.x.timestep;
+        x.time = v.x.time;
         return *this;
     }
 
@@ -66,6 +68,8 @@ public:
         x.q = a;
         x.omega = a;
         x.f = a;
+        x.timestep = 0;
+        x.time = 0;
         return *this;
     }
 

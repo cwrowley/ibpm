@@ -5,7 +5,18 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
-using namespace std;
+#include <iomanip>
+
+using std::string;
+using std::ostream;
+using std::vector;
+using std::ostringstream;
+using std::endl;
+using std::ios_base;
+using std::setw;
+using std::istringstream;
+using std::cerr;
+using std::fstream;
 
 /*!
     \file ParmParser.h

@@ -17,8 +17,6 @@
 #include <fstream>
 #include <iomanip>
 
-using namespace std;
-
 const int OPTION_WIDTH = 20;
 
 ParmParser::ParmParser(int argc, char* argv[]) :

@@ -20,7 +20,6 @@
 #include "ibpm.h"
 #include "Regularizer.h"
 
-using namespace std;
 using namespace ibpm;
 
 int main(int argc, char* argv[]) {

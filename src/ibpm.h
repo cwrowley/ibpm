@@ -48,6 +48,7 @@
 #include "Eldredge1.h"
 #include "Eldredge2.h"
 #include "MotionFile.h"
+#include "MotionFilePeriodic.h"
 
 // output routines
 #include "Logger.h"

@@ -5,6 +5,8 @@
 #include "Flux.h"
 #include "BoundaryVector.h"
 
+using std::vector;
+
 namespace ibpm {
 
 class Grid;

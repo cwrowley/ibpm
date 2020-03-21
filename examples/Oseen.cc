@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 	// Setup grid
 	int nx = 100;
 	int ny = 100;
-    int ngrid = 3;
+    int ngrid = 1;
 	double length = 10;
     double xOffset = -5;
     double yOffset = -5;

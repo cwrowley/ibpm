@@ -11,8 +11,6 @@
 #include "VectorOperations.h"
 #include <string>
 
-using namespace std;
-
 namespace ibpm {
 
 IBSolver::IBSolver( 

@@ -11,8 +11,6 @@
 #include "Grid.h"
 #include "NavierStokesModel.h"
 
-using namespace std;
-
 namespace ibpm{
 	
 class ProjectionSolver;

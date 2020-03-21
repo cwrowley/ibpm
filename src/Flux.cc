@@ -17,6 +17,8 @@
 #include "Scalar.h"
 #include "Grid.h"
 
+using std::cout;
+
 namespace ibpm {
 
 Flux::Flux() {}

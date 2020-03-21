@@ -5,8 +5,7 @@
 #include "BC.h"
 #include "Field.h"
 #include "Grid.h"
-#include <iostream>
-using namespace std;  
+#include <iostream>  
  
 namespace ibpm {
 

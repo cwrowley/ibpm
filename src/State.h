@@ -7,6 +7,8 @@
 #include "BoundaryVector.h"
 #include <string>
 
+using std::string;
+
 namespace ibpm {
 
 /*!

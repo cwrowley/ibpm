@@ -24,7 +24,7 @@
 #include "NavierStokesModel.h"
 #include <fftw3.h>
 #include <iostream>
-using namespace std;
+
 using Array::Array2;
 
 namespace ibpm {
