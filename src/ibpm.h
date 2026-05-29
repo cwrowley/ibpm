@@ -3,9 +3,9 @@
 
 /*!
     \file ibpm.h
-    
+
     \brief Main header file for immersed boundary projection method (IBPM) library
-    
+
     \author Clancy Rowley
     \author $LastChangedBy$
     \date 30 Aug 2008
@@ -40,6 +40,13 @@
 #include "FixedPosition.h"
 #include "FixedVelocity.h"
 #include "PitchPlunge.h"
+// #include "PitchPlungeT.h"
+// #include "PitchPlungeFS.h"
+// #include "PitchPlungeFS_test.h"
+// #include "PitchPlungeT_JF.h"
+// #include "PitchPlungeT_adj_check.h"
+// #include "PitchPlungeT_adj_check_full.h"
+#include "PitchPlungeT_mod.h"
 #include "SigmoidalStep.h"
 #include "LagStep1.h"
 #include "LagStep2.h"

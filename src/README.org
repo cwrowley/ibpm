@@ -1,0 +1,109 @@
+C++ library for Arnoldi, GMRES, Newton, and numerical continuation.
+
+* Overview
+
+  This library consists of C++ header files for performing some numerical tasks.
+  The tasks include
+
+  - Numerical continuation for an equilibrium arc in a parameter range
+  - Newton's method for root-solving
+  - Newton's method with the Armijo rule for root-solving
+  - Generalized Minimal Residual (GMRES) method for large linear systems solving
+  - Arnoldi decomposition
+  - Eigenvalue estimation by Arnoldi decomposition
+
+  The library is templated, so that the numerical tasks can be performed on any
+  data type, as long as the type supports certain operations.
+
+  The library also includes utilities for extracting and plotting Newton,
+  Armijo, and GMRES convergence data from the tools above.
+
+* Requirements
+
+  The Newton_GMRES library requires Eigen 3 headers; see
+  http://eigen.tuxfamily.org/.
+
+  The Newton_GMRES library uses C++11 functionality.  The utilities
+  getConvergence.py and org2dox.py use Python 2.7 or 3.2+.
+
+* Usage
+
+  For detailed usage information, see the Documentation section below.  Some
+  brief notes follow here.
+
+** Main library
+
+   The operations that the vector type =Vec= must support are
+
+   #+BEGIN_SRC C++
+       Vec::Vec(const Vec&)
+       Vec& Vec::operator=(const Vec&)
+       Vec& Vec::operator+=(const Vec&)
+       Vec& Vec::operator-=(const Vec&)
+       Vec& Vec::operator/=(double)
+       const Vec operator+(const Vec&, const Vec&) const
+       const Vec operator-(const Vec&, const Vec&) const
+       const Vec operator*(const Vec&, double) const
+       const Vec operator/(const Vec&, double) const
+   #+END_SRC
+
+   For safety, all mathematical operators should ideally be defined.  This
+   includes, for instance, "reflected/swapped" operators like
+
+   #+BEGIN_SRC C++
+       const Vec operator*(double, const Vec&)
+   #+END_SRC
+
+** Utilities
+
+   Run each utility with the =-h= flag to view usage information.
+
+* Documentation
+
+  To generate Doxygen outputs in HTML format, run
+
+  #+BEGIN_SRC sh
+      make doc
+  #+END_SRC
+
+  This generates both a user's guide, at =doc/user/html/index.html=, and a
+  developer's guide, at =doc/developer/html/index.html=.  (These can also be
+  generated individually with =make userHTML= and =make devHTML=.)  The chief
+  difference between the two is that the latter includes private members, and
+  the former does not.
+
+  To generate the PDF versions of the two manuals, also run
+
+  #+BEGIN_SRC sh
+      make pdf
+  #+END_SRC
+
+  (This automatically runs =make doc=.)  The PDF manuals will be at
+  =doc/user/latex/refman.pdf= and =doc/developer/latex/refman.pdf=.  (These can
+  also be generated individually with =make userPDF= and =make devPDF=.)
+
+  To remove the documentation, run
+
+  #+BEGIN_SRC sh
+      make clean_doc
+  #+END_SRC
+
+* Test suite
+
+  The test suite is not very encompassing at this point, but it does make sure
+  that the headers compile, and it allows the user to check that the results
+  make sense.
+
+  Note: to compile the test suite, you must create a Makefile =test/include.mk=
+  that defines the variable =INCLUDE= with the include commands for Eigen 3, for
+  instance,
+
+  #+BEGIN_SRC makefile
+      INCLUDE := -I/opt/local/include/eigen3
+  #+END_SRC
+
+  Then, you can run
+
+  #+BEGIN_SRC sh
+      make test
+  #+END_SRC

@@ -1,6 +1,6 @@
 # standard config file, using gcc compiler
 
-CXX = g++
+CXX = mpiCC
 
 # flags for compiling with optimization
 CXXFLAGS = -Wall -g -Ofast -funroll-loops -DNDEBUG
