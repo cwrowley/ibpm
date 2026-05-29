@@ -187,18 +187,47 @@ inline double innerproduct(const Vec& x, const Vec& y) {
 inline double norm(const Vec& x) {
 	return x.norm();
 }
-// Define mean
+// State flattened size: (nx-1)(ny-1) + (nx+1)ny + nx(ny+1) per grid level, plus 2*numPoints for body forces
+inline int stateVecSize(int numPoints) {
+    return ((nx-1)*(ny-1) + (nx+1)*ny + nx*(ny+1)) * ngrid + numPoints * 2;
+}
+
+// Pack State fields (omega, q_x, q_y, f_x, f_y) into a flat Eigen vector
+inline Vec stateToVec(const State& x, int numPoints) {
+    Vec v(stateVecSize(numPoints));
+    int m = 0;
+    for (int k = 0; k < ngrid; ++k) {
+        for (int i = 1; i < nx; ++i)
+            for (int j = 1; j < ny; ++j) v(m++) = x.omega(k,i,j);
+        for (int i = 0; i <= nx; ++i)
+            for (int j = 0; j < ny; ++j) v(m++) = x.q(k,0,i,j);
+        for (int i = 0; i < nx; ++i)
+            for (int j = 0; j <= ny; ++j) v(m++) = x.q(k,1,i,j);
+    }
+    for (int i = 0; i < numPoints; ++i) v(m++) = x.f(0,i);
+    for (int i = 0; i < numPoints; ++i) v(m++) = x.f(1,i);
+    return v;
+}
+
+// Unpack a flat Eigen vector into State fields
+inline void vecToState(const Vec& v, State& x, int numPoints) {
+    int n = 0;
+    for (int k = 0; k < ngrid; ++k) {
+        for (int i = 1; i < nx; ++i)
+            for (int j = 1; j < ny; ++j) x.omega(k,i,j) = v(n++);
+        for (int i = 0; i <= nx; ++i)
+            for (int j = 0; j < ny; ++j) x.q(k,0,i,j) = v(n++);
+        for (int i = 0; i < nx; ++i)
+            for (int j = 0; j <= ny; ++j) x.q(k,1,i,j) = v(n++);
+    }
+    for (int i = 0; i < numPoints; ++i) x.f(0,i) = v(n++);
+    for (int i = 0; i < numPoints; ++i) x.f(1,i) = v(n++);
+}
+
 inline double getAverage(const Vec& arr, int size) {
-  int i = 0;
-	double sum = 0;
-  double avg;
-
-   for (i = 0; i < size; ++i) {
-      sum += arr(i);
-   }
-   avg = double(sum) / size;
-
-   return avg;
+    double sum = 0;
+    for (int i = 0; i < size; ++i) sum += arr(i);
+    return sum / size;
 }
 
 
@@ -322,56 +351,13 @@ else{
 	NonlinearIBSolver solver(grid, model, dt, Scheme::RK3);
 	solver.init();
 
-	// Build the state variable, zero initial conditions
+	// Build the state variable from the input vector
 	State x(grid, geom.getNumPoints());
-	x.omega = 0.;
-	x.q = 0.;
-	x.f = 0.;
+	x.omega = 0.; x.q = 0.; x.f = 0.;
+	vecToState(Omega_in, x, geom.getNumPoints());
 
-
-	// Build a state structure to store the points coordinate on the body
 	State Boundary(grid, geom.getNumPoints());
 	Boundary.f = 0.1;
-	// Convert Vec variables to State
-	int N = 0;
-
-	for (int k = 0; k<ngrid;++k){
-		for (int i = 1; i < nx; ++i) {
-			for (int j = 1; j < ny; ++j) {
-				x.omega(k, i, j) = Omega_in(N);   //x.omega(0,i,j)
-				N = N + 1;
-			}
-
-		}
-
-		for (int i = 0; i <= nx; ++i) {
-			for (int j = 0; j < ny; ++j) {
-				x.q(k, 0, i, j) = Omega_in(N);   //x.omega(0,i,j)
-				N = N + 1;
-			}
-
-		}
-
-		for (int i = 0; i < nx; ++i) {
-			for (int j = 0; j <= ny; ++j) {
-				x.q(k, 1, i, j) = Omega_in(N);   //x.omega(0,i,j)
-				N = N + 1;
-			}
-
-		}
-
-	}
-
-
-	for (int i = 0; i < geom.getNumPoints(); ++i) {
-		x.f(0, i) = Omega_in(N);   //x.omega(0,i,j)
-		N = N + 1;
-	}
-
-	for (int i = 0; i < geom.getNumPoints(); ++i) {
-		x.f(1, i) = Omega_in(N);   //x.omega(0,i,j)
-		N = N + 1;
-	}
 
 
 Logger logger;
@@ -426,13 +412,7 @@ Logger logger;
 	int I_final = 0;
 /*	double cycle = 1 / freq / dt; */
 	int T = size1;
-	int numSteps = (int)T;
-	if (PhaseCal_flag == 0) {
-	    numSteps = (int)T;    //+1?
-	}
-	else {
-		numSteps = (int)T;
-	}
+	int numSteps = T;
 
 	z_m_save.resize(size1+1);
 	L_save.resize(size1+1);
@@ -462,15 +442,10 @@ Logger logger;
 
 
 
-					/////////////////////////////
-		Boundary.f = plate.getPoints();
-
+			Boundary.f = plate.getPoints();
 		double zM = 0.0;
-		double drag_check = 0.0;
-		for (int j = 0;j < geom.getNumPoints();++j) {
-				zM = x.f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC) + zM;
-				drag_check = x.f(0, j) * grid.Dx() * grid.Dx() + drag_check;
-		}
+		for (int j = 0; j < geom.getNumPoints(); ++j)
+			zM += x.f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC);
 		z_m_save(i) = zM;
 		L_save(i) = lift;
 		D_save(i) = drag;
@@ -557,55 +532,7 @@ Logger logger;
 	}
 	//
 
-	// Convert State variables in to Vec
-	int M = 0;
-	//Vec Omega(((nx-1) * (ny-1) * 3) * ngrid + geom.getNumPoints() * 2);
-	Vec Omega(((nx - 1)* (ny - 1) + (nx + 1) * ny + nx * (ny + 1))* ngrid + geom.getNumPoints() * 2);
-
-	for (int k = 0; k < ngrid; ++k){
-		for (int i = 1; i < nx; ++i) {
-			for (int j = 1; j < ny; ++j) {
-				Omega(M) = x.omega(k, i, j);
-				M = M + 1;
-			}
-
-		}
-
-		for (int i = 0; i <= nx; ++i) {
-			for (int j = 0; j < ny; ++j) {
-				Omega(M) = x.q(k, 0, i, j);
-				M = M + 1;
-			}
-
-		}
-
-		for (int i = 0; i < nx; ++i) {
-			for (int j = 0; j <= ny; ++j) {
-				Omega(M) = x.q(k, 1, i, j);
-				M = M + 1;
-			}
-
-		}
-
-	}
-
-
-	for (int i = 0; i < geom.getNumPoints(); ++i) {
-		Omega(M) = x.f(0, i);
-		M = M + 1;
-	}
-
-	for (int i = 0; i < geom.getNumPoints(); ++i) {
-		Omega(M) = x.f(1, i);
-		M = M + 1;
-	}
-
-	//for (int i = 0; i < _numPoints; ++i) {
-	//	x.f(0, i) = Omega_in(N);   //x.omega(0,i,j)
-	//	N = N + 1;
-	//}
-
-	//drag_int = drag_int / T;
+	Vec Omega = stateToVec(x, geom.getNumPoints());
 
 	// drag_int = (CT / (double)numSteps) / (CP / (double)numSteps);
 
@@ -850,19 +777,10 @@ inline double drag_int_fun(const Mat& parameter) {
 		// cout << " thetadot ... " << thetadot << endl;
 		// cout << " ydot ... " << ydot << endl;
 		// cout << " y ... " << y << endl;
-		/////////////////////////////
 		Boundary.f = plate.getPoints();
-
 		double zM = 0.0;
-		double drag_check = 0.0;
-		double lift_check = 0.0;
-		for (int j = 0;j < geom.getNumPoints();++j) {
-			//zM = x.f(0, j) * grid.Dx() * grid.Dx() * (Boundary.f(1, j) - yC) * sin(theta) + x.f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC) * cos(theta) + zM;
-			zM = x.f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC) + zM;
-			drag_check = x.f(0, j) * grid.Dx() * grid.Dx() + drag_check;
-			lift_check = x.f(1, j) * grid.Dx() * grid.Dx() + lift_check;
-		}
-
+		for (int j = 0; j < geom.getNumPoints(); ++j)
+			zM += x.f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC);
 	}
 
 	// quiet nan
@@ -872,59 +790,8 @@ inline double drag_int_fun(const Mat& parameter) {
 	//cout << "Loading initial condition from file: " << icfile << endl;
 	//
 
-	// Convert Vec variables to State
-	int M = 0;
-	//Vec Omega_in(((nx-1) * (ny-1) * 3) * ngrid + geom.getNumPoints() * 2);
-	Vec Omega_in(((nx - 1)* (ny - 1) + (nx + 1) * ny + nx * (ny + 1))* ngrid + geom.getNumPoints() * 2);
+	Vec Omega_in = stateToVec(x, geom.getNumPoints());
 
-	for (int k = 0; k < ngrid; ++k){
-		for (int i = 1; i < nx; ++i) {
-			for (int j = 1; j < ny; ++j) {
-				Omega_in(M) = x.omega(k, i, j);
-				M = M + 1;
-			}
-
-		}
-
-		for (int i = 0; i <= nx; ++i) {
-			for (int j = 0; j < ny; ++j) {
-				Omega_in(M) = x.q(k, 0, i, j);
-				M = M + 1;
-			}
-
-		}
-
-		for (int i = 0; i < nx; ++i) {
-			for (int j = 0; j <= ny; ++j) {
-				Omega_in(M) = x.q(k, 1, i, j);
-				M = M + 1;
-			}
-
-		}
-
-	}
-
-
-	for (int i = 0; i < geom.getNumPoints(); ++i) {
-		Omega_in(M) = x.f(0, i);
-		M = M + 1;
-	}
-
-	for (int i = 0; i < geom.getNumPoints(); ++i) {
-		Omega_in(M) = x.f(1, i);
-		M = M + 1;
-	}
-
-
-	//for (int i = 0; i < _numPoints; ++i) {
-	//	Omega(M) = Fx.f(0, i);
-	//	M = M + 1;
-	//}
-
-	//for (int i = 0; i < _numPoints; ++i) {
-	//	Omega(M) = Fx.f(1, i);
-	//	M = M + 1;
-	//}
 	// Newton-GMRES solver
 	linear_solver_ns::Gmres<Vec> gmres(innerproduct, 5, 1.e-3); // 1.e-3
 	// constexpr double tol{ Newton_tol };
@@ -1175,49 +1042,8 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 
 
 	StateVector xv(x);
-////////////
-// pass the initial value to the state
-	int N = 0;
+	vecToState(ADJ_x_in, xv.x, geom.getNumPoints());
 
-	for (int k = 0; k<ngrid;++k){
-		for (int i = 1; i < nx; ++i) {
-			for (int j = 1; j < ny; ++j) {
-				xv.x.omega(k, i, j) = ADJ_x_in(N);   //x.omega(0,i,j)
-				N = N + 1;
-			}
-
-		}
-
-		for (int i = 0; i <= nx; ++i) {
-			for (int j = 0; j < ny; ++j) {
-				xv.x.q(k, 0, i, j) = ADJ_x_in(N);   //x.omega(0,i,j)
-				N = N + 1;
-			}
-
-		}
-
-		for (int i = 0; i < nx; ++i) {
-			for (int j = 0; j <= ny; ++j) {
-				xv.x.q(k, 1, i, j) = ADJ_x_in(N);   //x.omega(0,i,j)
-				N = N + 1;
-			}
-
-		}
-
-	}
-
-
-	for (int i = 0; i < geom.getNumPoints(); ++i) {
-		xv.x.f(0, i) = ADJ_x_in(N);   //x.omega(0,i,j)
-		N = N + 1;
-	}
-
-	for (int i = 0; i < geom.getNumPoints(); ++i) {
-		xv.x.f(1, i) = ADJ_x_in(N);   //x.omega(0,i,j)
-		N = N + 1;
-	}
-
- ////////////////////
 	int numSteps = num_cycles * period;
 
 	 // start adjoint solver
@@ -1335,8 +1161,6 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 			 double theta = motion.gettheta(k * dt);
 			 double thetadot = motion.getthetadot(k * dt);
 			 double ydot = motion.getydot(k * dt);
-			 double y = motion.gety(k * dt);
-
 
 			 cout << " k ... " << k << endl;
 			 cout << " x.timestep ... " << xv.x.timestep << " x.time ... " << xv.x.time << endl;
@@ -1508,7 +1332,7 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 
 ///////////
 State x_dqdh(grid, geom.getNumPoints());
-Flux dqdh(x_dqdb.q);
+Flux dqdh(x_dqdh.q);
 Flux::index ind_2;
 for (int lev=0; lev<dqdh.Ngrid(); ++lev) {
 
@@ -1658,50 +1482,7 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 	 }
 
 
-	 //////////////////////////////
-	 // Convert State variables in to Vec
-	 int M = 0;
-	 //Vec Omega(((nx-1) * (ny-1) * 3) * ngrid + geom.getNumPoints() * 2);
-	 Vec Omega(((nx - 1)* (ny - 1) + (nx + 1) * ny + nx * (ny + 1))* ngrid + geom.getNumPoints() * 2);
-
-	 for (int k = 0; k < ngrid; ++k){
-	 	for (int i = 1; i < nx; ++i) {
-	 		for (int j = 1; j < ny; ++j) {
-	 			Omega(M) = xv.x.omega(k, i, j);
-	 			M = M + 1;
-	 		}
-
-	 	}
-
-	 	for (int i = 0; i <= nx; ++i) {
-	 		for (int j = 0; j < ny; ++j) {
-	 			Omega(M) = xv.x.q(k, 0, i, j);
-	 			M = M + 1;
-	 		}
-
-	 	}
-
-	 	for (int i = 0; i < nx; ++i) {
-	 		for (int j = 0; j <= ny; ++j) {
-	 			Omega(M) = xv.x.q(k, 1, i, j);
-	 			M = M + 1;
-	 		}
-
-	 	}
-
-	 }
-
-
-	 for (int i = 0; i < geom.getNumPoints(); ++i) {
-	 	Omega(M) = xv.x.f(0, i);
-	 	M = M + 1;
-	 }
-
-	 for (int i = 0; i < geom.getNumPoints(); ++i) {
-	 	Omega(M) = xv.x.f(1, i);
-	 	M = M + 1;
-	 }
-
+	 Vec Omega = stateToVec(xv.x, geom.getNumPoints());
 	 double f_norm = norm(Omega - ADJ_x_in);
 	 //////////////////////////////
 
@@ -2263,7 +2044,6 @@ inline Vec Adj(const Mat& input) {
 			 double theta = motion.gettheta(k * dt);
 			 double thetadot = motion.getthetadot(k * dt);
 			 double ydot = motion.getydot(k * dt);
-			 double y = motion.gety(k * dt);
 
 /////////////////////////////
 /////////////////////////////
@@ -2439,7 +2219,7 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 
 ///////////
 State x_dqdh(grid, geom.getNumPoints());
-Flux dqdh(x_dqdb.q);
+Flux dqdh(x_dqdh.q);
 Flux::index ind_2;
 for (int lev=0; lev<dqdh.Ngrid(); ++lev) {
 
@@ -2621,49 +2401,7 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 	///////////////////////
 	/////////////////////
 
-	 ///////////////////
-	 // Convert Vec variables to State
- 	int M = 0;
- 	//Vec Omega_in(((nx-1) * (ny-1) * 3) * ngrid + geom.getNumPoints() * 2);
-	Vec Omega_in(((nx - 1)* (ny - 1) + (nx + 1) * ny + nx * (ny + 1))* ngrid + geom.getNumPoints() * 2);
-
- 	for (int k = 0; k < ngrid; ++k){
- 		for (int i = 1; i < nx; ++i) {
- 			for (int j = 1; j < ny; ++j) {
- 				Omega_in(M) = xv.x.omega(k, i, j);
- 				M = M + 1;
- 			}
-
- 		}
-
- 		for (int i = 0; i <= nx; ++i) {
- 			for (int j = 0; j < ny; ++j) {
- 				Omega_in(M) = xv.x.q(k, 0, i, j);
- 				M = M + 1;
- 			}
-
- 		}
-
- 		for (int i = 0; i < nx; ++i) {
- 			for (int j = 0; j <= ny; ++j) {
- 				Omega_in(M) = xv.x.q(k, 1, i, j);
- 				M = M + 1;
- 			}
-
- 		}
-
- 	}
-
-
- 	for (int i = 0; i < geom.getNumPoints(); ++i) {
- 		Omega_in(M) = xv.x.f(0, i);
- 		M = M + 1;
- 	}
-
- 	for (int i = 0; i < geom.getNumPoints(); ++i) {
- 		Omega_in(M) = xv.x.f(1, i);
- 		M = M + 1;
- 	}
+	Vec Omega_in = stateToVec(xv.x, geom.getNumPoints());
 
 	linear_solver_ns::Gmres<Vec> gmres(innerproduct, 5, 1.e-3);   //1.e-3 1.e-10
 	// constexpr double tol{ Newton_tol };
@@ -2867,7 +2605,6 @@ class Drag_average
 
 		 	// compute base flow
 		 	T_perturb = 0;
-		 	size1 = size1;
 		 	tau(0) = (double)size1 * dt;
 		 	tau(1) = (double)size1 * dt;
 
