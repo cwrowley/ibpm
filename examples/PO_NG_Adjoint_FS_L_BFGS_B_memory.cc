@@ -1,14 +1,25 @@
-// A working version of ADJ optimization, using newton-gmres on the adj part,
-// rk3 is acceptable here
-// the first point of theta and y can be updated correctly and the limit cycle is solved correclty
-// This is a working code without constraint
-
+// Adjoint-based optimization of flapping-wing motion for drag (or efficiency)
+// at Re = 240, using a Fourier-mode parameterization of pitch/plunge kinematics.
+//
+// Algorithm overview:
+//   1. drag_int_fun()  -- spin up the flow for Ini_step cycles, then run
+//                         Newton-GMRES (via F) to converge to a periodic orbit.
+//                         Calls Adj() to compute the gradient of the cost
+//                         function w.r.t. the Fourier coefficients.
+//   2. F()             -- periodic-orbit residual: advance one period from x,
+//                         return phi(x) - x where phi is the Poincare map.
+//   3. ADJ_F()         -- adjoint periodic-orbit residual: same structure as
+//                         F but uses AdjointIBSolver2 and accumulates the
+//                         sensitivity eta (heave) and zeta (pitch) at each step.
+//   4. Adj()           -- runs the adjoint solver for Ini_step cycles over the
+//                         stored base flow x0_glob, integrates eta/zeta against
+//                         the Fourier basis to get dJ/dA, dJ/dB, dJ/dC, dJ/dD,
+//                         and uses finite differences (MPI rank 1) for dJ/dT.
+//   5. Drag_average    -- L-BFGS-B objective functor; MPI rank 0 runs the
+//                         primal + adjoint, rank 1 perturbs T by one step for
+//                         the finite-difference dJ/dT estimate.
+//
 // Princeton University
-
-// $Revision$
-// $LastChangedDate$
-// $LastChangedBy$
-// $HeadURL$
 
 #include <iostream>
 #include <iomanip>
@@ -62,32 +73,40 @@ using Scal = ibpm::Scalar; ////////////////////////// Scalar
 using namespace LBFGSpp;
 
 
-// Define global variable parameter
-int size1 = 4000;     ////period/dt   400
-int size2 = 2;    // 2 pitch and heave
-int size3 = 30;    // 2  number of Fourier modes
-double Fourier_mode = 0;    // 0 for y = sum (An * sin(t + Bn)), theta = sum (Cn * sin(t + Dn)); 1 for y = sum (An * sin + Bn * cos), theta = sum (Cn * sin + Dn * cos)
-int cost = 0; // costfunction, cost = 0 is for drag, cost = 1 is for efficiency
-int num_cycles = 1; // number of cycles
-int Ini_step = 20; //initial cycles for newton solver
-int k_global;
+// --- Simulation dimensions --------------------------------------------------
+int size1 = 4000;      // number of time steps per period (period / dt)
+int size2 = 2;         // number of motion DOFs: heave (y) and pitch (theta)
+int size3 = 30;        // number of Fourier modes per DOF
+
+// Fourier parameterization switch:
+//   0 -> y = sum_n A_n sin(omega_n t + B_n),  theta = sum_n C_n sin(omega_n t + D_n)
+//   1 -> y = sum_n A_n sin(omega_n t) + B_n cos(omega_n t),  (and same for theta)
+double Fourier_mode = 0;
+
+// Cost function: 0 = mean drag (CT), 1 = propulsive efficiency (CT/CP)
+int cost = 0;
+int num_cycles = 1;    // adjoint integration length in periods
+int Ini_step = 20;     // spin-up cycles before Newton solver starts
+
+int k_global;          // L-BFGS-B iteration counter
 int l_global;
 const int num_iter = 20;
 const int num_iter_linsearch = 20;
 double drag_global[num_iter];
 
+// --- Output directories -----------------------------------------------------
 string outdir = "Motion_Parameters_drag_opt_30_4grid_Re240_nx_200_L_2_BFGS_MEM_JFM";
-string outdir_PBF;
+string outdir_PBF;                  // set at runtime (with or without T_perturb suffix)
 string outdir_PBF_global = "PBF_drag_opt_30_4grid_Re240_nx_200_L_2_BFGS_MEM_JFM";
 string outdir_ADJ = "ADJ_drag_opt_30_4grid_Re240_nx_200_L_2_BFGS_MEM_JFM";
 
-// optimization parameters
+// --- L-BFGS-B box constraints -----------------------------------------------
 double theta_up = 1.0;
-double A_lim = 1.2;  // 1.0 heave
-double B_lim = 3.14;  // 3.14 heave
-double C_lim = 1.0;  // 0.4 pitch
-double D_lim = 3.14;  // 3.14 pitch
-int T_lim = 4000;
+double A_lim = 1.2;   // heave amplitude bound
+double B_lim = 3.14;  // heave phase bound
+double C_lim = 1.0;   // pitch amplitude bound
+double D_lim = 3.14;  // pitch phase bound
+int T_lim = 4000;     // minimum period (steps); upper bound is T_lim * 20
 
 Vec A_0(size3);
 Vec B_0(size3);
@@ -119,53 +138,64 @@ void initialization (){
 double alpha_step = 0.09;
 
 
-Vec A(size3);
-Vec B(size3);
-Vec C(size3);
-Vec D(size3);
+// --- Current Fourier coefficients (updated by L-BFGS-B each iteration) -----
+// Heave:  y(t)     = sum_n A[n] sin(omega_n t + B[n])
+// Pitch:  theta(t) = sum_n C[n] sin(omega_n t + D[n])
+Vec A(size3), B(size3);   // heave amplitude and phase
+Vec C(size3), D(size3);   // pitch amplitude and phase
 
-Vec dA(size3);
-Vec dB(size3);
-Vec dC(size3);
-Vec dD(size3);
-double dT;  // gradient with respect to period
+// --- Adjoint gradients (filled by Adj(), read by Drag_average) -------------
+Vec dA(size3), dB(size3); // dJ/dA_n, dJ/dB_n
+Vec dC(size3), dD(size3); // dJ/dC_n, dJ/dD_n
+double dT;                 // dJ/dT (period gradient, computed by finite difference)
 double dT_nonperiodic;
-double g_T; // the value of cost function at the time instant T, T is period
-double G_T;
-double h_T;
+double g_T;   // instantaneous cost integrand at the end of the period
+double G_T;   // drag term in the efficiency cost
+double h_T;   // power term in the efficiency cost
 
-Mat MotionParameter(size1 * Ini_step + 1,size2);
+// --- Motion time-series storage (cols: [theta, y, time]) -------------------
+// Rows span Ini_step full periods for the spin-up phase.
+Mat MotionParameter(size1 * Ini_step + 1, size2);
 Vec MotionTime(size1 * Ini_step + 1);
-Mat MotionParameterTime(size1 * Ini_step + 1,size2+1);
+Mat MotionParameterTime(size1 * Ini_step + 1, size2 + 1);
 
-Mat MotionParameterTPerturb(size1 * Ini_step + 1,size2);
+// Period-perturbed versions used by MPI rank 1 for finite-difference dJ/dT
+Mat MotionParameterTPerturb(size1 * Ini_step + 1, size2);
 Vec MotionTimeTPerturb(size1 * Ini_step + 1);
-Mat MotionParameterTimeTPerturb(size1 * Ini_step + 1,size2+1);
+Mat MotionParameterTimeTPerturb(size1 * Ini_step + 1, size2 + 1);
 
 
-double meandrag[num_iter * num_iter_linsearch];
-double drag_int = 0;
-double dt = 0.001;    // 0.01
+double meandrag[num_iter * num_iter_linsearch]; // cost value at each L-BFGS-B step
+double drag_int = 0;  // time-averaged cost (CT or CT/CP) after Newton convergence
 
+// --- Flow parameters --------------------------------------------------------
+double dt = 0.001;
 double Reynolds = 240;
-double magnitude = 1;
-int nx = 200;   // 100
-int ny = 200;   // 100
-int ngrid = 5;
+double magnitude = 1;   // freestream speed
+
+// --- Grid parameters --------------------------------------------------------
+int nx = 200;
+int ny = 200;
+int ngrid = 5;          // number of multi-grid levels
 bool TecplotAllGrids = 0;
-double length = 2.0; // 4.0
-double xOffset = -0.5; // -1
-double yOffset = -1.0; // -2
+double length = 2.0;    // half-width of the finest grid window
+double xOffset = -0.5;
+double yOffset = -1.0;
 double dy = abs(yOffset) * 2 / ny;
+
+// --- Pitching axis (quarter-chord) ------------------------------------------
 double xC = 0.0;
 double yC = 0.0;
+
+// --- Running cost accumulators (reset in F each call) -----------------------
+// CT = mean thrust coefficient, CP = mean power coefficient
 double CT = 0.0;
 double CP = 0.0;
-int save_flag = 0; // don't save the flow for periodic orbit solver
-int T_perturb = 0; // create new folder for T_perturb so if won't conflict with the ADJ solver when parallelized
 
+int save_flag = 0; // 1 = write Tecplot/force output (used after Newton converges)
+int T_perturb = 0; // 1 = MPI rank 1 uses period+1 for finite-difference dJ/dT
 
-// define vector<State> to store the base flow
+// Base flow snapshots over one period, stored by drag_int_fun for use in Adj
 vector<State> x0_glob;
 
 const double PI = 4. * atan(1.);
@@ -224,7 +254,11 @@ inline double getAverage(const Vec& arr, int size) {
 }
 
 
-// Function to compute pitching for one cycle
+// Periodic-orbit residual (Poincare map minus identity).
+// Advances the flow state by exactly one period (size1 steps) and returns
+// phi(x) - x.  Newton-GMRES drives this to zero to find the limit cycle.
+// Also accumulates CT, CP, g_T and saves per-step lift/drag/moment to
+// z_m_save, L_save, D_save for use by Adj().
 inline Vec F(const Vec& Omega_in) {
 	cout << "Pitching flat plate example\n";
 
@@ -436,26 +470,21 @@ Logger logger;
 		cout << " lift_aft ..." << lift << " drag_aft ..." << drag << endl;
 
 
-		// Compute drag integral
-		CT = CT + drag * magnitude * 2 / ((double)period*dt) * dt;     //  /tau * 2
-		CP = CP + (- lift * ydot - zM * thetadot) * 2 / ((double)period*dt) * dt;
+		// Accumulate thrust (CT) and power (CP) coefficients, normalised by period.
+		// Factor of 2 converts to coefficient (rho U^2 c / 2 = 1 in these units).
+		CT += drag * magnitude * 2 / ((double)period*dt) * dt;
+		CP += (- lift * ydot - zM * thetadot) * 2 / ((double)period*dt) * dt;
 
-		// CT = CT + drag * magnitude * 2 * dt;     //  /tau * 2
-		// CP = CP + (- lift * ydot - zM * thetadot) * 2 * dt;
-
-		g_T = 0.0;
-		G_T = 0.0;
-		h_T = 0.0;
-    if (cost == 0){
+		// Instantaneous cost integrand g_T — terminal condition for the adjoint.
+		g_T = 0.0; G_T = 0.0; h_T = 0.0;
+		if (cost == 0) {
+			// Drag minimisation: g = mean thrust coefficient (CT)
 			g_T = drag * magnitude / ((double)period*dt) * 2.;
-		}
-
-		else if (cost == 1){
+		} else if (cost == 1) {
+			// Efficiency maximisation: g = d(CT/CP)/dt via quotient rule
 			G_T = drag * magnitude / ((double)period*dt) * 2.;
 			h_T = (- lift * ydot - zM * thetadot) / ((double)period*dt) * 2.;
 			g_T = G_T / CP - CT/(pow(CP, 2.)) * (h_T);
-			// g_T = G_T / (CP / ((double)period * dt)) - (CT / ((double)period * dt))/(pow(CP / ((double)period * dt),2)) * (h_T);
-			// g_T = (drag * magnitude - lift * ydot - zM * thetadot) / ((double)period*dt) * 2;
 		}
 
 
@@ -544,8 +573,11 @@ Logger logger;
 
 
 }
-// Newton and drag integral
-
+// Main periodic-orbit driver.
+// 1. Spin up the flow for Ini_step periods using the given motion time series.
+// 2. Run Newton-GMRES (calling F) to converge to the periodic orbit.
+// 3. Re-run one period with save_flag=1 to write Tecplot/force output.
+// Returns the time-averaged cost (CT for drag, CT/CP for efficiency).
 inline double drag_int_fun(const Mat& parameter) {
 
 	using namespace std::chrono;
@@ -790,6 +822,11 @@ inline double drag_int_fun(const Mat& parameter) {
 
 // compute periodic orbit for ADJ Solver
 
+// Adjoint periodic-orbit residual.
+// Runs AdjointIBSolver2 for one period over the stored base flow x0_glob and
+// returns phi_adj(x) - x.  Newton-GMRES uses this to find the adjoint periodic
+// orbit, which is needed to integrate the sensitivity eta (heave) and zeta
+// (pitch) that Adj() later projects onto the Fourier basis.
 inline Vec ADJ_F(const Vec& ADJ_x_in){
 	double lift = 0.;
 	double drag = 0.;
@@ -1127,15 +1164,17 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 			 }
 
 
-// alpha
+// Sensitivity of the flux to heave velocity (alpha channel: d q / d hdot).
+// dqda represents the flux field produced by a unit heave velocity in the
+// body frame; its inner product with the adjoint state gives d(cost)/d(hdot).
 State x_dqda(grid, geom.getNumPoints());
 Flux dqda(x_dqda.q);
 
 Flux::index ind;
 for (int lev=0; lev<dqda.Ngrid(); ++lev) {
 
-		double xdot_dqda = sin(theta); //-
-		double ydot_dqda = cos(theta); //-
+		double xdot_dqda = sin(theta);
+		double ydot_dqda = cos(theta);
 
 
 		double xdiff, ydiff;
@@ -1169,6 +1208,8 @@ double dalphadt = (alpha_adj - alpha_previous) / dt;  /// add -  !!!
 cout << " deriv1_alpha ... " << deriv1_alpha << endl;
 cout << "deriv2_alpha ... " << deriv2_alpha << endl;
 
+// Sensitivity of the flux to pitch rate (beta channel: d q / d thetadot).
+// dqdb represents the flux from a unit angular velocity about (xC, yC).
 State x_dqdb(grid, geom.getNumPoints());
 Flux dqdb(x_dqdb.q);
 Flux::index ind_1;
@@ -1176,11 +1217,9 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 
 		double xdiff, ydiff;
 
-
 		for(ind_1 = dqdb.begin(X); ind_1 != dqdb.end(X); ++ind_1) {
 				xdiff = dqdb.x(lev,ind_1) - xC;
 				ydiff = dqdb.y(lev,ind_1) - yC;
-				// dqda(lev,ind) = (xdot -thetadot*ydiff)*dx;
 				dqdb(lev,ind_1) = -(ydiff)*dx;
 		}
 		for(ind_1 = dqdb.begin(Y); ind_1 != dqdb.end(Y); ++ind_1) {
@@ -1205,6 +1244,9 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 			 cout << " dgdthetadot ..." << dgdthetadot << " beta1 ..." << deriv1_beta << " beta2 ..." << deriv2_beta << endl;
 
 
+// Sensitivity of the flux to heave displacement (d q / d h).
+// Currently zeroed out (multiplied by 0) — heave displacement has no direct
+// effect on the boundary velocity in the body-frame formulation used here.
 State x_dqdh(grid, geom.getNumPoints());
 Flux dqdh(x_dqdh.q);
 Flux::index ind_2;
@@ -1234,6 +1276,9 @@ dudh = -model->flux2boundary(dqdh);
 			 // dqdh = dqdh * 0;
 
 
+// Sensitivity of the flux to pitch angle (d q / d theta).
+// Accounts for how the boundary velocity field changes when the plate rotates,
+// including the coupling between pitch angle and the heave velocity direction.
 State x_dqdtheta(grid, geom.getNumPoints());
 Flux dqdtheta(x_dqdtheta.q);
 Flux::index ind_3;
@@ -1331,18 +1376,18 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 
 
 	 logger.cleanup();
-	 // Flip gradient
+
+	 // The adjoint was integrated backward in time, so time-ordered arrays
+	 // must be reversed before projecting onto the Fourier basis.
 	 objgrad.reverseInPlace();
 	 dDdy.reverseInPlace();
 	 dDdtheta.reverseInPlace();
+	 dDdtheta(0) = dDdtheta(size1);
+	 dDdy(0) = dDdy(size1);
 
-    dDdtheta(0) = dDdtheta(size1);
-		dDdy(0) = dDdy(size1);
-
-
-eta.reverseInPlace();     // remove?
-zeta.reverseInPlace();   // remove?
-dgdtheta_save.reverseInPlace();   // remove?
+	 eta.reverseInPlace();
+	 zeta.reverseInPlace();
+	 dgdtheta_save.reverseInPlace();
 
 eta(size1) = eta(0);
 zeta(size1) = zeta(0);
@@ -1588,6 +1633,13 @@ return Omega - ADJ_x_in;
 
 // adjoint to compute the gradient
 
+// Adjoint gradient computation.
+// Loads the base-flow snapshots x0_glob (written by drag_int_fun), runs the
+// adjoint solver for Ini_step periods, and integrates the sensitivity signals
+// eta (heave) and zeta (pitch) against the Fourier basis to produce:
+//   dA, dB  -- gradient of cost w.r.t. heave Fourier coefficients
+//   dC, dD  -- gradient of cost w.r.t. pitch Fourier coefficients
+// The period gradient dT_nonperiodic is also accumulated here.
 inline Vec Adj(const Mat& input) {
 
 	int numCycles = Ini_step;
@@ -1942,6 +1994,8 @@ double dalphadt = (alpha_adj - alpha_previous) / dt;  /// add -  !!!
 cout << " deriv1_alpha ... " << deriv1_alpha << endl;
 cout << "deriv2_alpha ... " << deriv2_alpha << endl;
 
+// Sensitivity of the flux to pitch rate (beta channel: d q / d thetadot).
+// dqdb represents the flux from a unit angular velocity about (xC, yC).
 State x_dqdb(grid, geom.getNumPoints());
 Flux dqdb(x_dqdb.q);
 Flux::index ind_1;
@@ -1949,11 +2003,9 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 
 		double xdiff, ydiff;
 
-
 		for(ind_1 = dqdb.begin(X); ind_1 != dqdb.end(X); ++ind_1) {
 				xdiff = dqdb.x(lev,ind_1) - xC;
 				ydiff = dqdb.y(lev,ind_1) - yC;
-				// dqda(lev,ind) = (xdot -thetadot*ydiff)*dx;
 				dqdb(lev,ind_1) = -(ydiff)*dx;
 		}
 		for(ind_1 = dqdb.begin(Y); ind_1 != dqdb.end(Y); ++ind_1) {
@@ -1982,6 +2034,9 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 			 cout << " dalpha/dt ..." << dalphadt << " dbeta/dt ..." << dbetadt << endl;
 
 
+// Sensitivity of the flux to heave displacement (d q / d h).
+// Currently zeroed out (multiplied by 0) — heave displacement has no direct
+// effect on the boundary velocity in the body-frame formulation used here.
 State x_dqdh(grid, geom.getNumPoints());
 Flux dqdh(x_dqdh.q);
 Flux::index ind_2;
@@ -2011,6 +2066,9 @@ dudh = -model->flux2boundary(dqdh);
 			 // dqdh = dqdh * 0;
 
 
+// Sensitivity of the flux to pitch angle (d q / d theta).
+// Accounts for how the boundary velocity field changes when the plate rotates,
+// including the coupling between pitch angle and the heave velocity direction.
 State x_dqdtheta(grid, geom.getNumPoints());
 Flux dqdtheta(x_dqdtheta.q);
 Flux::index ind_3;
@@ -2185,6 +2243,14 @@ return objgrad;
 }
 
 
+// L-BFGS-B objective functor.
+// operator() is called once per L-BFGS-B iteration.  It unpacks the
+// optimisation vector x into Fourier coefficients (A,B,C,D) and period T,
+// then dispatches work via MPI:
+//   rank 0 -- runs drag_int_fun (Newton solver) + Adj (adjoint gradient)
+//   rank 1 -- runs drag_int_fun with period+1 for finite-difference dJ/dT
+// Results are gathered with MPI_Allgather and broadcast to all ranks before
+// the gradient is assembled and returned.
 class Drag_average
  {
  private:
