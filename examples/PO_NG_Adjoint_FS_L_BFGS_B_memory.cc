@@ -4,7 +4,7 @@
 // This is a working code without constraint
 
 // Princeton University
-//
+
 // $Revision$
 // $LastChangedDate$
 // $LastChangedBy$
@@ -30,11 +30,8 @@
 #include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <iterator>
-//#include <limits>
-//#include <vector>
-//#include <iterator>
-//#include <LBFGS.h>
+
+
 #include <LBFGSB.h>
 
 #include "StateVector.h"
@@ -46,7 +43,6 @@
 #include "MotionGenerator.h"
 
 
-//using namespace std;
 using std::ostream;
 using std::cout;
 using std::string;
@@ -57,8 +53,7 @@ using namespace std::chrono;
 using namespace ibpm;
 using std::ofstream;
 using std::sort;
-//using namespace Eigen;
-//using namespace newton_ns; //
+
 
 using Mat = Eigen::MatrixXd;
 using Vec = Eigen::VectorXd;
@@ -85,7 +80,7 @@ string outdir = "Motion_Parameters_drag_opt_30_4grid_Re240_nx_200_L_2_BFGS_MEM_J
 string outdir_PBF;
 string outdir_PBF_global = "PBF_drag_opt_30_4grid_Re240_nx_200_L_2_BFGS_MEM_JFM";
 string outdir_ADJ = "ADJ_drag_opt_30_4grid_Re240_nx_200_L_2_BFGS_MEM_JFM";
-///////
+
 // optimization parameters
 double theta_up = 1.0;
 double A_lim = 1.2;  // 1.0 heave
@@ -108,7 +103,7 @@ void initialization (){
 		B_0(i) = 1.435490;    // 1.57, 0.1
 		C_0(i) = 0.608895;     // 0.1
 		D_0(i) = 0.056592;      // 0.
-		/////////////////
+
 		// Turn this off when validating the ADJ code against FD
 		 if (i > 0){
 		 	A_0(i) = 0.;
@@ -116,15 +111,13 @@ void initialization (){
 		 	C_0(i) = 0.;
 		 	D_0(i) = 0.;
 		 }
-		/////////////////
+
 	}
 }
 
 
-
 double alpha_step = 0.09;
 
-/////////
 
 Vec A(size3);
 Vec B(size3);
@@ -149,11 +142,11 @@ Mat MotionParameterTPerturb(size1 * Ini_step + 1,size2);
 Vec MotionTimeTPerturb(size1 * Ini_step + 1);
 Mat MotionParameterTimeTPerturb(size1 * Ini_step + 1,size2+1);
 
-//
+
 double meandrag[num_iter * num_iter_linsearch];
 double drag_int = 0;
 double dt = 0.001;    // 0.01
-// double Newton_tol = 1.e-3;
+
 double Reynolds = 240;
 double magnitude = 1;
 int nx = 200;   // 100
@@ -171,10 +164,10 @@ double CP = 0.0;
 int save_flag = 0; // don't save the flow for periodic orbit solver
 int T_perturb = 0; // create new folder for T_perturb so if won't conflict with the ADJ solver when parallelized
 
-///////////////////////////////////////
+
 // define vector<State> to store the base flow
 vector<State> x0_glob;
-////////////////////////////////
+
 const double PI = 4. * atan(1.);
 double twopi = 8. * atan(1.);
 
@@ -187,12 +180,12 @@ inline double innerproduct(const Vec& x, const Vec& y) {
 inline double norm(const Vec& x) {
 	return x.norm();
 }
-// State flattened size: (nx-1)(ny-1) + (nx+1)ny + nx(ny+1) per grid level, plus 2*numPoints for body forces
+
 inline int stateVecSize(int numPoints) {
     return ((nx-1)*(ny-1) + (nx+1)*ny + nx*(ny+1)) * ngrid + numPoints * 2;
 }
 
-// Pack State fields (omega, q_x, q_y, f_x, f_y) into a flat Eigen vector
+
 inline Vec stateToVec(const State& x, int numPoints) {
     Vec v(stateVecSize(numPoints));
     int m = 0;
@@ -209,7 +202,7 @@ inline Vec stateToVec(const State& x, int numPoints) {
     return v;
 }
 
-// Unpack a flat Eigen vector into State fields
+
 inline void vecToState(const Vec& v, State& x, int numPoints) {
     int n = 0;
     for (int k = 0; k < ngrid; ++k) {
@@ -231,7 +224,6 @@ inline double getAverage(const Vec& arr, int size) {
 }
 
 
-//
 // Function to compute pitching for one cycle
 inline Vec F(const Vec& Omega_in) {
 	cout << "Pitching flat plate example\n";
@@ -275,7 +267,7 @@ inline Vec F(const Vec& Omega_in) {
 
 if(T_perturb == 0){
 	for(int i = 0; i<size1 + 1; ++i){
-	// for(int i = 0; i<size1+1; ++i){
+
 				pitch_in[i] =  MotionParameter(i,0);
 				plunge_in[i] =  MotionParameter(i,1);
 				motiontime_in[i] = MotionTime(i);
@@ -283,7 +275,7 @@ if(T_perturb == 0){
 }
 else{
 	for(int i = 0; i<size1 + 1; ++i){
-	// for(int i = 0; i<size1+1; ++i){
+
 				pitch_in[i] =  MotionParameterTPerturb(i,0);
 				plunge_in[i] =  MotionParameterTPerturb(i,1);
 				motiontime_in[i] = MotionTimeTPerturb(i);
@@ -302,17 +294,15 @@ else{
   ofstream myfile_thetacheck("../examples/theta_check.txt");
   if (myfile_thetacheck.is_open())
   {
- 	 // for (int count = 0; count < size; count++) {
+
  	 for (int count = 0; count < size1+1; ++count) {
  		 myfile_thetacheck << pitch_in[count] << " ";
  	 }
  	 myfile_thetacheck.close();
   }
   else cout << "Unable to open file";
-	////////////////////
 
-	//double freq = 1;
-    //bool ubf = true;
+
 	int TT = size1;
 	int end_index = TT;
 	PitchPlungeT_mod motion(
@@ -325,33 +315,32 @@ else{
 	plate.setMotion(motion);
 	Geometry geom;
 	geom.addBody(plate);
-	//geom.moveBodies(0);
+
 
 	// Setup equations to solve
 
 	double alpha = 0;  // angle of background flow
 	BaseFlow q_potential(grid, magnitude, alpha);
 
-/////////////
+
 	Motion* m = geom.transferMotion(); // pull motion from first RigidBody object
 	geom.transferCenter(xC, yC);  // pull center of motion from RigidBody object
 	q_potential.setMotion(*m);
 	q_potential.setCenter(xC, yC);
-////////////
+
 	cout << "Setting up Navier Stokes model..." << flush;
 	NavierStokesModel model(grid, geom, Reynolds, q_potential);
 	model.init();
 	cout << "done" << endl;
-	//cout << "amplitude = " << A << endl;
-	//cout << "amplitude = " << amplitude << endl;
+
 
 	// Setup timestepper
-	// NonlinearIBSolver solver(grid, model, dt, Scheme::EULER);
-	// NonlinearIBSolver solver(grid, model, dt, Scheme::AB2);
+
+
 	NonlinearIBSolver solver(grid, model, dt, Scheme::RK3);
 	solver.init();
 
-	// Build the state variable from the input vector
+
 	State x(grid, geom.getNumPoints());
 	x.omega = 0.; x.q = 0.; x.f = 0.;
 	vecToState(Omega_in, x, geom.getNumPoints());
@@ -367,18 +356,16 @@ Logger logger;
 	 mkdir( outdir_PBF.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
 
 	 // Setup output routines
-	 // if (save_flag == 1){
+
 		 OutputForce force(outdir_PBF + "PBF_force.dat");
 		 OutputTecplot tecplot(outdir_PBF + "PBF%03d.plt", "Pitching plate, step %03d", 1);
 		 if(TecplotAllGrids) tecplot.setFilename( outdir_PBF + "PBF%03d_g%01d.plt" );
 
-	 // }
 
 	 OutputRestart restart(outdir_PBF + "pitch%03d.bin");
 
 	 //Output Tecplot file every few timesteps
-	 // logger.addOutput(&tecplot, 1);
-	 // logger.addOutput(&force, 1);
+
 
 	 // save flow for one cycle
 	 if (save_flag == 1){
@@ -392,19 +379,18 @@ Logger logger;
 		 logger.addOutput(&restart, 1000);
 	 }
 
-	 //logger.doOutput(x);
 
   logger.init();
 
 	double zm_ini = 0;
 	double theta_ini = motion.gettheta(0 * dt);
 
-	// logger.doOutput(theta_ini, q_potential, x, zm_ini);
+
   logger.doOutput(x);
 
 	// Step
 	const double PI = 4. * atan(1.);
-	//
+
 	// initialize phase condition parameters
 	double indicator;
 	int StopCondition = 0;
@@ -417,29 +403,26 @@ Logger logger;
 	z_m_save.resize(size1+1);
 	L_save.resize(size1+1);
 	D_save.resize(size1+1);
-	//cout << "numSteps: " << period << endl;
-	//cout << "PhaseCal_flag: " << PhaseCal_flag << endl;
+
+
 	for (int i = 1; i <= numSteps; ++i) {             /// +1 or -1
-		//double theta = 1 * sin(2 * PI / T * x.time);
+
 	/*	cout << "step " << setw(4) << i
 			<< "  time = " << setw(5) << x.time;*/
-			////
+
     solver.advance(x);
 
 		double xF, yF;
 		x.computeNetForce(xF, yF);
-		////////////////////
+
 		double ydot = motion.getydot(x.time);
 		double y = motion.gety(x.time);
 		double theta = motion.gettheta(x.time);
 		double thetadot = motion.getthetadot(x.time);
 
-		////////////////////
-		//q_potential.setAlphaMag(x.time);
-		// alpha = q_potential.getAlpha();
+
 		drag = xF * cos(theta) - yF * sin(theta);
 		lift = xF * sin(theta) + yF * cos(theta);
-
 
 
 			Boundary.f = plate.getPoints();
@@ -451,11 +434,8 @@ Logger logger;
 		D_save(i) = drag;
 		cout << " step_aft " << setw(4) << i << " time_aft " << setw(5) << x.time << endl;
 		cout << " lift_aft ..." << lift << " drag_aft ..." << drag << endl;
-		// cout << " theta_aft ... " << theta << endl;
-		// cout << " thetadot_aft ... " << thetadot << endl;
-		// cout << " y_aft ... " << y << endl;
-		// cout << " ydot_aft ... " << ydot << endl;
-		////////////////////////////////
+
+
 		// Compute drag integral
 		CT = CT + drag * magnitude * 2 / ((double)period*dt) * dt;     //  /tau * 2
 		CP = CP + (- lift * ydot - zM * thetadot) * 2 / ((double)period*dt) * dt;
@@ -477,27 +457,12 @@ Logger logger;
 			// g_T = G_T / (CP / ((double)period * dt)) - (CT / ((double)period * dt))/(pow(CP / ((double)period * dt),2)) * (h_T);
 			// g_T = (drag * magnitude - lift * ydot - zM * thetadot) / ((double)period*dt) * 2;
 		}
-		// cout << " CT ... " << CT;
-		// cout << " CP ... " << CP;
-		// cout << " drag_int ... " << (CT / (double)numSteps) / (CP / (double)numSteps);
-    // cout << " period ... " << period << endl;
-		// cout << " ((double)period * dt) ... " << ((double)period * dt) << endl;
-		// cout << " drag ... " << drag << endl;
-		// cout << " G_T ... " << G_T << endl;
-		// cout << " h_T ... " << h_T << endl;
-		// cout << " g_T ... " << g_T << endl;
-    // logger.doOutput(theta, q_potential, x, zM);
+
+
 		logger.doOutput(x);
-    //////////////////////////////
 
 
-
-    //logger.doOutput(theta, q_potential , x, zM)
-    ////////////////////////////
 		// Compute drag integral
-
-		//cout << "CT..." << CT << endl;
-		//cout << "CP..." << CP << endl;
 
 
 		// if PhaseCal_flag=0, find the period
@@ -515,7 +480,6 @@ Logger logger;
 
 		}
 
-		//
 
 	}
 
@@ -528,9 +492,9 @@ Logger logger;
 		file_PF.open("../examples/period.txt");
 		file_PF << period;
 		file_PF.close();
-		//cout << "period: " << period << endl;
+
 	}
-	//
+
 
 	Vec Omega = stateToVec(x, geom.getNumPoints());
 
@@ -539,10 +503,8 @@ Logger logger;
 	logger.cleanup();
 	// Save drag integral
 	//ofstream file_drag_int;
-	//file_drag_int.open("drag_int.txt");
+
 	//file_drag_int << drag_int;
-	//file_drag_int.close();
-	//cout << "drag_in: " << drag_int << endl;
 
 
 	// Compute the norm of x_final-x_initial
@@ -551,42 +513,35 @@ Logger logger;
 
 	// Load step
 	//std::ifstream input_file_step("../examples/step.txt");
-	//int step;
+
 	//input_file_step >> step;
 	//// Load Error
 	//std::ifstream file_Err("../examples/ErrOut.txt");
-	//double Err[800];
-	//int size = 800;
+
+
 	//// Update Error
-	//for (int i = 0; i < size; ++i)
-	//	{
+
+
 	//		file_Err >> Err[i];
-	//	}
+
 
 	//// Save Error
 	//Err[step] = { f_norm };
 	//ofstream myfile("../examples/ErrOut.txt");
-	//if (myfile.is_open())
-	//{
-	//	// for (int count = 0; count < size; count++) {
-	//	for (int count = 0; count < size; ++count) {
+
+
 	//		myfile << Err[count] << " ";
-	//	}
-	//	myfile.close();
-	//}
-	//else cout << "Unable to open file";
-	////cout << "Error" << Err[step] << endl;
+
 
 	//step = step + 1;
 	//// Save step
 	//ofstream file;
-	//file.open("step.txt");
+
 	//file << step;
-	//file.close();
-	//cout << "Step_in: " << step << endl;
+
 
 	return Omega - Omega_in;
-	//return Omega;
+
 
 }
 // Newton and drag integral
@@ -598,7 +553,7 @@ inline double drag_int_fun(const Mat& parameter) {
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	// Start Newton solver after a few IBPM cycles
 
-	//
+
 	using std::cout;
 	using std::cerr;
 	using std::endl;
@@ -614,13 +569,13 @@ inline double drag_int_fun(const Mat& parameter) {
 
 	/*double plungePeriod_temp = round(plungePeriod / dt);
 	plungePeriod = plungePeriod_temp * dt;*/
-	////////////////////////////////////////////////
+
 	// pitch and plunge
 	int TT = (size1) * Ini_step;
 	int end_index = TT;
-	// double pitchPeriod_temp = round(TT / dt);
+
 	// // TT = pitchPeriod_temp * dt;
-  // int pitchPeriod = (int)pitchPeriod_temp;
+
 
 	double pitch_in[size1 * Ini_step + 1];
 	double plunge_in[size1 * Ini_step + 1];
@@ -651,21 +606,17 @@ inline double drag_int_fun(const Mat& parameter) {
 	     end_index
 	);
 	// Save motion configuration
-	//int size_para = sizeof(parameter_coef) / sizeof(parameter_coef[0]);
 
 
 	/*const int size_p = 11;
 	double para[11] = { amplitude0, Tp0, amplitude1, Tp1, amplitude2, Tp2, amplitude3, Tp3, amplitude4, Tp4, T };*/
-	//cout << "T..." << T << endl;
-	//cout << "Td..." << T << endl;
-	//ofstream myfile_para;
-	//myfile_para.open("../examples/para.txt");
 
-	//for (int count = 0; count < size_p; count++) {
-	//for (int count = 0; count < size_p; ++count) {
+
+	//ofstream myfile_para;
+
+
 	//	myfile_para << para[count] << " ";
-	//}
-	//myfile_para.close();
+
 
 	// Save step
 	int step = Ini_step;
@@ -681,7 +632,7 @@ inline double drag_int_fun(const Mat& parameter) {
 	ofstream myfile_ErrIc;
 	myfile_ErrIc.open("../examples/ErrOut.txt");
 
-	//for (int count = 0; count < size; count++) {
+
 	for (int count = 0; count < size; ++count) {
 		myfile_ErrIc << Err[count] << " ";
 	}
@@ -689,16 +640,14 @@ inline double drag_int_fun(const Mat& parameter) {
 	// Save drag integral
 	//drag_int = 0;
 	//ofstream file_drag_int;
-	//file_drag_int.open("../examples/drag_int.txt");
-	//file_drag_int << drag_int;
-	//file_drag_int.close();
 
-	//int period = T;
+	//file_drag_int << drag_int;
+
+
 	//ofstream file_PF;
-	//file_PF.open("../examples/period.txt");
+
 	//file_PF << period;
-	//file_PF.close();
-	//cout << "period: " << period << endl;
+
 
 	int PhaseCal_flag = 0;
 	// save PhaseCal_flag
@@ -707,13 +656,13 @@ inline double drag_int_fun(const Mat& parameter) {
 	file_PF_flag << PhaseCal_flag;
 	file_PF_flag.close();
 	cout << "PhaseCal_flag: " << PhaseCal_flag << endl;
-	//
+
 
 	// Set plate motion
 	plate.setMotion(motion);
 	Geometry geom;
 	geom.addBody(plate);
-	//geom.moveBodies(0);
+
 
 	// Setup equations to solve
 
@@ -730,14 +679,14 @@ inline double drag_int_fun(const Mat& parameter) {
 	NavierStokesModel model(grid, geom, Reynolds, q_potential);
 	model.init();
 	cout << "done" << endl;
-	//cout << "amplitude = " << amplitude << endl;
+
 
 	// Setup timestepper
-	// NonlinearIBSolver solver(grid, model, dt, Scheme::EULER);
-	// NonlinearIBSolver solver(grid, model, dt, Scheme::AB2);
+
+
 	NonlinearIBSolver solver(grid, model, dt, Scheme::RK3);
 	solver.init();
-	//
+
 	State x(grid, geom.getNumPoints());
 	x.omega = 0.1;
 	x.q = 0.1;
@@ -745,16 +694,11 @@ inline double drag_int_fun(const Mat& parameter) {
 
 	State Boundary(grid, geom.getNumPoints());
 	Boundary.f = 0.1;
-	//
 
 
-	//double cycle = 1 / freq / dt;
-	//int cycle_int = (int)cycle;
-//////////////////////////////
 	int T = size1;
 	int numSteps = (int)T * Ini_step;
 	for (int i = 1; i <= numSteps; ++i) {
-		// double theta = 1* sin(2 * PI / T * x.time);
 
 
 		solver.advance(x);
@@ -770,13 +714,11 @@ inline double drag_int_fun(const Mat& parameter) {
 		drag = xF * cos(theta) - yF * sin(theta);
 		lift = xF * sin(theta) + yF * cos(theta);
 
-		////////
+
 		cout << " step " << setw(4) << i << " time " << setw(5) << x.time << endl;;
 		cout << " lift ..." << lift << " drag ..." << drag << endl;
-		// cout << " theta ... " << theta << endl;
-		// cout << " thetadot ... " << thetadot << endl;
-		// cout << " ydot ... " << ydot << endl;
-		// cout << " y ... " << y << endl;
+
+
 		Boundary.f = plate.getPoints();
 		double zM = 0.0;
 		for (int j = 0; j < geom.getNumPoints(); ++j)
@@ -785,16 +727,12 @@ inline double drag_int_fun(const Mat& parameter) {
 
 	// quiet nan
 
-	//string icfile = "pitch200.bin";
-	//x.load(icfile);
-	//cout << "Loading initial condition from file: " << icfile << endl;
-	//
 
 	Vec Omega_in = stateToVec(x, geom.getNumPoints());
 
 	// Newton-GMRES solver
 	linear_solver_ns::Gmres<Vec> gmres(innerproduct, 5, 1.e-3); // 1.e-3
-	// constexpr double tol{ Newton_tol };
+
 	constexpr double tol{ 1.e-3 };  // 1.e-8  1.e-3
 	constexpr int max_iter{ 15 };
 	constexpr double jacobian_dx{ 1.e-3 }; // 1.e-3
@@ -804,8 +742,7 @@ inline double drag_int_fun(const Mat& parameter) {
 					jacobian_dx, 1, true }
 		);
 
-	//newton.reset(
-	//	new newton_ns::NewtonArmijo<Vec>{ F, gmres, norm, tol, max_iter,
+
 	//			jacobian_dx, 1, 10, 0.1, 0.5, 1.e-4, true }
 	//);
 
@@ -824,13 +761,13 @@ inline double drag_int_fun(const Mat& parameter) {
 
 	// Load drag intergral
 	//std::ifstream input_file_drag_int("../examples/drag_int.txt");
-	////double drag_int;
+
 	//input_file_drag_int >> drag_int;
-//////////////
+
   save_flag = 1;
   F(Omega_in);
 	save_flag = 0;
-/////////////
+
 	high_resolution_clock::time_point t2 = high_resolution_clock::now();
 
 	duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
@@ -850,15 +787,7 @@ inline double drag_int_fun(const Mat& parameter) {
 	return drag_int;
 }
 
-/////////////
-// inline double drag_int_fun(const Vec& x) {
-// 	//cout << "x0..." << x(0) << endl;
-// 	//cout << "x1..." << x(1) << endl;
-// 	 double y = ((x(0) - 3) * (x(0) - 3)) + ((x(1) + 5) * (x(1) + 5));
-// 	 //cout << "y..." << y << endl;
-// 	// double y = (x(0) - 3) * (x(0) - 3);
-// 	return y;
-// }
+
 // compute periodic orbit for ADJ Solver
 
 inline Vec ADJ_F(const Vec& ADJ_x_in){
@@ -870,12 +799,12 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 	plate.addLine(0, 0, 1, 0, grid.Dx());
 	plate.setCenter(0, 0);
 
-	//
+
 	int TT = size1;
 	int end_index = TT * num_cycles;  // only use end_index = TT for test
-	// double pitchPeriod_temp = round(TT / dt);
+
 	// // TT = pitchPeriod_temp * dt;
-	// int pitchPeriod = (int)pitchPeriod_temp;
+
 
 	double pitch_in[size1*num_cycles+1];
 	double plunge_in[size1*num_cycles+1];
@@ -906,14 +835,14 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 	ofstream myfile_thetacheck("../examples/theta_adj.txt");
 	if (myfile_thetacheck.is_open())
 	{
-	 // for (int count = 0; count < size; count++) {
+
 	 for (int count = 0; count <size1*num_cycles+1; ++count) {
 		 myfile_thetacheck << pitch_in[count] << " ";
 	 }
 	 myfile_thetacheck.close();
 	}
 	else cout << "Unable to open file";
-	////////////
+
 
 	PitchPlungeT_mod motion(
 		dt,
@@ -921,14 +850,13 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 		pitch_in,
 		plunge_in,
 		end_index
-		// matrix.row(i)
-		// matrix.col(j)
+
 
 	);
 	plate.setMotion(motion);
 	Geometry geom;
 	geom.addBody(plate);
-	// geom.moveBodies(0);
+
 
 	// Setup equations to solve
 
@@ -937,78 +865,40 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 	int period = TT;
 	BaseFlow q_potential(grid, magnitude, alpha);
 
-/////////////////////////////
-	// Motion* mot = geom.transferMotion(); // pull motion from first RigidBody object
-	// geom.transferCenter(xC, yC);  // pull center of motion from RigidBody object
-	// q_potential.setMotion(*mot);
-	// q_potential.setCenter(xC, yC);
-//////////////////////////
+
 	NavierStokesModel* model = NULL;
 	AdjointIBSolver2* adjointsolver = NULL;
 	IBSolver* solver = NULL;
 
-	//State x00(grid, geom.getNumPoints());
+
 	//vector<State> x0(period, x00);
-/////////////////
+
 	Motion* mot = NULL; // this is for adjoint tests; get rid of later
-///////////////
-/////////////////////////////
+
+
 	mot = geom.transferMotion(); // pull motion from first RigidBody object
 	geom.transferCenter(xC, yC);  // pull center of motion from RigidBody object
 	q_potential.setMotion(*mot);
 	q_potential.setCenter(xC, yC);
-//////////////////////////
 
-	//for (int i = 0; i < period; i++){  // if change period here, also change the period in vector<State> x0(period, x00);
+
 	//	// sprintf("PBF", "PBF".c_str(), i + periodStart);
-	//	// if ( ! x0[i].load(pbffilename) ) {
-
-	//	cout << "i = " << std::to_string(i) << endl;
-
-	//	if (i < 10) {
-	//		cout << "first" << endl;
-	//		if ( ! x0[i].load(outdir_PBF + "pitch00" + std::to_string(i) + ".bin") ) {
-	//				cout << "base flow " << "PBF/pitch00" + std::to_string(i) + ".bin" << " failed to load. Exiting program." << endl;
-	//				exit(1);
-	//			 }
-
-	//	}
-	//	if(i >= 10 && i < 100){
-	//		cout << "second" << endl;
-	//		if ( ! x0[i].load(outdir_PBF + "pitch0" + std::to_string(i) + ".bin") ) {
-	//				cout << "base flow " << "PBF/pitch0" + std::to_string(i) + ".bin" << " failed to load. Exiting program." << endl;
-	//				exit(1);
-	//			 }
-
-	//	}
-	//	if(i >= 100){
-	//		cout << "third" << endl;
-	//		if ( ! x0[i].load(outdir_PBF + "pitch" + std::to_string(i) + ".bin") ) {
-	//				cout << "base flow " << "PBF/pitch" + std::to_string(i) + ".bin" << " failed to load. Exiting program." << endl;
-	//				exit(1);
-	//			 }
-
-	//	}
-
-	//}
 
 
 	//x00 = x0[0];
-	///////////////////////
-	// mot = geom.transferMotion();
-	////////////////////
+
+
 	model = new NavierStokesModel( grid, geom, Reynolds);
-	// model = new NavierStokesModel( grid, geom, Reynolds, q_potential );
 
 
 	Scheme::SchemeType str2scheme( string integratorType );
 	string integratorType = "rk3";
-	// string integratorType = "AB2"; //////////////////////
-	// string integratorType = "EULER"; //////////////////////
+
+
 	Scheme::SchemeType schemeType = str2scheme( integratorType );
 
 	adjointsolver = new AdjointIBSolver2( grid, *model, dt, schemeType, x0_glob, period, cost, CT, CP, *mot );
-	// adjointsolver = new AdjointIBSolver2( grid, *model, dt, "rk3", x0, period, *mot );
+
 	solver = adjointsolver;
 
 	State x( grid, geom.getNumPoints() );
@@ -1018,8 +908,7 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 
 	State Boundary(grid, geom.getNumPoints());
 	Boundary.f = 0.1;
-		// update the geometry to the current time
-	// geom.moveBodies( x.time );
+
 
 	// Initialize model and timestepper
 	model->init();
@@ -1029,14 +918,13 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 			solver->init();
 			solver->save( "outdir_name" );
 
-	// Calculate flux for state, in case only vorticity was saved
+
 	if( ! q_potential.isStationary() ) {
 			q_potential.setAlphaMag( x.time );
 			alpha = q_potential.getAlpha();
 			cout << "q_potential calculation" << endl;
 	}
-	// model->updateOperators( x.time ); /////////////////////////
-	// model->refreshState( x );  ////////////////////////
+
 
 	cout << endl << "Initial timestep = " << x.timestep << "\n" << endl;
 
@@ -1089,12 +977,11 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 	mkdir(outdir_ADJ.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
 
 	// Setup output routines
-	// if (save_flag == 1){
+
 	OutputForce force(outdir_ADJ + "ADJ_force.dat");
 	OutputTecplot tecplot(outdir_ADJ + "ADJ%03d.plt", "Pitching plate, step %03d", 1);
 	if(TecplotAllGrids) tecplot.setFilename(outdir_ADJ + "ADJ%03d_g%01d.plt" );
 
-	// }
 
 	OutputRestart restart(outdir_ADJ + "ADJ%03d.bin");
 	Logger logger;
@@ -1114,28 +1001,25 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 
 
 	logger.init();
-//	logger.doOutput(xv.x);
 
 
 	double zm_ini = 0;
 	double theta_ini = motion.gettheta(0 * dt);
 
-	// logger.doOutput(theta_ini, q_potential, xv.x, zm_ini);
+
 	logger.doOutput(xv.x);
 
-//////////////////////
-// tranform the flow from NS using unsteady base flow to steady base flow !!!!
-//////////////////////
-	// for(int i = 0; i <= numSteps; i++) {
-	for(int i = 0; i < numSteps; i++) {
-	 // for(int i = 1; i <= numSteps; i++) {
 
-		 // if(i > period){
+// tranform the flow from NS using unsteady base flow to steady base flow !!!!
+
+
+	for(int i = 0; i < numSteps; i++) {
+
+
 			//  k = std::remainder(i,period);
-		 // }
-		 // if(k < 0){
+
+
 			//  k = k + period;
-		 // }
 
 
 		 	 solver->advance(xv.x);  ///// maybe put it at the beginning of the loop
@@ -1151,7 +1035,6 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 			 dudp = -model->flux2boundary(dqdp);
 			 double deriv2 = InnerProduct(dudp, xv.x.f);
 
-			 // logger.doOutput( q_potential, x);
 
 			 objgrad(i) = partial + deriv1 + deriv2;
 
@@ -1164,9 +1047,6 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 
 			 cout << " k ... " << k << endl;
 			 cout << " x.timestep ... " << xv.x.timestep << " x.time ... " << xv.x.time << endl;
-			 // cout << " theta_pass ... " << theta << endl;
-			 // cout << " thetadot_pass ... " << thetadot << endl;
-			 // cout << " ydot_pass ... " << ydot << endl;
 
 
 			 ///// dgd()
@@ -1186,13 +1066,11 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 			 Boundary.f = plate.getPoints();
        zM = 0.0;
 			 for (int j = 0;j < geom.getNumPoints();++j) {
-			 //zM = x.f(0, j) * grid.Dx() * grid.Dx() * (Boundary.f(1, j) - yC) * sin(theta) + x.f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC) * cos(theta) + zM;
-			 // zM = x.f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC) + zM;
+
+
 			 zM = x0_glob[k].f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC) + zM;
-			 // cout << " x0[k].f(1, j) ... " << x0[k].f(1, j) << endl;
-			 // cout << " grid.Dx() ... " << grid.Dx() << endl;
-			 // cout << " (Boundary.f(0, j) - xC) ... " << (Boundary.f(0, j) - xC) << endl;
-			 // cout << " zM ... " << zM << endl;
+
+
 			 }
 
 			 if (cost == 0){
@@ -1207,10 +1085,8 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 			 	dgdhdot = 0 / ((double)period*dt);
 			 	// dgdT = (-1) * pow((double)period*dt,-2.) * CT * 2;
 				dgdT = (-1) * CT / ((double)period * dt);
-				// cout << "(double)period ... " << (double)period << endl;
-				// cout << "(double)period*dt ... " << (double)period*dt << endl;
-				// cout << "pow((double)period*dt,-2) ... " << pow((double)period*dt,-2) << endl;
-				// cout << "CT ... " << CT << endl;
+
+
 			 }
 
 			 else if (cost == 1){
@@ -1238,18 +1114,18 @@ inline Vec ADJ_F(const Vec& ADJ_x_in){
 			 	// // Note that the dgd() in the note is -dgd()
 			 	// dgdtheta = (-1) * ((xF * sin(theta) + yF * cos(theta)) * (-cos(theta) * yF * ydot -sin(theta) * xF * ydot - zM * thetadot)/(pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period\
 			 	// 					- (-cos(theta) * xF + yF * sin(theta)) * (sin(theta) * yF * ydot -cos(theta) * xF * ydot)/(pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period);
-				//
+
 			 	// dgdthetadot = (-1) * (0/(pow(-cos(theta) * yF *ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period\
 			 	// 						 - (-xF * cos(theta) + yF * sin(theta) * (-1) * zM)/(pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period);
-				//
+
 			 	// dgdh = 0;
-				//
+
 			 	// dgdhdot	= (-1) * (0/(pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period\
 			 	// 					 - (-xF * cos(theta) + yF * sin(theta)) * (-cos(theta) * yF - sin(theta) * xF) / (pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period);
-				//
+
 			 	// dgdT = (-1) * pow(period,-2) * xF/(yF * ydot + zM * thetadot);
 			 }
-			 //////////////////
+
 
 // alpha
 State x_dqda(grid, geom.getNumPoints());
@@ -1260,12 +1136,11 @@ for (int lev=0; lev<dqda.Ngrid(); ++lev) {
 
 		double xdot_dqda = sin(theta); //-
 		double ydot_dqda = cos(theta); //-
-		// double xdot = 0;
-		// double ydot = 1;
+
+
 		double xdiff, ydiff;
 
 
-		// double dx = dqda.Dx(lev);
 		for(ind = dqda.begin(X); ind != dqda.end(X); ++ind) {
 				xdiff = dqda.x(lev,ind) - xC;
 				ydiff = dqda.y(lev,ind) - yC;
@@ -1281,7 +1156,6 @@ for (int lev=0; lev<dqda.Ngrid(); ++lev) {
 }
 
 
-// double deriv1_alpha = (-InnerProduct(dqda, CrossProduct(xv.x.q, x0[k].omega))) / dx2;  // cout this term and the one in next line
 double deriv1_alpha = (InnerProduct(dqda, CrossProduct(xv.x.q, x0_glob[k].omega))) / dx2;  // cout this term and the one in next line ///////mod
 BoundaryVector duda(xv.x.f.getNumPoints());
 duda = -model->flux2boundary(dqda); // remove -
@@ -1290,11 +1164,11 @@ double deriv2_alpha = -InnerProduct(duda, xv.x.f);
 alpha_previous = alpha_adj;
 alpha_adj = dgdhdot + deriv1_alpha + deriv2_alpha;
 double dalphadt = (alpha_adj - alpha_previous) / dt;  /// add -  !!!
-////////////////////////////////
-////////
+
+
 cout << " deriv1_alpha ... " << deriv1_alpha << endl;
 cout << "deriv2_alpha ... " << deriv2_alpha << endl;
-/////////////////
+
 State x_dqdb(grid, geom.getNumPoints());
 Flux dqdb(x_dqdb.q);
 Flux::index ind_1;
@@ -1302,7 +1176,7 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 
 		double xdiff, ydiff;
 
-		// double dx = dqda.Dx(lev);
+
 		for(ind_1 = dqdb.begin(X); ind_1 != dqdb.end(X); ++ind_1) {
 				xdiff = dqdb.x(lev,ind_1) - xC;
 				ydiff = dqdb.y(lev,ind_1) - yC;
@@ -1317,7 +1191,7 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 		}
 }
 
-			 // double deriv1_beta = (-InnerProduct(dqdb, CrossProduct(xv.x.q, x0[k].omega))) / dx2;
+
 			 double deriv1_beta = (InnerProduct(dqdb, CrossProduct(xv.x.q, x0_glob[k].omega))) / dx2;  //////////////////////// mod
 			 BoundaryVector dudb(xv.x.f.getNumPoints());
 			 dudb = -model->flux2boundary(dqdb);
@@ -1326,11 +1200,11 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 
 			 beta_adj = dgdthetadot + deriv1_beta + deriv2_beta;
 			 double dbetadt = (beta_adj - beta_previous) / dt;
-			 /////////////////
+
 			 cout << " dalpha/dt ..." << dalphadt << " dbeta/dt ..." << dbetadt << endl;
 			 cout << " dgdthetadot ..." << dgdthetadot << " beta1 ..." << deriv1_beta << " beta2 ..." << deriv2_beta << endl;
 
-///////////
+
 State x_dqdh(grid, geom.getNumPoints());
 Flux dqdh(x_dqdh.q);
 Flux::index ind_2;
@@ -1338,7 +1212,7 @@ for (int lev=0; lev<dqdh.Ngrid(); ++lev) {
 
 		double xdiff, ydiff;
 
-		// double dx = dqda.Dx(lev);
+
 		for(ind_2 = dqdh.begin(X); ind_2 != dqdh.end(X); ++ind_2) {
 				xdiff = dqdh.x(lev,ind_2) - xC;
 				ydiff = dqdh.y(lev,ind_2) - yC;
@@ -1355,19 +1229,11 @@ for (int lev=0; lev<dqdh.Ngrid(); ++lev) {
 
 BoundaryVector dudh(xv.x.f.getNumPoints());
 dudh = -model->flux2boundary(dqdh);
-///////////
-			 // Flux dqdh(x0[k].q);
+
+
 			 // dqdh = dqdh * 0;
-			 // BoundaryVector dudh(xv.x.f.getNumPoints());
-			 // dudh = -model->flux2boundary(dqdh);
-////////////
 
 
-
-
-
-/////////////////////
-/////////////////
 State x_dqdtheta(grid, geom.getNumPoints());
 Flux dqdtheta(x_dqdtheta.q);
 Flux::index ind_3;
@@ -1375,7 +1241,7 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 
 		double xdiff, ydiff;
 
-		// double dx = dqda.Dx(lev);
+
 		for(ind_3 = dqdtheta.begin(X); ind_3 != dqdtheta.end(X); ++ind_3) {
 				xdiff = dqdtheta.x(lev,ind_3) - xC;
 				ydiff = dqdtheta.y(lev,ind_3) - yC;
@@ -1389,12 +1255,12 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 				dqdtheta(lev,ind_3) = (-cos(theta)+ydot*sin(theta))*dx;   /////////////////////////
 		}
 }
-/////////////////////
-			 // Flux dqdtheta(x0[k].q);
+
+
 			 // TangentSE2 gg_theta(0, 0, 0, -sin(theta)-ydot*cos(theta) , -cos(theta)+ydot*sin(theta), 0);  // eq 14 in Daniel's note, add the one for eq 15 which is the second argument. The right one
 			 // // (x, y, theta, xdot, ydot, thetadot).
-			 // dqdtheta.setFlow(gg_theta, xC, yC);
-///////////////////
+
+
 			 BoundaryVector dudtheta(xv.x.f.getNumPoints());
 			 dudtheta = -model->flux2boundary(dqdtheta);
 
@@ -1406,23 +1272,8 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 			 // delta_theta = dgdtheta-(InnerProduct(dqdtheta, CrossProduct( xv.x.q, x0[k].omega)))/dx2-InnerProduct(dudtheta, xv.x.f)-dbetadt;
 			 delta_theta = dgdtheta+(InnerProduct(dqdtheta, CrossProduct( xv.x.q, x0_glob[k].omega)))/dx2-InnerProduct(dudtheta, xv.x.f)-dbetadt; ////////////// mod
 			 cout << " delta_h ..." << delta_h << " delta_theta ..." << delta_theta << endl;
-			 //////////
-			 // cout << " dgdh ... " << dgdh << endl;
-			 // double dqdaN = (InnerProduct(dqdh, CrossProduct(xv.x.q, x0[k].omega)))/dx2;
-			 // cout << " dqda*N ... " << dqdaN << endl;
-			 //
-			 // double dqdbN = (InnerProduct(dqdtheta, CrossProduct(xv.x.q, x0[k].omega)))/dx2;
-			 // cout << " dqdb*N ... " << dqdbN << endl;
-			 //
-			 // double dudaphi = InnerProduct(dudh, xv.x.f);
-			 // cout << " duda*phi ... " << dudaphi << endl;
-			 // double dudbphi = InnerProduct(dudtheta, xv.x.f);
-			 // cout << " dudb*phi ... " << dudbphi << endl;
-			 // cout << " dalphadt ... " << dalphadt << endl;
-			 // double Ssin = sin(xv.x.time/2*(2*PI));
-			 // cout << " sin(t) ... " << Ssin << endl;
 
-			 //////////
+
 			 eta(i) = delta_h;
 			 zeta(i) = delta_theta;
       // dA amp for heaving
@@ -1430,41 +1281,34 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 			// dC amp for theta
 			// dD phase for theta
 
-			// for (int n = 0; n < size3; ++n){
+
 			//   /// add dgdA ...
 			// 		dA(n) = dA(n) + eta(i) * sin(2 * PI * (n+1) * xv.x.time/((double)period*dt) + B(n)) * dt;   /// keep dt or not
 			// 		dB(n) = dB(n) + eta(i) * A(n) * cos(2 * PI * (n+1) * xv.x.time/((double)period*dt) + B(n)) * dt;
 			// 		dC(n) = dC(n) + zeta(i) * sin(2 * PI * (n+1) * xv.x.time/((double)period*dt) + D(n)) * dt;
 			// 		dD(n) = dD(n) + zeta(i) * C(n) * cos(2 * PI * (n+1) * xv.x.time/((double)period*dt) + D(n)) * dt;
-			//
-			// }
+
 
 			// eta(i) = delta_h;
 			// zeta(i) = delta_theta;
-			// for (int n = 0; n < size3; ++n){
+
 			// 	/// add dgdA ...
 			// 		dA(n) = dA(n) + eta(i) * sin(2 * PI * (n+1) * (double)k*dt/((double)period*dt) + B(n)) * dt;   /// keep dt or not
 			// 		dB(n) = dB(n) + eta(i) * A(n) * cos(2 * PI * (n+1) * (double)k*dt/((double)period*dt) + B(n)) * dt;
 			// 		dC(n) = dC(n) + zeta(i) * sin(2 * PI * (n+1) * (double)k*dt/((double)period*dt) + D(n)) * dt;
 			// 		dD(n) = dD(n) + zeta(i) * C(n) * cos(2 * PI * (n+1) * (double)k*dt/((double)period*dt) + D(n)) * dt;
-			//
+
 			// 		dA_check(i) = dA(size3-1);
 			// 		increment(i) = eta(i) * sin(2 * PI * (size3) * (double)k*dt/((double)period*dt) + B(size3-1)) * dt;
 			// 		increment1(i) = eta(i) * sin(2 * PI * (size3) * (double)k*dt/((double)period*dt) + B(size3-1));
-			//
-			// }
 
 
-			 // if (i == 0){
 				//  dDdy(i) = delta_h;
 				//  dDdtheta(i) = delta_theta;
-			 // }
+
 			 // else{
 				//  dDdy(i) = eta * (sin(2*PI));
 				//  dDdtheta(i) = delta_theta;
-			 // }
-
-
 
 
 			 // dqdaN_s[i] = dqdaN;
@@ -1477,14 +1321,14 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 
        double zm = 0;
        logger.doOutput(xv.x);
-			 // logger.doOutput( theta, q_potential, xv.x, zm);
+
 
 	 }
 
 
 	 Vec Omega = stateToVec(xv.x, geom.getNumPoints());
 	 double f_norm = norm(Omega - ADJ_x_in);
-	 //////////////////////////////
+
 
 	 logger.cleanup();
 	 // Flip gradient
@@ -1495,7 +1339,7 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
     dDdtheta(0) = dDdtheta(size1);
 		dDdy(0) = dDdy(size1);
 
-// logger.cleanup();
+
 eta.reverseInPlace();     // remove?
 zeta.reverseInPlace();   // remove?
 dgdtheta_save.reverseInPlace();   // remove?
@@ -1527,8 +1371,8 @@ if (Fourier_mode > 0.5){
 			dA_check(k) = dA(size3-1);
 			increment(k) = eta(k) * sin(2 * PI * (2*size3) * (double)k*dt/((double)period*dt)) * dt;
 			increment1(k) = eta(k) * sin(2 * PI * (2*size3) * (double)k*dt/((double)period*dt));
-			// cout << " eta(k)... " << eta(k) << endl;
-			// cout << " zeta(k)... " << zeta(k) << endl;
+
+
 		}
 
 	}
@@ -1549,8 +1393,7 @@ else if (Fourier_mode < 0.5){
 				dA_check(k) = dA(size3-1);
 				increment(k) = eta(k) * sin(2 * PI * (2*size3) * (double)k*dt/((double)period*dt) + B(size3-1)) * dt;
 				increment1(k) = eta(k) * sin(2 * PI * (2*size3) * (double)k*dt/((double)period*dt) + B(size3-1));
-				// cout << " eta(k)... " << eta(k) << endl;
-				// cout << " zeta(k)... " << zeta(k) << endl;
+
 
 		}
 
@@ -1558,12 +1401,11 @@ else if (Fourier_mode < 0.5){
 
 }
 // compute gradient with respect to T
-/////
-// eta.reverseInPlace();     // remove?
-// zeta.reverseInPlace();   // remove?
+
+
 // eta(0) = eta(size1);
 // zeta(0) = zeta(size1);
-/////
+
 double dT1 = 0.0;
 double dT2 = 0.0;
 double sum1;
@@ -1576,14 +1418,13 @@ if (Fourier_mode > 0.5){
 		for (int n = 0; n < size3; ++n){
 			sum1 = sum1 + (A(n) * cos(2 * PI * (2*n+1) * (double)k*dt/((double)period*dt)) * 2 * PI * (2*n+1) * (double)k*dt * (-1) * pow((double)period*dt,-2.)\
 			 - B(n) * sin(2 * PI * (2*n+1) * (double)k*dt/((double)period*dt)) * 2 * PI * (2*n+1) * (double)k*dt * (-1) * pow((double)period*dt,-2.));
-			 // cout << " sum1 ... " << sum1 << endl;
-			 // cout << " n ... " << n << endl;
+
+
 		}
 		// dT1 = dT1 + eta(k) * sum1 * dt;
 		dT1 = dT1 + eta(k) * sum1 * dt;
-		// cout << " k ... " << k << endl;
-		// cout << " eta(k)... " << eta(k) << endl;
-		// cout << " dT1 ... " << dT1 << endl;
+
+
 	}
 
 	for (int k = 0; k <= period; ++k){
@@ -1591,22 +1432,21 @@ if (Fourier_mode > 0.5){
 		for (int n = 0; n < size3; ++n){
 			sum2 = sum2 + (C(n) * cos(2 * PI * (2*n+1) * (double)k*dt/((double)period*dt)) * 2 * PI * (2*n+1) * (double)k*dt * (-1) * pow((double)period*dt,-2.)\
 			 - D(n) * sin(2 * PI * (2*n+1) * (double)k*dt/((double)period*dt)) * 2 * PI * (2*n+1) * (double)k*dt * (-1) * pow((double)period*dt,-2.));
-			 // cout << " sum2 ... " << sum2 << endl;
-			 // cout << " n ... " << n << endl;
+
+
 		}
 		dT2 = dT2 + zeta(k) * sum2 * dt;
 		// dT2 = dT2 + zeta(k) * sum2 * dt + dgdtheta_save(k) * sum2 * dt;
 		cout << " k ... " << k << endl;
-		// cout << " (double)k*dt ... " << (double)k*dt << endl;
-		// cout << " zeta(k)... " << zeta(k) << endl;
-		// cout << " dT2 ... " << dT2 << endl;
+
+
 	}
 
 	// dT = (dT1 + dT2) + dgdT + g_T;  // add g(T) at line 1257 and 1269
 	// dT = (dT1 + dT2) + dgdT + g_T;  // add g(T) at line 1257 and 1269
 	 cout << " dT ... " << dT << " dT1 ... " << dT1 << " dT2 ... " << dT2 << " dgdT ... " << dgdT << " g_T ... " << g_T<< endl;
-	// cout << " (double)period*dt ... " << (double)period*dt << endl;
-	// cout << " pow((double)period*dt,-2.) ... " << pow((double)period*dt,-2.) << endl;
+
+
 }
 
 if (Fourier_mode < 0.5){
@@ -1616,45 +1456,41 @@ if (Fourier_mode < 0.5){
 		sum1 = 0.0;
 		for (int n = 0; n < size3; ++n){
 			sum1 = sum1 + A(n) * sin(2 * PI * (2*n+1) * (double)k*dt/((double)period*dt) + B(n)) * 2 * PI * (2*n+1) * (double)k*dt * (-1) * pow((double)period*dt,-2.);
-      // cout << " sum1 ... " << sum1 << endl;
-			// cout << " n ... " << n << endl;
+
+
 		}
 		dT1 = dT1 + eta(k) * sum1 * dt;
 		cout << " k ... " << k << endl;
-		// cout << " eta(k)... " << eta(k) << endl;
-		// cout << " dT1 ... " << dT1 << endl;
+
+
 	}
 
 	for (int k = 0; k <= period; ++k){
 		sum2 = 0.0;
 		for (int n = 0; n < size3; ++n){
 			sum2 = sum2 + C(n) * sin(2 * PI * (2*n+1) * (double)k*dt/((double)period*dt) + D(n)) * 2 * PI * (2*n+1) * (double)k*dt * (-1) * pow((double)period*dt,-2.);
-      // cout << " sum2 ... " << sum2 << endl;
-			// cout << " n ... " << n << endl;
+
+
 		}
 		dT2 = dT2 + zeta(k) * sum2 * dt;
 		cout << " k ... " << k << endl;
-		// cout << " (double)k*dt ... " << (double)k*dt << endl;
-		// cout << " zeta(k)... " << zeta(k) << endl;
-		// cout << " dT2 ... " << dT2 << endl;
+
+
 	}
   	dT = (dT1 + dT2) + dgdT + g_T;  // add g(T) at line 1257 and 1269
 	// dT = (dT1 + dT2) + dgdT + g_T;
 	cout << " dT ... " << dT << " dT1 ... " << dT1 << " dT2 ... " << dT2 << " dgdT ... " << dgdT << " g_T ... " << g_T<< endl;
-	// cout << " (double)period*dt ... " << (double)period*dt << endl;
-	// cout << " pow((double)period*dt,-2.) ... " << pow((double)period*dt,-2.) << endl;
+
+
 }
 
-/////
-// eta.reverseInPlace();     // remove?
-// zeta.reverseInPlace();   // remove?
-/////
+
 // create dDdy
 // Save dDdt
 ofstream myfile_dA_check("../examples/dA_check.txt");
 if (myfile_dA_check.is_open())
 {
-// for (int count = 0; count < size; count++) {
+
 for (int count = 0; count < size1; ++count) {
 	myfile_dA_check << dA_check(count) << " ";
 }
@@ -1667,7 +1503,7 @@ else cout << "Unable to open file";
 ofstream myfile_din("../examples/din_check.txt");
 if (myfile_din.is_open())
 {
-// for (int count = 0; count < size; count++) {
+
 for (int count = 0; count < size1; ++count) {
 	myfile_din << increment(count) << " ";
 }
@@ -1680,7 +1516,7 @@ else cout << "Unable to open file";
 ofstream myfile_din1("../examples/din1_check.txt");
 if (myfile_din1.is_open())
 {
-// for (int count = 0; count < size; count++) {
+
 for (int count = 0; count < size1; ++count) {
 	myfile_din1 << increment1(count) << " ";
 }
@@ -1689,55 +1525,41 @@ myfile_din1.close();
 else cout << "Unable to open file";
 
 
-//
 //// create dDdtheta
 //std::ifstream file_dDdtheta("../examples/dDdtheta_pp.txt");
-//double dddtheta[numSteps+1];
+
 //// Update Error
-//for (int i = 0; i <= numSteps; ++i)
-// {
+
+
 //	 file_dDdtheta >> dddtheta[i];
-// }
+
 //// Save dDdt
 //ofstream myfile_dDdtheta("../examples/dDdtheta_pp.txt");
-//if (myfile_dDdtheta.is_open())
-//{
-// // for (int count = 0; count < size; count++) {
-// for (int count = 0; count <= numSteps; ++count) {
+
+
 //	 myfile_dDdtheta << dDdtheta[count] << " ";
-// }
-// myfile_dDdtheta.close();
-//}
-//else cout << "Unable to open file";
-//
+
+
 //// create dDdy
 //std::ifstream file_dDdy("../examples/dDdy_pp.txt");
-//double dddy[numSteps+1];
+
 //// Update Error
-//for (int i = 0; i <= numSteps; ++i)
-//	{
+
+
 //		file_dDdy >> dddy[i];
-//	}
+
 //// Save dDdt
 //ofstream myfile_dDdy("../examples/dDdy_pp.txt");
-//if (myfile_dDdy.is_open())
-//{
-//	// for (int count = 0; count < size; count++) {
-//	for (int count = 0; count <= numSteps; ++count) {
+
+
 //		myfile_dDdy << dDdy[count] << " ";
-//	}
-//	myfile_dDdy.close();
-//}
-//else cout << "Unable to open file";
-
-
 
 
 	// Save dDdt
 	ofstream myfile_eta("../examples/" + outdir + "eta.txt");
 	if (myfile_eta.is_open())
 	{
-	 // for (int count = 0; count < size; count++) {
+
 	 for (int count = 0; count < numSteps; ++count) {
 		 myfile_eta << eta(count) << " ";
 	 }
@@ -1749,7 +1571,7 @@ else cout << "Unable to open file";
 	ofstream myfile_zeta("../examples/" + outdir + "zeta.txt");
 	if (myfile_zeta.is_open())
 	{
-	 // for (int count = 0; count < size; count++) {
+
 	 for (int count = 0; count < numSteps; ++count) {
 		 myfile_zeta << zeta(count) << " ";
 	 }
@@ -1763,7 +1585,7 @@ return Omega - ADJ_x_in;
 
 }
 
-/////////////
+
 // adjoint to compute the gradient
 
 inline Vec Adj(const Mat& input) {
@@ -1777,12 +1599,12 @@ inline Vec Adj(const Mat& input) {
 	plate.addLine(0, 0, 1, 0, grid.Dx());
 	plate.setCenter(0, 0);
 
-	//
+
 	int TT = size1;
 	int end_index = TT * numCycles;
- 	// double pitchPeriod_temp = round(TT / dt);
+
  	// // TT = pitchPeriod_temp * dt;
-	// int pitchPeriod = (int)pitchPeriod_temp;
+
 
 	double pitch_in[size1*numCycles+1];
 	double plunge_in[size1*numCycles+1];
@@ -1807,14 +1629,13 @@ inline Vec Adj(const Mat& input) {
 		pitch_in,
 		plunge_in,
 		end_index
-		// matrix.row(i)
-		// matrix.col(j)
+
 
 	);
 	plate.setMotion(motion);
 	Geometry geom;
 	geom.addBody(plate);
-	// geom.moveBodies(0);
+
 
 	// Setup equations to solve
 
@@ -1823,12 +1644,7 @@ inline Vec Adj(const Mat& input) {
 	int period = TT;
 	BaseFlow q_potential(grid, magnitude, alpha);
 
-/////////////////////////////
-	// Motion* mot = geom.transferMotion(); // pull motion from first RigidBody object
-	// geom.transferCenter(xC, yC);  // pull center of motion from RigidBody object
-	// q_potential.setMotion(*mot);
-	// q_potential.setCenter(xC, yC);
-//////////////////////////
+
 	NavierStokesModel* model = NULL;
 	AdjointIBSolver2* adjointsolver = NULL;
 	IBSolver* solver = NULL;
@@ -1836,54 +1652,23 @@ inline Vec Adj(const Mat& input) {
   State x00(grid, geom.getNumPoints());
 	//vector<State> x0(period, x00);
 	x0_glob.resize(period + 1);
-/////////////////
+
   Motion* mot = NULL; // this is for adjoint tests; get rid of later
-///////////////
-/////////////////////////////
+
+
 	mot = geom.transferMotion(); // pull motion from first RigidBody object
 	geom.transferCenter(xC, yC);  // pull center of motion from RigidBody object
 	q_potential.setMotion(*mot);
 	q_potential.setCenter(xC, yC);
-//////////////////////////
 
- // for (int i = 0; i < period; i++){
+
 	//	// sprintf("PBF", "PBF".c_str(), i + periodStart);
-	//	// if ( ! x0[i].load(pbffilename) ) {
-
-	//	cout << "i = " << std::to_string(i) << endl;
-
-	//	if (i < 10) {
-	//		cout << "first" << endl;
-	//		if ( ! x0[i].load(outdir_PBF + "pitch00" + std::to_string(i) + ".bin") ) {
-	//				cout << "base flow " << outdir_PBF + "pitch00" + std::to_string(i) + ".bin" << " failed to load. Exiting program." << endl;
-	//				exit(1);
-	//			 }
-
-	//	}
-	//	if(i >= 10 && i < 100){
-	//		cout << "second" << endl;
-	//		if ( ! x0[i].load(outdir_PBF + "pitch0" + std::to_string(i) + ".bin") ) {
-	//				cout << "base flow " << outdir_PBF + "pitch0" + std::to_string(i) + ".bin" << " failed to load. Exiting program." << endl;
-	//				exit(1);
-	//			 }
-
-	//	}
-	//	if(i >= 100){
-	//		cout << "third" << endl;
-	//		if ( ! x0[i].load(outdir_PBF + "pitch" + std::to_string(i) + ".bin") ) {
-	//				cout << "base flow " << outdir_PBF + "/pitch" + std::to_string(i) + ".bin" << " failed to load. Exiting program." << endl;
-	//				exit(1);
-	//			 }
-
-	//	}
-
-	//}
 
 
  // x00 = x0[0];
 	for (int i = 0; i <= period; i++) {
 		// sprintf("PBF", "PBF".c_str(), i + periodStart);
-		// if ( ! x0[i].load(pbffilename) ) {
+
 
 		cout << "i = " << std::to_string(i) << endl;
 
@@ -1912,25 +1697,23 @@ inline Vec Adj(const Mat& input) {
 
 		}
 		// x0[i] = x00;
-		// x0_glob.push_back(x0[i]);
-   // x0_glob.push_back(x00);
+
+
 		cout << "x0_glob size... " << x0_glob.size() << endl;
 	}
-	///////////////////////
-	// mot = geom.transferMotion();
-	////////////////////
+
+
 	model = new NavierStokesModel( grid, geom, Reynolds);
-	// model = new NavierStokesModel( grid, geom, Reynolds, q_potential );
 
 
 	Scheme::SchemeType str2scheme( string integratorType );
   string integratorType = "rk3";
-	// string integratorType = "AB2"; //////////////////////
-	// string integratorType = "EULER"; //////////////////////
+
+
 	Scheme::SchemeType schemeType = str2scheme( integratorType );
 
 	adjointsolver = new AdjointIBSolver2( grid, *model, dt, schemeType, x0_glob, period, cost, CT, CP, *mot );
-	// adjointsolver = new AdjointIBSolver2( grid, *model, dt, "rk3", x0, period, *mot );
+
 	solver = adjointsolver;
 
 	State x( grid, geom.getNumPoints() );
@@ -1940,8 +1723,7 @@ inline Vec Adj(const Mat& input) {
 
 	State Boundary(grid, geom.getNumPoints());
 	Boundary.f = 0.;
-	  // update the geometry to the current time
-	// geom.moveBodies( x.time );
+
 
 	// Initialize model and timestepper
 	model->init();
@@ -1951,14 +1733,13 @@ inline Vec Adj(const Mat& input) {
 			solver->init();
 			solver->save( "outdir_name" );
 
-	// Calculate flux for state, in case only vorticity was saved
+
 	if( ! q_potential.isStationary() ) {
 			q_potential.setAlphaMag( x.time );
 			alpha = q_potential.getAlpha();
 			cout << "q_potential calculation" << endl;
 	}
-	// model->updateOperators( x.time ); /////////////////////////
-	// model->refreshState( x );  ////////////////////////
+
 
 	cout << endl << "Initial timestep = " << x.timestep << "\n" << endl;
 
@@ -2002,9 +1783,9 @@ inline Vec Adj(const Mat& input) {
 
 
 // tranform the flow from NS using unsteady base flow to steady base flow !!!!
-//////////////////////
+
   for(int i = 0; i <= numSteps; i++) {
-	 // for(int i = 1; i <= numSteps; i++) {
+
 		 if(i > period){
 			 k = std::remainder(i,period);
 		 }
@@ -2025,29 +1806,22 @@ inline Vec Adj(const Mat& input) {
 			 dudp = -model->flux2boundary(dqdp);
 			 double deriv2 = InnerProduct(dudp, xv.x.f);
 
-			 // logger.doOutput( q_potential, x);
 
 			 objgrad(i) = partial + deriv1 + deriv2;
 
 
-       ///////////////////
 			 // a = hdot, b = thetadot
 
 			 // y_pre = y;
-			 // y = motion.gety(xv.x.time);
-			 // double theta = motion.gettheta(xv.x.time);
-			 // double thetadot = motion.getthetadot(xv.x.time);
-			 // double ydot = motion.getydot(xv.x.time);
-			 /////////////////
+
+
        y_pre = y;
 			 y = motion.gety(k * dt);
 			 double theta = motion.gettheta(k * dt);
 			 double thetadot = motion.getthetadot(k * dt);
 			 double ydot = motion.getydot(k * dt);
 
-/////////////////////////////
-/////////////////////////////
-////////////////////////////
+
 ///// dgd()
 double dgdh = 0.;
 double dgdhdot = 0.;
@@ -2065,13 +1839,11 @@ lift_adj = xF * sin(theta) + yF * cos(theta);
 Boundary.f = plate.getPoints();
 zM = 0.0;
 for (int j = 0;j < geom.getNumPoints();++j) {
-//zM = x.f(0, j) * grid.Dx() * grid.Dx() * (Boundary.f(1, j) - yC) * sin(theta) + x.f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC) * cos(theta) + zM;
-// zM = x.f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC) + zM;
+
+
 zM = x0_glob[k].f(1, j) * grid.Dx() * grid.Dx() * (Boundary.f(0, j) - xC) + zM;
-// cout << " x0[k].f(1, j) ... " << x0[k].f(1, j) << endl;
-// cout << " grid.Dx() ... " << grid.Dx() << endl;
-// cout << " (Boundary.f(0, j) - xC) ... " << (Boundary.f(0, j) - xC) << endl;
-// cout << " zM ... " << zM << endl;
+
+
 }
 
 if (cost == 0){
@@ -2086,10 +1858,8 @@ if (cost == 0){
  dgdhdot = 0 / ((double)period*dt);
  // dgdT = (-1) * pow((double)period*dt,-2.) * CT * 2;
  dgdT = (-1) * CT / ((double)period * dt);
- // cout << "(double)period ... " << (double)period << endl;
- // cout << "(double)period*dt ... " << (double)period*dt << endl;
- // cout << "pow((double)period*dt,-2) ... " << pow((double)period*dt,-2) << endl;
- // cout << "CT ... " << CT << endl;
+
+
 }
 
 else if (cost == 1){
@@ -2117,23 +1887,19 @@ else if (cost == 1){
  // // Note that the dgd() in the note is -dgd()
  // dgdtheta = (-1) * ((xF * sin(theta) + yF * cos(theta)) * (-cos(theta) * yF * ydot -sin(theta) * xF * ydot - zM * thetadot)/(pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period\
  // 					- (-cos(theta) * xF + yF * sin(theta)) * (sin(theta) * yF * ydot -cos(theta) * xF * ydot)/(pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period);
- //
+
  // dgdthetadot = (-1) * (0/(pow(-cos(theta) * yF *ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period\
  // 						 - (-xF * cos(theta) + yF * sin(theta) * (-1) * zM)/(pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period);
- //
+
  // dgdh = 0;
- //
+
  // dgdhdot	= (-1) * (0/(pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period\
  // 					 - (-xF * cos(theta) + yF * sin(theta)) * (-cos(theta) * yF - sin(theta) * xF) / (pow(-cos(theta) * yF * ydot - sin(theta) * xF * ydot - zM * thetadot,2)) / period);
- //
+
  // dgdT = (-1) * pow(period,-2) * xF/(yF * ydot + zM * thetadot);
 }
-//////////////////
-////////////////////////////
-//////////////////////////
-////////////////////////
 
-//////////////////////////////
+
 // alpha
 State x_dqda(grid, geom.getNumPoints());
 Flux dqda(x_dqda.q);
@@ -2143,12 +1909,11 @@ for (int lev=0; lev<dqda.Ngrid(); ++lev) {
 
 		double xdot_dqda = -sin(theta);
 		double ydot_dqda = -cos(theta);
-		// double xdot = 0;
-		// double ydot = 1;
+
+
 		double xdiff, ydiff;
 
 
-		// double dx = dqda.Dx(lev);
 		for(ind = dqda.begin(X); ind != dqda.end(X); ++ind) {
 				xdiff = dqda.x(lev,ind) - xC;
 				ydiff = dqda.y(lev,ind) - yC;
@@ -2163,7 +1928,7 @@ for (int lev=0; lev<dqda.Ngrid(); ++lev) {
 		}
 }
 
-// double deriv1_alpha = (-InnerProduct(dqda, CrossProduct(xv.x.q, x0[k].omega))) / dx2;  // cout this term and the one in next line
+
 double deriv1_alpha = (InnerProduct(dqda, CrossProduct(xv.x.q, x0_glob[k].omega))) / dx2;  // cout this term and the one in next line ///////mod
 BoundaryVector duda(xv.x.f.getNumPoints());
 duda = -model->flux2boundary(dqda); // remove -
@@ -2172,11 +1937,11 @@ double deriv2_alpha = -InnerProduct(duda, xv.x.f);
 alpha_previous = alpha_adj;
 alpha_adj = deriv1_alpha + deriv2_alpha;
 double dalphadt = (alpha_adj - alpha_previous) / dt;  /// add -  !!!
-////////////////////////////////
-////////
+
+
 cout << " deriv1_alpha ... " << deriv1_alpha << endl;
 cout << "deriv2_alpha ... " << deriv2_alpha << endl;
-/////////////////
+
 State x_dqdb(grid, geom.getNumPoints());
 Flux dqdb(x_dqdb.q);
 Flux::index ind_1;
@@ -2184,7 +1949,7 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 
 		double xdiff, ydiff;
 
-		// double dx = dqda.Dx(lev);
+
 		for(ind_1 = dqdb.begin(X); ind_1 != dqdb.end(X); ++ind_1) {
 				xdiff = dqdb.x(lev,ind_1) - xC;
 				ydiff = dqdb.y(lev,ind_1) - yC;
@@ -2198,14 +1963,13 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 				dqdb(lev,ind_1) = -(-xdiff)*dx;
 		}
 }
-//////////////
-       // Flux dqdb(x0[k].q);
+
+
        // TangentSE2 gg_b(0, 0, 0, 0, 0, -1.);  // eq 14 in Daniel's note, add the one for eq 15 which is the second argument. The right one
 			 // // TangentSE2 gg_b(0, 0, 0, 0, 0, 1);  // eq 14 in Daniel's note, add the one for eq 15 which is the second argument. The right one
        // // (x, y, theta, xdot, ydot, thetadot).
-			 // dqdb.setFlow(gg_b, xC, yC);
-/////////////
-			 // double deriv1_beta = (-InnerProduct(dqdb, CrossProduct(xv.x.q, x0[k].omega))) / dx2;
+
+
 			 double deriv1_beta = (InnerProduct(dqdb, CrossProduct(xv.x.q, x0_glob[k].omega))) / dx2;  //////////////////////// mod
 			 BoundaryVector dudb(xv.x.f.getNumPoints());
 			 dudb = -model->flux2boundary(dqdb);
@@ -2214,10 +1978,10 @@ for (int lev=0; lev<dqdb.Ngrid(); ++lev) {
 
 			 beta_adj = deriv1_beta + deriv2_beta;
 			 double dbetadt = (beta_adj - beta_previous) / dt;
-			 /////////////////
+
 			 cout << " dalpha/dt ..." << dalphadt << " dbeta/dt ..." << dbetadt << endl;
 
-///////////
+
 State x_dqdh(grid, geom.getNumPoints());
 Flux dqdh(x_dqdh.q);
 Flux::index ind_2;
@@ -2225,7 +1989,7 @@ for (int lev=0; lev<dqdh.Ngrid(); ++lev) {
 
 		double xdiff, ydiff;
 
-		// double dx = dqda.Dx(lev);
+
 		for(ind_2 = dqdh.begin(X); ind_2 != dqdh.end(X); ++ind_2) {
 				xdiff = dqdh.x(lev,ind_2) - xC;
 				ydiff = dqdh.y(lev,ind_2) - yC;
@@ -2242,14 +2006,11 @@ for (int lev=0; lev<dqdh.Ngrid(); ++lev) {
 
 BoundaryVector dudh(xv.x.f.getNumPoints());
 dudh = -model->flux2boundary(dqdh);
-///////////
-			 // Flux dqdh(x0[k].q);
+
+
 			 // dqdh = dqdh * 0;
-			 // BoundaryVector dudh(xv.x.f.getNumPoints());
-			 // dudh = -model->flux2boundary(dqdh);
-////////////
-/////////////////////
-/////////////////
+
+
 State x_dqdtheta(grid, geom.getNumPoints());
 Flux dqdtheta(x_dqdtheta.q);
 Flux::index ind_3;
@@ -2257,7 +2018,7 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 
 		double xdiff, ydiff;
 
-		// double dx = dqda.Dx(lev);
+
 		for(ind_3 = dqdtheta.begin(X); ind_3 != dqdtheta.end(X); ++ind_3) {
 				xdiff = dqdtheta.x(lev,ind_3) - xC;
 				ydiff = dqdtheta.y(lev,ind_3) - yC;
@@ -2271,12 +2032,12 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 				dqdtheta(lev,ind_3) = (-cos(theta)+ydot*sin(theta))*dx;   /////////////////////////
 		}
 }
-/////////////////////
-       // Flux dqdtheta(x0[k].q);
+
+
 			 // TangentSE2 gg_theta(0, 0, 0, -sin(theta)-ydot*cos(theta) , -cos(theta)+ydot*sin(theta), 0);  // eq 14 in Daniel's note, add the one for eq 15 which is the second argument. The right one
        // // (x, y, theta, xdot, ydot, thetadot).
-			 // dqdtheta.setFlow(gg_theta, xC, yC);
-///////////////////
+
+
 			 BoundaryVector dudtheta(xv.x.f.getNumPoints());
 			 dudtheta = -model->flux2boundary(dqdtheta);
 
@@ -2288,23 +2049,8 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 			 // delta_theta = dgdtheta-(InnerProduct(dqdtheta, CrossProduct( xv.x.q, x0[k].omega)))/dx2-InnerProduct(dudtheta, xv.x.f)-dbetadt;
 			 delta_theta = dgdtheta+(InnerProduct(dqdtheta, CrossProduct( xv.x.q, x0_glob[k].omega)))/dx2-InnerProduct(dudtheta, xv.x.f)-dbetadt; ////////////// mod
 			 cout << " delta_h ..." << delta_h << " delta_theta ..." << delta_theta << endl;
-			 //////////
-			 // // cout << " dgdh ... " << dgdh << endl;
-			 // double dqdaN = (InnerProduct(dqdh, CrossProduct(xv.x.q, x0[k].omega)))/dx2;
-			 // cout << " dqda*N ... " << dqdaN << endl;
-			 //
-			 // double dqdbN = (InnerProduct(dqdtheta, CrossProduct(xv.x.q, x0[k].omega)))/dx2;
-			 // cout << " dqdb*N ... " << dqdbN << endl;
-			 //
-			 // double dudaphi = InnerProduct(dudh, xv.x.f);
-			 // cout << " duda*phi ... " << dudaphi << endl;
-			 // double dudbphi = InnerProduct(dudtheta, xv.x.f);
-			 // cout << " dudb*phi ... " << dudbphi << endl;
-			 // cout << " dalphadt ... " << dalphadt << endl;
-			 // double Ssin = sin(xv.x.time/2*(2*PI));
-			 // cout << " sin(t) ... " << Ssin << endl;
 
-       //////////
+
        dDdy(i) = delta_h;
        dDdtheta(i) = delta_theta;
 			 // dqdaN_s[i] = dqdaN;
@@ -2326,10 +2072,8 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 	 dDdtheta.reverseInPlace();
 	 eta_nonperiodic.reverseInPlace();
 	 zeta_nonperiodic.reverseInPlace();
-  ///////////////////////
-	///////////////////////
-	//////////////////////
-	/////
+
+
 	double dT1 = 0.0;
 	double dT2 = 0.0;
 	double sum1;
@@ -2363,10 +2107,10 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 
 		dT_nonperiodic = (dT1 + dT2) + dgdT + g_T;  // add g(T) at line 1257 and 1269
 		// dT = (dT1 + dT2) + dgdT + g_T;  // add g(T) at line 1257 and 1269
-		// cout << " dT ... " << dT << " dT1 ... " << dT1 << " dT2 ... " << dT2 << " dgdT ... " << dgdT << " g_T ... " << g_T<< endl;
+
 		cout << " dT_nonperiodic ... " << dT_nonperiodic << " dT1 ... " << dT1 << " dT2 ... " << dT2 << " dgdT ... " << dgdT << " g_T ... " << g_T << endl;
-		// cout << " (double)period*dt ... " << (double)period*dt << endl;
-		// cout << " pow((double)period*dt,-2.) ... " << pow((double)period*dt,-2.) << endl;
+
+
 	}
 
 	if (Fourier_mode < 0.5){
@@ -2393,18 +2137,15 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 	  	dT_nonperiodic = (dT1 + dT2) + dgdT + g_T;  // add g(T) at line 1257 and 1269
 		// dT = (dT1 + dT2) + dgdT + g_T;
 		cout << " dT_nonperiodic ... " << dT_nonperiodic << " dT1 ... " << dT1 << " dT2 ... " << dT2 << " dgdT ... " << dgdT << " g_T ... " << g_T<< endl;
-		// cout << " (double)period*dt ... " << (double)period*dt << endl;
-		// cout << " pow((double)period*dt,-2.) ... " << pow((double)period*dt,-2.) << endl;
+
+
 	}
 
-	//////////////////////
-	///////////////////////
-	/////////////////////
 
 	Vec Omega_in = stateToVec(xv.x, geom.getNumPoints());
 
 	linear_solver_ns::Gmres<Vec> gmres(innerproduct, 5, 1.e-3);   //1.e-3 1.e-10
-	// constexpr double tol{ Newton_tol };
+
 	constexpr double tol{ 1.e-8 };   //1.e-3 1.e-6  1.e-8
 	constexpr int max_iter{ 15 };
 	constexpr double jacobian_dx{ 1.e-3 };  //1.e-3 1.e-6
@@ -2414,8 +2155,7 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 					jacobian_dx, 1, true }
 		);
 
-	//newton.reset(
-	//	new newton_ns::NewtonArmijo<Vec>{ F, gmres, norm, tol, max_iter,
+
 	//			jacobian_dx, 1, 10, 0.1, 0.5, 1.e-4, true }
 	//);
 
@@ -2431,22 +2171,19 @@ for (int lev=0; lev<dqdtheta.Ngrid(); ++lev) {
 		cerr << "Other exception: " << e.what() << endl;
 		exit(3);
 	}
-	 ///////////////////
 
-	 //////////////
+
 	   save_flag = 1;
 	   ADJ_F(Omega_in);
 	 	save_flag = 0;
-	 /////////////
 
-// logger.cleanup();
 
 delete solver;
 return objgrad;
-// return gradient;
+
 
 }
-//
+
 
 class Drag_average
  {
@@ -2475,8 +2212,7 @@ class Drag_average
 			size1 = x(n-1);
 		}
 
-	/////////////////////////
- ///////////////
+
 	if (id == 0) {
 
 		// create A
@@ -2491,7 +2227,7 @@ class Drag_average
 		ofstream myfile_Aa("../examples/" + outdir + "A" + std::to_string(k_global) + ".txt");
 		if (myfile_Aa.is_open())
 		{
-			// for (int count = 0; count < size; count++) {
+
 			for (int count = 0; count < size3; ++count) {
 				myfile_Aa << A(count) << " ";
 			}
@@ -2511,7 +2247,7 @@ class Drag_average
 		ofstream myfile_Ba("../examples/" + outdir + "B" + std::to_string(k_global) + ".txt");
 		if (myfile_Ba.is_open())
 		{
-			// for (int count = 0; count < size; count++) {
+
 			for (int count = 0; count < size3; ++count) {
 				myfile_Ba << B(count) << " ";
 			}
@@ -2532,7 +2268,7 @@ class Drag_average
 		ofstream myfile_Ca("../examples/" + outdir + "C" + std::to_string(k_global) + ".txt");
 		if (myfile_Ca.is_open())
 		{
-			// for (int count = 0; count < size; count++) {
+
 			for (int count = 0; count < size3; ++count) {
 				myfile_Ca << C(count) << " ";
 			}
@@ -2553,7 +2289,7 @@ class Drag_average
 		ofstream myfile_Da("../examples/" + outdir + "D" + std::to_string(k_global) + ".txt");
 		if (myfile_Da.is_open())
 		{
-			// for (int count = 0; count < size; count++) {
+
 			for (int count = 0; count < size3; ++count) {
 				myfile_Da << D(count) << " ";
 			}
@@ -2630,7 +2366,7 @@ class Drag_average
 		 ofstream myfile_ya("../examples/" + outdir + "y" + std::to_string(k_global) + ".txt");
 		 if (myfile_ya.is_open())
 		 {
-			 // for (int count = 0; count < size; count++) {
+
 			 for (int count = 0; count < MotionParameter.rows(); ++count) {
 				 myfile_ya << MotionParameter(count, 1) << " ";
 			 }
@@ -2651,7 +2387,7 @@ class Drag_average
 		 ofstream myfile_thetaa("../examples/" + outdir + "theta" + std::to_string(k_global) + ".txt");
 		 if (myfile_thetaa.is_open())
 		 {
-			 // for (int count = 0; count < size; count++) {
+
 			 for (int count = 0; count < MotionParameter.rows(); ++count) {
 				 myfile_thetaa << MotionParameter(count, 0) << " ";
 			 }
@@ -2677,15 +2413,15 @@ class Drag_average
 			ofstream myfile_La("../examples/" + outdir + "L" + std::to_string(k_global) + ".txt");
 			if (myfile_La.is_open())
 			{
-				// for (int count = 0; count < size; count++) {
-				// for (int count = 0; count <= size1 * 8; ++count) {
+
+
 				for (int count = 0; count < size1; ++count) {
 					myfile_La << L_save(count) << " ";
 				}
 				myfile_La.close();
 			}
 			else cout << "Unable to open file";
-			///
+
 			// create dDdy
 			std::ifstream file_Draga("../examples/" + outdir + "Drag" + std::to_string(k_global) + ".txt");
 			double Draga[size1];
@@ -2698,15 +2434,15 @@ class Drag_average
 			ofstream myfile_Draga("../examples/" + outdir + "Drag" + std::to_string(k_global) + ".txt");
 			if (myfile_Draga.is_open())
 			{
-				// for (int count = 0; count < size; count++) {
-				// for (int count = 0; count <= size1 * 8; ++count) {
+
+
 				for (int count = 0; count < size1; ++count) {
 					myfile_Draga << D_save(count) << " ";
 				}
 				myfile_Draga.close();
 			}
 			else cout << "Unable to open file";
-			///
+
 				 // create dDdy
 			std::ifstream file_za("../examples/" + outdir + "zm" + std::to_string(k_global) + ".txt");
 			double za[size1];
@@ -2719,8 +2455,8 @@ class Drag_average
 			ofstream myfile_za("../examples/" + outdir + "zm" + std::to_string(k_global) + ".txt");
 			if (myfile_za.is_open())
 			{
-				// for (int count = 0; count < size; count++) {
-				// for (int count = 0; count <= size1 * 8; ++count) {
+
+
 				for (int count = 0; count < size1; ++count) {
 					myfile_za << z_m_save(count) << " ";
 				}
@@ -2742,7 +2478,6 @@ class Drag_average
 		 }
 		 cout << "Line 2979" << endl;
 
-		 /////////////
 
 		 cout << "Line 2990" << endl;
 		 double* rbuf_temp;
@@ -2756,9 +2491,7 @@ class Drag_average
 		 dT = (rbuf_temp[1] - rbuf_temp[0]) / dt;
 		 //dT = round(dT / dt);
 		  dT = dT/(abs(dT)) * ceil(abs(dT/dt))*5;
-		 //
 
-		 ///////////////////////////
 
 		  if (id == 0){
 		 	if (cost == 0){
@@ -2770,7 +2503,7 @@ class Drag_average
 		 	}
 
 		  }
-//////
+
 		  MPI_Barrier(MPI_COMM_WORLD);
 
 		 MPI_Bcast(A.data(), A.size(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -2786,19 +2519,15 @@ class Drag_average
 		 MPI_Bcast(&dT, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 		 MPI_Bcast(&grad_norm, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-		 /////////////
 
 		meandrag[k_global] = grad_norm;
     cout << " k_global ... " << k_global << endl;
-		////////////////
+
 
 		 cout << "Line 3187" << endl;
-		 /////////////////
-		 ////////////////
+
 
 		 MPI_Barrier(MPI_COMM_WORLD);
-
-    //////////////////////////////
 
 
 			 if (id == 0)
@@ -2815,14 +2544,14 @@ class Drag_average
 			 ofstream myfile_Drag("../examples/" + outdir + "Drag_opt.txt");
 			 if (myfile_Drag.is_open())
 			 {
-				 // for (int count = 0; count < size; count++) {
+
 				 for (int count = 0; count < num_iter * num_iter_linsearch; ++count) {
 					 myfile_Drag << meandrag[count] << " ";
 				 }
 				 myfile_Drag.close();
 			 }
 			 else cout << "Unable to open file";
-			 ///////////////////
+
 
 			// create dA
 			std::ifstream file_dAa("../examples/" + outdir + "dA" + std::to_string(k_global) + ".txt");
@@ -2836,7 +2565,7 @@ class Drag_average
 			ofstream myfile_dAa("../examples/" + outdir + "dA" + std::to_string(k_global) + ".txt");
 			if (myfile_dAa.is_open())
 			{
-				// for (int count = 0; count < size; count++) {
+
 				for (int count = 0; count < size3; ++count) {
 					myfile_dAa << dA(count) << " ";
 				}
@@ -2856,7 +2585,7 @@ class Drag_average
 			ofstream myfile_dBa("../examples/" + outdir + "dB" + std::to_string(k_global) + ".txt");
 			if (myfile_dBa.is_open())
 			{
-				// for (int count = 0; count < size; count++) {
+
 				for (int count = 0; count < size3; ++count) {
 					myfile_dBa << dB(count) << " ";
 				}
@@ -2877,7 +2606,7 @@ class Drag_average
 			ofstream myfile_dCa("../examples/" + outdir + "dC" + std::to_string(k_global) + ".txt");
 			if (myfile_dCa.is_open())
 			{
-				// for (int count = 0; count < size; count++) {
+
 				for (int count = 0; count < size3; ++count) {
 					myfile_dCa << dC(count) << " ";
 				}
@@ -2898,7 +2627,7 @@ class Drag_average
 			ofstream myfile_dDa("../examples/" + outdir + "dD" + std::to_string(k_global) + ".txt");
 			if (myfile_dDa.is_open())
 			{
-				// for (int count = 0; count < size; count++) {
+
 				for (int count = 0; count < size3; ++count) {
 					myfile_dDa << dD(count) << " ";
 				}
@@ -2922,7 +2651,7 @@ class Drag_average
 				myfile_dTa.close();
 			}
 			else cout << "Unable to open file";
-			//////////////////////////////
+
 		 }
 
 		 if (id == 1){
@@ -2940,26 +2669,17 @@ class Drag_average
  			 ofstream myfile_Drag("../examples/" + outdir + "Drag_opt_id1.txt");
  			 if (myfile_Drag.is_open())
  			 {
- 				 // for (int count = 0; count < size; count++) {
+
  				 for (int count = 0; count < num_iter * num_iter_linsearch; ++count) {
  					 myfile_Drag << meandrag[count] << " ";
  				 }
  				 myfile_Drag.close();
  			 }
  			 else cout << "Unable to open file";
- 			 ///////////////////
 
-			//////////////////////////////
+
 		 }
 
-
-
-		 // }
-		 // cout << "A0 ... " << A(0) << endl;
-		 // cout << "A1 ... " << A(1) << endl;
-		 // cout << "A2 ... " << A(2) << endl;
-		 // cout << "A3 ... " << A(3) << endl;
-		 // cout << "A4 ... " << A(4) << endl;
 
      k_global = k_global + 1;
 		 double fx = 0.0;
@@ -2975,39 +2695,31 @@ class Drag_average
 		 grad(n-1) = dT;
 		 fx = grad_norm;
 
-		 // if (norm(grad_pre - grad) < 1e-11) {
-			//  if (id == 0) {
+
 			// 	 drag_global[l_global] = fx;
 			// 	 // create drag
 			// 	 std::ifstream file_D("../examples/" + outdir + "Drag.txt");
-			// 	 double D_temp[num_iter];
+
 			// 	 // Update Error
-			// 	 for (int i = 0; i < num_iter; ++i)
-			// 	 {
+
+
 			// 		 file_D >> D_temp[i];
-			// 	 }
+
 			// 	 // Save drag
 			// 	 ofstream myfile_D("../examples/" + outdir + "Drag.txt");
-			// 	 if (myfile_D.is_open())
-			// 	 {
-			// 		 // for (int count = 0; count < size; count++) {
-			// 		 for (int count = 0; count < num_iter; ++count) {
+
+
 			// 			 myfile_D << drag_global[count] << " ";
-			// 		 }
-			// 		 myfile_D.close();
-			// 	 }
-			// 	 else cout << "Unable to open file";
-			//  }
-		 //
+
+
 			//  l_global = l_global + 1;
-		 // }
 
 
      MPI_Barrier(MPI_COMM_WORLD);
 		 return fx;
 	 }
  };
-//////////////////////
+
 int main(int argc, char* argv[]) {
 // initialize the parameters
 initialization();
@@ -3021,7 +2733,6 @@ initialization();
 	double CT_0;
 	double CT_temp;
 
-	//
 
 	double meandrag[num_iter * num_iter_linsearch];
 	tau(0) = (double)size1 * dt;
@@ -3050,7 +2761,7 @@ AddSlashToPath(outdir_ADJ);
 ofstream myfile_command("../examples/" + outdir + "command.txt");
 if (myfile_command.is_open())
 {
-	// for (int count = 0; count < size; count++) {
+
 
 	myfile_command << "numner of total sample points, size1=" + std::to_string(size1) << "\n";
   myfile_command << "2 for pitch and plunge, size2=" + std::to_string(size2) << "\n";
@@ -3094,11 +2805,11 @@ int N = 2;
 ierr = MPI_Init(NULL, NULL);
 
 //  Get the number of processes.
-//
+
 ierr = MPI_Comm_size(MPI_COMM_WORLD, &p);
-//
+
 //  Get the individual process ID.
-//
+
 ierr = MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
 const int n = size3 * 4 + 1;
@@ -3150,7 +2861,7 @@ std::cout << niter << " iterations" << std::endl;
 std::cout << "x = \n" << y.transpose() << std::endl;
 std::cout << "f(x) = " << fx << std::endl;
 MPI_Barrier(MPI_COMM_WORLD);
-////////////////////
+
 MPI_Finalize();
 	return 0;
 }
